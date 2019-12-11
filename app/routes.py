@@ -18,13 +18,15 @@ def plot_png(num_x_points=50, linewidth=1):
     fig = Figure(figsize=(20,20))
     axis = fig.add_subplot(1, 1, 1)
     x_points = range(num_x_points)
-    axis.plot(x_points, [random.randint(1, 30) for x in x_points] )
+    axis.scatter(x_points, [random.randint(1, 30) for x in x_points])
+    axis.set_title("test", fontsize=40)
+    axis.set_xlabel("x")    
     output = io.BytesIO()
     FigureCanvasAgg(fig).print_png(output)
     return Response(output.getvalue(), mimetype="image/png")
 
 @app.route("/matplot-as-image.svg")
-def plot_svg(num_x_points=50):
+def plot_svg(num_x_points=2):
     """ 
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
@@ -32,11 +34,12 @@ def plot_svg(num_x_points=50):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
     x_points = range(num_x_points)
-    axis.plot(x_points, [random.randint(1, 30) for x in x_points])
+    axis.scatter(x_points, [random.randint(1, 30) for x in x_points])
+    axis.set_title("test", fontsize=40)
+    axis.set_xlabel("x")
     output = io.BytesIO()
     FigureCanvasSVG(fig).print_svg(output)
     return Response(output.getvalue(), mimetype="image/svg+xml")
-
 
 @app.route('/')
 @app.route('/index')

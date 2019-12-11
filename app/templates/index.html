@@ -21,6 +21,9 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" >
             <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom arguments:</h6>
+            <div style="padding-right: 6px; padding-left: 6px;" >
+            <input class="form-control" type="text" placeholder="title">
+            </div>
             <a class="collapse-item" href="buttons.html">Buttons</a>
             <a class="collapse-item" href="cards.html">Cards</a>
             </div>
@@ -30,5 +33,5 @@
 {% endblock %}
 
 {% block content %}
-    <img src="/matplot-as-image.png" alt="Chart" height="500" width="500">
+    <img src= {{ figure_url }} alt="Chart" height="500" width="500">
 {% endblock %}
