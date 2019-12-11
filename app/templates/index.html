@@ -1,8 +1,34 @@
 {% extends "base.html" %}
 
+{% block side_bar_content %}
+    <!-- Heading -->
+    <div class="sidebar-heading">Input</div>
+
+    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+        <span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span>
+        <input class="form-control" type="text" placeholder="input file">
+    </div>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Arguments</span>
+        </a>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" >
+            <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Custom arguments:</h6>
+            <a class="collapse-item" href="buttons.html">Buttons</a>
+            <a class="collapse-item" href="cards.html">Cards</a>
+            </div>
+        </div>
+        </li>
+
+{% endblock %}
+
 {% block content %}
-    <h1>Hi, {{ user.username }}!</h1>
-    {% for post in posts %}
-    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %}
+    <img src="/matplot-as-image.png" alt="Chart" height="500" width="500">
 {% endblock %}
