@@ -39,6 +39,6 @@
 {% block content %}
     <p> {{ sometext }} </p>
     {% if figure_url != None %}
-    <img src= "{{ url_for('static', filename=figure_url ) }}" alt="Chart" height="500" width="500">
+    <img src="data:image/png;base64,{{ figure_url }}" >
     {% endif %}
 {% endblock %}

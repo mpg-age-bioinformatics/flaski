@@ -7,11 +7,13 @@ import io
 import sys
 import random
 
+import matplotlib
+matplotlib.use('agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends.backend_svg import FigureCanvasSVG
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-
+import mpld3
 
 import base64
 
@@ -60,19 +62,23 @@ def index():
     form = InputForm(request.form)
     if request.method == 'POST':
         sometext="post"
+        #plt.close()
         fig = Figure()
-        axis = fig.add_subplot(1, 1, 1)
+        #axis = fig.add_subplot(1, 1, 1)
         x_points = range(50)
-        axis.scatter(x_points, [random.randint(1, 30) for x in x_points])
-        axis.set_title(request.form['title'], fontsize=40)
-        axis.set_xlabel("x")
+        plt.scatter(x_points, [random.randint(1, 30) for x in x_points])
         plt.savefig( "app/static/plot.png", format='png')
-        plt.close()
+        plt.title(request.form['title'], fontsize=40)
+        #axis.set_xlabel("x")
 
-        figure_url = "plot.png"
+        figfile = io.BytesIO()
+        plt.savefig(figfile, format='png')
+        plt.close()
+        figfile.seek(0)  # rewind to beginning of file
+        figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
     else:
         sometext="get"
         figure_url=None
 
-    return render_template('index.html', figure_url=figure_url, form=form, sometext=figure_url)
+    return render_template('index.html', figure_url=figure_url, form=form, sometext=sometext)
