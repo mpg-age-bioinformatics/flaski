@@ -77,8 +77,7 @@ def index():
         figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
     else:
-        
-        title=None
+        title="plot_title"
         sometext="get"
         figure_url=None
 

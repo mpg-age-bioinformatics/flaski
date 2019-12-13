@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block side_bar_content %}
+
+    <form action="{{ url_for('index') }}" method="post">
+
     <!-- Heading -->
     <div class="sidebar-heading">Input</div>
 
@@ -9,6 +12,7 @@
         <input class="form-control" type="text" placeholder="input file">
     </div>
 
+    
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
@@ -21,18 +25,21 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" >
             <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom arguments:</h6>
-            
+
             <div style="padding-right: 6px; padding-left: 6px;" >
-                <form action="{{ url_for('index') }}" method="post">
-                        <input type="text" name="title" value={{ title }}>
-                        <input type="submit">
-                    </form>
+                <input type="text" name="title" value={{ title }} size="24">
             </div>
+
             <a class="collapse-item" href="buttons.html">Buttons</a>
             <a class="collapse-item" href="cards.html">Cards</a>
             </div>
         </div>
         </li>
+    
+    <div style="padding-right: 6px; padding-left: 6px;" >
+    <input class="btn btn-secondary btn-lg btn-block" type="submit">
+    </div>
+    </form>
 
 {% endblock %}
 
