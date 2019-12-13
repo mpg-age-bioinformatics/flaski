@@ -21,8 +21,12 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" >
             <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom arguments:</h6>
+            
             <div style="padding-right: 6px; padding-left: 6px;" >
-            <input class="form-control" type="text" placeholder="title">
+                <form action="{{ url_for('index') }}" method="post">
+                        <input type="text" name="title">
+                        <input type="submit">
+                    </form>
             </div>
             <a class="collapse-item" href="buttons.html">Buttons</a>
             <a class="collapse-item" href="cards.html">Cards</a>
@@ -33,5 +37,8 @@
 {% endblock %}
 
 {% block content %}
-    <img src= {{ figure_url }} alt="Chart" height="500" width="500">
+    <p> {{ sometext }} </p>
+    {% if figure_url != None %}
+    <img src= "{{ url_for('static', filename=figure_url ) }}" alt="Chart" height="500" width="500">
+    {% endif %}
 {% endblock %}
