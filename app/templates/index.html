@@ -8,8 +8,12 @@
     <div class="sidebar-heading">Input</div>
 
     <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
-        <span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span>
-        <input class="form-control" type="text" placeholder="input file">
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" name="image" id="inputfile">
+            <label class="custom-file-label" for="inputfile">Select file..</label>
+        </div>
+        <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
+        <!--input class="form-control" type="text" placeholder="input file"-->
     </div>
 
     
@@ -36,7 +40,7 @@
         </div>
         </li>
     
-    <div style="padding-right: 6px; padding-left: 6px;" >
+    <div style="padding-right: 15px; padding-left: 15px;" >
     <input class="btn btn-secondary btn-lg btn-block" type="submit">
     </div>
     </form>
