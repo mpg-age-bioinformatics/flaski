@@ -2,14 +2,14 @@
 
 {% block side_bar_content %}
 
-    <form action="{{ url_for('index') }}" method="post">
+    <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data">
 
     <!-- Heading -->
     <div class="sidebar-heading">Input</div>
 
     <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
         <div class="custom-file">
-            <input type="file" class="custom-file-input" name="image" id="inputfile">
+            <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
             <label class="custom-file-label" for="inputfile">Select file..</label>
         </div>
         <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
@@ -30,8 +30,8 @@
             <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom arguments:</h6>
 
-            <div style="padding-right: 6px; padding-left: 6px;" >
-                <input type="text" name="title" value={{ title }} size="24">
+            <div style="padding-right: 20px; padding-left: 20px;" >
+                <input type="text" name="title" value={{ title }} size="20">
             </div>
 
             <a class="collapse-item" href="buttons.html">Buttons</a>

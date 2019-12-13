@@ -1,6 +1,7 @@
 from flask import render_template, Flask, Response, request, url_for, redirect
 from app import app
 from app.model import InputForm
+from werkzeug.utils import secure_filename
 
 import os
 import io
@@ -62,6 +63,11 @@ def index():
     form = InputForm(request.form)
 
     if request.method == 'POST':
+
+        inputfile = request.files["inputfile"]
+        filename = secure_filename(inputfile.filename)
+        print(inputfile)
+
         sometext="post"
         title=request.form['title']
 
