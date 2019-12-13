@@ -60,16 +60,15 @@ def plot_svg(num_x_points=2):
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = InputForm(request.form)
+
     if request.method == 'POST':
         sometext="post"
-        #plt.close()
+        title=request.form['title']
+
         fig = Figure()
-        #axis = fig.add_subplot(1, 1, 1)
         x_points = range(50)
         plt.scatter(x_points, [random.randint(1, 30) for x in x_points])
-        plt.savefig( "app/static/plot.png", format='png')
-        plt.title(request.form['title'], fontsize=40)
-        #axis.set_xlabel("x")
+        plt.title(title, fontsize=40)
 
         figfile = io.BytesIO()
         plt.savefig(figfile, format='png')
@@ -78,7 +77,9 @@ def index():
         figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
     else:
+        
+        title=None
         sometext="get"
         figure_url=None
 
-    return render_template('index.html', figure_url=figure_url, form=form, sometext=sometext)
+    return render_template('index.html', figure_url=figure_url, form=form, sometext=sometext, title=title)
