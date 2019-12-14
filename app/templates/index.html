@@ -10,13 +10,42 @@
     <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
         <div class="custom-file">
             <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
-            <label class="custom-file-label" for="inputfile">Select file..</label>
+            <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
+            <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
         </div>
         <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
         <!--input class="form-control" type="text" placeholder="input file"-->
     </div>
 
+
     
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+
+    {% if filename != "Select file.." %}
+
+    <div class="sidebar-heading">X values:</div>
+    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+        <select title="thing" name=xcols method="GET" action="/" style="width:200px">
+            {% for xcol in xcols %}
+                <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>"
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <div class="sidebar-heading">Y values:</div>
+    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+        <select name=ycols method="GET" action="/" style="width:200px">
+            {% for ycol in ycols %}
+                <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>"
+            {% endfor %}
+        </select>
+    </div>
+
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
@@ -28,17 +57,17 @@
         </a>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" >
             <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Custom arguments:</h6>
+                <h6 class="collapse-header">Custom arguments:</h6>
 
-            <div style="padding-right: 20px; padding-left: 20px;" >
-                <input type="text" name="title" value={{ title }} size="20">
-            </div>
+                <div style="padding-right: 20px; padding-left: 20px;" >
+                    <input type="text" name="title" value={{ title }} size="20">
+                </div>
 
-            <a class="collapse-item" href="buttons.html">Buttons</a>
-            <a class="collapse-item" href="cards.html">Cards</a>
             </div>
         </div>
-        </li>
+    </li>
+    {% endif %}
+
     
     <div style="padding-right: 15px; padding-left: 15px;" >
     <input class="btn btn-secondary btn-lg btn-block" type="submit">
@@ -48,8 +77,32 @@
 {% endblock %}
 
 {% block content %}
-    <p> {{ sometext }} </p>
-    {% if figure_url != None %}
+    {% if sometext %}
+        <!-- Basic Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+            </div>
+            <div class="card-body">
+                {{ sometext }} 
+            </div>
+        </div>
+    {% endif %}
+
+    {% if error_message %}
+        <!-- Basic Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+            </div>
+            <div class="card-body">
+                {{ error_message }} 
+            </div>
+        </div>
+    {% endif %}
+
+    {% if figure_url %}
     <img src="data:image/png;base64,{{ figure_url }}" >
     {% endif %}
+
 {% endblock %}
