@@ -38,6 +38,17 @@ ALLOWED_EXTENSIONS=["xlsx","tsv","csv"]
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           
+def make_figure(df,pa):
+    x=df[pa["xvals"]].tolist()
+    y=df[pa["yvals"]].tolist()
+
+    # MAIN FIGURE
+    fig = Figure()
+    plt.scatter(x, y, marker=pa["marker"])
+    plt.title(pa['title'], fontsize=40)
+
+    return fig
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -118,13 +129,9 @@ def index():
         
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
-        x=df[plot_arguments["xvals"]].tolist()
-        y=df[plot_arguments["yvals"]].tolist()
 
-        # MAIN FIGURE
-        fig = Figure()
-        plt.scatter(x, y, marker=plot_arguments["marker"])
-        plt.title(plot_arguments['title'], fontsize=40)
+        # CALL FIGURE FUNCTION
+        fig=make_figure(df,plot_arguments)
 
         # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
         figfile = io.BytesIO()
@@ -146,6 +153,7 @@ def index():
         session["fileread"]=None
 
         # DEFAULT ARGUMENTS
+        # MARKER: https://matplotlib.org/3.1.1/api/markers_api.html
         plot_arguments={
             "title":'plot title',\
             "xcols":[],\
