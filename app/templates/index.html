@@ -174,6 +174,31 @@
 
     {% endif %}
 
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- -------------------- SESSION ARGUMENTS ---------------------- -->
+
+    <li class="nav-item" style="padding-top: 0px;">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top: 0px;">
+                <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                <span>Session control</span>
+            </a>
+            <div id="collapseSession" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
+                <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
+                    <!--h6 class="collapse-header">Marker arguments:</h6-->
+                    <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
+                        
+                        <!-- ARGUMENTS -->
+                        <label>Download session:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="session_download_check"/>
+                        <label>File name:<input type="text" name="session_downloadn" value='{{ session_downloadn }}' size="20">
+                        
+                    </div>
+    
+                </div>
+            </div>
+        </li>
+
     
     <div style="padding-right: 15px; padding-left: 15px;" >
     <input class="btn btn-secondary btn-lg btn-block" type="submit">

@@ -94,7 +94,8 @@ def figure_defaults():
         "ylabels":"14",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
-        "downloadn":"scatterplot"
+        "downloadn":"scatterplot",\
+        "session_downloadn":"MySession.scatter.plot"
     }
 
     # lists without a default value on the arguments
