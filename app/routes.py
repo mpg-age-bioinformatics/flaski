@@ -1,4 +1,4 @@
-from flask import render_template, Flask, Response, request, url_for, redirect, session
+from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file
 from app import app
 from app.model import InputForm
 from werkzeug.utils import secure_filename
@@ -91,7 +91,10 @@ def figure_defaults():
         "xlabels":"14",\
         "ylabel":"y",\
         "ylabel_size":standard_sizes,\
-        "ylabels":"14"
+        "ylabels":"14",\
+        "download_format":["png","pdf","svg"],\
+        "downloadf":"pdf",\
+        "downloadn":"scatterplot"
     }
 
     # lists without a default value on the arguments
@@ -192,6 +195,16 @@ def index():
 
         # CALL FIGURE FUNCTION
         fig=make_figure(df,plot_arguments)
+
+        # DOWNLOAD FIGURE
+        if request.form.get('download_check'):
+            figfile = io.BytesIO()
+            mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
+            plt.savefig(figfile, format=plot_arguments["downloadf"])
+            plt.close()
+            figfile.seek(0)  # rewind to beginning of file
+            return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
+
 
         # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
         figfile = io.BytesIO()

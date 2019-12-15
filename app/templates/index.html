@@ -144,6 +144,33 @@
         </div>
     </li>
 
+    <!-- -------------------- DOWNLOAD ARGUMENTS ---------------------- -->
+
+    <li class="nav-item" style="padding-top: 0px;">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                <i class="fas fa-fw fa-download"></i>
+                <span>Download</span>
+            </a>
+            <div id="collapseDownload" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
+                <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
+                    <!--h6 class="collapse-header">Marker arguments:</h6-->
+                    <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
+                        
+                        <!-- ARGUMENTS -->
+                        <label>Download plot:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="download_check"/>
+                        <label>Format:<select name=download_format method="GET" action="/" style="width:152px">
+                            {% for download_format_ in download_format %}
+                                <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
+                            {% endfor %}
+                        </select>
+                        <label>File name:<input type="text" name="downloadn" value='{{ downloadn }}' size="20">
+                        
+                    </div>
+    
+                </div>
+            </div>
+        </li>
+
 
     {% endif %}
 

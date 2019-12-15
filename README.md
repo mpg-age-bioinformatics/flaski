@@ -6,34 +6,37 @@ starting redis:
 redis-server redis.conf
 ```
 
+##################
 
+def download():
+    file = open('damlevels.csv','r')
+    returnfile = file.read().encode('latin-1')
+    file.close()
+    return Response(returnfile,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=damlevels.csv"})
 
+@app.route('/item/<int:appitemid>/')
+@app.route('/item/<int:appitemid>/<path:anythingcanbehere>')
+def show_item(appitemid, anythingcanbehere=None):
 
-    <div class="sidebar-heading">X values:</div>
-    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
-        <select name=xcols method="GET" action="/">
-            {% for xcol in xcols %}
-                {% if {{xvals}} == {{xcol}} %}
-                    <option value={{xcol}} SELECTED>{{xcol}}</option>"
-                {% else %}
-                    <option value={{xcol}}>{{xcol}}</option>"
-                {% endif %}
-            {% endfor %}
-        </select>
-    </div>
+##################
 
-    <!-- Divider -->
-    <hr class="sidebar-divider d-none d-md-block">
+@api.route("/files/<path:path>")
+def get_file(path):
+    """Download a file."""
+    return send_from_directory(UPLOAD_DIRECTORY, path, as_attachment=True)
 
-    <div class="sidebar-heading">Y values:</div>
-    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
-        <select name=ycols method="GET" action="/">
-            {% for ycol in ycols %}
-                {% if {{yvals}} == {{ycol}} %}
-                    <option value={{ycol}} SELECTED>{{ycol}}</option>"
-                {% else %}
-                    <option value={{ycol}}>{{ycol}}</option>"
-                {% endif %}                
-            {% endfor %}
-        </select>
-    </div>
+##################
+
+@app.route('/return-files/')
+def return_files_tut():
+	try:
+		return send_file('/var/www/PythonProgramming/PythonProgramming/static/images/python.jpg', attachment_filename='python.jpg')
+	except Exception as e:
+		return str(e)
+
+###################
+
+https://stackoverflow.com/questions/24577349/flask-download-a-file
