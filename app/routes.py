@@ -98,15 +98,16 @@ def figure_defaults():
     excluded_list=[]
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
-    lists={}
+    # dictionary of the type 
+    # {"key_list_name":"key_default_value"} 
+    # eg. {"marker_size":"markers"}
+    lists={} 
     for i in range(len(allargs)):
         if type(plot_arguments[allargs[i]]) == type([]):
             if allargs[i] not in excluded_list:
                 lists[allargs[i]]=allargs[i+1]
 
     return plot_arguments, lists
-    #lists={"xcols":"xvals","ycols":"yvals","markers":"marker",\
-    #        "title_size":"titles","xlabel_size":"xlabels", "ylabel_size":"ylabels"}
 
 
 @app.route('/', methods=['GET', 'POST'])
