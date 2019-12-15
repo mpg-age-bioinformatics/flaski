@@ -45,10 +45,69 @@ def make_figure(df,pa):
 
     # MAIN FIGURE
     fig = Figure()
-    plt.scatter(x, y, marker=pa["marker"])
+    
+    plt.scatter(x, y, \
+        marker=pa["marker"], \
+        s=int(pa["markers"]),\
+        c=pa["markerc"])
+
     plt.title(pa['title'], fontsize=int(pa["titles"]))
+    plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
+    plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
 
     return fig
+
+def figure_defaults():
+    
+    # https://matplotlib.org/3.1.1/api/markers_api.html
+    # https://matplotlib.org/2.0.2/api/colors_api.html
+
+    standard_sizes=[ str(i) for i in list(range(101)) ]
+
+    # lists allways need to have thee default value after the list
+    # eg.:
+    # "title_size":standard_sizes,\
+    # "titles":"20"
+
+    plot_arguments={
+        "title":'plot title',\
+        "title_size":standard_sizes,\
+        "titles":"20",\
+        "xcols":[],\
+        "xvals":None,\
+        "ycols":[],\
+        "yvals":None,\
+        "markerstyles":[".",",","o","v","^","<",">",\
+            "1","2","3","4","8",\
+            "s","p","*","h","H","+","x",\
+            "X","D","d","|","_"],\
+        "marker":".",\
+        "marker_size":standard_sizes,\
+        "markers":"50",\
+        "marker_color":["blue","green","red","cyan","magenta","yellow","black","white"],\
+        "markerc":"black",\
+        "xlabel":"x",\
+        "xlabel_size":standard_sizes,\
+        "xlabels":"14",\
+        "ylabel":"y",\
+        "ylabel_size":standard_sizes,\
+        "ylabels":"14"
+    }
+
+    # lists without a default value on the arguments
+    excluded_list=[]
+    # lists with a default value on the arguments
+    allargs=list(plot_arguments.keys())
+    lists={}
+    for i in range(len(allargs)):
+        if type(plot_arguments[allargs[i]]) == type([]):
+            if allargs[i] not in excluded_list:
+                lists[allargs[i]]=allargs[i+1]
+
+    return plot_arguments, lists
+    #lists={"xcols":"xvals","ycols":"yvals","markers":"marker",\
+    #        "title_size":"titles","xlabel_size":"xlabels", "ylabel_size":"ylabels"}
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -68,9 +127,8 @@ def index():
         fileread = inputfile.read()
 
         # SELECTION LISTS DO NOT GET UPDATED 
-        lists={"xcols":"xvals","ycols":"yvals","markers":"marker",\
-            "title_size":"titles"}
-
+        lists=session["lists"]
+    
         # USER INPUT GETS UPDATED TO THE LATEST INPUT
         # WITH THE EXCEPTION OF SELECTION LISTS
         plot_arguments = session["plot_arguments"]
@@ -153,22 +211,9 @@ def index():
         session["filename"]="Select file.."
         session["fileread"]=None
 
-        # DEFAULT ARGUMENTS
-        # MARKER: https://matplotlib.org/3.1.1/api/markers_api.html
-        plot_arguments={
-            "title":'plot title',\
-            "title_size":list(range(101))
-            "titles":20
-            "xcols":[],\
-            "xvals":None,\
-            "ycols":[],\
-            "yvals":None,\
-            "markers":[".",",","o","v","^","<",">",\
-                "1","2","3","4","8",\
-                "s","p","*","h","H","+","x",\
-                "X","D","d","|","_"],\
-            "marker":"."
-        }
+        plot_arguments, lists=figure_defaults()
+
         session["plot_arguments"]=plot_arguments
+        session["lists"]=lists
 
         return render_template('index.html', form=form, filename=session["filename"], **plot_arguments)

@@ -65,18 +65,54 @@
             <div class="bg-white py-2 collapse-inner rounded" style="padding-bottom: 0px;">
                 <!--h6 class="collapse-header">Marker arguments:</h6-->
                 <div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px;" >
-
+                    
+                    <!-- ARGUMENTS -->
                     <label>Title:<input type="text" name="title" value='{{ title }}' size="20">
                     <label>Title size:<select name=title_size method="GET" action="/" style="width:152px">
                         {% for title_size_ in title_size %}
                             <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>"
                         {% endfor %}
                     </select>
+
                 </div>
 
             </div>
         </div>
     </li>
+
+
+    <!-- -------------------- AXES ARGUMENTS ---------------------- -->
+
+    <li class="nav-item" style="padding-top: 0px;">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAxes" aria-expanded="true" aria-controls="collapseAxes" style="padding-top: 0px;">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Axes</span>
+            </a>
+            <div id="collapseAxes" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
+                <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
+                    <!--h6 class="collapse-header">Marker arguments:</h6-->
+                    <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
+                        
+                        <!-- ARGUMENTS -->
+                        <label>x label:<input type="text" name="xlabel" value='{{ xlabel }}' size="20">
+                        <label>x label size:<select name=xlabel_size method="GET" action="/" style="width:152px">
+                            {% for xlabel_size_ in xlabel_size %}
+                                <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>"
+                            {% endfor %}
+                        </select>
+                        <label>y label:<input type="text" name="ylabel" value='{{ ylabel }}' size="20">
+                        <label>y label size:<select name=ylabel_size method="GET" action="/" style="width:152px">
+                            {% for ylabel_size_ in ylabel_size %}
+                                <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>"
+                            {% endfor %}
+                        </select>
+    
+                    </div>
+    
+                </div>
+            </div>
+        </li>
+
 
     <!-- -------------------- MARKER ARGUMENTS ---------------------- -->
 
@@ -89,10 +125,16 @@
             <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
                 <!--h6 class="collapse-header">Marker arguments:</h6-->
                 <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
-
-                    <label>Shape:<select name=markers method="GET" action="/" style="width:152px">
-                        {% for markers_ in markers %}
-                            <option value="{{markers_}}" {% if markers_==marker %} selected {% endif %}>{{markers_}}</option>"
+                    
+                    <!-- ARGUMENTS -->
+                    <label>Shape:<select name=markerstyles method="GET" action="/" style="width:152px">
+                        {% for markerstyles_ in markerstyles %}
+                            <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>"
+                        {% endfor %}
+                    </select>
+                    <label>Size:<select name=marker_size method="GET" action="/" style="width:152px">
+                        {% for marker_size_ in marker_size %}
+                            <option value="{{marker_size_}}" {% if marker_size_==markers %} selected {% endif %}>{{marker_size_}}</option>"
                         {% endfor %}
                     </select>
 
