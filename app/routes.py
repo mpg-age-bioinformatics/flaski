@@ -45,7 +45,7 @@ def make_figure(df,pa):
 
     # MAIN FIGURE
     fig = Figure()
-    
+
     plt.scatter(x, y, \
         marker=pa["marker"], \
         s=int(pa["markers"]),\
@@ -129,7 +129,7 @@ def index():
         # SELECTION LISTS DO NOT GET UPDATED 
         lists=session["lists"]
     
-        # USER INPUT GETS UPDATED TO THE LATEST INPUT
+        # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
         # WITH THE EXCEPTION OF SELECTION LISTS
         plot_arguments = session["plot_arguments"]
         for a in list(plot_arguments.keys()):
