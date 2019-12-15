@@ -39,7 +39,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -51,16 +50,34 @@ def index():
     form = InputForm(request.form)
 
     if request.method == 'POST':
+
+        # READ INPUT FILE
         inputfile = request.files["inputfile"]
         filename = secure_filename(inputfile.filename)
         fileread = inputfile.read()
 
+        # SELECTION LISTS DO NOT GET UPDATED 
+        lists={"xcols":"xvals","ycols":"yvals","markers":"marker"}
+
+        # USER INPUT GETS UPDATED TO THE LATEST INPUT
+        # WITH THE EXCEPTION OF SELECTION LISTS
         plot_arguments = session["plot_arguments"]
         for a in list(plot_arguments.keys()):
-            if ( a in list(request.form.keys()) ) & ( a not in ["xcols","ycols"] ):
+            if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys()) ):
                 plot_arguments[a]=request.form[a]
-        session["plot_arguments"] = plot_arguments
+
+        # VALUES SELECTED FROM SELECTION LISTS 
+        # GET UPDATED TO THE LATEST CHOICE
+        for k in list(lists.keys()):
+            if k in list(request.form.keys()):
+                plot_arguments[lists[k]]=request.form[k]
+
+        # UPDATE SESSION VALUES
+        session["plot_arguments"]=plot_arguments
         
+        # IF THE CURRENT FILE IS DIFERENT FROM 
+        # THE FILE CURRENTLY IN MEMORY FOR THIS SESSION
+        # THAN UPDATE THE SESSION FILE
         if session["fileread"] != fileread and \
             filename != "" and \
             filename != "Select file..":
@@ -76,10 +93,11 @@ def index():
                 elif extension == "tsv":
                     df=pd.read_csv(fileread,sep="\t")
                 
-                #print(df.columns.tolist())
-
+                session["df"]=df.to_json()
+                
                 cols=df.columns.tolist()
 
+                # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                 if (session["plot_arguments"]["xvals"] not in cols) & (session["plot_arguments"]["yvals"] not in cols):
 
                     session["plot_arguments"]["xcols"]=cols
@@ -93,40 +111,52 @@ def index():
                     return render_template('index.html', form=form, filename=filename, sometext=sometext, **plot_arguments)
                 
             else:
+                # IF UPLOADED FILE DOES NOT CONTAIN A VALIDA EXTENSION PLEASE UPDATE
                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                 has the correct format and respective extension and try uploadling it again." %filename
                 return render_template('index.html', form=form, filename="Select file..", error_message=error_message, **plot_arguments)
-        else:
-            filename=session["filename"]
+        
+        # READ INPUT DATA FROM SESSION JSON
+        df=pd.read_json(session["df"])
+        x=df[plot_arguments["xvals"]].tolist()
+        y=df[plot_arguments["yvals"]].tolist()
 
-        sometext="post"
-
+        # MAIN FIGURE
         fig = Figure()
-        x_points = range(50)
-        plt.scatter(x_points, [random.randint(1, 30) for x in x_points])
+        plt.scatter(x, y, marker=plot_arguments["marker"])
         plt.title(plot_arguments['title'], fontsize=40)
 
+        # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
         figfile = io.BytesIO()
         plt.savefig(figfile, format='png')
         plt.close()
         figfile.seek(0)  # rewind to beginning of file
         figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
+        # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
+        filename=session["filename"]
         plot_arguments=session["plot_arguments"]
         return render_template('index.html', form=form, figure_url=figure_url, filename=filename, **plot_arguments)
 
     else:
         #sometext="get"
 
+        # INITIATE SESSION
         session["filename"]="Select file.."
         session["fileread"]=None
 
+        # DEFAULT ARGUMENTS
         plot_arguments={
             "title":'plot title',\
             "xcols":[],\
             "xvals":None,\
             "ycols":[],\
-            "yvals":None
+            "yvals":None,\
+            "markers":[".",",","o","v","^","<",">",\
+                "1","2","3","4","8",\
+                "s","p","*","h","H","+","x",\
+                "X","D","d","|","_"],\
+            "marker":"."
         }
         session["plot_arguments"]=plot_arguments
 

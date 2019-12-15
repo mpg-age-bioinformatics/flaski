@@ -4,6 +4,7 @@
 
     <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data">
 
+    <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
     <!-- Heading -->
     <div class="sidebar-heading">Input</div>
 
@@ -16,17 +17,17 @@
         <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
         <!--input class="form-control" type="text" placeholder="input file"-->
     </div>
-
-
+    <!-- ################################################################ -->
     
+
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
-
     {% if filename != "Select file.." %}
 
+    <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
     <div class="sidebar-heading">X values:</div>
-    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
         <select title="thing" name=xcols method="GET" action="/" style="width:200px">
             {% for xcol in xcols %}
                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>"
@@ -34,11 +35,8 @@
         </select>
     </div>
 
-    <!-- Divider -->
-    <hr class="sidebar-divider d-none d-md-block">
-
     <div class="sidebar-heading">Y values:</div>
-    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
         <select name=ycols method="GET" action="/" style="width:200px">
             {% for ycol in ycols %}
                 <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>"
@@ -46,26 +44,61 @@
         </select>
     </div>
 
+
     <!-- Divider -->
-    <hr class="sidebar-divider d-none d-md-block">
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+    Arguments:
+    </div>
+
+    <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+    <li class="nav-item" style="padding-bottom: 0px;">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
             <i class="fas fa-fw fa-cog"></i>
-            <span>Arguments</span>
+            <span>Figure</span>
         </a>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" >
-            <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Custom arguments:</h6>
+        <div id="collapseFigure" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-bottom: 0px;" >
+            <div class="bg-white py-2 collapse-inner rounded" style="padding-bottom: 0px;">
+                <!--h6 class="collapse-header">Marker arguments:</h6-->
+                <div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px;" >
 
-                <div style="padding-right: 20px; padding-left: 20px;" >
-                    <input type="text" name="title" value={{ title }} size="20">
+                    <label>Title:<input type="text" name="title" value='{{ title }}' size="20">
+
                 </div>
 
             </div>
         </div>
     </li>
+
+    <!-- -------------------- MARKER ARGUMENTS ---------------------- -->
+
+    <li class="nav-item" style="padding-top: 0px;">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMarker" aria-expanded="true" aria-controls="collapseMarker" style="padding-top: 0px;">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Marker</span>
+        </a>
+        <div id="collapseMarker" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
+            <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
+                <!--h6 class="collapse-header">Marker arguments:</h6-->
+                <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
+
+                    <label>Shape:<select name=markers method="GET" action="/" style="width:152px">
+                        {% for markers_ in markers %}
+                            <option value="{{markers_}}" {% if markers_==marker %} selected {% endif %}>{{markers_}}</option>"
+                        {% endfor %}
+                    </select>
+
+                </div>
+
+            </div>
+        </div>
+    </li>
+
+
     {% endif %}
 
     
@@ -76,9 +109,12 @@
 
 {% endblock %}
 
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
 {% block content %}
+
+    <!-- INFORMATION CARD -->
     {% if sometext %}
-        <!-- Basic Card Example -->
         <div class="card shadow mb-4">
             <div class="card-header py-3", >
                 <h6 class="m-0 font-weight-bold text-primary">Info</h6>
@@ -89,8 +125,8 @@
         </div>
     {% endif %}
 
+    <!-- ATTENTION CARD -->
     {% if error_message %}
-        <!-- Basic Card Example -->
         <div class="card shadow mb-4">
             <div class="card-header py-3", >
                 <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
