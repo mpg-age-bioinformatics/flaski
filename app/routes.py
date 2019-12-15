@@ -1,4 +1,4 @@
-from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file
+from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file, flash, jsonify
 from app import app
 from app.model import InputForm
 from werkzeug.utils import secure_filename
@@ -11,6 +11,7 @@ import os
 import io
 import sys
 import random
+import json
 
 import matplotlib
 matplotlib.use('agg')
@@ -44,8 +45,8 @@ def make_figure(df,pa):
     y=df[pa["yvals"]].tolist()
 
     # MAIN FIGURE
-    fig = Figure()
-
+    #fig = Figure()
+    fig=plt.figure()
     plt.scatter(x, y, \
         marker=pa["marker"], \
         s=int(pa["markers"]),\
@@ -113,7 +114,6 @@ def figure_defaults():
 
     return plot_arguments, lists
 
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -155,7 +155,8 @@ def index():
         # THAN UPDATE THE SESSION FILE
         if session["fileread"] != fileread and \
             filename != "" and \
-            filename != "Select file..":
+            filename != "Select file.." and \
+            filename != "-session-data-" :
             if allowed_file(inputfile.filename):
                 session["fileread"]=fileread
                 session["filename"]=filename
@@ -197,16 +198,6 @@ def index():
         # CALL FIGURE FUNCTION
         fig=make_figure(df,plot_arguments)
 
-        # DOWNLOAD FIGURE
-        if request.form.get('download_check'):
-            figfile = io.BytesIO()
-            mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
-            plt.savefig(figfile, format=plot_arguments["downloadf"])
-            plt.close()
-            figfile.seek(0)  # rewind to beginning of file
-            return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
-
-
         # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
         figfile = io.BytesIO()
         plt.savefig(figfile, format='png')
@@ -231,4 +222,43 @@ def index():
         session["plot_arguments"]=plot_arguments
         session["lists"]=lists
 
+        #print(session.keys(),session)
+        #sys.stdout.flush()
+
         return render_template('index.html', form=form, filename=session["filename"], **plot_arguments)
+
+@app.route('/figure', methods=['GET','POST'])
+def figure():
+    # READ INPUT DATA FROM SESSION JSON
+    df=pd.read_json(session["df"])
+
+    plot_arguments=session["plot_arguments"]
+
+    # CALL FIGURE FUNCTION
+    fig=make_figure(df,plot_arguments)
+
+    #flash('Figure is being sent to download but will not be updated on your screen.')
+    figfile = io.BytesIO()
+    mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
+    plt.savefig(figfile, format=plot_arguments["downloadf"])
+    plt.close()
+    figfile.seek(0)  # rewind to beginning of file
+    return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
+
+@app.route('/downloadsession', methods=['GET','POST'])
+def downloadsession():
+    # READ INPUT DATA FROM SESSION JSON
+    session_={}
+    for k in list(session.keys()):
+        session_[k]=session[k]
+    session_["filename"]="-session-data-"
+    session_["fileread"]=None
+
+    session_file = io.BytesIO()
+    session_file.write(json.dumps(session_).encode())
+    session_file.seek(0)
+
+    # json.load(session_file.read())
+
+    plot_arguments=session["plot_arguments"]
+    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_downloadn"]+".json" )

@@ -16,9 +16,7 @@
         </div>
         <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
         <!--input class="form-control" type="text" placeholder="input file"-->
-    </div>
-    <!-- ################################################################ -->
-    
+    </div>    
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
@@ -144,12 +142,22 @@
         </div>
     </li>
 
+    {% endif %}
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
+
+    {% if figure_url %}
+
     <!-- -------------------- DOWNLOAD ARGUMENTS ---------------------- -->
 
     <li class="nav-item" style="padding-top: 0px;">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
                 <i class="fas fa-fw fa-download"></i>
-                <span>Download</span>
+                <span>Figure</span>
             </a>
             <div id="collapseDownload" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
                 <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
@@ -157,7 +165,7 @@
                     <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
                         
                         <!-- ARGUMENTS -->
-                        <label>Download plot:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="download_check"/>
+                        <!-- label>Download plot:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="download_check"/ -->
                         <label>Format:<select name=download_format method="GET" action="/" style="width:152px">
                             {% for download_format_ in download_format %}
                                 <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
@@ -171,33 +179,29 @@
             </div>
         </li>
 
-
     {% endif %}
-
-    <!-- Divider -->
-    <hr class="sidebar-divider">
 
     <!-- -------------------- SESSION ARGUMENTS ---------------------- -->
 
     <li class="nav-item" style="padding-top: 0px;">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top: 0px;">
-                <i class="fas fa-fw fa-th" aria-hidden="true"></i>
-                <span>Session control</span>
-            </a>
-            <div id="collapseSession" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
-                <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
-                    <!--h6 class="collapse-header">Marker arguments:</h6-->
-                    <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
-                        
-                        <!-- ARGUMENTS -->
-                        <label>Download session:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="session_download_check"/>
-                        <label>File name:<input type="text" name="session_downloadn" value='{{ session_downloadn }}' size="20">
-                        
-                    </div>
-    
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top: 0px;">
+            <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+            <span>Session</span>
+        </a>
+        <div id="collapseSession" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;">
+            <div class="bg-white py-2 collapse-inner rounded" style="padding-top: 0px;">
+                <!--h6 class="collapse-header">Marker arguments:</h6-->
+                <div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" >
+                    
+                    <!-- ARGUMENTS -->
+                    <!--label>Download session:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="session_download_check"/-->
+                    <label>File name:<input type="text" name="session_downloadn" value='{{ session_downloadn }}' size="20">
+                    
                 </div>
+
             </div>
-        </li>
+        </div>
+    </li>
 
     
     <div style="padding-right: 15px; padding-left: 15px;" >
@@ -236,7 +240,29 @@
     {% endif %}
 
     {% if figure_url %}
-    <img src="data:image/png;base64,{{ figure_url }}" >
+        <img src="data:image/png;base64,{{ figure_url }}" >
+
+        <!--div class="d-sm-flex align-items-center justify-content-between mb-4" style="padding-top: 2px;" -->
+        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+            <div style="padding-right: 2px;">
+            <form action="{{ url_for('figure') }}" method="post" enctype="multipart/form-data">
+                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                    <i class="fas fa-download fa-sm text-white-50"></i> Figure
+                </button>
+            </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+            <form action="{{ url_for('downloadsession') }}" method="post" enctype="multipart/form-data">
+            <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    <i class="fas fa-th fa-sm text-white-50"></i> Session
+            </button>
+            </form>
+            </div>
+
+        </div>
+
     {% endif %}
 
 {% endblock %}
