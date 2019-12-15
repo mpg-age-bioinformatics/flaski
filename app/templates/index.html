@@ -67,7 +67,11 @@
                 <div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px;" >
 
                     <label>Title:<input type="text" name="title" value='{{ title }}' size="20">
-
+                    <label>Title size:<select name=title_size method="GET" action="/" style="width:152px">
+                        {% for title_size_ in title_size %}
+                            <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>"
+                        {% endfor %}
+                    </select>
                 </div>
 
             </div>

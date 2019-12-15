@@ -46,7 +46,7 @@ def make_figure(df,pa):
     # MAIN FIGURE
     fig = Figure()
     plt.scatter(x, y, marker=pa["marker"])
-    plt.title(pa['title'], fontsize=40)
+    plt.title(pa['title'], fontsize=int(pa["titles"]))
 
     return fig
 
@@ -68,7 +68,8 @@ def index():
         fileread = inputfile.read()
 
         # SELECTION LISTS DO NOT GET UPDATED 
-        lists={"xcols":"xvals","ycols":"yvals","markers":"marker"}
+        lists={"xcols":"xvals","ycols":"yvals","markers":"marker",\
+            "title_size":"titles"}
 
         # USER INPUT GETS UPDATED TO THE LATEST INPUT
         # WITH THE EXCEPTION OF SELECTION LISTS
@@ -156,6 +157,8 @@ def index():
         # MARKER: https://matplotlib.org/3.1.1/api/markers_api.html
         plot_arguments={
             "title":'plot title',\
+            "title_size":list(range(101))
+            "titles":20
             "xcols":[],\
             "xvals":None,\
             "ycols":[],\
