@@ -57,6 +57,13 @@
                       {% endfor %}
                       <!--input type="password" class="form-control form-control-user" id="InputPassword" placeholder="Password"-->
                     </div>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-info" style="background-color: coral;" role="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
                     <div class="form-group">
                       <div class="custom-control custom-checkbox small">
                         {{ form.remember_me() }}

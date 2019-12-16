@@ -92,6 +92,13 @@
                 <a href="index.html" class="btn btn-facebook btn-user btn-block">
                   <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
                 </a-->
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
                 {{ form.submit() }}
               </form>
               <hr>
@@ -99,7 +106,7 @@
                 <a class="small" href="forgot-password.html">Forgot Password?</a>
               </div>
               <div class="text-center">
-                <a class="small" href="login.html">Already have an account? Login!</a>
+                <a class="small" href="{{ url_for('login') }}">Already have an account? Login!</a>
               </div>
             </div>
           </div>

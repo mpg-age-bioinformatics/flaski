@@ -144,11 +144,12 @@ def register():
     if form.validate_on_submit():
         user = User(firstname=form.firstname.data,\
                 lastname=form.lastname.data,\
-                email=form.email.data)
+                email=form.email.data,\
+                organization=form.organization.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        #flash('Congratulations, you are now a registered user!')
+        flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
