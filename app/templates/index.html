@@ -195,7 +195,19 @@
                     
                     <!-- ARGUMENTS -->
                     <!--label>Download session:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="session_download_check"/-->
-                    <label>File name:<input type="text" name="session_downloadn" value='{{ session_downloadn }}' size="20">
+
+                    <label>Upload session file:<div class="input-group margin-bottom-sm" style="padding-right: 0px; padding-bottom: 12px;" >
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile">
+                            <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
+                            <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                        </div>
+                        <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
+                        <!--input class="form-control" type="text" placeholder="input file"-->
+                    </div>  
+                    {% if filename != "Select file.." %}
+                    <label>Download file name:<input type="text" name="session_downloadn" value='{{ session_downloadn }}' size="20">
+                    {% endif %}
                     
                 </div>
 

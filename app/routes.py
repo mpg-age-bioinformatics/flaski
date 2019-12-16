@@ -96,13 +96,18 @@ def figure_defaults():
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
-        "session_downloadn":"MySession.scatter.plot"
+        "session_downloadn":"MySession.scatter.plot",\
+        "inputsessionfile":"Select file.."
     }
+    # not update list
+    notUpdateList=["inputsessionfile"]
 
     # lists without a default value on the arguments
     excluded_list=[]
+
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
+
     # dictionary of the type 
     # {"key_list_name":"key_default_value"} 
     # eg. {"marker_size":"markers"}
@@ -112,7 +117,7 @@ def figure_defaults():
             if allargs[i] not in excluded_list:
                 lists[allargs[i]]=allargs[i+1]
 
-    return plot_arguments, lists
+    return plot_arguments, lists, notUpdateList
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -126,40 +131,45 @@ def index():
 
     if request.method == 'POST':
 
-        # READ INPUT FILE
-        inputfile = request.files["inputfile"]
-        filename = secure_filename(inputfile.filename)
-        fileread = inputfile.read()
+        # READ SESSION FILE IF AVAILABLE 
+        # AND OVERWRITE VARIABLES
+        inputsessionfile = request.files["inputsessionfile"]
+        if inputsessionfile:
+            session_=json.load(inputsessionfile)
+            for k in list(session_.keys()):
+                session[k]=session_[k]
+            plot_arguments=session["plot_arguments"]
 
-        # SELECTION LISTS DO NOT GET UPDATED 
-        lists=session["lists"]
-    
-        # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-        # WITH THE EXCEPTION OF SELECTION LISTS
-        plot_arguments = session["plot_arguments"]
-        for a in list(plot_arguments.keys()):
-            if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys()) ):
-                plot_arguments[a]=request.form[a]
+        else:
+            # SELECTION LISTS DO NOT GET UPDATED 
+            lists=session["lists"]
 
-        # VALUES SELECTED FROM SELECTION LISTS 
-        # GET UPDATED TO THE LATEST CHOICE
-        for k in list(lists.keys()):
-            if k in list(request.form.keys()):
-                plot_arguments[lists[k]]=request.form[k]
+            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+            # WITH THE EXCEPTION OF SELECTION LISTS
+            plot_arguments = session["plot_arguments"]
+            for a in list(plot_arguments.keys()):
+                if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
+                    plot_arguments[a]=request.form[a]
 
-        # UPDATE SESSION VALUES
-        session["plot_arguments"]=plot_arguments
+            # VALUES SELECTED FROM SELECTION LISTS 
+            # GET UPDATED TO THE LATEST CHOICE
+            for k in list(lists.keys()):
+                if k in list(request.form.keys()):
+                    plot_arguments[lists[k]]=request.form[k]
+
+            # UPDATE SESSION VALUES
+            session["plot_arguments"]=plot_arguments
         
-        # IF THE CURRENT FILE IS DIFERENT FROM 
+        # IF THE CURRENT FILE IS DIFFERENT FROM 
         # THE FILE CURRENTLY IN MEMORY FOR THIS SESSION
         # THAN UPDATE THE SESSION FILE
-        if session["fileread"] != fileread and \
-            filename != "" and \
-            filename != "Select file.." and \
-            filename != "-session-data-" :
+        # READ INPUT FILE
+        inputfile = request.files["inputfile"]
+        if inputfile:
+            filename = secure_filename(inputfile.filename)
             if allowed_file(inputfile.filename):
-                session["fileread"]=fileread
                 session["filename"]=filename
+                fileread = inputfile.read()
                 extension=filename.rsplit('.', 1)[1].lower()
                 if extension == "xlsx":
                     filestream=io.BytesIO(fileread)
@@ -187,7 +197,7 @@ def index():
                     return render_template('index.html', form=form, filename=filename, sometext=sometext, **plot_arguments)
                 
             else:
-                # IF UPLOADED FILE DOES NOT CONTAIN A VALIDA EXTENSION PLEASE UPDATE
+                # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                 has the correct format and respective extension and try uploadling it again." %filename
                 return render_template('index.html', form=form, filename="Select file..", error_message=error_message, **plot_arguments)
@@ -215,15 +225,12 @@ def index():
 
         # INITIATE SESSION
         session["filename"]="Select file.."
-        session["fileread"]=None
 
-        plot_arguments, lists=figure_defaults()
+        plot_arguments, lists, notUpdateList=figure_defaults()
 
         session["plot_arguments"]=plot_arguments
         session["lists"]=lists
-
-        #print(session.keys(),session)
-        #sys.stdout.flush()
+        session["notUpdateList"]=notUpdateList
 
         return render_template('index.html', form=form, filename=session["filename"], **plot_arguments)
 
@@ -250,15 +257,12 @@ def downloadsession():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
     for k in list(session.keys()):
-        session_[k]=session[k]
-    session_["filename"]="-session-data-"
-    session_["fileread"]=None
+        if k not in ['_permanent','fileread','_flashes']:
+            session_[k]=session[k]
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
     session_file.seek(0)
-
-    # json.load(session_file.read())
 
     plot_arguments=session["plot_arguments"]
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_downloadn"]+".json" )
