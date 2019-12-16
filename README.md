@@ -1,15 +1,18 @@
 # flask_dashboard
 
+### redis
+
 starting redis:
 
 ```
 redis-server redis.conf
 ```
 
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+### Databases
+
+```
+rm -rf app.db migrations
+flask db init
+flask db migrate -m "users table"
+flask db upgrade 
+```
