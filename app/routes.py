@@ -6,8 +6,8 @@ from app.forms import LoginForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from app.forms import RegistrationForm
+from datetime import datetime
 from app import db
-
 
 import os
 import io
@@ -66,7 +66,7 @@ def figure_defaults():
     # "titles":"20"
 
     plot_arguments={
-        "title":'plot title',\
+        "title":'Scatter plot',\
         "title_size":standard_sizes,\
         "titles":"20",\
         "xcols":[],\
@@ -268,6 +268,7 @@ def index():
         return render_template('index.html',  filename=session["filename"], **plot_arguments)
 
 @app.route('/figure', methods=['GET','POST'])
+@login_required
 def figure():
     # READ INPUT DATA FROM SESSION JSON
     df=pd.read_json(session["df"])
@@ -286,6 +287,7 @@ def figure():
     return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
 
 @app.route('/downloadsession', methods=['GET','POST'])
+@login_required
 def downloadsession():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
@@ -299,3 +301,10 @@ def downloadsession():
 
     plot_arguments=session["plot_arguments"]
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_downloadn"]+".json" )
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()

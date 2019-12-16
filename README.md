@@ -16,3 +16,9 @@ flask db init
 flask db migrate -m "users table"
 flask db upgrade 
 ```
+
+alternative
+```
+flask db migrate -m "new fields in user model"
+flask db upgrade
+```
