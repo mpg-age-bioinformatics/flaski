@@ -1,11 +1,8 @@
 from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file, flash, jsonify
 from app import app
-from app.model import InputForm
 from werkzeug.utils import secure_filename
-import secrets
 from flask_session import Session
-import redis
-
+from app.forms import LoginForm
 
 import os
 import io
@@ -25,15 +22,8 @@ import pandas as pd
 
 import base64
 
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = redis.from_url('redis://:REDIS_PASSWORD@127.0.0.1:6379/0')
-app.config.from_object(__name__)
-
 sess = Session()
 sess.init_app(app)
-
-session_token=secrets.token_urlsafe(16)
-app.config["SECRET_KEY"] = session_token
 
 ALLOWED_EXTENSIONS=["xlsx","tsv","csv"]
 def allowed_file(filename):
@@ -119,6 +109,15 @@ def figure_defaults():
 
     return plot_arguments, lists, notUpdateList
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.email.data, form.remember_me.data))
+        return redirect(url_for('index'))
+    return render_template('login.html', title='Sign In', form=form)
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -126,8 +125,6 @@ def index():
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """
-
-    form = InputForm(request.form)
 
     if request.method == 'POST':
 
@@ -194,13 +191,13 @@ def index():
                 
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]
-                    return render_template('index.html', form=form, filename=filename, sometext=sometext, **plot_arguments)
+                    return render_template('index.html', filename=filename, sometext=sometext, **plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                 has the correct format and respective extension and try uploadling it again." %filename
-                return render_template('index.html', form=form, filename="Select file..", error_message=error_message, **plot_arguments)
+                return render_template('index.html', filename="Select file..", error_message=error_message, **plot_arguments)
         
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
@@ -218,7 +215,7 @@ def index():
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
-        return render_template('index.html', form=form, figure_url=figure_url, filename=filename, **plot_arguments)
+        return render_template('index.html',  figure_url=figure_url, filename=filename, **plot_arguments)
 
     else:
         #sometext="get"
@@ -232,7 +229,7 @@ def index():
         session["lists"]=lists
         session["notUpdateList"]=notUpdateList
 
-        return render_template('index.html', form=form, filename=session["filename"], **plot_arguments)
+        return render_template('index.html',  filename=session["filename"], **plot_arguments)
 
 @app.route('/figure', methods=['GET','POST'])
 def figure():
