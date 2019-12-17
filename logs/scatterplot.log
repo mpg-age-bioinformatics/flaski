@@ -117,3 +117,5 @@ Traceback (most recent call last):
     if not next_page or url_parse(next_page).netloc != '':
 NameError: name 'url_parse' is not defined
 2019-12-17 13:50:39,077 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 13:52:23,510 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 13:54:05,135 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
