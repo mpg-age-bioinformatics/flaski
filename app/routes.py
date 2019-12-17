@@ -8,6 +8,8 @@ from app.models import User
 from app.forms import RegistrationForm
 from datetime import datetime
 from app import db
+from werkzeug.urls import url_parse
+
 
 import os
 import io
