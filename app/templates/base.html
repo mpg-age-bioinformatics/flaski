@@ -24,12 +24,6 @@
   <!-- Custom styles for this template-->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" type="text/css">
 
-  <style>
-      div.ex1 {
-        overflow: auto;
-      }
-  </style>
-
 </head>
 <body id="page-top">
   <!-- Page Wrapper -->
@@ -54,7 +48,7 @@
       <!-- Divider -->
       <hr class="sidebar-divider">
 
-      <div id="" style="overflow:scroll;max-height:650px">
+      <div id="" style="overflow:scroll;max-height:{{maxHeightSideBar}}px">
 
       {% block side_bar_content %}{% endblock %}
       

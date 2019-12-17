@@ -116,6 +116,7 @@ def figure_defaults():
 
     return plot_arguments, lists, notUpdateList
 
+#@app.route('/login',methods=['GET', 'POST'])
 @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
 @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
 def login(width=None, height=None):
@@ -173,7 +174,7 @@ def index():
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """
-
+    maxHeightSideBar=int(float(session["width"])*0.9)
     if request.method == 'POST':
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -238,13 +239,13 @@ def index():
                 
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]
-                    return render_template('index.html', filename=filename, sometext=sometext, **plot_arguments)
+                    return render_template('index.html', maxHeightSideBar=maxHeightSideBar , filename=filename, sometext=sometext, **plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                 has the correct format and respective extension and try uploadling it again." %filename
-                return render_template('index.html', filename="Select file..", error_message=error_message, **plot_arguments)
+                return render_template('index.html', maxHeightSideBar=maxHeightSideBar , filename="Select file..", error_message=error_message, **plot_arguments)
         
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
@@ -262,7 +263,7 @@ def index():
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
-        return render_template('index.html',  figure_url=figure_url, filename=filename, **plot_arguments)
+        return render_template('index.html', maxHeightSideBar=maxHeightSideBar , figure_url=figure_url, filename=filename, **plot_arguments)
 
     else:
         #sometext="get"

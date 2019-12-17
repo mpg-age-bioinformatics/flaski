@@ -24,24 +24,31 @@
     {% if filename != "Select file.." %}
 
     <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
-    <div class="sidebar-heading">X values:</div>
-    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
-        <select title="thing" name=xcols method="GET" action="/" style="width:200px">
-            {% for xcol in xcols %}
-                <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>"
-            {% endfor %}
-        </select>
-    </div>
+    <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
 
-    <div class="sidebar-heading">Y values:</div>
-    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
-        <select name=ycols method="GET" action="/" style="width:200px">
-            {% for ycol in ycols %}
-                <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>"
-            {% endfor %}
-        </select>
-    </div>
+        <div class="column">
+            <div class="sidebar-heading">X values:</div>
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
+                <select title="thing" name=xcols method="GET" action="/" style="width:167px">
+                    {% for xcol in xcols %}
+                        <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>"
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
+        <div class="column">
+            <div class="sidebar-heading">Y values:</div>
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
+                <select name=ycols method="GET" action="/" style="width:167px">
+                    {% for ycol in ycols %}
+                        <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>"
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+    </div>
 
     <!-- Divider -->
     <hr class="sidebar-divider">
@@ -215,6 +222,8 @@
         </div>
     </li>
 
+    <!-- Divider -->
+    <hr class="sidebar-divider">
     
     <div style="padding-right: 15px; padding-left: 15px;" >
     <input class="btn btn-secondary btn-lg btn-block" type="submit">
@@ -252,7 +261,7 @@
     {% endif %}
 
     {% if figure_url %}
-        <div id=""  style="overflow:scroll; width: 1000px; height: 1000px;">
+        <div id=""  style="overflow:scroll"> <!--; width: 600px; height: 600px;"-->
         <img src="data:image/png;base64,{{ figure_url }}">
 
         <!--div class="d-sm-flex align-items-center justify-content-between mb-4" style="padding-top: 2px;" -->
