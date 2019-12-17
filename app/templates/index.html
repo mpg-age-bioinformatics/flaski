@@ -252,7 +252,8 @@
     {% endif %}
 
     {% if figure_url %}
-        <img src="data:image/png;base64,{{ figure_url }}" >
+        <div id=""  style="overflow:scroll; width: 1000px; height: 1000px;">
+        <img src="data:image/png;base64,{{ figure_url }}">
 
         <!--div class="d-sm-flex align-items-center justify-content-between mb-4" style="padding-top: 2px;" -->
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
@@ -273,6 +274,7 @@
             </form>
             </div>
 
+        </div>
         </div>
 
     {% endif %}

@@ -43,7 +43,7 @@ def make_figure(df,pa):
 
     # MAIN FIGURE
     #fig = Figure()
-    fig=plt.figure()
+    fig=plt.figure(figsize=(6,6))
     plt.scatter(x, y, \
         marker=pa["marker"], \
         s=int(pa["markers"]),\
