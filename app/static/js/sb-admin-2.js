@@ -46,8 +46,4 @@
     e.preventDefault();
   });
 
-  document.getElementById("inputfile").onchange = function () {
-    document.getElementById("inputfilelabel").value = this.value;
-  };
-
 })(jQuery); // End of use strict

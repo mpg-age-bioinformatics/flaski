@@ -24,6 +24,12 @@
   <!-- Custom styles for this template-->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" type="text/css">
 
+  <style>
+      div.ex1 {
+        overflow: auto;
+      }
+  </style>
+
 </head>
 <body id="page-top">
   <!-- Page Wrapper -->
@@ -48,11 +54,14 @@
       <!-- Divider -->
       <hr class="sidebar-divider">
 
+      <div id="" style="overflow:scroll;max-height:650px">
+
       {% block side_bar_content %}{% endblock %}
-
+      
       <!-- Divider -->
-      <hr class="sidebar-divider d-none d-md-block">
-
+      <!--hr class="sidebar-divider d-none d-md-block"-->
+      </div>
+    
       <!-- Sidebar Toggler (Sidebar) -->
       <!-- div class="text-center d-none d-md-inline" -->
         <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
