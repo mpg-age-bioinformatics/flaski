@@ -116,6 +116,19 @@ def figure_defaults():
 
     return plot_arguments, lists, notUpdateList
 
+
+@app.route('/user/<user>', defaults={'width': None, 'height': None})
+@app.route('/user/<user>/<width>/<height>')
+def user(user, width=None, height=None):
+    if not width or not height:
+        return """
+        <script>
+        (() => window.location.href = window.location.href +
+        ['', window.innerWidth, window.innerHeight].join('/'))()
+        </script>
+        """
+    return 'Hello %s (%s, %s)' %(user, width, height)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
