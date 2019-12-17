@@ -117,8 +117,9 @@ def figure_defaults():
     return plot_arguments, lists, notUpdateList
 
 
-@app.route('/user/<user>', defaults={'width': None, 'height': None})
-@app.route('/user/<user>/<width>/<height>')
+@app.route('/getresolution', defaults={'width': None, 'height': None})
+@app.route('/getresolution/<width>/<height>')
+@login_required
 def user(user, width=None, height=None):
     if not width or not height:
         return """

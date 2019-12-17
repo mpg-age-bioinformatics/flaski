@@ -23,3 +23,4 @@ Traceback (most recent call last):
     fig=plt.figure(figsize(6,6))
 NameError: name 'figsize' is not defined
 2019-12-17 15:32:51,563 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 15:42:39,309 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
