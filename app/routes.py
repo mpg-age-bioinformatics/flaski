@@ -116,11 +116,9 @@ def figure_defaults():
 
     return plot_arguments, lists, notUpdateList
 
-
-@app.route('/getresolution', defaults={'width': None, 'height': None})
-@app.route('/getresolution/<width>/<height>')
-@login_required
-def user(user, width=None, height=None):
+@app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
+@app.route('/login/<width>/<height>',methods=['GET', 'POST'])
+def login(width=None, height=None):
     if not width or not height:
         return """
         <script>
@@ -128,10 +126,6 @@ def user(user, width=None, height=None):
         ['', window.innerWidth, window.innerHeight].join('/'))()
         </script>
         """
-    return 'Hello %s (%s, %s)' %(user, width, height)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
@@ -142,6 +136,8 @@ def login():
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
+        session["width"]=width
+        session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
@@ -179,7 +175,6 @@ def index():
     """
 
     if request.method == 'POST':
-
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
         inputsessionfile = request.files["inputsessionfile"]
@@ -308,7 +303,7 @@ def downloadsession():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
     for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes']:
+        if k not in ['_permanent','fileread','_flashes',"width","height"]:
             session_[k]=session[k]
 
     session_file = io.BytesIO()

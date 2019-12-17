@@ -24,3 +24,7 @@ Traceback (most recent call last):
 NameError: name 'figsize' is not defined
 2019-12-17 15:32:51,563 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
 2019-12-17 15:42:39,309 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 16:02:41,514 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 16:03:18,802 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 16:04:04,661 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-17 16:06:13,035 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
