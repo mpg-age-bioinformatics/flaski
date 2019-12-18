@@ -226,12 +226,12 @@
                                 <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
                             </div>
                     </div> 
-                        {% if filename != "Select file.." %}
 
+                    {% if filename != "Select file.." %}
                     <div class="row arg">
                         <label>Download file name:<input type="text" style="width:300px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
-                        {% endif %}
                     </div>
+                    {% endif %}
 
                 </div>
 
