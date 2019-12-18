@@ -12,7 +12,7 @@ from werkzeug.urls import url_parse
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
-
+from .scatterplot import make_figure, figure_defaults
 
 import os
 import io
@@ -39,136 +39,6 @@ ALLOWED_EXTENSIONS=["xlsx","tsv","csv"]
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-           
-def make_figure(df,pa):
-    x=df[pa["xvals"]].tolist()
-    y=df[pa["yvals"]].tolist()
-
-    # MAIN FIGURE
-    #fig = Figure()
-    fig=plt.figure(figsize=(6,6))
-    plt.scatter(x, y, \
-        marker=pa["marker"], \
-        s=int(pa["markers"]),\
-        c=pa["markerc"])
-
-    plt.title(pa['title'], fontsize=int(pa["titles"]))
-    plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
-    plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
-
-    return fig
-
-def figure_defaults():
-    
-    # https://matplotlib.org/3.1.1/api/markers_api.html
-    # https://matplotlib.org/2.0.2/api/colors_api.html
-
-    standard_sizes=[ str(i) for i in list(range(101)) ]
-
-    # lists allways need to have thee default value after the list
-    # eg.:
-    # "title_size":standard_sizes,\
-    # "titles":"20"
-
-    plot_arguments={
-        "title":'Scatter plot',\
-        "title_size":standard_sizes,\
-        "titles":"20",\
-        "xcols":[],\
-        "xvals":None,\
-        "ycols":[],\
-        "yvals":None,\
-        "markerstyles":[".",",","o","v","^","<",">",\
-            "1","2","3","4","8",\
-            "s","p","*","h","H","+","x",\
-            "X","D","d","|","_"],\
-        "marker":".",\
-        "marker_size":standard_sizes,\
-        "markers":"50",\
-        "marker_color":["blue","green","red","cyan","magenta","yellow","black","white"],\
-        "markerc":"black",\
-        "xlabel":"x",\
-        "xlabel_size":standard_sizes,\
-        "xlabels":"14",\
-        "ylabel":"y",\
-        "ylabel_size":standard_sizes,\
-        "ylabels":"14",\
-        "download_format":["png","pdf","svg"],\
-        "downloadf":"pdf",\
-        "downloadn":"scatterplot",\
-        "session_downloadn":"MySession.scatter.plot",\
-        "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.scatter.plot"
-    }
-    # not update list
-    notUpdateList=["inputsessionfile"]
-
-    # lists without a default value on the arguments
-    excluded_list=[]
-
-    # lists with a default value on the arguments
-    allargs=list(plot_arguments.keys())
-
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    lists={} 
-    for i in range(len(allargs)):
-        if type(plot_arguments[allargs[i]]) == type([]):
-            if allargs[i] not in excluded_list:
-                lists[allargs[i]]=allargs[i+1]
-
-    return plot_arguments, lists, notUpdateList
-
-# @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
-# @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
-@app.route('/login',methods=['GET', 'POST'])
-def login(width=None, height=None):
-    # if not width or not height:
-    #     return """
-    #     <script>
-    #     (() => window.location.href = window.location.href +
-    #     ['', window.innerWidth, window.innerHeight].join('/'))()
-    #     </script>
-    #     """
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        # session["width"]=width
-        # session["height"]=height
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
-        return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(firstname=form.firstname.data,\
-                lastname=form.lastname.data,\
-                email=form.email.data,\
-                organization=form.organization.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -279,6 +149,7 @@ def index():
         session["plot_arguments"]=plot_arguments
         session["lists"]=lists
         session["notUpdateList"]=notUpdateList
+        session["COMMIT"]=app.config['COMMIT']
 
         return render_template('index.html',  filename=session["filename"], **plot_arguments)
 
@@ -332,6 +203,56 @@ def downloadsession():
 
     plot_arguments=session["plot_arguments"]
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_downloadn"]+".json" )
+
+# @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
+# @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
+@app.route('/login',methods=['GET', 'POST'])
+def login(width=None, height=None):
+    # if not width or not height:
+    #     return """
+    #     <script>
+    #     (() => window.location.href = window.location.href +
+    #     ['', window.innerWidth, window.innerHeight].join('/'))()
+    #     </script>
+    #     """
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        # session["width"]=width
+        # session["height"]=height
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('index')
+        return redirect(next_page)
+    return render_template('login.html', title='Sign In', form=form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(firstname=form.firstname.data,\
+                lastname=form.lastname.data,\
+                email=form.email.data,\
+                organization=form.organization.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():

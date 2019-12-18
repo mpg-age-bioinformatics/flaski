@@ -3,6 +3,9 @@ import secrets
 import redis
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+with open(basedir+"/.git/refs/heads/master", "r") as f:
+    commit=f.readline()
+
 class Config(object):
     session_token=secrets.token_urlsafe(16)
     SECRET_KEY = os.environ.get('SECRET_KEY') or session_token
@@ -18,3 +21,4 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['jboucas@age.mpg.de']
+    COMMIT = commit
