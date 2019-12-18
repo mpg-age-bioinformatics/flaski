@@ -71,7 +71,7 @@
                 <div class="row arguments">
 
                     <div class="row arg">
-                        <label>title: <input type="text" name="title" value='{{ title }}' style="width:178px;padding-left: 4px">
+                        <label>title: <input type="text" name="title" value='{{ title }}' style="width:186px;padding-left: 4px">
                         <label> size: <select name=title_size method="GET" action="/" style="width:50px">
                             {% for title_size_ in title_size %}
                                 <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>"
@@ -97,7 +97,7 @@
                     <div class="row arguments">
                         
                         <div class="row arg">
-                            <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:166px;padding-left: 4px">
+                            <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:170px;padding-left: 4px">
                             <label> size: <select name=xlabel_size method="GET" action="/" style="width:50px">
                                 {% for xlabel_size_ in xlabel_size %}
                                     <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>"
@@ -106,7 +106,7 @@
                         </div>
 
                         <div class="row arg">
-                            <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:166px;padding-left: 4px">
+                            <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:170px;padding-left: 4px">
                             <label> size: <select name=ylabel_size method="GET" action="/" style="width:50px">
                                 {% for ylabel_size_ in ylabel_size %}
                                     <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>"
@@ -172,7 +172,7 @@
                     <div class="row arguments">
 
                         <div class="row arg">
-                            <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;padding-left: 4px">
+                            <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:137px;padding-left: 4px">
                             <label> format: <select name=download_format method="GET" action="/" style="width:50px">
                                 {% for download_format_ in download_format %}
                                     <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
@@ -201,14 +201,14 @@
                     <div class="row arg">
                         <label>Upload session file:
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:296px;height:30px">
+                                <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;height:30px">
                                 <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
                             </div>
                     </div> 
                         {% if filename != "Select file.." %}
 
                     <div class="row arg">
-                        <label>Download file name:<input type="text" style="width:296px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                        <label>Download file name:<input type="text" style="width:300px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
                         {% endif %}
                     </div>
 
