@@ -163,27 +163,48 @@
     <!-- -------------------- DOWNLOAD ARGUMENTS ---------------------- -->
 
     <li class="nav-item" style="padding-top: 0px;">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
-                <i class="fas fa-fw fa-download"></i>
-                <span>Figure</span>
-            </a>
-            <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded openmenu">
-                    <div class="row arguments">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+            <i class="fas fa-fw fa-download"></i>
+            <span>Figure</span>
+        </a>
+        <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded openmenu">
+                <div class="row arguments">
 
-                        <div class="row arg">
-                            <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:137px;padding-left: 4px">
-                            <label> format: <select name=download_format method="GET" action="/" style="width:50px">
-                                {% for download_format_ in download_format %}
-                                    <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
-                                {% endfor %}
-                            </select>
-                            
-                        </div>
+                    <div class="row arg">
+                        <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:137px;padding-left: 4px">
+                        <label> format: <select name=download_format method="GET" action="/" style="width:50px">
+                            {% for download_format_ in download_format %}
+                                <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
+                            {% endfor %}
+                        </select>
+                        
                     </div>
                 </div>
             </div>
-        </li>
+        </div>
+    </li>
+
+    <!-- -------------------- ARGUMENTS ARGUMENTS ---------------------- -->
+
+    <li class="nav-item" style="padding-top: 0px;">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+            <i class="fas fa-fw fa-cogs"></i>
+            <span>Arguments</span>
+        </a>
+        <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded openmenu">
+                <div class="row arguments">
+
+                    <div class="row arg">
+                        <label>file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:238px;padding-left: 4px">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </li>
+
 
     {% endif %}
 
@@ -263,19 +284,27 @@
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-            <form action="{{ url_for('figure') }}" method="post" enctype="multipart/form-data">
-                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                    <i class="fas fa-download fa-sm text-white-50"></i> Figure
-                </button>
-            </form>
+                <form action="{{ url_for('figure') }}" method="post" enctype="multipart/form-data">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Figure
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('downloadarguments') }}" method="post" enctype="multipart/form-data">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                    </button>
+                </form>
             </div>
 
             <div style="padding-left: 2px;">
-            <form action="{{ url_for('downloadsession') }}" method="post" enctype="multipart/form-data">
-            <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                    <i class="fas fa-th fa-sm text-white-50"></i> Session
-            </button>
-            </form>
+                <form action="{{ url_for('downloadsession') }}" method="post" enctype="multipart/form-data">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-th fa-sm text-white-50"></i> Session
+                    </button>
+                </form>
             </div>
 
         </div>

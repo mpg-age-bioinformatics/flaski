@@ -94,7 +94,8 @@ def figure_defaults():
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
         "session_downloadn":"MySession.scatter.plot",\
-        "inputsessionfile":"Select file.."
+        "inputsessionfile":"Select file..",\
+        "session_argumentsn":"MyParameters.scatter.plot"
     }
     # not update list
     notUpdateList=["inputsessionfile"]
@@ -296,6 +297,22 @@ def figure():
     plt.close()
     figfile.seek(0)  # rewind to beginning of file
     return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
+
+@app.route('/downloadarguments', methods=['GET','POST'])
+@login_required
+def downloadarguments():
+    # READ INPUT DATA FROM SESSION JSON
+    session_={}
+    for k in list(session.keys()):
+        if k not in ['_permanent','fileread','_flashes',"width","height","df"]:
+            session_[k]=session[k]
+
+    session_file = io.BytesIO()
+    session_file.write(json.dumps(session_).encode())
+    session_file.seek(0)
+
+    plot_arguments=session["plot_arguments"]
+    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+".json" )
 
 @app.route('/downloadsession', methods=['GET','POST'])
 @login_required
