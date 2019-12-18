@@ -205,7 +205,7 @@
 
                     <label>Upload session file:<div class="input-group margin-bottom-sm" style="padding-right: 0px; padding-bottom: 12px;" >
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:296px">
+                            <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:296px;height:30px">
                             <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
                             <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
                         </div>
@@ -213,7 +213,7 @@
                         <!--input class="form-control" type="text" placeholder="input file"-->
                     </div>  
                     {% if filename != "Select file.." %}
-                    <label>Download file name:<input type="text" name="session_downloadn" value='{{ session_downloadn }}' size="20">
+                    <label>Download file name:<input type="text" style="width:296px;height:30px;padding-left: 4px" name="session_downloadn" value='{{ session_downloadn }}'>
                     {% endif %}
                     
                 </div>
