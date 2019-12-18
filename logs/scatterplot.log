@@ -26,3 +26,6 @@ KeyError: 'width'
 2019-12-18 09:00:35,799 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
 2019-12-18 09:00:50,883 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
 2019-12-18 09:01:18,342 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:10:19,095 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:11:58,823 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:12:24,327 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
