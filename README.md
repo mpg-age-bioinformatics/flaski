@@ -29,8 +29,15 @@ There are two approaches to test email logging. The easiest one is to use the SM
 This is a fake email server that accepts emails, but instead of sending them, it prints them to the console. 
 To run this server, open a second terminal session and run the following command on it:
 ```
-python -m smtpd -n -c DebuggingServer localhost:8025
+python -m smtpd -n -c DebuggingServer localhost:8025 
 ```
+and 
+```
+export MAIL_SERVER=localhost
+export MAIL_PORT=8025
+```
+before running your app.
+
 A second testing approach for this feature is to configure a real email server. 
 Below is the configuration to use your Gmail account's email server:
 ```
