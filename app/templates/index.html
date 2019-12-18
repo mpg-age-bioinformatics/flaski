@@ -66,14 +66,16 @@
             <i class="fas fa-fw fa-cog"></i>
             <span>Figure</span>
         </a>
-        <div id="collapseFigure" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;padding-bottom: 12px;" >
-            <div class="bg-white py-2 collapse-inner rounded" style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 0px;">
+        <!--div id="collapseFigure" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="padding-top: 0px;padding-bottom: 12px;" -->
+            <!-- div class="bg-white py-2 collapse-inner rounded" style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 0px;" -->
+        <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded openmenu">
                 <!--h6 class="collapse-header">Marker arguments:</h6-->
                 <!--div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 16px;" -->
-                <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div>
-                    
+                <!--div class="row arguments" style="padding-bottom: 0px; padding-top: 12px;padding-right: 30px; padding-left: 30px;"-->
+                <div class="row arguments">
                     <!-- ARGUMENTS -->
-                    <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
+                    <div class="row arg"> <!-- style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;" -->
                         <label>title: <input type="text" name="title" value='{{ title }}' style="width:176px;padding-left: 4px">
                         <label> size: <select name=title_size method="GET" action="/" style="width:50px">
                             {% for title_size_ in title_size %}
@@ -81,7 +83,8 @@
                             {% endfor %}
                         </select>
                     </div>
-
+                
+                </div>
                 <!--/div-->
 
             </div>
@@ -101,7 +104,7 @@
                     <!--h6 class="collapse-header">Marker arguments:</h6-->
                     <!--div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 16px;" -->
 
-                    <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div>
+                    <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;">
                         
                         <!-- ARGUMENTS -->
                         <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
@@ -122,7 +125,7 @@
                             </select>
                         </div>
 
-                    <!-- /div -->
+                    </div>
     
                 </div>
             </div>
@@ -141,7 +144,7 @@
                 <!--h6 class="collapse-header">Marker arguments:</h6-->
                 <!--div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 16px;" -->
                     
-                    <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div>
+                    <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;">
 
                     <!-- ARGUMENTS -->
                     <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
@@ -156,7 +159,7 @@
                             {% endfor %}
                         </select>
                     </div>
-
+                </div>
                 <!-- /div -->
 
             </div>
@@ -184,21 +187,21 @@
                 <div class="bg-white py-2 collapse-inner rounded" style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 0px;">
                     <!--h6 class="collapse-header">Marker arguments:</h6-->
                     <!--div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" -->
-                    <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div>
+                    <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;">
 
 
                         <!-- ARGUMENTS -->
-                    <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
-                        <!-- label>Download plot:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="download_check"/ -->
-                        <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;padding-left: 4px">
-                        <label> format: <select name=download_format method="GET" action="/" style="width:50px">
-                            {% for download_format_ in download_format %}
-                                <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
-                            {% endfor %}
-                        </select>
-                        
+                        <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
+                            <!-- label>Download plot:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="download_check"/ -->
+                            <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;padding-left: 4px">
+                            <label> format: <select name=download_format method="GET" action="/" style="width:50px">
+                                {% for download_format_ in download_format %}
+                                    <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
+                                {% endfor %}
+                            </select>
+                            
+                        </div>
                     </div>
-    
                 </div>
             </div>
         </li>
@@ -218,29 +221,31 @@
                 <!-- div style="padding-right: 20px; padding-left: 20px; padding-top: 0px;" -->
                 <!--div style="padding-right: 20px; padding-left: 20px; padding-bottom: 0px; padding-top: 16px;" -->
 
-                <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div>
+                <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;">
 
                     <!-- ARGUMENTS -->
                     <!--label>Download session:&nbsp&nbsp<input style="padding-left: 20px;" type="checkbox" name="session_download_check"/-->
-                <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
-                    <label>Upload session file:<!--div class="input-group margin-bottom-sm" style="padding-right: 0px; padding-bottom: 12px;" -->
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:296px;height:30px">
-                            <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
-                            <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
-                        </div>
-                        <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
-                        <!--input class="form-control" type="text" placeholder="input file"-->
-                    <!--/div-->
-                </div> 
-                    {% if filename != "Select file.." %}
+                    <div class="row" style="padding-bottom: 0px; padding-top: 0px;padding-right: 12px; padding-left: 12px;">
+                        <label>Upload session file:<!--div class="input-group margin-bottom-sm" style="padding-right: 0px; padding-bottom: 12px;" -->
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:296px;height:30px">
+                                <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
+                                <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                            </div>
+                            <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
+                            <!--input class="form-control" type="text" placeholder="input file"-->
+                        <!--/div-->
+                    </div> 
+                        {% if filename != "Select file.." %}
 
-                <div class="row" style="padding-bottom: 0px; padding-top: 0px; padding-right: 12px; padding-left: 12px;">
-                    <label>Download file name:<input type="text" style="width:296px;height:30px;padding-left: 4px" name="session_downloadn" value='{{ session_downloadn }}'>
-                    {% endif %}
+                    <div class="row" style="padding-bottom: 0px; padding-top: 0px; padding-right: 12px; padding-left: 12px;">
+                        <label>Download file name:<input type="text" style="width:296px;height:30px;padding-left: 4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                        {% endif %}
+                    </div>
+
                 </div>
 
-                <div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div>
+                <!--div class="row" style="padding-bottom: 0px; padding-top: 12px;padding-right: 12px; padding-left: 12px;"></div-->
 
                 <!--/div-->
 
