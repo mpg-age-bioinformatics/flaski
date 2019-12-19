@@ -19,6 +19,8 @@ mail = Mail(app)
 
 from app import routes, models, errors
 
+from app.plots.routes import scatterplot
+
 if not app.debug:
     if app.config['MAIL_SERVER']:
         auth = None
