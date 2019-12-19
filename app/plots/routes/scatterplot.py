@@ -28,9 +28,6 @@ import pandas as pd
 
 import base64
 
-sess = Session()
-sess.init_app(app)
-
 ALLOWED_EXTENSIONS=["xlsx","tsv","csv"]
 def allowed_file(filename):
     return '.' in filename and \
