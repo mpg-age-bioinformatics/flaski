@@ -7,6 +7,8 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 import os
 from flask_mail import Mail
+from flask_session import Session
+
 
 
 app = Flask(__name__)
@@ -16,6 +18,8 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 mail = Mail(app)
+sess = Session()
+sess.init_app(app)
 
 from app import routes, models, errors
 

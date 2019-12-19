@@ -1,7 +1,6 @@
 from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file, flash, jsonify
 from app import app
 from werkzeug.utils import secure_filename
-from flask_session import Session
 from app.forms import LoginForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, UserLogging
@@ -32,9 +31,6 @@ import mpld3
 import pandas as pd
 
 import base64
-
-sess = Session()
-sess.init_app(app)
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
 # @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
