@@ -8,6 +8,8 @@ from datetime import datetime
 from app import db
 from werkzeug.urls import url_parse
 from app.plots.figures.scatterplot import make_figure, figure_defaults
+from app.models import User, UserLogging
+
 
 import os
 import io
@@ -149,6 +151,10 @@ def scatterplot():
         session["notUpdateList"]=notUpdateList
         session["COMMIT"]=app.config['COMMIT']
 
+        eventlog = UserLogging(email=current_user.email,action="visit scatterplot")
+        db.session.add(eventlog)
+        db.session.commit()
+
         return render_template('plots/scatterplot.html',  filename=session["filename"], **plot_arguments)
 
 @app.route('/figure', methods=['GET','POST'])
@@ -168,6 +174,11 @@ def figure():
     plt.savefig(figfile, format=plot_arguments["downloadf"])
     plt.close()
     figfile.seek(0)  # rewind to beginning of file
+
+    eventlog = UserLogging(email=current_user.email,action="download figure scatterplot")
+    db.session.add(eventlog)
+    db.session.commit()
+
     return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
 
 @app.route('/downloadarguments', methods=['GET','POST'])
@@ -184,6 +195,11 @@ def downloadarguments():
     session_file.seek(0)
 
     plot_arguments=session["plot_arguments"]
+
+    eventlog = UserLogging(email=current_user.email,action="download arguments scatterplot")
+    db.session.add(eventlog)
+    db.session.commit()
+
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+".json" )
 
 @app.route('/downloadsession', methods=['GET','POST'])
@@ -200,114 +216,9 @@ def downloadsession():
     session_file.seek(0)
 
     plot_arguments=session["plot_arguments"]
+
+    eventlog = UserLogging(email=current_user.email,action="download session scatterplot")
+    db.session.add(eventlog)
+    db.session.commit()
+
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_downloadn"]+".json" )
-
-# # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
-# # @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
-# @app.route('/login',methods=['GET', 'POST'])
-# def login(width=None, height=None):
-#     # if not width or not height:
-#     #     return """
-#     #     <script>
-#     #     (() => window.location.href = window.location.href +
-#     #     ['', window.innerWidth, window.innerHeight].join('/'))()
-#     #     </script>
-#     #     """
-#     if current_user.is_authenticated:
-#         return redirect(url_for('index'))
-        
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         user = User.query.filter_by(email=form.email.data).first()
-#         if user is None or not user.check_password(form.password.data):
-#             flash('Invalid username or password')
-#             return redirect(url_for('login'))
-#         login_user(user, remember=form.remember_me.data)
-#         next_page = request.args.get('next')
-#         # session["width"]=width
-#         # session["height"]=height
-#         if not next_page or url_parse(next_page).netloc != '':
-#             next_page = url_for('index')
-#         return redirect(next_page)
-#     return render_template('login.html', title='Sign In', form=form)
-
-# @app.route('/logout')
-# def logout():
-#     logout_user()
-#     return redirect(url_for('login'))
-
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('index'))
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         user = User(firstname=form.firstname.data,\
-#                 lastname=form.lastname.data,\
-#                 email=form.email.data,\
-#                 organization=form.organization.data)
-#         user.set_password(form.password.data)
-#         user.registered_on=datetime.utcnow()
-#         db.session.add(user)
-#         db.session.commit()
-#         send_validate_email(user)
-#         flash('Please check your email and confirm your account.')
-#         return redirect(url_for('login'))
-#     return render_template('register.html', title='Register', form=form)
-
-# @app.route('/confirm/<token>')
-# def confirm(token):
-#     user = User.verify_email_token(token)
-#     if not user:
-#         return redirect(url_for('login'))
-#     user = User.verify_email_token(token)
-#     if user.active:
-#         flash('Account already confirmed. Please login.', 'success')
-#     else:
-#         user.active = True
-#         print("active")
-#         user.confirmed_on = datetime.now()
-#         db.session.add(user)
-#         db.session.commit()
-#         flash('You have confirmed your account. Thanks!', 'success')
-#     return redirect(url_for('login'))
-
-# @app.route('/reset_password_request', methods=['GET', 'POST'])
-# def reset_password_request():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('index'))
-#     form = ResetPasswordRequestForm()
-#     if form.validate_on_submit():
-#         user = User.query.filter_by(email=form.email.data).first()
-#         if user:
-#             send_password_reset_email(user)
-#         flash('Check your email for the instructions to reset your password')
-#         return redirect(url_for('login'))
-#     return render_template('reset_password_request.html',
-#                            title='Reset Password', form=form)
-
-# @app.route('/reset_password/<token>', methods=['GET', 'POST'])
-# def reset_password(token):
-#     if current_user.is_authenticated:
-#         return redirect(url_for('index'))
-#     user = User.verify_reset_password_token(token)
-#     if not user:
-#         return redirect(url_for('index'))
-#     form = ResetPasswordForm()
-#     if form.validate_on_submit():
-#         user.password_set=datetime.utcnow()
-#         user.set_password(form.password.data)
-#         db.session.commit()
-#         flash('Your password has been reset.')
-#         return redirect(url_for('login'))
-#     return render_template('reset_password.html', form=form)
-
-# @app.before_request
-# def before_request():
-#     if current_user.is_authenticated:
-#         current_user.last_seen = datetime.utcnow()
-#         db.session.commit()
-#         if not current_user.active:
-#             flash('This account is not active. Please contact support.')
-#             logout_user()
-#             return redirect(url_for('login'))

@@ -1,4 +1,4 @@
-from matplotlib.figure import Figure
+#from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib
 

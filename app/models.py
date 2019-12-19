@@ -8,6 +8,12 @@ from time import time
 import jwt
 from app import app
 
+class UserLogging(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), index=True, unique=False)
+    action = db.Column(db.String(120), index=True, unique=False)
+    date_time = db.Column(db.DateTime, default=datetime.utcnow)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(64), index=True)
