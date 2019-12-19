@@ -1,0 +1,145 @@
+Metadata-Version: 2.1
+Name: email-verifier
+Version: 1.0.0
+Summary: Python client library for Email Verification API.
+Home-page: https://github.com/whois-api-llc/python-email-verifier
+Author: Whois API, Inc.
+Author-email: support@whoisxmlapi.com
+License: MIT License
+Keywords: email,verification,email verifier,api,email verification api
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Utilities
+Requires-Dist: future
+Requires-Dist: python-dateutil
+Requires-Dist: requests
+Provides-Extra: dev
+Requires-Dist: mock; extra == 'dev'
+Requires-Dist: tox; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+
+python-email-verifier
+===================
+
+The simplest possible way to verify an email address in Python.
+
+Meta
+----
+
+- Author: WHOIS API, Inc.
+- Email: support@whoisxmlapi.com
+- Site: https://emailverification.whoisxmlapi.com/
+
+
+Prerequisites
+-------------
+
+To use this library, you'll need to create a free Email Verification API account:
+https://emailverification.whoisxmlapi.com/
+
+If you haven't done this yet, please do so now.
+
+
+Documentation
+-------------
+
+Documentation available `here <https://emailverification.whoisxmlapi.com/docs>`_.
+
+Installation
+------------
+
+To install ``email-verifier`` using `pypi <https://pypi.org/>`_, simply run:
+
+.. code-block:: console
+
+    $ pip install email-verifier
+
+In the root of your project directory.
+
+
+Usage
+-----
+
+Once you have `email-verified` installed, you can use it to easily verify any
+email address.
+
+
+.. code-block:: python
+
+    from emailverifier import Client
+    from emailverifier import exceptions
+
+    client = Client('Your-api-key')
+
+    try:
+        data = client.get("support@whoisxmlapi.com")
+    except exceptions.HttpException:
+        # If you get here, it means service returned HTTP error code
+        pass
+    except exceptions.GeneralException:
+        # If you get here, it means you cannot connect to the service
+        pass
+    except exceptions.UndefinedVariableException:
+        # If you get here, it means you forgot to specify the API key
+        pass
+    except exceptions.InvalidArgumentException:
+        # If you get here, it means you specified invalid argument
+        # (options should be a dictionary)
+        pass
+    except:
+        pass
+        # Something else happened related. Maybe you hit CTRL-C
+        # while the program was running, the kernel is killing your process, or
+        # something else all together.
+
+    print(data)
+
+    # Use data.json_string to get raw data in JSON.
+    # You can access any response field as a class property
+    # by converting field name from "camelCase" to "snake_case"
+    print("Email address: " + data.email_address)
+    print("Format: " + str(data.format_check))
+    print("DNS: " + str(data.dns_check))
+    print("SMTP: " + str(data.smtp_check))
+    print("Catch all: " + str(data.catch_all_check))
+    print("Disposable: " + str(data.disposable_check))
+    print("Free: " + str(data.free_check))
+    print("Last audit date: " + str(data.audit.audit_updated_date))
+
+Here's the sort of data you might get back when performing a email verification
+request:
+
+.. code-block:: json
+
+    {
+      "emailAddress": "support@whoisxmlapi.com",
+      "formatCheck": "true",
+      "smtpCheck": "true",
+      "dnsCheck": "true",
+      "freeCheck": "false",
+      "disposableCheck": "false",
+      "catchAllCheck": "true",
+      "mxRecords": [
+        "ALT1.ASPMX.L.GOOGLE.com",
+        "ALT2.ASPMX.L.GOOGLE.com",
+        "ASPMX.L.GOOGLE.com",
+        "ASPMX2.GOOGLEMAIL.com",
+        "ASPMX3.GOOGLEMAIL.com",
+        "mx.yandex.net"
+      ],
+      "audit": {
+        "auditCreatedDate": "2018-04-19 18:12:45.000 UTC",
+        "auditUpdatedDate": "2018-04-19 18:12:45.000 UTC"
+      }
+    }
+

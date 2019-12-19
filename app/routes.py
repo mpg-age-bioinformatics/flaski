@@ -254,6 +254,7 @@ def register():
                 email=form.email.data,\
                 organization=form.organization.data)
         user.set_password(form.password.data)
+        user.registered_on=datetime.utcnow()
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
