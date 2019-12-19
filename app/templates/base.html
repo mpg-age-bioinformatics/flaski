@@ -9,11 +9,11 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  {% if title %}
-  <title>Flaski - {{ title }}</title>
-  {% else %}
-  <title>Flaski - Scatter plot </title>
-  {% endif %}
+  {#% if title %#}
+  <!--title>Flaski - {{ title }}</!--title-->
+  {#% else %#}
+  <title>Flaski</title>
+  {#% endif %#}
 
   <script src="https://kit.fontawesome.com/609ed3ec10.js" crossorigin="anonymous"></script>
 
@@ -23,6 +23,8 @@
 
   <!-- Custom styles for this template-->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" type="text/css">
+
+  <link rel="icon" href="{{ url_for('static', filename='dog-solid.png') }}">
 
   <style>
     .closedmenu{
@@ -61,7 +63,7 @@
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('scatterplot') }}">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
           <!-- div class="sidebar-brand-icon rotate-n-15"-->
             <!-- i class="fas fa-laugh-wink"--><!-- /i -->
           <!-- /div -->
