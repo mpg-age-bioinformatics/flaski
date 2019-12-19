@@ -1,0 +1,9 @@
+<p>Hi {{ user.fistname }},</p>
+<p>Welcome! Thanks for signing up. Please follow this link to activate your account:</p>
+<p><a href="{{ url_for('confirm', token=token, _external=True) }}">
+    click here
+</a>.</p>
+<br>
+<p>Cheers!</p>
+<p>Sincerely,</p>
+<p>Flaski</p>

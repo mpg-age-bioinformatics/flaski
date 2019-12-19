@@ -1,0 +1,11 @@
+Hi {{ user.fistname }},
+
+Welcome! Thanks for signing up. Please follow this link to activate your account:
+
+{{ url_for('confirm', token=token, _external=True) }}
+
+Cheers!
+
+Sincerely,
+
+Flaski

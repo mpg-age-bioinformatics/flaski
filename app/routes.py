@@ -10,9 +10,10 @@ from datetime import datetime
 from app import db
 from werkzeug.urls import url_parse
 from app.forms import ResetPasswordRequestForm
-from app.email import send_password_reset_email
+from app.email import send_password_reset_email, send_validate_email
 from app.forms import ResetPasswordForm
-from .scatterplot import make_figure, figure_defaults
+#from app.token import generate_confirmation_token, confirm_token
+from app.scatterplot import make_figure, figure_defaults
 
 import os
 import io
@@ -41,9 +42,8 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/', methods=['GET', 'POST'])
-@login_required
 def landingpage():
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
@@ -257,9 +257,27 @@ def register():
         user.registered_on=datetime.utcnow()
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        send_validate_email(user)
+        flash('Please check your email and confirm your account.')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/confirm/<token>')
+def confirm(token):
+    user = User.verify_email_token(token)
+    if not user:
+        return redirect(url_for('login'))
+    user = User.verify_email_token(token)
+    if user.active:
+        flash('Account already confirmed. Please login.', 'success')
+    else:
+        user.active = True
+        print("active")
+        user.confirmed_on = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        flash('You have confirmed your account. Thanks!', 'success')
+    return redirect(url_for('login'))
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
@@ -284,6 +302,7 @@ def reset_password(token):
         return redirect(url_for('index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
+        user.password_set=datetime.utcnow()
         user.set_password(form.password.data)
         db.session.commit()
         flash('Your password has been reset.')

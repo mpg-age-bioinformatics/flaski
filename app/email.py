@@ -23,3 +23,13 @@ def send_password_reset_email(user):
                                          user=user, token=token),
                html_body=render_template('email/reset_password.html',
                                          user=user, token=token))
+
+def send_validate_email(user):
+    token = user.get_email_validation_token()
+    send_email('Welcome to Flaski!',
+               sender=app.config['ADMINS'][0],
+               recipients=[user.email],
+               text_body=render_template('email/validate_email.txt',
+                                         user=user, token=token),
+               html_body=render_template('email/validate_email.html',
+                                         user=user, token=token))
