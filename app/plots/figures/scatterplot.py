@@ -63,7 +63,8 @@ def figure_defaults():
         "downloadn":"scatterplot",\
         "session_downloadn":"MySession.scatter.plot",\
         "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.scatter.plot"
+        "session_argumentsn":"MyArguments.scatter.plot",\
+        "inputargumentsfile":"Select file.."
     }
     # not update list
     notUpdateList=["inputsessionfile"]

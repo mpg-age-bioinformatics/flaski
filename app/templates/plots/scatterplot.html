@@ -197,8 +197,18 @@
                 <div class="row arguments">
 
                     <div class="row arg">
-                        <label>file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:238px;padding-left: 4px">
+                        <label>Upload arguments file:
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;height:30px">
+                                <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                            </div>
+                    </div> 
+
+                    {% if filename != "Select file.." %}
+                    <div class="row arg">
+                        <label>file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:238px;height:30px;padding-left: 4px">
                     </div>
+                    {% endif %}
 
                 </div>
             </div>

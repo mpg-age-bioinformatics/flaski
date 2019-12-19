@@ -33,9 +33,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/', methods=['GET', 'POST'])
-def landingpage():
-    return redirect(url_for('login'))
 
 @app.route('/scatterplot', methods=['GET', 'POST'])
 @login_required
@@ -46,16 +43,43 @@ def scatterplot():
     """       
 
     if request.method == 'POST':
+
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
         inputsessionfile = request.files["inputsessionfile"]
         if inputsessionfile:
             session_=json.load(inputsessionfile)
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
+            if session_["ftype"]=="session":
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Session file sucessufuly read.')
+            else:
+                plot_arguments=session["plot_arguments"]
+                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
+                return render_template('plots/scatterplot.html' , filename=session["filename"], error=error_msg, **plot_arguments)
 
-        else:
+        # READ ARGUMENTS FILE IF AVAILABLE 
+        # AND OVERWRITE VARIABLES
+        inputargumentsfile = request.files["inputargumentsfile"]
+        if inputargumentsfile:
+            session_=json.load(inputargumentsfile)
+            if session_["ftype"]=="arguments":
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Arguments file sucessufuly read.')
+            else:
+                plot_arguments=session["plot_arguments"]
+                error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
+                return render_template('plots/scatterplot.html' , filename=session["filename"], error=error_msg, **plot_arguments)
+        
+
+        if not inputsessionfile and not inputargumentsfile:
             # SELECTION LISTS DO NOT GET UPDATED 
             lists=session["lists"]
 
@@ -186,6 +210,7 @@ def downloadarguments():
     for k in list(session.keys()):
         if k not in ['_permanent','fileread','_flashes',"width","height","df"]:
             session_[k]=session[k]
+    session_["ftype"]="arguments"
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
@@ -207,6 +232,7 @@ def downloadsession():
     for k in list(session.keys()):
         if k not in ['_permanent','fileread','_flashes',"width","height"]:
             session_[k]=session[k]
+    session_["ftype"]="session"
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())

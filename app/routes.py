@@ -32,6 +32,10 @@ import pandas as pd
 
 import base64
 
+@app.route('/', methods=['GET', 'POST'])
+def landingpage():
+    return redirect(url_for('login'))
+
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
 # @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
 @app.route('/login',methods=['GET', 'POST'])
