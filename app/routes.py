@@ -41,13 +41,18 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
+def landingpage():
+    return redirect(url_for('index'))
+
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     """ 
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
-    """
+    """       
+
     if request.method == 'POST':
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -217,6 +222,7 @@ def login(width=None, height=None):
     #     """
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+        
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -268,7 +274,6 @@ def reset_password_request():
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form)
 
-
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
@@ -289,3 +294,7 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
+        if not current_user.active:
+            flash('This account is not active. Please contact support.')
+            logout_user()
+            return redirect(url_for('login'))
