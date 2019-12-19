@@ -117,13 +117,13 @@ sess.init_app(app)
                 
 #                     sometext="Please select which values should map to the x and y axes."
 #                     plot_arguments=session["plot_arguments"]
-#                     return render_template('index.html' , filename=filename, sometext=sometext, **plot_arguments)
+#                     return render_template('plots/scatterplot.html' , filename=filename, sometext=sometext, **plot_arguments)
                 
 #             else:
 #                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
 #                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
 #                 has the correct format and respective extension and try uploadling it again." %filename
-#                 return render_template('index.html' , filename="Select file..", error_message=error_message, **plot_arguments)
+#                 return render_template('plots/scatterplot.html' , filename="Select file..", error_message=error_message, **plot_arguments)
         
 #         # READ INPUT DATA FROM SESSION JSON
 #         df=pd.read_json(session["df"])
@@ -141,7 +141,7 @@ sess.init_app(app)
 #         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
 #         filename=session["filename"]
 #         plot_arguments=session["plot_arguments"]
-#         return render_template('index.html', figure_url=figure_url, filename=filename, **plot_arguments)
+#         return render_template('plots/scatterplot.html', figure_url=figure_url, filename=filename, **plot_arguments)
 
 #     else:
 #         #sometext="get"
@@ -156,7 +156,7 @@ sess.init_app(app)
 #         session["notUpdateList"]=notUpdateList
 #         session["COMMIT"]=app.config['COMMIT']
 
-#         return render_template('index.html',  filename=session["filename"], **plot_arguments)
+#         return render_template('plots/scatterplot.html',  filename=session["filename"], **plot_arguments)
 
 # @app.route('/figure', methods=['GET','POST'])
 # @login_required
@@ -221,7 +221,7 @@ def login(width=None, height=None):
     #     </script>
     #     """
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('scatterplot'))
         
     form = LoginForm()
     if form.validate_on_submit():
@@ -234,7 +234,7 @@ def login(width=None, height=None):
         # session["width"]=width
         # session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('scatterplot')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -246,7 +246,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('scatterplot'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(firstname=form.firstname.data,\
@@ -282,7 +282,7 @@ def confirm(token):
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('scatterplot'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -296,10 +296,10 @@ def reset_password_request():
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('scatterplot'))
     user = User.verify_reset_password_token(token)
     if not user:
-        return redirect(url_for('index'))
+        return redirect(url_for('scatterplot'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.password_set=datetime.utcnow()

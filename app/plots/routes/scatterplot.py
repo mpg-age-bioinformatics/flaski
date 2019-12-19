@@ -38,9 +38,9 @@ def allowed_file(filename):
 def landingpage():
     return redirect(url_for('login'))
 
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/scatterplot', methods=['GET', 'POST'])
 @login_required
-def index():
+def scatterplot():
     """ 
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
@@ -110,13 +110,13 @@ def index():
                 
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]
-                    return render_template('index.html' , filename=filename, sometext=sometext, **plot_arguments)
+                    return render_template('plots/scatterplot.html' , filename=filename, sometext=sometext, **plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                 has the correct format and respective extension and try uploadling it again." %filename
-                return render_template('index.html' , filename="Select file..", error_message=error_message, **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename="Select file..", error_message=error_message, **plot_arguments)
         
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
@@ -134,7 +134,7 @@ def index():
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
-        return render_template('index.html', figure_url=figure_url, filename=filename, **plot_arguments)
+        return render_template('plots/scatterplot.html', figure_url=figure_url, filename=filename, **plot_arguments)
 
     else:
         #sometext="get"
@@ -149,7 +149,7 @@ def index():
         session["notUpdateList"]=notUpdateList
         session["COMMIT"]=app.config['COMMIT']
 
-        return render_template('index.html',  filename=session["filename"], **plot_arguments)
+        return render_template('plots/scatterplot.html',  filename=session["filename"], **plot_arguments)
 
 @app.route('/figure', methods=['GET','POST'])
 @login_required
