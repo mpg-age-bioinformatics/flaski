@@ -120,100 +120,6 @@ def get_range(request):
     else:
         return 0, None
 
-
-
-#class PathView(MethodView):
-
-# @app.route('/fileserver',defaults={'p': "", methods=['GET', 'POST'])})
-# @app.route('/fileserver/<p>',methods=['GET', 'POST'])
-# @login_required
-
-#     if request.method == 'POST':
-#     def get(self, p=''):
-#         """
-#         downloading files
-#         """
-#         print(p)
-#         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'no'))
-
-#         path = os.path.join(UserFolder(current_user), p)
-
-#         if os.path.isdir(path):
-#             contents = []
-#             total = {'size': 0, 'dir': 0, 'file': 0}
-#             for filename in os.listdir(path):
-#                 if filename in ignored:
-#                     continue
-#                 if hide_dotfile == 'yes' and filename[0] == '.':
-#                     continue
-#                 filepath = os.path.join(path, filename)
-#                 stat_res = os.stat(filepath)
-#                 info = {}
-#                 info['name'] = filename
-#                 info['mtime'] = stat_res.st_mtime
-#                 ft = get_type(stat_res.st_mode)
-#                 info['type'] = ft
-#                 total[ft] += 1
-#                 sz = stat_res.st_size
-#                 info['size'] = sz
-#                 total['size'] += sz
-#                 contents.append(info)
-#             print(p)
-#             page = render_template('fileserver.html', path="fileserver/"+p, contents=contents, total=total, hide_dotfile=hide_dotfile)
-#             res = make_response(page, 200)
-#             res.set_cookie('hide-dotfile', hide_dotfile, max_age=16070400)
-#         elif os.path.isfile(path):
-#             if 'Range' in request.headers:
-#                 start, end = get_range(request)
-#                 res = partial_response(path, start, end)
-#             else:
-#                 res = send_file(path)
-#                 res.headers.add('Content-Disposition', 'attachment')
-#         else:
-#             res = make_response('Not found', 404)
-#         return res
-
-#     @login_required
-#     def post(self, p=''):
-#         """
-#         uploading files
-#         """
-#         if request.cookies.get('auth_cookie') == key:
-#             path = os.path.join(UserFolder(current_user), p)
-
-#             Path(path).mkdir(parents=True, exist_ok=True)
-
-#             info = {}
-#             if os.path.isdir(path):
-#                 files = request.files.getlist('files[]')
-#                 for file in files:
-#                     try:
-#                         filename = secure_filename(file.filename)
-#                         file.save(os.path.join(path, filename))
-#                     except Exception as e:
-#                         info['status'] = 'error'
-#                         info['msg'] = str(e)
-#                     else:
-#                         info['status'] = 'success'
-#                         info['msg'] = 'File Saved'
-#             else:
-#                 info['status'] = 'error'
-#                 info['msg'] = 'Invalid Operation'
-#             res = make_response(json.JSONEncoder().encode(info), 200)
-#             res.headers.add('Content-type', 'application/json')
-#         else:
-#             info = {} 
-#             info['status'] = 'error'
-#             info['msg'] = 'Authentication failed'
-#             res = make_response(json.JSONEncoder().encode(info), 401)
-#             res.headers.add('Content-type', 'application/json')
-#         return res
-
-# path_view = PathView.as_view('path_view')
-# app.add_url_rule('/fileserver', view_func=path_view)
-
-# app.add_url_rule('/<path:p>', view_func=path_view)
-
 class PathView(MethodView):
     @login_required
     def get(self, p=''):
@@ -221,9 +127,6 @@ class PathView(MethodView):
         downloading files
         """
         
-        # print("First",p)
-
-
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'no'))
 
         path = os.path.join(UserFolder(current_user), p)
@@ -291,18 +194,26 @@ class PathView(MethodView):
         Path(path).mkdir(parents=True, exist_ok=True)
 
         info = {}
+        info["msg"]=[]
         if os.path.isdir(path):
             files = request.files.getlist('files[]')
-            for file in files:
-                try:
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(path, filename))
-                except Exception as e:
-                    info['status'] = 'error'
-                    info['msg'] = str(e)
-                else:
-                    info['status'] = 'success'
-                    info['msg'] = 'File Saved'
+            for f in files:
+                if f.filename.rsplit('.', 1)[1].lower() not in ["ses","arg"]:
+                    info["msg"].append("%s: This file was not uploaded as it is neither a session nor arguments file." %f.filename)
+                else:    
+                    session_=json.load(f) 
+                    print(session_)
+                    if session_["ftype"] not in ["arguments","session"]: 
+                        info["msg"].append("%s: This file was not uploaded as it is neither a session nor arguments file." %f.filename)
+                    else:
+                        try:
+                            filename = secure_filename(f.filename)
+                            f.save(os.path.join(path, filename))
+                            info['status'] = 'success'
+                            info["msg"].append("%s: File Saved" %f.filename)
+                        except Exception as e:
+                            info['status'] = 'error'
+                            info["msg"].append("%s: %s" %(f.filename,str(e)))
         else:
             info['status'] = 'error'
             info['msg'] = 'Invalid Operation'
@@ -321,6 +232,8 @@ class PathView(MethodView):
         # on the download screen add send as input dataframe, parameters, or session
         # restrict to sessions and parameters only
         # change extensions to par and ses
+        # simplify routines
+        # simplify tokes
 
         return res
 
