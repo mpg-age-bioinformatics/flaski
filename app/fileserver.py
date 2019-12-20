@@ -15,7 +15,7 @@ from pathlib2 import Path
 from app import app
 
 
-root = os.path.normpath("/tmp")
+root = os.path.normpath("/tmp/%s/" %str(current_user.id))
 key = "my_trusted_key"
 
 ignored = ['.bzr', '$RECYCLE.BIN', '.DAV', '.DS_Store', '.git', '.hg', '.htaccess', '.htpasswd', '.Spotlight-V100', '.svn', '__MACOSX', 'ehthumbs.db', 'robots.txt', 'Thumbs.db', 'thumbs.tps']
