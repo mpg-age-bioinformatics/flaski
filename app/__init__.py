@@ -21,7 +21,7 @@ mail = Mail(app)
 sess = Session()
 sess.init_app(app)
 
-from app import routes, models, errors
+from app import routes, models, errors, fileserver
 
 from app.plots.routes import scatterplot
 
