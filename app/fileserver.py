@@ -1,4 +1,5 @@
 from flask import Flask, make_response, request, session, render_template, send_file, Response
+from flask_login import current_user, login_user, logout_user, login_required
 from flask.views import MethodView
 from werkzeug import secure_filename
 from datetime import datetime
@@ -22,16 +23,19 @@ datatypes = {'audio': 'm4a,mp3,oga,ogg,webma,wav', 'archive': '7z,zip,rar,gz,tar
 icontypes = {'fa-music': 'm4a,mp3,oga,ogg,webma,wav', 'fa-archive': '7z,zip,rar,gz,tar', 'fa-picture-o': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'fa-file-text': 'pdf', 'fa-film': '3g2,3gp,3gp2,3gpp,mov,qt', 'fa-code': 'atom,plist,bat,bash,c,cmd,coffee,css,hml,js,json,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml', 'fa-file-text-o': 'txt', 'fa-film': 'mp4,m4v,ogv,webm', 'fa-globe': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
 
 @app.template_filter('size_fmt')
+@login_required
 def size_fmt(size):
     return humanize.naturalsize(size)
 
 @app.template_filter('time_fmt')
+@login_required
 def time_desc(timestamp):
     mdate = datetime.fromtimestamp(timestamp)
     str = mdate.strftime('%Y-%m-%d %H:%M:%S')
     return str
 
 @app.template_filter('data_fmt')
+@login_required
 def data_fmt(filename):
     t = 'unknown'
     for type, exts in datatypes.items():
@@ -40,6 +44,7 @@ def data_fmt(filename):
     return t
 
 @app.template_filter('icon_fmt')
+@login_required
 def icon_fmt(filename):
     i = 'fa-file-o'
     for icon, exts in icontypes.items():
@@ -48,10 +53,12 @@ def icon_fmt(filename):
     return i
 
 @app.template_filter('humanize')
+@login_required
 def time_humanize(timestamp):
     mdate = datetime.utcfromtimestamp(timestamp)
     return humanize.naturaltime(mdate)
 
+@login_required
 def get_type(mode):
     if stat.S_ISDIR(mode) or stat.S_ISLNK(mode):
         type = 'dir'
@@ -59,6 +66,7 @@ def get_type(mode):
         type = 'file'
     return type
 
+@login_required
 def partial_response(path, start, end=None):
     file_size = os.path.getsize(path)
 
@@ -88,6 +96,7 @@ def partial_response(path, start, end=None):
     )
     return response
 
+@login_required
 def get_range(request):
     range = request.headers.get('Range')
     m = re.match('bytes=(?P<start>\d+)-(?P<end>\d+)?', range)
@@ -102,6 +111,7 @@ def get_range(request):
         return 0, None
 
 class PathView(MethodView):
+    @login_required
     def get(self, p=''):
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'no'))
 
@@ -141,6 +151,7 @@ class PathView(MethodView):
             res = make_response('Not found', 404)
         return res
 
+    @login_required
     def post(self, p=''):
         if request.cookies.get('auth_cookie') == key:
             path = os.path.join(root, p)
@@ -174,4 +185,5 @@ class PathView(MethodView):
 
 path_view = PathView.as_view('path_view')
 app.add_url_rule('/fileserver', view_func=path_view)
+
 app.add_url_rule('/fileserver/<path:p>', view_func=path_view)
