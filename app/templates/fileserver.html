@@ -125,7 +125,13 @@
                             Activity Log
                         </a>
                         <div class="dropdown-divider"></div-->
-                        <!--a class="dropdown-item" href="{{ url_for('logout') }}"> <!-- data-toggle="modal" data-target="#logoutModal"-->
+                        <!--a class="dropdown-item" href="{{ url_for('logout') }}"> <data-toggle="modal" data-target="#logoutModal"-->
+
+                        <a class="dropdown-item" href="/fileserver">
+                            <i class="fas fa-hdd fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Files
+                        </a>
+
                         <a class="dropdown-item"href="#" data-toggle="modal" data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                             Logout
@@ -238,15 +244,15 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-left" id="file-name">&nbsp;</h4>
+                <h4 class="modal-title text-left" id="file-name">&nbsp; </h4>
                 <small class="text-muted" id="file-meta"></small>
+                <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body"></div>
             <div class="modal-footer">
-                <div class="pull-xs-left">
+                <!--div class="pull-xs-left">
                 <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
-                </div>
+                </div-->
                 <div class="pull-xs-right">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
@@ -259,6 +265,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

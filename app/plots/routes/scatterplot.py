@@ -141,6 +141,10 @@ def scatterplot():
                 has the correct format and respective extension and try uploadling it again." %filename
                 return render_template('/plots/scatterplot.html' , filename="Select file..", error_message=error_message, **plot_arguments)
         
+        if "df" not in list(session.keys()):
+                error_message="No data to plot, please upload a data or session  file."
+                return render_template('/plots/scatterplot.html' , filename="Select file..", error_message=error_message, **plot_arguments)
+ 
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
 
