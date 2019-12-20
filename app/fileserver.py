@@ -14,8 +14,18 @@ from pathlib2 import Path
 
 from app import app
 
+# root = "/tmp/"
 
-root = os.path.normpath("/tmp/%s/" %str(current_user.id))
+def UserFolder(u):
+    if u.is_authenticated:
+        root = os.path.normpath("/tmp/%s/" %str(u.id))
+        if not os.path.isdir(root):
+            os.makedirs(root)
+    else:
+        root=None
+    return root
+
+
 key = "my_trusted_key"
 
 ignored = ['.bzr', '$RECYCLE.BIN', '.DAV', '.DS_Store', '.git', '.hg', '.htaccess', '.htpasswd', '.Spotlight-V100', '.svn', '__MACOSX', 'ehthumbs.db', 'robots.txt', 'Thumbs.db', 'thumbs.tps']
@@ -115,7 +125,7 @@ class PathView(MethodView):
     def get(self, p=''):
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'no'))
 
-        path = os.path.join(root, p)
+        path = os.path.join(UserFolder(current_user), p)
 
         if os.path.isdir(path):
             contents = []
@@ -154,7 +164,7 @@ class PathView(MethodView):
     @login_required
     def post(self, p=''):
         if request.cookies.get('auth_cookie') == key:
-            path = os.path.join(root, p)
+            path = os.path.join(UserFolder(current_user), p)
             Path(path).mkdir(parents=True, exist_ok=True)
 
             info = {}
