@@ -158,7 +158,7 @@ class PathView(MethodView):
             if len(p) > 0:
                 p="/"+p
 
-            page = render_template('fileserver.html', path=p, contents=contents, total=total, hide_dotfile=hide_dotfile)
+            page = render_template('storage.html', path=p, contents=contents, total=total, hide_dotfile=hide_dotfile)
             res = make_response(page, 200)
             res.set_cookie('hide-dotfile', hide_dotfile, max_age=16070400)
         elif os.path.isfile(path):
@@ -202,7 +202,6 @@ class PathView(MethodView):
                     info["msg"].append("%s: This file was not uploaded as it is neither a session nor arguments file." %f.filename)
                 else:    
                     session_=json.load(f) 
-                    print(session_)
                     if session_["ftype"] not in ["arguments","session"]: 
                         info["msg"].append("%s: This file was not uploaded as it is neither a session nor arguments file." %f.filename)
                     else:
@@ -238,6 +237,6 @@ class PathView(MethodView):
         return res
 
 path_view = PathView.as_view('path_view')
-app.add_url_rule('/fileserver/', view_func=path_view)
+app.add_url_rule('/storage/', view_func=path_view)
 
-app.add_url_rule('/fileserver/<path:p>', view_func=path_view)
+app.add_url_rule('/storage/<path:p>', view_func=path_view)
