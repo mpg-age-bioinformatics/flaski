@@ -165,6 +165,7 @@ class PathView(MethodView):
     def post(self, p=''):
         if request.cookies.get('auth_cookie') == key:
             path = os.path.join(UserFolder(current_user), p)
+
             Path(path).mkdir(parents=True, exist_ok=True)
 
             info = {}
