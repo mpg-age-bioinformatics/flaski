@@ -61,7 +61,7 @@ def scatterplot():
 
             if session_["app"]!="scatterplot":
                 plot_arguments=session["plot_arguments"]
-                error_msg="The file was not load as it is associated with the "%s" and not with this app." %session_["app"]
+                error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
                 return render_template('/plots/scatterplot.html' , filename=session["filename"], error_message=error_msg, **plot_arguments)
     
             del(session_["ftype"])
@@ -89,7 +89,7 @@ def scatterplot():
 
             if session_["app"]!="scatterplot":
                 plot_arguments=session["plot_arguments"]
-                error_msg="The file was not load as it is associated with the "%s" and not with this app." %session_["app"]
+                error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
                 return render_template('/plots/scatterplot.html' , filename=session["filename"], error_message=error_msg, **plot_arguments)
 
             del(session_["ftype"])
