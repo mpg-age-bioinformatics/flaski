@@ -6,9 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, shrink-to-fit=no">
   <meta name="generator" content="Bootstrap Listr">
   <title>Flaski</title>
-  <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/custom.css')}}">
-  <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/listr.pack.css')}}">
-  <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/jquery.filer.css')}}">
 
   <script src="https://kit.fontawesome.com/609ed3ec10.js" crossorigin="anonymous"></script>
 
@@ -21,121 +18,34 @@
 
   <link rel="icon" href="{{ url_for('static', filename='dog-solid.png') }}">
 
+  <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/custom.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/listr.pack.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/jquery.filer.css')}}"-->
+
 </head>
 
 <!-- body dir="ltr" -->
-<div id="page-top">
+<body id="page-top">
     <div id="wrapper">
         <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content-wrapper" class="d-flex flex-column">
 
-        <!-- Main Content -->
-        <div id="content">
-  
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <!-- Main Content -->
+            <div id="content">
     
-                <!-- Sidebar Toggle (Topbar) -->
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                <i class="fa fa-bars"></i>
-                </button>
-    
-                <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
-                    <h1 class="h3 mb-0 text-gray-800">Scatter plot</h1>
-                </div>
-    
-                <!-- Topbar Navbar -->
-                <ul class="navbar-nav ml-auto">
-    
-                
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Apps
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right animated--fade-in" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Scatter plot</a>
-                        <a class="dropdown-item" href="#">Line plot</a>
-                        <a class="dropdown-item" href="#">Heatmap</a>
-                        <a class="dropdown-item" href="#">Venn diagram</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                    </li>
-                </ul>
-    
-                <div class="topbar-divider d-none d-sm-block"></div>
-    
-                
-                <li class="nav-item dropdown no-arrow mx-1">
-                <a class="nav-link" href="https://github.com/jorgeboucas" id="alertsDropdown" role="button" target="_blank">
-                    <i class="fas fa-book fa-fw"></i>
-                    <!-- Counter - Alerts -->
-                    <!--span class="badge badge-danger badge-counter">3+</span-->
-                </a>
-                </li>
-    
-                <li class="nav-item dropdown no-arrow mx-1">
-                    <a class="nav-link" href="https://github.com/jorgeboucas" id="alertsDropdown" role="button" target="_blank">
-                    <i class="fas fa-exclamation-triangle fa-fw" aria-hidden="true"></i>
-                    <!-- Counter - Alerts -->
-                    <!--span class="badge badge-danger badge-counter">3+</span-->
-                    </a>
-                </li>
-    
-                <li class="nav-item dropdown no-arrow mx-1">
-                <a class="nav-link" href="mailto:bioinformatics@age.mpg.de" id="alertsDropdown" role="button" target="_blank">
-                    <i class="fas fa-envelope fa-fw"></i>
-                    <!-- Counter - Alerts -->
-                    <!--span class="badge badge-danger badge-counter">3+</span-->
-                </a>
-                </li>
-    
-                <div class="topbar-divider d-none d-sm-block"></div>
-    
-                <!-- Nav Item - User Information -->
-                <li class="nav-item dropdown no-arrow">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{current_user.firstname }} {{current_user.lastname }}</span>
-                    <img class="img-profile rounded-circle" src="{{ current_user.avatar(128) }}">
-                    </a>
-                    <!-- Dropdown - User Information -->
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                    <!--a class="dropdown-item" href="#">
-                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                        Profile
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                        Settings
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                        Activity Log
-                    </a>
-                    <div class="dropdown-divider"></div-->
-                    <!--a class="dropdown-item" href="{{ url_for('logout') }}"> <!-- data-toggle="modal" data-target="#logoutModal"-->
-                    <a class="dropdown-item"href="#" data-toggle="modal" data-target="#logoutModal">
-                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                        Logout
-                    </a>
-                    </div>
-                </li>
-    
-    
-                <!-- Topbar Navbar -->
-                <ul class="navbar-nav ml-auto">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+        
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                    </button>
+        
+                    <!--div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+                        <h1 class="h3 mb-0 text-gray-800">Scatter plot</h1>
+                    </div-->
 
-                </ul>
-                
-            </nav>
-            <!-- End of Topbar -->
-
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
-            <!--div class="container"-->
-                <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-xs-12" style="width:3000000px;padding-top:18px;">
                         <ol class="breadcrumb" dir="ltr">
                             <li class="breadcrumb-item"><a href="{{url_for('path_view')}}"><i class="fa fa-fw fa-home fa-lg"></i> </a></li>
                             {% for part in path.strip('/').split('/') %}
@@ -144,128 +54,233 @@
                             <!--li class="login"><a data-toggle="modal" data-target="#login-modal" class="btn btn-secondary text-muted"><i class="fa fa-fw fa-user"></i><strong id="userlogin">Login</strong></a></li-->
                         </ol>
                     </div>
-
-                    <div class="col-xs-12 col-sm-5 col-md-4 col-sm-offset-7 col-md-offset-8 pull-sm-right">
-                        <div class="form-group">
-                            <label class="form-control-label sr-only" for="listr-search">Search</label>
-                            <input type="text" id="listr-search" class="form-control" placeholder="Search">
+        
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+        
+                    
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Apps
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right animated--fade-in" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Scatter plot</a>
+                            <a class="dropdown-item" href="#">Line plot</a>
+                            <a class="dropdown-item" href="#">Heatmap</a>
+                            <a class="dropdown-item" href="#">Venn diagram</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
                         </div>
-                    </div>
-                <div class="pull-sm-right">
-                    <div class="btn-group">
-                    <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted">Upload</a>
-                    {% if hide_dotfile == 'yes' %}
-                    <a href="?hide-dotfile=no" class="btn btn-secondary text-muted">Show Dotfiles</a>
-                    {% else %}
-                    <a href="?hide-dotfile=yes" class="btn btn-secondary text-muted">Hide Dotfiles</a>
-                    {% endif %}
-                    </div>
-                </div>
-                </div>
-                <div class="table-responsive">
-                <table id="listr-table" class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th class="text-xs-left " data-sort="string">Name</th>
-                        <th class="text-xs-right " data-sort="int">Size</th>
-                        <th class="text-xs-right " data-sort="int">Modified</th>
-                    </tr>
-                    </thead>
-                    <tfoot>
-                    <tr>
-                        <td colspan="3">
-                            <small class="pull-xs-left text-muted" dir="ltr">{{total.dir}} folders and {{total.file}} files, {{total.size | size_fmt}} in total</small>
-                        </td>
-                    </tr>
-                    </tfoot>
-                    <tbody>
-                    {% for entry in contents if entry.type == 'dir' %}
-                    <tr>
-                        <td class="text-xs-left " data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}/" ><strong>{{entry.name}}</strong></a></td>
-                        <td class="text-xs-right " data-sort-value="-1">&mdash;</td>
-                        <td class="text-xs-right " data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
-                    </tr>
-                    {% endfor %}
-                    {% for entry in contents if entry.type == 'file' %}
-                    <tr>
-                        <td class="text-xs-left " data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
-                        <a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a>
-                        </td>
-                        <td class="text-xs-right " data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
-                        <td class="text-xs-right " data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-                <div class="modal fade" id="viewer-modal" tabindex="-1" role="dialog" aria-labelledby="file-name" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title text-left" id="file-name">&nbsp;</h4>
-                        <small class="text-muted" id="file-meta"></small>
-                    </div>
-                    <div class="modal-body"></div>
-                    <div class="modal-footer">
-                        <div class="pull-xs-left">
-                        <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
+                        </li>
+                    </ul>
+        
+                    <div class="topbar-divider d-none d-sm-block"></div>
+        
+                    
+                    <li class="nav-item dropdown no-arrow mx-1">
+                    <a class="nav-link" href="https://github.com/jorgeboucas" id="alertsDropdown" role="button" target="_blank">
+                        <i class="fas fa-book fa-fw"></i>
+                        <!-- Counter - Alerts -->
+                        <!--span class="badge badge-danger badge-counter">3+</span-->
+                    </a>
+                    </li>
+        
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link" href="https://github.com/jorgeboucas" id="alertsDropdown" role="button" target="_blank">
+                        <i class="fas fa-exclamation-triangle fa-fw" aria-hidden="true"></i>
+                        <!-- Counter - Alerts -->
+                        <!--span class="badge badge-danger badge-counter">3+</span-->
+                        </a>
+                    </li>
+        
+                    <li class="nav-item dropdown no-arrow mx-1">
+                    <a class="nav-link" href="mailto:bioinformatics@age.mpg.de" id="alertsDropdown" role="button" target="_blank">
+                        <i class="fas fa-envelope fa-fw"></i>
+                        <!-- Counter - Alerts -->
+                        <!--span class="badge badge-danger badge-counter">3+</span-->
+                    </a>
+                    </li>
+        
+                    <div class="topbar-divider d-none d-sm-block"></div>
+        
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{current_user.firstname }} {{current_user.lastname }}</span>
+                        <img class="img-profile rounded-circle" src="{{ current_user.avatar(128) }}">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                        <!--a class="dropdown-item" href="#">
+                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Profile
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Settings
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Activity Log
+                        </a>
+                        <div class="dropdown-divider"></div-->
+                        <!--a class="dropdown-item" href="{{ url_for('logout') }}"> <!-- data-toggle="modal" data-target="#logoutModal"-->
+                        <a class="dropdown-item"href="#" data-toggle="modal" data-target="#logoutModal">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Logout
+                        </a>
                         </div>
-                        <div class="pull-xs-right">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </li>
+        
+        
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
 
-                        <div class="btn-group">
-                            <a href="#" class="btn btn-primary fullview" download>Download</a>
+                    </ul>
+                    
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                <!--div class="container"-->
+                    <div class="row">
+                        <!--div class="col-xs-12">
+                            <ol class="breadcrumb" dir="ltr">
+                                <li class="breadcrumb-item"><a href="{{url_for('path_view')}}"><i class="fa fa-fw fa-home fa-lg"></i> </a></li>
+                                {% for part in path.strip('/').split('/') %}
+                                <li class="breadcrumb-item"><a href="{{url_for('path_view', p='/'+path[:path.find(part)+part|length]+'/')}}"><strong>{{ part }}</strong></a></li>
+                                {% endfor %}
+                                <li class="login"><a data-toggle="modal" data-target="#login-modal" class="btn btn-secondary text-muted"><i class="fa fa-fw fa-user"></i><strong id="userlogin">Login</strong></a></li>
+                            </ol>
+                        <div-->
+
+                        <div class="col-xs-12 col-sm-5 col-md-4 col-sm-offset-7 col-md-offset-8 pull-sm-right">
+                            <div class="form-group">
+                                <label class="form-control-label sr-only" for="listr-search">Search</label>
+                                <input type="text" id="listr-search" class="form-control" placeholder="Search">
                             </div>
                         </div>
+
+                        <div class="pull-sm-right">
+                            <div class="btn-group">
+                            <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted">Upload</a>
+                            {% if hide_dotfile == 'yes' %}
+                            <a href="?hide-dotfile=no" class="btn btn-secondary text-muted">Show Dotfiles</a>
+                            {% else %}
+                            <a href="?hide-dotfile=yes" class="btn btn-secondary text-muted">Hide Dotfiles</a>
+                            {% endif %}
+                            </div>
                         </div>
                     </div>
+                    <div class="table-responsive">
+                        <table id="listr-table" class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="text-xs-left " data-sort="string">Name</th>
+                                <th class="text-xs-right " data-sort="int">Size</th>
+                                <th class="text-xs-right " data-sort="int">Modified</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <td colspan="3">
+                                    <small class="pull-xs-left text-muted" dir="ltr">{{total.dir}} folders and {{total.file}} files, {{total.size | size_fmt}} in total</small>
+                                </td>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            {% for entry in contents if entry.type == 'dir' %}
+                            <tr>
+                                <td class="text-xs-left " data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}/" ><strong>{{entry.name}}</strong></a></td>
+                                <td class="text-xs-right " data-sort-value="-1">&mdash;</td>
+                                <td class="text-xs-right " data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% for entry in contents if entry.type == 'file' %}
+                            <tr>
+                                <td class="text-xs-left " data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
+                                <a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a>
+                                </td>
+                                <td class="text-xs-right " data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
+                                <td class="text-xs-right " data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                </!--div>
-                <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                    <div class="modal-body">
-                        <form id="upload-files" method="post" enctype="multipart/form-data">
-                            <input type="file" name="files[]" id="filer_input" multiple="multiple">
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="pull-xs-right">
-                        <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <div class="modal fade" id="viewer-modal" tabindex="-1" role="dialog" aria-labelledby="file-name" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title text-left" id="file-name">&nbsp;</h4>
+                                <small class="text-muted" id="file-meta"></small>
+                            </div>
+                            <div class="modal-body"></div>
+                            <div class="modal-footer">
+                                <div class="pull-xs-left">
+                                <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
+                                </div>
+                                <div class="pull-xs-right">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-primary fullview" download>Download</a>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
                         </div>
                     </div>
+                    <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                            <div class="modal-body">
+                                <form id="upload-files" method="post" enctype="multipart/form-data">
+                                    <input type="file" name="files[]" id="filer_input" multiple="multiple">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="pull-xs-right">
+                                <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                </div>
-                <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                    <form id="login">
-                        <div class="modal-body">
-                        <div class="md-form">
-                            <i class="fa fa-envelope prefix grey-text"> </i><label>Username</label>
-                            <input type="text" id="username" class="form-control">
+                    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <form id="login">
+                                    <div class="modal-body">
+                                        <div class="md-form">
+                                            <i class="fa fa-envelope prefix grey-text"> </i><label>Username</label>
+                                            <input type="text" id="username" class="form-control">
+                                        </div>
+                                        <div class="md-form">
+                                            <i class="fa fa-lock prefix grey-text"> </i>
+                                            <label>Password</label>
+                                            <input type="password" id="password" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="pull-xs-right">
+                                            <button type="button" id="close-login" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="submit" id="send-login" class="btn btn-secondary">Login</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        <div class="md-form">
-                            <i class="fa fa-lock prefix grey-text"> </i>
-                            <label>Password</label>
-                            <input type="password" id="password" class="form-control">
-                        </div>
-                        </div>
-                        <div class="modal-footer">
-                        <div class="pull-xs-right">
-                            <button type="button" id="close-login" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="submit" id="send-login" class="btn btn-secondary">Login</button>
-                        </div>
-                        </div>
-                    </form>
                     </div>
                 </div>
             </div>
+        </div>
     </div>
-  </div>
+    
   <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
@@ -291,7 +306,7 @@
     <script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
   
-</!-- body>
+</body>
 </html>
 
 
