@@ -269,16 +269,24 @@
     <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-            <div class="modal-body">
                 <form id="upload-files" method="post" enctype="multipart/form-data">
-                    <input type="file" name="files[]" id="filer_input" multiple="multiple">
+
+                    <div class="modal-body">
+                            <input type="file" name="files[]" id="filer_input" multiple="multiple">
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pull-xs-right">
+                        <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary fullview">
+                                <i></i> Upload
+                            </button>
+                            <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
+                            </div>
+                        </div>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <div class="pull-xs-right">
-                <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
             </div>
         </div>
     </div>
@@ -309,13 +317,13 @@
     </div-->
 
 
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
-  <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
 
     <!-- Bootstrap core JavaScript-->
     <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>

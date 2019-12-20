@@ -12,13 +12,13 @@ import mimetypes
 import sys
 from pathlib2 import Path
 
-from app import app
+from app import app, sess
 
 # root = "/tmp/"
 
 def UserFolder(u):
     if u.is_authenticated:
-        root = os.path.normpath("/tmp/%s" %str(u.id))
+        root = os.path.normpath("/Users/jboucas/Desktop/flaski_user_space/%s" %str(u.id))
         if not os.path.isdir(root):
             os.makedirs(root)
     else:
@@ -26,7 +26,7 @@ def UserFolder(u):
     return root
 
 
-key = "my_trusted_key"
+key = app.config["SECRET_KEY"]
 
 ignored = ['.bzr', '$RECYCLE.BIN', '.DAV', '.DS_Store', '.git', '.hg', '.htaccess', '.htpasswd', '.Spotlight-V100', '.svn', '__MACOSX', 'ehthumbs.db', 'robots.txt', 'Thumbs.db', 'thumbs.tps']
 datatypes = {'audio': 'm4a,mp3,oga,ogg,webma,wav', 'archive': '7z,zip,rar,gz,tar', 'image': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'pdf': 'pdf', 'quicktime': '3g2,3gp,3gp2,3gpp,mov,qt', 'source': 'atom,bat,bash,c,cmd,coffee,css,hml,js,json,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml,plist', 'text': 'txt', 'video': 'mp4,m4v,ogv,webm', 'website': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
@@ -221,7 +221,7 @@ class PathView(MethodView):
         downloading files
         """
         
-        print("First",p)
+        # print("First",p)
 
 
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'no'))
@@ -254,7 +254,7 @@ class PathView(MethodView):
                 p=p[:-1]
             if len(p) > 0:
                 p="/"+p
-            print("Going to render", p)
+
             page = render_template('fileserver.html', path=p, contents=contents, total=total, hide_dotfile=hide_dotfile)
             res = make_response(page, 200)
             res.set_cookie('hide-dotfile', hide_dotfile, max_age=16070400)
@@ -274,35 +274,54 @@ class PathView(MethodView):
         """
         uploading files
         """
-        if request.cookies.get('auth_cookie') == key:
-            path = os.path.join(UserFolder(current_user), p)
+        print(p)
 
-            Path(path).mkdir(parents=True, exist_ok=True)
+        p="/"+p
 
-            info = {}
-            if os.path.isdir(path):
-                files = request.files.getlist('files[]')
-                for file in files:
-                    try:
-                        filename = secure_filename(file.filename)
-                        file.save(os.path.join(path, filename))
-                    except Exception as e:
-                        info['status'] = 'error'
-                        info['msg'] = str(e)
-                    else:
-                        info['status'] = 'success'
-                        info['msg'] = 'File Saved'
-            else:
-                info['status'] = 'error'
-                info['msg'] = 'Invalid Operation'
-            res = make_response(json.JSONEncoder().encode(info), 200)
-            res.headers.add('Content-type', 'application/json')
+        #s = requests.Session()
+        #print(request.cookies["session"])
+        #print(app)
+        #print(key,request.cookies.get('auth_cookie'))
+
+        #if request.cookies.get('auth_cookie') == key:
+        
+        path = UserFolder(current_user)+ p
+        #print(p, path, UserFolder(current_user))
+
+        Path(path).mkdir(parents=True, exist_ok=True)
+
+        info = {}
+        if os.path.isdir(path):
+            files = request.files.getlist('files[]')
+            for file in files:
+                try:
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(path, filename))
+                except Exception as e:
+                    info['status'] = 'error'
+                    info['msg'] = str(e)
+                else:
+                    info['status'] = 'success'
+                    info['msg'] = 'File Saved'
         else:
-            info = {} 
             info['status'] = 'error'
-            info['msg'] = 'Authentication failed'
-            res = make_response(json.JSONEncoder().encode(info), 401)
-            res.headers.add('Content-type', 'application/json')
+            info['msg'] = 'Invalid Operation'
+        res = make_response(json.JSONEncoder().encode(info), 200)
+        res.headers.add('Content-type', 'application/json')
+        #else:
+        #    info = {} 
+        #    info['status'] = 'error'
+        #    info['msg'] = 'Authentication failed'
+        #    res = make_response(json.JSONEncoder().encode(info), 401)
+        #    res.headers.add('Content-type', 'application/json')
+
+        # change fileserver to files
+        # return url_for('fileserver')
+        # add messaging on the right of the buttoms 
+        # on the download screen add send as input dataframe, parameters, or session
+        # restrict to sessions and parameters only
+        # change extensions to par and ses
+
         return res
 
 path_view = PathView.as_view('path_view')
