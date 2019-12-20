@@ -59,6 +59,11 @@ def scatterplot():
                 error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
                 return render_template('/plots/scatterplot.html' , filename=session["filename"], error_message=error_msg, **plot_arguments)
 
+            if session_["app"]!="scatterplot":
+                plot_arguments=session["plot_arguments"]
+                error_msg="The file was not load as it is associated with the "%s" and not with this app." %session_["app"]
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], error_message=error_msg, **plot_arguments)
+    
             del(session_["ftype"])
             del(session_["COMMIT"])
             for k in list(session_.keys()):
@@ -81,6 +86,12 @@ def scatterplot():
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
                 return render_template('/plots/scatterplot.html' , filename=session["filename"], error_message=error_msg, **plot_arguments)
+
+            if session_["app"]!="scatterplot":
+                plot_arguments=session["plot_arguments"]
+                error_msg="The file was not load as it is associated with the "%s" and not with this app." %session_["app"]
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], error_message=error_msg, **plot_arguments)
+
             del(session_["ftype"])
             del(session_["COMMIT"])
             for k in list(session_.keys()):
@@ -183,6 +194,7 @@ def scatterplot():
         session["lists"]=lists
         session["notUpdateList"]=notUpdateList
         session["COMMIT"]=app.config['COMMIT']
+        session["app"]="scatterplot"
 
         eventlog = UserLogging(email=current_user.email,action="visit scatterplot")
         db.session.add(eventlog)
