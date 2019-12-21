@@ -9,10 +9,6 @@
 
   <script src="https://kit.fontawesome.com/609ed3ec10.js" crossorigin="anonymous"></script>
 
-  <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/custom.css')}}"-->
-  <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/listr.pack.css')}}"-->
-  <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/jquery.filer.css')}}"-->
-
   <!-- Custom fonts for this template-->
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -21,6 +17,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" type="text/css">
 
   <link rel="icon" href="{{ url_for('static', filename='dog-solid.png') }}">
+
+    <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/custom.css')}}">
+    <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/listr.pack.css')}}"-->
+    <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/jquery.filer.css')}}">
 
 </head>
 
@@ -168,18 +168,30 @@
                             </div>
                         </div>
 
-                        <div class="pull-sm-right">
-                            <div class="btn-group" sytle="color:white;">
+                        <div class="pull-sm-right" >
+                            <div class="btn-group" sytle="color:white">
                             <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted bg-gray-300">Upload</a>
-                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Makedir</a>
-                            {% if hide_dotfile == 'yes' %}
-                            <a href="?hide-dotfile=no" class="btn btn-secondary text-muted bg-gray-300">Show Dotfiles</a>
-                            {% else %}
-                            <a href="?hide-dotfile=yes" class="btn btn-secondary text-muted bg-gray-300">Hide Dotfiles</a>
-                            {% endif %}
+                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Save</a>
+                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
+                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Delete Dir</a>
+
+                            {#% if hide_dotfile == 'yes' %#}
+                            <!--a href="?hide-dotfile=no" class="btn btn-secondary text-muted bg-gray-300">Show Dotfiles</a-->
+                            {#% else %#}
+                            <!--a href="?hide-dotfile=yes" class="btn btn-secondary text-muted bg-gray-300">Hide Dotfiles</a-->
+                            {#% endif %#}
                             </div>
                         </div>
                     </div>
+
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-info" style="background-color:rgb(121, 151, 241);color:black" role="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
                     <div class="table-responsive">
                         <table id="listr-table" class="table table-hover">
                             <thead>
@@ -255,16 +267,20 @@
                     <div class="pull-xs-right">
 
                         <div class="btn-group">
-                            <a href="#" class="btn btn-primary fullview" download>Load file</a>
-                            </div>
+                            <a href="#" class="btn btn-primary fullview">Load file</a>
                         </div>
 
                         <div class="btn-group">
                             <a href="#" class="btn btn-primary fullview" download>Download</a>
-                            </div>
                         </div>
 
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary fullview bg-gradient-danger border-danger">Delete</a>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
 
                     </div>
                 </div>
@@ -322,13 +338,6 @@
         </div>
     </div-->
 
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
-
     <!-- Bootstrap core JavaScript-->
     <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -346,7 +355,14 @@
     <script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
 
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
+
   
 </body>
 </html>

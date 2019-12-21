@@ -10,7 +10,6 @@ from werkzeug.urls import url_parse
 from app.plots.figures.scatterplot import make_figure, figure_defaults
 from app.models import User, UserLogging
 
-
 import os
 import io
 import sys
@@ -232,7 +231,7 @@ def downloadarguments():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
     for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes',"width","height","df"]:
+        if k not in ['_permanent','fileread','_flashes',"width","height","df","csrf_token","user_id","_fresh"]:
             session_[k]=session[k]
     session_["ftype"]="arguments"
 
@@ -254,7 +253,7 @@ def downloadsession():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
     for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes',"width","height"]:
+        if k not in ['_permanent','fileread','_flashes',"width","height","csrf_token","user_id","_fresh"]:
             session_[k]=session[k]
     session_["ftype"]="session"
 

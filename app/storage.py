@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, session, render_template, send_file, Response
+from flask import Flask, make_response, request, session, render_template, send_file, Response, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from flask.views import MethodView
 from werkzeug import secure_filename
@@ -18,19 +18,18 @@ from app import app, sess
 
 def UserFolder(u):
     if u.is_authenticated:
-        root = os.path.normpath("/Users/jboucas/Desktop/flaski_user_space/%s" %str(u.id))
+        root = "/Users/jboucas/Desktop/flaski_user_space/%s" %str(u.id)
         if not os.path.isdir(root):
             os.makedirs(root)
     else:
         root=None
     return root
 
-
 key = app.config["SECRET_KEY"]
 
 ignored = ['.bzr', '$RECYCLE.BIN', '.DAV', '.DS_Store', '.git', '.hg', '.htaccess', '.htpasswd', '.Spotlight-V100', '.svn', '__MACOSX', 'ehthumbs.db', 'robots.txt', 'Thumbs.db', 'thumbs.tps']
-datatypes = {'audio': 'm4a,mp3,oga,ogg,webma,wav', 'archive': '7z,zip,rar,gz,tar', 'image': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'pdf': 'pdf', 'quicktime': '3g2,3gp,3gp2,3gpp,mov,qt', 'source': 'atom,bat,bash,c,cmd,coffee,css,hml,js,json,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml,plist', 'text': 'txt', 'video': 'mp4,m4v,ogv,webm', 'website': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
-icontypes = {'fa-music': 'm4a,mp3,oga,ogg,webma,wav', 'fa-archive': '7z,zip,rar,gz,tar', 'fa-picture-o': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'fa-file-text': 'pdf', 'fa-film': '3g2,3gp,3gp2,3gpp,mov,qt', 'fa-code': 'atom,plist,bat,bash,c,cmd,coffee,css,hml,js,json,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml', 'fa-file-text-o': 'txt', 'fa-film': 'mp4,m4v,ogv,webm', 'fa-globe': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
+datatypes = {'audio': 'm4a,mp3,oga,ogg,webma,wav', 'archive': '7z,zip,rar,gz,tar', 'image': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'pdf': 'pdf', 'quicktime': '3g2,3gp,3gp2,3gpp,mov,qt', 'source': 'atom,bat,bash,c,cmd,coffee,css,hml,js,json,arg,ses,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml,plist', 'text': 'txt', 'video': 'mp4,m4v,ogv,webm', 'website': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
+icontypes = {'fa-music': 'm4a,mp3,oga,ogg,webma,wav', 'fa-archive': '7z,zip,rar,gz,tar', 'fa-picture-o': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'fa-file-text': 'pdf', 'fa-film': '3g2,3gp,3gp2,3gpp,mov,qt', 'fa-code': 'atom,plist,bat,bash,c,cmd,coffee,css,hml,js,json,arg,ses,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml', 'fa-file-text-o': 'txt', 'fa-film': 'mp4,m4v,ogv,webm', 'fa-globe': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
 
 @app.template_filter('size_fmt')
 @login_required
@@ -120,6 +119,12 @@ def get_range(request):
     else:
         return 0, None
 
+@login_required
+@app.route('/upload')
+def upload():
+    return redirect('/storage')
+
+
 class PathView(MethodView):
     @login_required
     def get(self, p=''):
@@ -127,7 +132,7 @@ class PathView(MethodView):
         downloading files
         """
         
-        hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'no'))
+        hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'yes'))
 
         path = os.path.join(UserFolder(current_user), p)
         
@@ -177,17 +182,10 @@ class PathView(MethodView):
         """
         uploading files
         """
-        print(p)
+        root=UserFolder(current_user)
 
         p="/"+p
 
-        #s = requests.Session()
-        #print(request.cookies["session"])
-        #print(app)
-        #print(key,request.cookies.get('auth_cookie'))
-
-        #if request.cookies.get('auth_cookie') == key:
-        
         path = UserFolder(current_user)+ p
         #print(p, path, UserFolder(current_user))
 
@@ -197,46 +195,36 @@ class PathView(MethodView):
         info["msg"]=[]
         if os.path.isdir(path):
             files = request.files.getlist('files[]')
-            for f in files:
-                if f.filename.rsplit('.', 1)[1].lower() not in ["ses","arg"]:
-                    info["msg"].append("%s: This file was not uploaded as it is neither a session nor arguments file." %f.filename)
-                else:    
-                    session_=json.load(f) 
-                    if session_["ftype"] not in ["arguments","session"]: 
-                        info["msg"].append("%s: This file was not uploaded as it is neither a session nor arguments file." %f.filename)
+            files = [ s for s in files if s ]
+            for uploadfile in files:
+                session_=json.load(uploadfile) 
+                if session_["ftype"] not in ["arguments","session"]:
+                    msg="%s: This file was not uploaded as it is neither a session nor an arguments file." %uploadfile.filename
+                    flash(msg)
+                    info["msg"].append(msg)
+                else:
+                    try:
+                        filename = secure_filename(uploadfile.filename)
+                        uploadfile.save(os.path.join(path, filename))
+
+                    except Exception as e:
+                        info['status'] = 'error'
+                        msg="%s: %s" %(uploadfile.filename,str(e))
+                        flash(msg)
+                        info["msg"].append(msg)
+                    
                     else:
-                        try:
-                            filename = secure_filename(f.filename)
-                            f.save(os.path.join(path, filename))
-                            info['status'] = 'success'
-                            info["msg"].append("%s: File Saved" %f.filename)
-                        except Exception as e:
-                            info['status'] = 'error'
-                            info["msg"].append("%s: %s" %(f.filename,str(e)))
+                        info['status'] = 'success'
+                        msg="%s: File Uploaded" %uploadfile.filename
+                        flash(msg)
+                        info["msg"].append(msg)
         else:
             info['status'] = 'error'
             info['msg'] = 'Invalid Operation'
         res = make_response(json.JSONEncoder().encode(info), 200)
         res.headers.add('Content-type', 'application/json')
-        #else:
-        #    info = {} 
-        #    info['status'] = 'error'
-        #    info['msg'] = 'Authentication failed'
-        #    res = make_response(json.JSONEncoder().encode(info), 401)
-        #    res.headers.add('Content-type', 'application/json')
-
-        # change fileserver to files
-        # return url_for('fileserver')
-        # add messaging on the right of the buttoms 
-        # on the download screen add send as input dataframe, parameters, or session
-        # restrict to sessions and parameters only
-        # change extensions to par and ses
-        # simplify routines
-        # simplify tokes
-
-        return res
+        return redirect('/storage'+p)
 
 path_view = PathView.as_view('path_view')
 app.add_url_rule('/storage/', view_func=path_view)
-
 app.add_url_rule('/storage/<path:p>', view_func=path_view)
