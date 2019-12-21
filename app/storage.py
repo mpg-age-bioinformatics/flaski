@@ -119,11 +119,6 @@ def get_range(request):
     else:
         return 0, None
 
-@login_required
-@app.route('/upload')
-def upload():
-    return redirect('/storage')
-
 
 class PathView(MethodView):
     @login_required
