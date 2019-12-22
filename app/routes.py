@@ -144,3 +144,10 @@ def before_request():
             flash('This account is not active. Please contact support.')
             logout_user()
             return redirect(url_for('login'))
+
+@app.route('/reset_plot')
+@login_required
+def reset_plot():
+    app=session["app"]
+    session["app"]=None
+    return redirect(url_for(app))

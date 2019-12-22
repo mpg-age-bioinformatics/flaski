@@ -179,27 +179,36 @@ def scatterplot():
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
+        
         return render_template('/plots/scatterplot.html', figure_url=figure_url, filename=filename, **plot_arguments)
 
     else:
         #sometext="get"
 
-        # INITIATE SESSION
-        session["filename"]="Select file.."
+        if "app" not in list(session.keys()):
+            return_to_plot=False
+        elif session["app"] != "scatterplot" :
+            return_to_plot=False
+        else:
+            return_to_plot=True
 
-        plot_arguments, lists, notUpdateList=figure_defaults()
+        if not return_to_plot:
+            # INITIATE SESSION
+            session["filename"]="Select file.."
 
-        session["plot_arguments"]=plot_arguments
-        session["lists"]=lists
-        session["notUpdateList"]=notUpdateList
-        session["COMMIT"]=app.config['COMMIT']
-        session["app"]="scatterplot"
+            plot_arguments, lists, notUpdateList=figure_defaults()
 
-        eventlog = UserLogging(email=current_user.email,action="visit scatterplot")
-        db.session.add(eventlog)
-        db.session.commit()
+            session["plot_arguments"]=plot_arguments
+            session["lists"]=lists
+            session["notUpdateList"]=notUpdateList
+            session["COMMIT"]=app.config['COMMIT']
+            session["app"]="scatterplot"
 
-        return render_template('plots/scatterplot.html',  filename=session["filename"], **plot_arguments)
+            eventlog = UserLogging(email=current_user.email, action="visit scatterplot")
+            db.session.add(eventlog)
+            db.session.commit()
+        
+        return render_template('plots/scatterplot.html',  filename=session["filename"], **session["plot_arguments"])
 
 @app.route('/figure', methods=['GET','POST'])
 @login_required
