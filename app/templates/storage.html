@@ -22,6 +22,16 @@
     <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/listr.pack.css')}}"-->
     <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/jquery.filer.css')}}">
 
+<style>
+.error{
+    background-color:coral
+}
+.info{
+    background-color:rgb(148,224,153)
+}
+
+</style>
+
 </head>
 
 <!-- body dir="ltr" -->
@@ -189,10 +199,14 @@
                         </div>
                     </div>
 
-                    {% with messages = get_flashed_messages() %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-info" style="background-color:rgb(121, 151, 241);color:black" role="alert">{{ message }}</div>
+                        {% for category, message in messages %}
+                        {% if category == "error" %}
+                        <div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div>
+                        {% else %}
+                        <div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div>
+                        {% endif %}
                         {% endfor %}
                     {% endif %}
                     {% endwith %}

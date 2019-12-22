@@ -169,8 +169,8 @@ class PathView(MethodView):
                 res = send_file(path)
                 res.headers.add('Content-Disposition', 'attachment')
         else:
-            res = make_response('Not found', 404)
-        return res
+            return make_response('Not found', 404)
+        return redirect('/storage'+p)
 
     @login_required
     def post(self, p=''):
@@ -192,30 +192,38 @@ class PathView(MethodView):
             files = request.files.getlist('files[]')
             files = [ s for s in files if s ]
             for uploadfile in files:
-                session_=json.load(uploadfile) 
+                try:
+                    session_=json.load(uploadfile)
+                except:
+                    msg="%s: This file was not uploaded as it is neither a session nor an arguments file." %uploadfile.filename
+                    flash(msg,'error')
+                    return redirect('/storage'+p)
                 if session_["ftype"] not in ["arguments","session"]:
                     msg="%s: This file was not uploaded as it is neither a session nor an arguments file." %uploadfile.filename
-                    flash(msg)
+                    flash(msg,'error')
                     info["msg"].append(msg)
                 else:
                     try:
-                        filename = secure_filename(uploadfile.filename)
+                        filename = secure_filename(uploadfile.filename) 
                         uploadfile.save(os.path.join(path, filename))
 
                     except Exception as e:
                         info['status'] = 'error'
                         msg="%s: %s" %(uploadfile.filename,str(e))
-                        flash(msg)
+                        flash(msg,'error')
                         info["msg"].append(msg)
                     
                     else:
                         info['status'] = 'success'
                         msg="%s: File Uploaded" %uploadfile.filename
-                        flash(msg)
+                        flash(msg,'info')
                         info["msg"].append(msg)
         else:
             info['status'] = 'error'
             info['msg'] = 'Invalid Operation'
+            msg="Could not save file(s) to %s. %s is not a directory." %(path,path)
+            flash(msg,'error')
+            info["msg"].append(msg)
         res = make_response(json.JSONEncoder().encode(info), 200)
         res.headers.add('Content-type', 'application/json')
         return redirect('/storage'+p)
