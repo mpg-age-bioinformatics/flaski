@@ -170,7 +170,7 @@ class PathView(MethodView):
                 res.headers.add('Content-Disposition', 'attachment')
         else:
             return make_response('Not found', 404)
-        return redirect('/storage'+p)
+        return res
 
     @login_required
     def post(self, p=''):
