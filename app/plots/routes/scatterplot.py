@@ -240,7 +240,7 @@ def downloadarguments():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
     for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes',"width","height","df","csrf_token","user_id","_fresh","available_disk_space"]:
+        if k not in ['_permanent','fileread','_flashes',"width","height","df","csrf_token","user_id","_fresh","available_disk_space","_id"]:
             session_[k]=session[k]
     session_["ftype"]="arguments"
 
@@ -262,7 +262,7 @@ def downloadsession():
     # READ INPUT DATA FROM SESSION JSON
     session_={}
     for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes',"width","height","csrf_token","user_id","_fresh","available_disk_space"]:
+        if k not in ['_permanent','fileread','_flashes',"width","height","csrf_token","user_id","_fresh","available_disk_space","_id"]:
             session_[k]=session[k]
     session_["ftype"]="session"
 

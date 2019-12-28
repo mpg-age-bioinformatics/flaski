@@ -224,20 +224,27 @@ class PathView(MethodView):
                     info["msg"].append(msg)
                 else:
                     try:
-                        filename = secure_filename(uploadfile.filename) 
-                        uploadfile.save(os.path.join(path, filename))
+                        filename = secure_filename(uploadfile.filename)
+                        #session_["COMMIT"]=app.config['COMMIT']
+                        with open(os.path.join(path, filename), "w") as write_file:
+                            write_file.write(json.dumps(session_))
+                        #uploadfile.save(os.path.join(path, filename))
+                        #uploadfile.close()
                         session["available_disk_space"]=session["available_disk_space"]-file_length
+                        info['status'] = 'success'
+                        msg="%s: File Uploaded" %uploadfile.filename
+                        flash(msg,'info')
+                        info["msg"].append(msg)
                     except Exception as e:
                         info['status'] = 'error'
                         msg="%s: %s" %(uploadfile.filename,str(e))
                         flash(msg,'error')
                         info["msg"].append(msg)
-                    
-                    else:
-                        info['status'] = 'success'
-                        msg="%s: File Uploaded" %uploadfile.filename
-                        flash(msg,'info')
-                        info["msg"].append(msg)
+                    # else:
+                    #     info['status'] = 'success'
+                    #     msg="%s: File Uploaded" %uploadfile.filename
+                    #     flash(msg,'info')
+                    #     info["msg"].append(msg)
         else:
             info['status'] = 'error'
             info['msg'] = 'Invalid Operation'

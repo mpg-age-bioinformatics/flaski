@@ -4,7 +4,7 @@ import redis
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 with open(basedir+"/.git/refs/heads/master", "r") as f:
-    commit=f.readline()
+    commit=f.readline().split("\n")[0]
 
 class Config(object):
     session_token=secrets.token_urlsafe(16)
