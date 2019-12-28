@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):
     lastname = db.Column(db.String(64), index=True)
     organization = db.Column(db.String(120), index=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    disk_quota = db.Column(db.Float, nullable=False, default=250)
+    disk_quota = db.Column(db.Float, nullable=False, default=2.5e+8)
     registered_on = db.Column(db.DateTime, default=datetime.utcnow)
     password_set = db.Column(db.DateTime, default=datetime.utcnow)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<Email {}>'.format(self.email)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

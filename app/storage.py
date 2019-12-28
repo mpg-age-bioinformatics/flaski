@@ -11,6 +11,7 @@ import json
 import mimetypes
 import sys
 from pathlib2 import Path
+from copy import copy
 
 from app import app, sess
 
@@ -158,7 +159,17 @@ class PathView(MethodView):
             if len(p) > 0:
                 p="/"+p
 
-            page = render_template('storage.html', path=p, contents=contents, total=total, hide_dotfile=hide_dotfile)
+            percent_used=int(total['size']/current_user.disk_quota*100)
+            available_disk_space=current_user.disk_quota-total['size']
+            session["available_disk_space"]=available_disk_space
+            if percent_used > 75:
+                progress_bar_background="bg-warning"
+            elif percent_used > 95:
+                progress_bar_background="bg-danger"
+            else:
+                progress_bar_background="bg-success"
+
+            page = render_template('storage.html', path=p, contents=contents, percent_used=percent_used , progress_bar_background=progress_bar_background, total=total, hide_dotfile=hide_dotfile)
             res = make_response(page, 200)
             res.set_cookie('hide-dotfile', hide_dotfile, max_age=16070400)
         elif os.path.isfile(path):
@@ -192,10 +203,19 @@ class PathView(MethodView):
             files = request.files.getlist('files[]')
             files = [ s for s in files if s ]
             for uploadfile in files:
+                # check file size
+                pos = uploadfile.tell()
+                uploadfile.seek(0, os.SEEK_END)  #seek to end
+                file_length = uploadfile.tell()
+                uploadfile.seek(pos)  # back to original position
+                if session["available_disk_space"] < file_length:
+                    msg="%s: You do not have enough free space to upload this file." %uploadfile.filename
+                    flash(msg,'error')
+                    return redirect('/storage'+p)
                 try:
                     session_=json.load(uploadfile)
                 except:
-                    msg="%s: This file was not uploaded as it is neither a session nor an arguments file." %uploadfile.filename
+                    msg="%s: This file was not uploaded as it is not properly formated." %uploadfile.filename
                     flash(msg,'error')
                     return redirect('/storage'+p)
                 if session_["ftype"] not in ["arguments","session"]:
@@ -206,7 +226,7 @@ class PathView(MethodView):
                     try:
                         filename = secure_filename(uploadfile.filename) 
                         uploadfile.save(os.path.join(path, filename))
-
+                        session["available_disk_space"]=session["available_disk_space"]-file_length
                     except Exception as e:
                         info['status'] = 'error'
                         msg="%s: %s" %(uploadfile.filename,str(e))
