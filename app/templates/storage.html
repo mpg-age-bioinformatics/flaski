@@ -194,8 +194,8 @@
                         <div class="pull-sm-right" >
                             <div class="btn-group" sytle="color:white">
                             <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted bg-gray-300">Upload</a>
-                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Save</a>
-                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
+                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Save</a> 
+                            <a data-toggle="modal" data-target="#makedir-modal" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
 
                             {#% if hide_dotfile == 'yes' %#}
                             <!--a href="?hide-dotfile=no" class="btn btn-secondary text-muted bg-gray-300">Show Dotfiles</a-->
@@ -336,6 +336,33 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="makedir-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="upload-files" method="post" enctype="multipart/form-data">
+
+                    <div class="modal-body">
+                            <input type="file" name="files[]" id="filer_input" multiple="multiple">
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pull-xs-right">
+                        <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary fullview">
+                                <i></i> Upload
+                            </button>
+                            <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!--div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
