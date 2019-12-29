@@ -50,6 +50,15 @@ export MAIL_PASSWORD=<your-gmail-password>
 
 
 
+
+                                {% if path == "" %}
+                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
+                                {% else %}
+                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{path}}{% '/' if path != '' else '' %}{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
+                                {% endif %}
+
+
+
   <script src="https://kit.fontawesome.com/609ed3ec10.js" crossorigin="anonymous"></script>
 
   <!-- Custom fonts for this template-->
