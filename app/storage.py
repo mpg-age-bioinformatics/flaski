@@ -163,8 +163,8 @@ def save(p=""):
 @app.route('/load/<path:p>')
 @login_required
 def load(p):
-    p="/"+p
-    path = UserFolder(current_user) + p
+    #p=p 
+    path = UserFolder(current_user) + "/" + p
     with open(path,"r") as json_in:
         session_=json.load(json_in)
     del(session_["ftype"])
@@ -173,7 +173,7 @@ def load(p):
         session[k]=session_[k]
     plot_arguments=session["plot_arguments"]
     app_redirect=session["app"]
-    flash("`%s` loaded. Press `Submit` to see results." %p.rsplit("/",1)[1],'info')
+    flash("`%s` loaded. Press `Submit` to see results." %os.path.basename(path),'info')
     return redirect(url_for(app_redirect))
 
 def get_size(start_path = '.'):
@@ -221,7 +221,10 @@ class PathView(MethodView):
                 sz = stat_res.st_size
                 info['size'] = sz
                 total['size'] += sz
-                info["path"] = p+"/"+filename
+                if p =="":
+                    info["path"] = filename
+                else:
+                    info["path"] = p+"/"+filename
                 contents.append(info)
 
             if len(p) > 0 and p[-1] == "/":
