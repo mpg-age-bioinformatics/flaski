@@ -133,6 +133,20 @@ def delete(p):
     p=p.rsplit("/",1)[0]
     return redirect( '/storage'+p )
 
+@app.route('/makedir/',methods=['GET', 'POST'])
+@app.route('/makedir/<path:p>',methods=['GET', 'POST'])
+@login_required
+def makedir(p=""):
+    new_folders=request.form["folder_name"]
+    path = UserFolder(current_user) + "/"+p +"/"+ new_folders
+    print(p, path) #    #p=
+    if not os.path.isdir(path):
+        os.makedirs(path)
+        flash("`%s` created. " %new_folders,'info')
+    else:
+        flash("`%s` could not be created. %s already exists." %(new_folders,new_folders),'info')
+    return redirect( '/storage/'+p )
+
 
 @app.route('/load/<path:p>')
 @login_required
@@ -193,13 +207,13 @@ class PathView(MethodView):
                 sz = stat_res.st_size
                 info['size'] = sz
                 total['size'] += sz
-                info["path"] = p+filename
+                info["path"] = p+"/"+filename
                 contents.append(info)
 
             if len(p) > 0 and p[-1] == "/":
                 p=p[:-1]
-            if len(p) > 0:
-                p="/"+p
+            #if len(p) > 0:
+            #    p="/"+p
 
             percent_used=int(quota_used/current_user.disk_quota*100)
             available_disk_space=current_user.disk_quota-quota_used
@@ -232,9 +246,9 @@ class PathView(MethodView):
         """
         root=UserFolder(current_user)
 
-        p="/"+p
+        #p="/"+p
 
-        path = UserFolder(current_user)+ p
+        path = UserFolder(current_user)+ "/"+p
         #print(p, path, UserFolder(current_user))
 
         Path(path).mkdir(parents=True, exist_ok=True)
@@ -253,13 +267,13 @@ class PathView(MethodView):
                 if session["available_disk_space"] < file_length:
                     msg="%s: You do not have enough free space to upload this file." %uploadfile.filename
                     flash(msg,'error')
-                    return redirect('/storage'+p)
+                    return redirect('/storage/'+p)
                 try:
                     session_=json.load(uploadfile)
                 except:
                     msg="%s: This file was not uploaded as it is not properly formated." %uploadfile.filename
                     flash(msg,'error')
-                    return redirect('/storage'+p)
+                    return redirect('/storage/'+p)
                 if session_["ftype"] not in ["arguments","session"]:
                     msg="%s: This file was not uploaded as it is neither a session nor an arguments file." %uploadfile.filename
                     flash(msg,'error')
@@ -295,7 +309,7 @@ class PathView(MethodView):
             info["msg"].append(msg)
         res = make_response(json.JSONEncoder().encode(info), 200)
         res.headers.add('Content-type', 'application/json')
-        return redirect('/storage'+p)
+        return redirect('/storage/'+p)
 
 path_view = PathView.as_view('path_view')
 app.add_url_rule('/storage/', view_func=path_view)

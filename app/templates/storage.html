@@ -240,7 +240,12 @@
                             {% for entry in contents if entry.type == 'dir' %}
                             <tr>
                                 <td class="text-xs-left " style="padding-right:0px;"></td>
-                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}/" ><strong>{{entry.name}}</strong></a></td>
+                                <!--do something> if <something is true> else <do something else></do-->
+                                {% if path == "" %}
+                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
+                                {% else %}
+                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{path}}/{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
+                                {% endif %}
                                 <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="-1">&mdash;</td>
                                 <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
                                 <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/delete/{{entry.path}}" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
@@ -341,21 +346,22 @@
     <div class="modal fade" id="makedir-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="upload-files" method="post" enctype="multipart/form-data">
+                <form id="mkdir-folders" action="{{ url_for('makedir', p=path ) }}" method="post" enctype="multipart/form-data">
 
                     <div class="modal-body">
-                            <input type="file" name="files[]" id="filer_input" multiple="multiple">
+                        <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
+                        <input type="text" name="folder_name" placeholder="folder name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
                     </div>
                     <div class="modal-footer">
                         <div class="pull-xs-right">
-                        <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                         <div class="btn-group">
-                            <button type="submit" class="btn btn-primary fullview">
-                                <i></i> Upload
+                            <button type="submit" class="btn btn-primary">
+                                <i></i> Make directory
                             </button>
                             <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
-                            </div>
+                        <!--/div-->
                         </div>
                     </div>
                 </form>
