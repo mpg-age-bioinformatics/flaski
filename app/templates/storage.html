@@ -194,7 +194,7 @@
                         <div class="pull-sm-right" >
                             <div class="btn-group" sytle="color:white">
                             <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted bg-gray-300">Upload</a>
-                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Save</a> 
+                            <a data-toggle="modal" data-target="#save-modal" class="btn btn-secondary text-muted bg-gray-300">Save</a>
                             <a data-toggle="modal" data-target="#makedir-modal" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
 
                             {#% if hide_dotfile == 'yes' %#}
@@ -339,6 +339,38 @@
                                 <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
 
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="save-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="save-file" action="{{ url_for('save', p=path ) }}" method="post" enctype="multipart/form-data">
+
+                    <div class="modal-body">
+                        <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
+                        <input type="text" name="file_name" placeholder="file name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pull-xs-right">
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" name="action" value="ses">
+                                    <i></i> Save session
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" name="action" value="arg">
+                                    <i></i> Save arguments
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
                 </form>

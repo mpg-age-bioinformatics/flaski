@@ -14,6 +14,7 @@ from pathlib2 import Path
 from copy import copy
 import shutil
 
+from app.routines import session_to_file
 from app import app, sess
 
 # root = "/tmp/"
@@ -139,7 +140,6 @@ def delete(p):
 def makedir(p=""):
     new_folders=request.form["folder_name"]
     path = UserFolder(current_user) + "/"+p +"/"+ new_folders
-    print(p, path) #    #p=
     if not os.path.isdir(path):
         os.makedirs(path)
         flash("`%s` created. " %new_folders,'info')
@@ -147,6 +147,18 @@ def makedir(p=""):
         flash("`%s` could not be created. %s already exists." %(new_folders,new_folders),'info')
     return redirect( '/storage/'+p )
 
+
+@app.route('/save/',methods=['GET', 'POST'])
+@app.route('/save/<path:p>',methods=['GET', 'POST'])
+@login_required
+def save(p=""):
+    filename=secure_filename(request.form["file_name"])
+    ext=request.form['action']
+    session_=session_to_file(session,ext)
+    path = UserFolder(current_user) + "/"+p +"/"+ filename+"."+ext
+    with open(path,"w") as fout:
+        json.dump(session_, fout)
+    return redirect( '/storage/'+p )
 
 @app.route('/load/<path:p>')
 @login_required
@@ -174,6 +186,8 @@ def get_size(start_path = '.'):
                 total_size += os.path.getsize(fp)
 
     return total_size
+
+
 
 class PathView(MethodView):
     @login_required

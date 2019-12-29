@@ -9,6 +9,7 @@ from app import db
 from werkzeug.urls import url_parse
 from app.plots.figures.scatterplot import make_figure, figure_defaults
 from app.models import User, UserLogging
+from app.routines import session_to_file
 
 import os
 import io
@@ -238,11 +239,12 @@ def figure():
 @login_required
 def downloadarguments():
     # READ INPUT DATA FROM SESSION JSON
-    session_={}
-    for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes',"width","height","df","csrf_token","user_id","_fresh","available_disk_space","_id"]:
-            session_[k]=session[k]
-    session_["ftype"]="arguments"
+    session_=session_to_file(session,"arg")
+    # session_={}
+    # for k in list(session.keys()):
+    #     if k not in ['_permanent','fileread','_flashes',"width","height","df","csrf_token","user_id","_fresh","available_disk_space","_id"]:
+    #         session_[k]=session[k]
+    # session_["ftype"]="arguments"
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
@@ -260,11 +262,12 @@ def downloadarguments():
 @login_required
 def downloadsession():
     # READ INPUT DATA FROM SESSION JSON
-    session_={}
-    for k in list(session.keys()):
-        if k not in ['_permanent','fileread','_flashes',"width","height","csrf_token","user_id","_fresh","available_disk_space","_id"]:
-            session_[k]=session[k]
-    session_["ftype"]="session"
+    session_=session_to_file(session,"arg")
+    # session_={}
+    # for k in list(session.keys()):
+    #     if k not in ['_permanent','fileread','_flashes',"width","height","csrf_token","user_id","_fresh","available_disk_space","_id"]:
+    #         session_[k]=session[k]
+    # session_["ftype"]="session"
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
