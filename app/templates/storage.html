@@ -196,7 +196,6 @@
                             <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted bg-gray-300">Upload</a>
                             <a href="" class="btn btn-secondary text-muted bg-gray-300">Save</a>
                             <a href="" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
-                            <a href="" class="btn btn-secondary text-muted bg-gray-300">Delete Dir</a>
 
                             {#% if hide_dotfile == 'yes' %#}
                             <!--a href="?hide-dotfile=no" class="btn btn-secondary text-muted bg-gray-300">Show Dotfiles</a-->
@@ -223,14 +222,16 @@
                         <table id="listr-table" class="table table-hover">
                             <thead>
                             <tr>
-                                <th class="text-xs-left " data-sort="string">Name</th>
-                                <th class="text-xs-right " data-sort="int">Size</th>
-                                <th class="text-xs-right " data-sort="int">Modified</th>
+                                <th class="text-xs-right " style="padding-right:0px;" data-sort="int">Load</th>
+                                <th class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort="string">Name</th>
+                                <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Size</th>
+                                <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Modified</th>
+                                <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Delete</th>
                             </tr>
                             </thead>
                             <tfoot>
                             <tr>
-                                <td colspan="3">
+                                <td colspan="5">
                                     <small class="pull-xs-left text-muted" dir="ltr">{{total.dir}} folders and {{total.file}} files, {{total.size | size_fmt}} in total</small>
                                 </td>
                             </tr>
@@ -238,18 +239,22 @@
                             <tbody>
                             {% for entry in contents if entry.type == 'dir' %}
                             <tr>
-                                <td class="text-xs-left " data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}/" ><strong>{{entry.name}}</strong></a></td>
-                                <td class="text-xs-right " data-sort-value="-1">&mdash;</td>
-                                <td class="text-xs-right " data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                                <td class="text-xs-left " style="padding-right:0px;"></td>
+                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}/" ><strong>{{entry.name}}</strong></a></td>
+                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="-1">&mdash;</td>
+                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
                             </tr>
                             {% endfor %}
                             {% for entry in contents if entry.type == 'file' %}
                             <tr>
-                                <td class="text-xs-left " data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
+                                <td class="text-xs-left " style="padding-right:0px;" title=Load><a href="/" class="fas fa-spinner"></a></td> <!-- <i class="fas fa-spinner"></i>-->
+                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
                                 <a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a>
                                 </td>
-                                <td class="text-xs-right " data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
-                                <td class="text-xs-right " data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;"data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
+                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
                             </tr>
                             {% endfor %}
                             </tbody>
@@ -294,7 +299,7 @@
                     <div class="pull-xs-right">
 
                         <div class="btn-group">
-                            <a href="#" class="btn btn-primary fullview">Load file</a>
+                            <a href="#" class="btn btn-primary">Load file</a>
                         </div>
 
                         <div class="btn-group">
@@ -302,7 +307,7 @@
                         </div>
 
                         <div class="btn-group">
-                            <a href="#" class="btn btn-primary fullview bg-gradient-danger border-danger">Delete</a>
+                            <a href="#" class="btn btn-primary bg-gradient-danger border-danger">Delete</a>
                         </div>
 
                         <div class="btn-group">
