@@ -12,6 +12,7 @@ import mimetypes
 import sys
 from pathlib2 import Path
 from copy import copy
+import shutil
 
 from app import app, sess
 
@@ -120,6 +121,45 @@ def get_range(request):
     else:
         return 0, None
 
+@app.route('/delete/<path:p>')
+@login_required
+def delete(p):
+    p="/"+p
+    path = UserFolder(current_user) + p 
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    elif os.path.isfile(path):
+        os.remove(path)
+    p=p.rsplit("/",1)[0]
+    return redirect( '/storage'+p )
+
+
+@app.route('/load/<path:p>')
+@login_required
+def load(p):
+    p="/"+p
+    path = UserFolder(current_user) + p
+    with open(path,"r") as json_in:
+        session_=json.load(json_in)
+    del(session_["ftype"])
+    del(session_["COMMIT"])
+    for k in list(session_.keys()):
+        session[k]=session_[k]
+    plot_arguments=session["plot_arguments"]
+    app_redirect=session["app"]
+    flash("`%s` loaded. Press `Submit` to see results." %p.rsplit("/",1)[1],'info')
+    return redirect(url_for(app_redirect))
+
+def get_size(start_path = '.'):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            # skip if it is symbolic link
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+
+    return total_size
 
 class PathView(MethodView):
     @login_required
@@ -131,11 +171,12 @@ class PathView(MethodView):
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'yes'))
 
         path = os.path.join(UserFolder(current_user), p)
-        
+
+        quota_used=get_size(UserFolder(current_user))        
 
         if os.path.isdir(path):
             contents = []
-            total = {'size': 0, 'dir': 0, 'file': 0}
+            total = {'size': get_size(path), 'dir': 0, 'file': 0}
             for filename in os.listdir(path):
                 if filename in ignored:
                     continue
@@ -152,6 +193,7 @@ class PathView(MethodView):
                 sz = stat_res.st_size
                 info['size'] = sz
                 total['size'] += sz
+                info["path"] = p+filename
                 contents.append(info)
 
             if len(p) > 0 and p[-1] == "/":
@@ -159,8 +201,8 @@ class PathView(MethodView):
             if len(p) > 0:
                 p="/"+p
 
-            percent_used=int(total['size']/current_user.disk_quota*100)
-            available_disk_space=current_user.disk_quota-total['size']
+            percent_used=int(quota_used/current_user.disk_quota*100)
+            available_disk_space=current_user.disk_quota-quota_used
             session["available_disk_space"]=available_disk_space
             if percent_used > 75:
                 progress_bar_background="bg-warning"
