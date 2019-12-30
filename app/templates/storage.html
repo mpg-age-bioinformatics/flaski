@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,132 +36,22 @@
 
 </head>
 
-<!-- body dir="ltr" -->
-<body id="page-top">
-    <div id="wrapper">
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
+{% block app_title %}
 
-            <!-- Main Content -->
-            <div id="content">
-    
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-        
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                    <i class="fa fa-bars"></i>
-                    </button>
-        
-                    <!--div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
-                        <h1 class="h3 mb-0 text-gray-800">Scatter plot</h1>
-                    </div-->
+<div class="col-xs-12" style="width:3000000px;padding-top:18px;">
+    <ol class="breadcrumb" dir="ltr">
+        <li class="breadcrumb-item"><a href="{{url_for('path_view')}}"><i class="fa fa-fw fa-home fa-lg"></i> </a></li>
+        {% for part in path.strip('/').split('/') %}
+        <li class="breadcrumb-item"><a href="{{url_for('path_view', p='/'+path[:path.find(part)+part|length]+'/')}}"><strong>{{ part }}</strong></a></li>
+        {% endfor %}
+        <!--li class="login"><a data-toggle="modal" data-target="#login-modal" class="btn btn-secondary text-muted"><i class="fa fa-fw fa-user"></i><strong id="userlogin">Login</strong></a></li-->
+    </ol>
+</div>
 
-                    <div class="col-xs-12" style="width:3000000px;padding-top:18px;">
-                        <ol class="breadcrumb" dir="ltr">
-                            <li class="breadcrumb-item"><a href="{{url_for('path_view')}}"><i class="fa fa-fw fa-home fa-lg"></i> </a></li>
-                            {% for part in path.strip('/').split('/') %}
-                            <li class="breadcrumb-item"><a href="{{url_for('path_view', p='/'+path[:path.find(part)+part|length]+'/')}}"><strong>{{ part }}</strong></a></li>
-                            {% endfor %}
-                            <!--li class="login"><a data-toggle="modal" data-target="#login-modal" class="btn btn-secondary text-muted"><i class="fa fa-fw fa-user"></i><strong id="userlogin">Login</strong></a></li-->
-                        </ol>
-                    </div>
-        
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-        
-                    
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown" >
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Apps </a>
-                        <div class="dropdown-menu dropdown-menu-right animated--fade-in" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Scatter plot</a>
-                            <a class="dropdown-item" href="#">Line plot</a>
-                            <a class="dropdown-item" href="#">Heatmap</a>
-                            <a class="dropdown-item" href="#">Venn diagram</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                        </li>
-                    </ul>
-        
-                    <div class="topbar-divider d-none d-sm-block"></div>
-        
-                    
-                    <li class="nav-item dropdown no-arrow mx-1">
-                    <a class="nav-link" href="https://github.com/jorgeboucas" id="alertsDropdown" role="button" target="_blank">
-                        <i class="fas fa-book fa-fw"></i>
-                        <!-- Counter - Alerts -->
-                        <!--span class="badge badge-danger badge-counter">3+</span-->
-                    </a>
-                    </li>
-        
-                    <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link" href="https://github.com/jorgeboucas" id="alertsDropdown" role="button" target="_blank">
-                        <i class="fas fa-exclamation-triangle fa-fw" aria-hidden="true"></i>
-                        <!-- Counter - Alerts -->
-                        <!--span class="badge badge-danger badge-counter">3+</span-->
-                        </a>
-                    </li>
-        
-                    <li class="nav-item dropdown no-arrow mx-1">
-                    <a class="nav-link" href="mailto:bioinformatics@age.mpg.de" id="alertsDropdown" role="button" target="_blank">
-                        <i class="fas fa-envelope fa-fw"></i>
-                        <!-- Counter - Alerts -->
-                        <!--span class="badge badge-danger badge-counter">3+</span-->
-                    </a>
-                    </li>
-        
-                    <div class="topbar-divider d-none d-sm-block"></div>
-        
-                    <!-- Nav Item - User Information -->
-                    <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{current_user.firstname }} {{current_user.lastname }}</span>
-                        <img class="img-profile rounded-circle" src="{{ current_user.avatar(128) }}">
-                        </a>
-                        <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                        <!--a class="dropdown-item" href="#">
-                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Profile
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Settings
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Activity Log
-                        </a>
-                        <div class="dropdown-divider"></div-->
-                        <!--a class="dropdown-item" href="{{ url_for('logout') }}"> <data-toggle="modal" data-target="#logoutModal"-->
+{% endblock %}
 
-                        <a class="dropdown-item" href="{{ url_for('reset_plot') }}">
-                            <i class="fas fa-drafting-compass fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Reset
-                            </a> 
+{% block content %}
 
-                        <a class="dropdown-item" href="/storage">
-                            <i class="fas fa-hdd fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Files
-                        </a>
-
-                        <a class="dropdown-item"href="#" data-toggle="modal" data-target="#logoutModal">
-                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Logout
-                        </a>
-                        </div>
-                    </li>
-        
-        
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                    </ul>
-                    
-                </nav>
-                <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
                 <section>
@@ -270,141 +162,141 @@
                 <!-- End of Page Content -->
                 </section>
 
-            </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;position: absolute;bottom: 0;width: 100%;">
-                <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
-                    <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
-                        <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Insitute for Biology of Ageing</span>
+                <div class="modal fade" id="viewer-modal" tabindex="-1" role="dialog" aria-labelledby="file-name" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title text-left" id="file-name">&nbsp; </h4>
+                                <small class="text-muted" id="file-meta"></small>
+                                <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                            <div class="modal-body"></div>
+                            <div class="modal-footer">
+                                <!--div class="pull-xs-left">
+                                <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
+                                </div-->
+                                <div class="pull-xs-right">
+            
+                                    <div class="btn-group">
+                                        <a href="#" class="btn btn-primary fullview" download>Download</a>
+                                    </div>
+            
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+            
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </footer>
-            <!-- End of Footer -->
-
-        </div>
-        <!-- End of Content Wrapper -->
-    </div>
-    <!-- End of Page Wrapper -->
-
-    <div class="modal fade" id="viewer-modal" tabindex="-1" role="dialog" aria-labelledby="file-name" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title text-left" id="file-name">&nbsp; </h4>
-                    <small class="text-muted" id="file-meta"></small>
-                    <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <!--div class="pull-xs-left">
-                    <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
-                    </div-->
-                    <div class="pull-xs-right">
-
-                        <div class="btn-group">
-                            <a href="#" class="btn btn-primary fullview" download>Download</a>
+            
+                <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form id="upload-files" method="post" enctype="multipart/form-data">
+            
+                                <div class="modal-body">
+                                        <input type="file" name="files[]" id="filer_input" multiple="multiple">
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="pull-xs-right">
+            
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-primary fullview">
+                                                <i></i> Upload
+                                            </button>
+                                        <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
+                                        </div>
+            
+                                        <div class="btn-group"></div>
+                                            <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+            
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="upload-files" method="post" enctype="multipart/form-data">
-
-                    <div class="modal-body">
-                            <input type="file" name="files[]" id="filer_input" multiple="multiple">
-                    </div>
-                    <div class="modal-footer">
-                        <div class="pull-xs-right">
-
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary fullview">
-                                    <i></i> Upload
-                                </button>
-                            <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
-                            </div>
-
-                            <div class="btn-group"></div>
-                                <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
-
+            
+            
+                <div class="modal fade" id="save-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form id="save-file" action="{{ url_for('save', p=path ) }}" method="post" enctype="multipart/form-data">
+            
+                                <div class="modal-body">
+                                    <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
+                                    <input type="text" name="file_name" placeholder="file name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="pull-xs-right">
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-primary" name="action" value="ses">
+                                                <i></i> Save session
+                                            </button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-primary" name="action" value="arg">
+                                                <i></i> Save arguments
+                                            </button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade" id="save-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="save-file" action="{{ url_for('save', p=path ) }}" method="post" enctype="multipart/form-data">
-
-                    <div class="modal-body">
-                        <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
-                        <input type="text" name="file_name" placeholder="file name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
-                    </div>
-                    <div class="modal-footer">
-                        <div class="pull-xs-right">
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary" name="action" value="ses">
-                                    <i></i> Save session
-                                </button>
-                            </div>
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary" name="action" value="arg">
-                                    <i></i> Save arguments
-                                </button>
-                            </div>
-                            <div class="btn-group">
-                                <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
+                </div>
+            
+            
+                <div class="modal fade" id="makedir-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form id="mkdir-folders" action="{{ url_for('makedir', p=path ) }}" method="post" enctype="multipart/form-data">
+            
+                                <div class="modal-body">
+                                    <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
+                                    <input type="text" name="folder_name" placeholder="folder name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="pull-xs-right">
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i></i> Make directory
+                                            </button>
+                                        <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                {% endblock %}
+
+{% block in_page_footer %}
+
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;position: absolute;bottom: 0;width: 100%;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+            <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Insitute for Biology of Ageing</span>
         </div>
     </div>
+</footer>
+<!-- End of Footer -->
 
+{% endblock %}
 
-    <div class="modal fade" id="makedir-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="mkdir-folders" action="{{ url_for('makedir', p=path ) }}" method="post" enctype="multipart/form-data">
-
-                    <div class="modal-body">
-                        <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
-                        <input type="text" name="folder_name" placeholder="folder name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
-                    </div>
-                    <div class="modal-footer">
-                        <div class="pull-xs-right">
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary">
-                                    <i></i> Make directory
-                                </button>
-                            <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
-                            </div>
-                            <div class="btn-group">
-                                <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+ 
 
     <!--div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">

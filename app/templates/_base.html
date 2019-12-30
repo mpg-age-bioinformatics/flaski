@@ -60,9 +60,38 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+          <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+          <!-- /div -->
+          <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+              </div>
+          <!--/div-->
+          <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+        </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <div id="" style="overflow:scroll;max-height:{{maxHeightSideBar}}px">
 
       {% block side_bar_content %}{% endblock %}
       
+      <!-- Divider -->
+      <!--hr class="sidebar-divider d-none d-md-block"-->
+      </div>
+    
+      <!-- Sidebar Toggler (Sidebar) -->
+      <!-- div class="text-center d-none d-md-inline" -->
+        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
+      <!-- /div -->
+
+    </ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -79,10 +108,9 @@
             <i class="fa fa-bars"></i>
           </button>
 
-          {% block app_title %}{% endblock %}
-          <!--div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+          <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
               <h1 class="h3 mb-0 text-gray-800">Scatter plot</h1>
-          </div-->
+          </div>
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
@@ -183,30 +211,27 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
+        <div class="container-fluid">
 
           {% block content %}{% endblock %}
 
+        </div>
       </div>
       <!-- End of Main Content -->
 
       <!-- Footer -->
-      {% block in_app_footer %}{% endblock %}
-
-      <!--footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+      <footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
         <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
           <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
             <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Insitute for Biology of Ageing</span>
           </div>
         </div>
-      </footer-->
+      </footer>
         <!-- End of Footer -->
       </div>
       <!-- End of Content Wrapper -->
 
-      {% block in_page_footer %}{% endblock %}
-
     </div>
-
     <!-- End of Page Wrapper -->
 
       <!-- Logout Modal-->
