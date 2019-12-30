@@ -13,6 +13,7 @@ import sys
 from pathlib2 import Path
 from copy import copy
 import shutil
+import io
 
 from app.routines import session_to_file
 from app import app, sess
@@ -156,6 +157,14 @@ def save(p=""):
     ext=request.form['action']
     session_=session_to_file(session,ext)
     path = UserFolder(current_user) + "/"+p +"/"+ filename+"."+ext
+
+    session_file = io.BytesIO()
+    session_file.write(json.dumps(session_).encode())
+    session_file.seek(0,os.SEEK_END)
+    session_file=session_file.tell()           
+    if session_file > session["available_disk_space"]:
+        flash("'%s': you do not have enough space to save this file." %(filename+"."+ext),'error')
+        return redirect( '/storage/'+p )
     with open(path,"w") as fout:
         json.dump(session_, fout)
     return redirect( '/storage/'+p )
@@ -163,7 +172,6 @@ def save(p=""):
 @app.route('/load/<path:p>')
 @login_required
 def load(p):
-    #p=p 
     path = UserFolder(current_user) + "/" + p
     with open(path,"r") as json_in:
         session_=json.load(json_in)
@@ -186,8 +194,6 @@ def get_size(start_path = '.'):
                 total_size += os.path.getsize(fp)
 
     return total_size
-
-
 
 class PathView(MethodView):
     @login_required
