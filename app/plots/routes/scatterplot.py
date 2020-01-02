@@ -173,24 +173,30 @@ def scatterplot():
                 flash(error_msg,'error')
                 return render_template('/plots/scatterplot.html' , filename="Select file..",  **plot_arguments)
  
-        # READ INPUT DATA FROM SESSION JSON
-        df=pd.read_json(session["df"])
-
-        # CALL FIGURE FUNCTION
-        fig=make_figure(df,plot_arguments)
-
-        # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-        figfile = io.BytesIO()
-        plt.savefig(figfile, format='png')
-        plt.close()
-        figfile.seek(0)  # rewind to beginning of file
-        figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
-
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
 
-        return render_template('/plots/scatterplot.html', figure_url=figure_url, filename=filename, **plot_arguments)
+        # READ INPUT DATA FROM SESSION JSON
+        df=pd.read_json(session["df"])
+
+        # CALL FIGURE FUNCTION
+        try:
+            fig=make_figure(df,plot_arguments)
+
+            # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+            figfile = io.BytesIO()
+            plt.savefig(figfile, format='png')
+            plt.close()
+            figfile.seek(0)  # rewind to beginning of file
+            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+
+            return render_template('/plots/scatterplot.html', figure_url=figure_url, filename=filename, **plot_arguments)
+
+        except Exception as e:
+            flash(e,'error')
+
+            return render_template('/plots/scatterplot.html', filename=filename, **plot_arguments)
 
     else:
         #sometext="get"

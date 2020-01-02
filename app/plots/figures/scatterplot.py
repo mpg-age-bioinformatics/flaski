@@ -23,12 +23,21 @@ def make_figure(df,pa):
 
     return fig
 
+STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
+ALLOWED_MARKERS=[".",",","o","v","^","<",">",\
+            "1","2","3","4","8",\
+            "s","p","*","h","H","+","x",\
+            "X","D","d","|","_"]
+
+
 def figure_defaults():
     
     # https://matplotlib.org/3.1.1/api/markers_api.html
     # https://matplotlib.org/2.0.2/api/colors_api.html
 
-    standard_sizes=[ str(i) for i in list(range(101)) ]
+   
+
+    markers_i
 
     # lists allways need to have thee default value after the list
     # eg.:
@@ -37,26 +46,23 @@ def figure_defaults():
 
     plot_arguments={
         "title":'Scatter plot',\
-        "title_size":standard_sizes,\
+        "title_size":STANDARD_SIZES,\
         "titles":"20",\
         "xcols":[],\
         "xvals":None,\
         "ycols":[],\
         "yvals":None,\
-        "markerstyles":[".",",","o","v","^","<",">",\
-            "1","2","3","4","8",\
-            "s","p","*","h","H","+","x",\
-            "X","D","d","|","_"],\
+        "markerstyles":ALLOWED_MARKERS,\
         "marker":".",\
-        "marker_size":standard_sizes,\
+        "marker_size":STANDARD_SIZES,\
         "markers":"50",\
         "marker_color":["blue","green","red","cyan","magenta","yellow","black","white"],\
         "markerc":"black",\
         "xlabel":"x",\
-        "xlabel_size":standard_sizes,\
+        "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
         "ylabel":"y",\
-        "ylabel_size":standard_sizes,\
+        "ylabel_size":STANDARD_SIZES,\
         "ylabels":"14",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
@@ -85,3 +91,49 @@ def figure_defaults():
                 lists[allargs[i]]=allargs[i+1]
 
     return plot_arguments, lists, notUpdateList
+
+# def input_check(df,pa):
+#     errors=[]
+#     try:
+#         pa["title"]=str(pa["title"])
+#     else:
+#         errors=errors+["Could not convert title to string."]
+
+#     try:
+#         pa["titles"]=int(pa["titles"])
+#     except:
+#         errors=errors+["Could not convert title size to int."]
+
+#     for x in pa["xcols"]:
+#         if x not in df.columns.tolist():
+#             errors=errors+["%s could not be found on your dataframe headers." %x]
+
+#     for y in pa["ycols"]:
+#         if y not in df.columns.tolist():
+#             errors=errors+["%s could not be found on your dataframe headers." %y]
+
+#     if type(pa["xvals"]) != list:
+#         if str(pa["xvals"]).lower() == "none":
+#             errors=errors+["No x vals selected."]
+#         else:
+#             errors=errors+["Could not find proper values for x"]
+#     else:
+#         for v in pa["xvals"]:
+#             values=[]
+#             try:
+#                 values=values+[float(v)]
+#             except:
+#                 errors=errors+["Could not find proper values for x"]
+
+    
+
+    
+
+    
+    
+
+        
+
+            
+
+
