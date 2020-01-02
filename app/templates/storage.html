@@ -52,235 +52,224 @@
 
 {% block content %}
 
+<!-- Begin Page Content -->
+<section>
+    <div class="container">
+        <h4 class="small font-weight-bold">Disk usage <span class="float-right">{{ percent_used }}%</span></h4>
+        <div class="progress mb-4">
+            <div class="progress-bar {{progress_bar_background}}" role="progressbar" style="width: {{ percent_used }}%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <!-- bg-warning ; bg-success-->
 
-                <!-- Begin Page Content -->
-                <section>
-                <div class="container">
-                    <h4 class="small font-weight-bold">Disk usage <span class="float-right">{{ percent_used }}%</span></h4>
-                    <div class="progress mb-4">
-                      <div class="progress-bar {{progress_bar_background}}" role="progressbar" style="width: {{ percent_used }}%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
+        <!--div class="container"-->
+        <div class="row">
+            <div class="col-xs-12 col-sm-5 col-md-4 col-sm-offset-7 col-md-offset-8 pull-sm-right">
+                <div class="form-group">
+                    <label class="form-control-label sr-only" for="listr-search">Search</label>
+                    <input type="text" id="listr-search" class="form-control" placeholder="Search">
+                </div>
+            </div>
 
-                <!-- bg-warning ; bg-success-->
+            <div class="pull-sm-right" >
+                <div class="btn-group" sytle="color:white">
+                <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted bg-gray-300">Upload</a>
+                <a data-toggle="modal" data-target="#save-modal" class="btn btn-secondary text-muted bg-gray-300">Save</a>
+                <a data-toggle="modal" data-target="#makedir-modal" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
 
+                {#% if hide_dotfile == 'yes' %#}
+                <!--a href="?hide-dotfile=no" class="btn btn-secondary text-muted bg-gray-300">Show Dotfiles</a-->
+                {#% else %#}
+                <!--a href="?hide-dotfile=yes" class="btn btn-secondary text-muted bg-gray-300">Hide Dotfiles</a-->
+                {#% endif %#}
+                </div>
+            </div>
+        </div>
 
-                <!--div class="container"-->
-                    <div class="row">
-                        <!--div class="col-xs-12">
-                            <ol class="breadcrumb" dir="ltr">
-                                <li class="breadcrumb-item"><a href="{{url_for('path_view')}}"><i class="fa fa-fw fa-home fa-lg"></i> </a></li>
-                                {% for part in path.strip('/').split('/') %}
-                                <li class="breadcrumb-item"><a href="{{url_for('path_view', p='/'+path[:path.find(part)+part|length]+'/')}}"><strong>{{ part }}</strong></a></li>
-                                {% endfor %}
-                                <li class="login"><a data-toggle="modal" data-target="#login-modal" class="btn btn-secondary text-muted"><i class="fa fa-fw fa-user"></i><strong id="userlogin">Login</strong></a></li>
-                            </ol>
-                        <div-->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            {% if category == "error" %}
+            <div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div>
+            {% else %}
+            <div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-                        <div class="col-xs-12 col-sm-5 col-md-4 col-sm-offset-7 col-md-offset-8 pull-sm-right">
-                            <div class="form-group">
-                                <label class="form-control-label sr-only" for="listr-search">Search</label>
-                                <input type="text" id="listr-search" class="form-control" placeholder="Search">
-                            </div>
-                        </div>
-
-                        <div class="pull-sm-right" >
-                            <div class="btn-group" sytle="color:white">
-                            <a data-toggle="modal" data-target="#uploader-modal" class="btn btn-secondary text-muted bg-gray-300">Upload</a>
-                            <a data-toggle="modal" data-target="#save-modal" class="btn btn-secondary text-muted bg-gray-300">Save</a>
-                            <a data-toggle="modal" data-target="#makedir-modal" class="btn btn-secondary text-muted bg-gray-300">Make Dir</a>
-
-                            {#% if hide_dotfile == 'yes' %#}
-                            <!--a href="?hide-dotfile=no" class="btn btn-secondary text-muted bg-gray-300">Show Dotfiles</a-->
-                            {#% else %#}
-                            <!--a href="?hide-dotfile=yes" class="btn btn-secondary text-muted bg-gray-300">Hide Dotfiles</a-->
-                            {#% endif %#}
-                            </div>
-                        </div>
-                    </div>
-
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                        {% if category == "error" %}
-                        <div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div>
-                        {% else %}
-                        <div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div>
-                        {% endif %}
-                        {% endfor %}
+        <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
+            <table id="listr-table" class="table table-hover">
+                <thead>
+                <tr>
+                    <th class="text-xs-right " style="padding-right:0px;" data-sort="int">Load</th>
+                    <th class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort="string">Name</th>
+                    <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Size</th>
+                    <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Modified</th>
+                    <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Delete</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">{{total.dir}} folders and {{total.file}} files, {{total.size | size_fmt}} in total</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+                {% for entry in contents if entry.type == 'dir' %}
+                <tr>
+                    <td class="text-xs-left " style="padding-right:0px;"></td>
+                    <!--do something> if <something is true> else <do something else></do-->
+                    {% if path == "" %}
+                    <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
+                    {% else %}
+                    <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{path}}/{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
                     {% endif %}
-                    {% endwith %}
+                    <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="-1">&mdash;</td>
+                    <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                    <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/delete/{{entry.path}}" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
+                </tr>
+                {% endfor %}
+                {% for entry in contents if entry.type == 'file' %}
+                <tr>
+                    <td class="text-xs-left " style="padding-right:0px;" title=Load><a href="/load/{{entry.path}}" class="fas fa-spinner"></a></td> <!-- <i class="fas fa-spinner"></i>-->
+                    <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
+                    <a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a>
+                    </td>
+                    <td class="text-xs-right " style="padding-left:0px;padding-right:0px;"data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
+                    <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
+                    <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/delete/{{entry.path}}" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-                    <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
-                        <table id="listr-table" class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th class="text-xs-right " style="padding-right:0px;" data-sort="int">Load</th>
-                                <th class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort="string">Name</th>
-                                <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Size</th>
-                                <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Modified</th>
-                                <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Delete</th>
-                            </tr>
-                            </thead>
-                            <tfoot>
-                            <tr>
-                                <td colspan="5">
-                                    <small class="pull-xs-left text-muted" dir="ltr">{{total.dir}} folders and {{total.file}} files, {{total.size | size_fmt}} in total</small>
-                                </td>
-                            </tr>
-                            </tfoot>
-                            <tbody>
-                            {% for entry in contents if entry.type == 'dir' %}
-                            <tr>
-                                <td class="text-xs-left " style="padding-right:0px;"></td>
-                                <!--do something> if <something is true> else <do something else></do-->
-                                {% if path == "" %}
-                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
-                                {% else %}
-                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{path}}/{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
-                                {% endif %}
-                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="-1">&mdash;</td>
-                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
-                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/delete/{{entry.path}}" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
-                            </tr>
-                            {% endfor %}
-                            {% for entry in contents if entry.type == 'file' %}
-                            <tr>
-                                <td class="text-xs-left " style="padding-right:0px;" title=Load><a href="/load/{{entry.path}}" class="fas fa-spinner"></a></td> <!-- <i class="fas fa-spinner"></i>-->
-                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
-                                <a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a>
-                                </td>
-                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;"data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
-                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>
-                                <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" title=Delete><a href="/delete/{{entry.path}}" class="fas fa-trash-alt"></a></td> <!--<i class="fas fa-trash-alt"></i>-->
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+    </div>
+    <!-- End of Page Content -->
+</section>
+
+<div class="modal fade" id="viewer-modal" tabindex="-1" role="dialog" aria-labelledby="file-name" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-left" id="file-name">&nbsp; </h4>
+                <small class="text-muted" id="file-meta"></small>
+                <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <!--div class="pull-xs-left">
+                <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
+                </div-->
+                <div class="pull-xs-right">
+
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-primary fullview" download>Download</a>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
 
                 </div>
-                <!-- End of Page Content -->
-                </section>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <div class="modal fade" id="viewer-modal" tabindex="-1" role="dialog" aria-labelledby="file-name" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title text-left" id="file-name">&nbsp; </h4>
-                                <small class="text-muted" id="file-meta"></small>
-                                <button type="button" class="close pull-xs-right" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            </div>
-                            <div class="modal-body"></div>
-                            <div class="modal-footer">
-                                <!--div class="pull-xs-left">
-                                <button type="button" class="btn btn-link highlight hidden-xs-up">Apply syntax highlighting</button>
-                                </div-->
-                                <div class="pull-xs-right">
-            
-                                    <div class="btn-group">
-                                        <a href="#" class="btn btn-primary fullview" download>Download</a>
-                                    </div>
-            
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    </div>
-            
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <form id="upload-files" method="post" enctype="multipart/form-data">
-            
-                                <div class="modal-body">
-                                        <input type="file" name="files[]" id="filer_input" multiple="multiple">
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="pull-xs-right">
-            
-                                        <div class="btn-group">
-                                            <button type="submit" class="btn btn-primary fullview">
-                                                <i></i> Upload
-                                            </button>
-                                        <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
-                                        </div>
-            
-                                        <div class="btn-group"></div>
-                                            <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
-            
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            
-            
-                <div class="modal fade" id="save-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <form id="save-file" action="{{ url_for('save', p=path ) }}" method="post" enctype="multipart/form-data">
-            
-                                <div class="modal-body">
-                                    <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
-                                    <input type="text" name="file_name" placeholder="file name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="pull-xs-right">
-                                        <div class="btn-group">
-                                            <button type="submit" class="btn btn-primary" name="action" value="ses">
-                                                <i></i> Save session
-                                            </button>
-                                        </div>
-                                        <div class="btn-group">
-                                            <button type="submit" class="btn btn-primary" name="action" value="arg">
-                                                <i></i> Save arguments
-                                            </button>
-                                        </div>
-                                        <div class="btn-group">
-                                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            
-            
-                <div class="modal fade" id="makedir-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <form id="mkdir-folders" action="{{ url_for('makedir', p=path ) }}" method="post" enctype="multipart/form-data">
-            
-                                <div class="modal-body">
-                                    <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
-                                    <input type="text" name="folder_name" placeholder="folder name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="pull-xs-right">
-                                        <div class="btn-group">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i></i> Make directory
-                                            </button>
-                                        <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
-                                        </div>
-                                        <div class="btn-group">
-                                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+<div class="modal fade" id="uploader-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="upload-files" method="post" enctype="multipart/form-data">
 
-                {% endblock %}
+                <div class="modal-body">
+                        <input type="file" name="files[]" id="filer_input" multiple="multiple">
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-xs-right">
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary fullview">
+                                <i></i> Upload
+                            </button>
+                        <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
+                        </div>
+
+                        <div class="btn-group"></div>
+                            <button type="button" id="close-uploader" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="save-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="save-file" action="{{ url_for('save', p=path ) }}" method="post" enctype="multipart/form-data">
+
+                <div class="modal-body">
+                    <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
+                    <input type="text" name="file_name" placeholder="file name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-xs-right">
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary" name="action" value="ses">
+                                <i></i> Save session
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary" name="action" value="arg">
+                                <i></i> Save arguments
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="makedir-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="mkdir-folders" action="{{ url_for('makedir', p=path ) }}" method="post" enctype="multipart/form-data">
+
+                <div class="modal-body">
+                    <!--input type="file" name="files[]" id="filer_input" multiple="multiple"-->
+                    <input type="text" name="folder_name" placeholder="folder name .." style="width:768px;height:30px;padding-left: 4px;padding-right: 4px">
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-xs-right">
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i></i> Make directory
+                            </button>
+                        <!--a href="#" class="btn btn-primary fullview" download>Upload</a-->
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="close-makedir" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
 
 {% block in_page_footer %}
 
@@ -324,33 +313,33 @@
         </div>
     </div-->
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<!-- Bootstrap core JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+<!-- Core plugin JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
-    <!-- Custom scripts for all pages-->
-    <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+<!-- Custom scripts for all pages-->
+<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
 
-    <!-- Page level plugins -->
-    <script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
+<!-- Page level plugins -->
+<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
 
-    <!-- Page level custom scripts -->
-    <script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
+<!-- Page level custom scripts -->
+<script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
+<script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
 
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
 
   
-</body>
+<!--/body-->
 </html>
 
 
