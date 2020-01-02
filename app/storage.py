@@ -241,10 +241,10 @@ class PathView(MethodView):
             percent_used=int(quota_used/current_user.disk_quota*100)
             available_disk_space=current_user.disk_quota-quota_used
             session["available_disk_space"]=available_disk_space
-            if percent_used > 75:
-                progress_bar_background="bg-warning"
-            elif percent_used > 95:
+            if percent_used > 95:
                 progress_bar_background="bg-danger"
+            elif percent_used > 75:
+                progress_bar_background="bg-warning"
             else:
                 progress_bar_background="bg-success"
 
