@@ -168,17 +168,53 @@
                         <div class="row arguments">
 
                             <div class="row arg">
-                                <label>shape: <select name=markerstyles method="GET" action="/" style="width:50px">
-                                    {% for markerstyles_ in markerstyles %}
-                                        <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>"
-                                    {% endfor %}
-                                </select>
                                 <label> size: <select name=marker_size method="GET" action="/" style="width:50px">
                                     {% for marker_size_ in marker_size %}
                                         <option value="{{marker_size_}}" {% if marker_size_==markers %} selected {% endif %}>{{marker_size_}}</option>"
                                     {% endfor %}
                                 </select>
+
+                                <label> ..or, <select name=markersizes_cols method="GET" action="/" style="width:191px">
+                                    {% for markersizes_col in markersizes_cols %}
+                                        <option value="{{markersizes_col}}" {% if markersizes_col==markersizes_cols %} selected {% endif %}>{{markersizes_col}}</option>"
+                                    {% endfor %}
+                                </select>
+
                             </div>
+
+                            <div class="row arg">
+                                <label> color: <select name=marker_color method="GET" action="/" style="width:80px">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==markerc %} selected {% endif %}>{{marker_color_}}</option>"
+                                    {% endfor %}
+                                </select>
+
+                                <label> ..or, <select name=markerc_cols method="GET" action="/" style="width:155px">
+                                    {% for markerc_col in markerc_cols %}
+                                        <option value="{{markerc_col}}" {% if markerc_col==markerc_cols %} selected {% endif %}>{{markerc_col}}</option>"
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:6px;">
+                                <label> ..or, write a color name <input type="text" name="markerc_write" value='{{ markerc_write }}' style="width:159px;height:22px;padding-left: 4px">
+                            </div>
+
+
+                            <div class="row arg">
+                                <label>shape: <select name=markerstyles method="GET" action="/" style="width:50px">
+                                    {% for markerstyles_ in markerstyles %}
+                                        <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>"
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <label> ..or, <select name=markerstyles_cols method="GET" action="/" style="width:182px">
+                                {% for markerstyles_col in markerstyles_cols %}
+                                    <option value="{{markerstyles_col}}" {% if markerstyles_col==markerstyles_cols %} selected {% endif %}>{{markerstyles_col}}</option>"
+                                {% endfor %}
+                            </select>
+
 
                         </div>
                     </div>

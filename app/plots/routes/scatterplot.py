@@ -155,6 +155,11 @@ def scatterplot():
 
                     session["plot_arguments"]["ycols"]=cols
                     session["plot_arguments"]["yvals"]=cols[1]
+
+                    session["plot_arguments"]["markersizes_cols"]=session["plot_arguments"]["markersizes_cols"]+cols
+                    session["plot_arguments"]["markerc_cols"]=session["plot_arguments"]["markerc_cols"]+cols
+                    session["plot_arguments"]["markerstyles_cols"]=session["plot_arguments"]["markerstyles_cols"]+cols
+
                 
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]

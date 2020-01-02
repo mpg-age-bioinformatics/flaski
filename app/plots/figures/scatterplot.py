@@ -1,21 +1,44 @@
 #from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib
+from collections import OrderedDict
 
 
 matplotlib.use('agg')
 
 def make_figure(df,pa):
-    x=df[pa["xvals"]].tolist()
-    y=df[pa["yvals"]].tolist()
 
     # MAIN FIGURE
-    #fig = Figure()
     fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-    plt.scatter(x, y, \
-        marker=pa["marker"], \
-        s=int(pa["markers"]),\
-        c=pa["markerc"])
+
+    if pa["markerstyles_col"] != "select a column..":
+        markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
+        df["__marker__"]=markers
+    else:
+        df["__marker__"]=pa["marker"]
+    
+    for marker in list(OrderedDict.fromkeys(df["__marker__"].tolist())):
+        tmp=df[df["__marker__"]==marker]
+
+        x=tmp[pa["xvals"]].tolist()
+        y=tmp[pa["yvals"]].tolist()
+
+        if pa["markersizes_col"] != "select a column..":
+            s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+        else:
+            s=float(pa["markers"])
+
+        if pa["markerc_col"] != "select a column..":
+            c=[ str(i) for i in tmp[pa["markerc_col"]].tolist() ]
+        elif str(pa["markerc_write"]) != "":
+            c=str(pa["markerc_write"])
+        else:
+            c=pa["markerc"]
+        
+        plt.scatter(x, y, \
+            marker=marker, \
+            s=s,\
+            c=c)
 
     plt.title(pa['title'], fontsize=int(pa["titles"]))
     plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
@@ -56,10 +79,17 @@ def figure_defaults():
         "yvals":None,\
         "markerstyles":ALLOWED_MARKERS,\
         "marker":".",\
+        "markerstyles_cols":["select a column.."],\
+        "markerstyles_col":"select a column..",\
         "marker_size":STANDARD_SIZES,\
         "markers":"50",\
+        "markersizes_cols":["select a column.."],\
+        "markersizes_col":"select a column..",\
         "marker_color":["blue","green","red","cyan","magenta","yellow","black","white"],\
         "markerc":"black",\
+        "markerc_write":"",\
+        "markerc_cols":["select a column.."],\
+        "markerc_col":"select a column..",\
         "xlabel":"x",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
