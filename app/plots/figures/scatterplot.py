@@ -11,7 +11,7 @@ def make_figure(df,pa):
 
     # MAIN FIGURE
     #fig = Figure()
-    fig=plt.figure(figsize=(6,6))
+    fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
     plt.scatter(x, y, \
         marker=pa["marker"], \
         s=int(pa["markers"]),\
@@ -35,16 +35,18 @@ def figure_defaults():
     # https://matplotlib.org/3.1.1/api/markers_api.html
     # https://matplotlib.org/2.0.2/api/colors_api.html
 
-   
-
-    markers_i
 
     # lists allways need to have thee default value after the list
     # eg.:
     # "title_size":standard_sizes,\
     # "titles":"20"
 
+    # "fig_size_x"="6"
+    # "fig_size_y"="6"
+
     plot_arguments={
+        "fig_width":"6",\
+        "fig_height":"6",\
         "title":'Scatter plot',\
         "title_size":STANDARD_SIZES,\
         "titles":"20",\

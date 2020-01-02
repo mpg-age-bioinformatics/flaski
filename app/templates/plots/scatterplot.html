@@ -29,7 +29,7 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
-    <div id="" style="overflow:scroll;max-height:{{maxHeightSideBar}}px">
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
 
         <form action="{{ url_for('scatterplot') }}" method="post" enctype="multipart/form-data">
 
@@ -98,6 +98,12 @@
                 <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:101px;padding-left: 4px">
+                                <label> Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:101px;padding-left: 4px">
+                            </div>
+
 
                             <div class="row arg">
                                 <label>title: <input type="text" name="title" value='{{ title }}' style="width:186px;padding-left: 4px">
@@ -307,6 +313,8 @@
 {% block content %}
 <div class="container-fluid">
 
+
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
@@ -338,7 +346,7 @@
     {% endwith %}
 
     {% if figure_url %}
-        <div id=""  style="overflow:scroll">
+        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
         <img src="data:image/png;base64,{{ figure_url }}">
 
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
