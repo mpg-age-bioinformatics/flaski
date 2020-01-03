@@ -121,6 +121,15 @@ def scatterplot():
             for k in list(lists.keys()):
                 if k in list(request.form.keys()):
                     plot_arguments[lists[k]]=request.form[k]
+            for checkbox in session["checkboxes"]:
+                checkresult=request.form.getlist(checkbox)
+                if len(checkresult) > 0:
+                    plot_arguments[checkbox]="on"
+                elif plot_arguments[checkbox][0]==".":
+                    plot_arguments[checkbox]="on"
+                else:
+                    plot_arguments[checkbox]="off"
+
 
             # UPDATE SESSION VALUES
             session["plot_arguments"]=plot_arguments
@@ -217,13 +226,14 @@ def scatterplot():
             # INITIATE SESSION
             session["filename"]="Select file.."
 
-            plot_arguments, lists, notUpdateList=figure_defaults()
+            plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
 
             session["plot_arguments"]=plot_arguments
             session["lists"]=lists
             session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="scatterplot"
+            session["checkboxes"]=checkboxes
 
         eventlog = UserLogging(email=current_user.email, action="visit scatterplot")
         db.session.add(eventlog)

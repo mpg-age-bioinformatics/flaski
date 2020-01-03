@@ -149,6 +149,18 @@
                                 </select>
                             </div>
 
+                            <div class="row arg">
+                                <label style="width:46px">Axis:</label>
+                                <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="left_axis" {% if left_axis=="on" %} checked {% elif left_axis==".on" %} checked {% endif %}/> left </label>
+                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="right_axis" {% if right_axis=="on" %} checked {% elif right_axis==".on" %} checked {% endif %}/> right </label>
+                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="upper_axis" {% if upper_axis=="on" %} checked {% elif upper_axis==".on" %} checked {% endif %}/> upper </label>
+                                <label style="padding-left:21px;padding-right:0px;"><input type="checkbox" name="lower_axis" {% if lower_axis=="on" %} checked {% elif lower_axis==".on" %} checked {% endif %}/> lower </label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>Line width: <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:40px;padding-left: 4px">
+                            </div>
+
                         </div>
         
                     </div>

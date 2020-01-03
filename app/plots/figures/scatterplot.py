@@ -8,6 +8,8 @@ matplotlib.use('agg')
 
 def make_figure(df,pa):
 
+    #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
+
     # MAIN FIGURE
     fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
@@ -40,6 +42,17 @@ def make_figure(df,pa):
             s=s,\
             c=c)
 
+    axes=plt.gca()
+
+    for axis in ['top','bottom','left','right']:
+        axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
+
+    for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
+        if argv =="on":
+            axes.spines[axis].set_visible(True)
+        else:
+            axes.spines[axis].set_visible(False)
+
     plt.title(pa['title'], fontsize=int(pa["titles"]))
     plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
     plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
@@ -68,8 +81,8 @@ def figure_defaults():
     # "fig_size_y"="6"
 
     plot_arguments={
-        "fig_width":"6",\
-        "fig_height":"6",\
+        "fig_width":"6.0",\
+        "fig_height":"6.0",\
         "title":'Scatter plot',\
         "title_size":STANDARD_SIZES,\
         "titles":"20",\
@@ -96,6 +109,11 @@ def figure_defaults():
         "ylabel":"y",\
         "ylabel_size":STANDARD_SIZES,\
         "ylabels":"14",\
+        "axis_line_width":"1.0",\
+        "left_axis":".on" ,\
+        "right_axis":".on",\
+        "upper_axis":".on",\
+        "lower_axis":".on",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
@@ -104,6 +122,9 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.scatter.plot",\
         "inputargumentsfile":"Select file.."
     }
+
+    checkboxes=["left_axis","right_axis","upper_axis","lower_axis"]
+
     # not update list
     notUpdateList=["inputsessionfile"]
 
@@ -122,7 +143,7 @@ def figure_defaults():
             if allargs[i] not in excluded_list:
                 lists[allargs[i]]=allargs[i+1]
 
-    return plot_arguments, lists, notUpdateList
+    return plot_arguments, lists, notUpdateList, checkboxes
 
 # def input_check(df,pa):
 #     errors=[]
