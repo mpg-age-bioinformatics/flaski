@@ -158,8 +158,37 @@
                             </div>
 
                             <div class="row arg">
-                                <label>Line width: <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:40px;padding-left: 4px">
+                                <label>Line width: <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;padding-left: 4px">
                             </div>
+                            <div class="row arg">
+                                <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;padding-left: 4px">
+                                <label style="padding-left:7px;"> Ticks direction: <select name=ticks_direction method="GET" action="/" style="width:64px">
+                                    {% for ticks_direction_ in ticks_direction %}
+                                        <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>"
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg">
+                                <label style="width:46px">Ticks:</label>
+                                <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="tick_left_axis" {% if tick_left_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/> left </label>
+                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="tick_right_axis" {% if rtick_ight_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
+                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/> upper </label>
+                                <label style="padding-left:21px;padding-right:0px;"><input type="checkbox" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>X ticks fontsize: <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:66px;padding-left: 4px">
+                                <label style="padding-left:13px;"> rotation: <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:66px;padding-left: 4px">
+                            </div>
+
+                            <div class="row arg">
+                                <label>Y ticks fontsize: <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:66px;padding-left: 4px">
+                                <label style="padding-left:13px;"> rotation: <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:66px;padding-left: 4px">
+                            </div>
+
+
+
 
                         </div>
         
@@ -221,7 +250,7 @@
                                 </select>
                             </div>
 
-                            <label> ..or, <select name=markerstyles_cols method="GET" action="/" style="width:182px">
+                            <label>&nbsp;..or, <select name=markerstyles_cols method="GET" action="/" style="width:178px">
                                 {% for markerstyles_col in markerstyles_cols %}
                                     <option value="{{markerstyles_col}}" {% if markerstyles_col==markerstyles_cols %} selected {% endif %}>{{markerstyles_col}}</option>"
                                 {% endfor %}

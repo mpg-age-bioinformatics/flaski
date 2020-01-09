@@ -53,9 +53,33 @@ def make_figure(df,pa):
         else:
             axes.spines[axis].set_visible(False)
 
+    ticks={}
+    for axis,argv in zip(['top','bottom','left','right'], \
+        [pa["tick_upper_axis"],pa["tick_lower_axis"],pa["tick_left_axis"],pa["tick_right_axis"]]):
+        if argv =="on":
+            show=True
+        else:
+            show=False
+        ticks[axis]=show
+
+    axes.tick_params(right= ticks["right"],top=ticks["top"],\
+        left=ticks["left"], bottom=ticks["bottom"])
+
+    axes.tick_params(direction=pa["ticks_direction_value"], width=float(pa["axis_line_width"]),length=float(pa["ticks_length"]))  
+
     plt.title(pa['title'], fontsize=int(pa["titles"]))
     plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
     plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
+
+    plt.xticks(fontsize=float(pa["xticks_fontsize"]), rotation=float(pa["xticks_rotation"]))
+    plt.yticks(fontsize=float(pa["yticks_fontsize"]), rotation=float(pa["yticks_rotation"]))
+
+
+    # for tick in ax.xaxis.get_major_ticks():
+    #                 tick.label.set_fontsize(14) 
+    #                 # specify integer or one of preset strings, e.g.
+    #                 #tick.label.set_fontsize('x-small') 
+    #                 tick.label.set_rotation('vertical')
 
     return fig
 
@@ -64,6 +88,7 @@ ALLOWED_MARKERS=[".",",","o","v","^","<",">",\
             "1","2","3","4","8",\
             "s","p","*","h","H","+","x",\
             "X","D","d","|","_"]
+TICKS_DIRECTIONS=["in","out","inout"]
 
 
 def figure_defaults():
@@ -114,6 +139,17 @@ def figure_defaults():
         "right_axis":".on",\
         "upper_axis":".on",\
         "lower_axis":".on",\
+        "tick_left_axis":".on" ,\
+        "tick_right_axis":"off",\
+        "tick_upper_axis":"off",\
+        "tick_lower_axis":".on",\
+        "ticks_direction":TICKS_DIRECTIONS,\
+        "ticks_direction_value":TICKS_DIRECTIONS[1],\
+        "ticks_length":"6.0",\
+        "xticks_fontsize":"14",\
+        "yticks_fontsize":"14",\
+        "xticks_rotation":"0",\
+        "yticks_rotation":"0",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
@@ -123,7 +159,8 @@ def figure_defaults():
         "inputargumentsfile":"Select file.."
     }
 
-    checkboxes=["left_axis","right_axis","upper_axis","lower_axis"]
+    checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
+        "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis"]
 
     # not update list
     notUpdateList=["inputsessionfile"]
