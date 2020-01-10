@@ -67,6 +67,28 @@ def make_figure(df,pa):
 
     axes.tick_params(direction=pa["ticks_direction_value"], width=float(pa["axis_line_width"]),length=float(pa["ticks_length"]))  
 
+    if (pa["x_lower_limit"]!="") or (pa["x_upper_limit"]!="") :
+        xmin, xmax = axes.get_xlim()
+        if pa["x_lower_limit"]!="":
+            xmin=float(pa["x_lower_limit"])
+        if pa["x_upper_limit"]!="":
+            xmax=float(pa["x_upper_limit"])
+        plt.xlim(xmin, xmax)
+
+    if (pa["y_lower_limit"]!="") or (pa["y_upper_limit"]!="") :
+        ymin, ymax = axes.get_ylim()
+        if pa["y_lower_limit"]!="":
+            ymin=float(pa["y_lower_limit"])
+        if pa["y_upper_limit"]!="":
+            ymax=float(pa["y_upper_limit"])
+        plt.ylim(xmin, ymax)
+
+    if pa["maxxticks"]!="":
+        axes.xaxis.set_major_locator(plt.MaxNLocator(int(pa["maxxticks"])))
+
+    if pa["maxyticks"]!="":
+        axes.yaxis.set_major_locator(plt.MaxNLocator(int(pa["maxyticks"])))
+
     plt.title(pa['title'], fontsize=int(pa["titles"]))
     plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
     plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
@@ -150,6 +172,12 @@ def figure_defaults():
         "yticks_fontsize":"14",\
         "xticks_rotation":"0",\
         "yticks_rotation":"0",\
+        "x_lower_limit":"",\
+        "y_lower_limit":"",\
+        "x_upper_limit":"",\
+        "y_upper_limit":"",\
+        "maxxticks":"",\
+        "maxyticks":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\

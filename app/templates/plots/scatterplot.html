@@ -158,7 +158,7 @@
                             </div>
 
                             <div class="row arg">
-                                <label>Line width: <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;padding-left: 4px">
+                                <label>Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;padding-left: 4px"></label></label>
                             </div>
                             <div class="row arg">
                                 <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;padding-left: 4px">
@@ -178,16 +178,29 @@
                             </div>
 
                             <div class="row arg">
-                                <label>X ticks fontsize: <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:66px;padding-left: 4px">
-                                <label style="padding-left:13px;"> rotation: <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:66px;padding-left: 4px">
+                                <label>X ticks <label>fontsize: <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label style="padding-left:14px;"> rotation: <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:66px;padding-left:4px;"></label></label>
                             </div>
 
                             <div class="row arg">
-                                <label>Y ticks fontsize: <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:66px;padding-left: 4px">
-                                <label style="padding-left:13px;"> rotation: <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:66px;padding-left: 4px">
+                                <label>Y ticks <label style="padding-left:1px;">fontsize: <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label style="padding-left:14px;"> rotation: <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:66px;padding-left:4px;"></label></label>
                             </div>
 
+                            <div class="row arg">
+                                <label>X limits <label style="padding-left:9px;">lower: <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label style="padding-left:26px;"> upper: <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="width:66px;padding-left:4px;"></label></label>
+                            </div>
 
+                            <div class="row arg">
+                                <label>Y limits <label style="padding-left:10px;">lower: <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label style="padding-left:25px;"> upper: <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:66px;padding-left:4px;"></label></label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>N ticks <label style="padding-left:10px;">x-axis: <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label style="padding-left:25px;"> y-axis: <input type="text" name="maxyticks" value='{{ maxyticks }}' style="width:66px;padding-left:4px;"></label></label>
+                            </div>
 
 
                         </div>
