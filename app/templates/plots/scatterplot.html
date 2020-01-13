@@ -57,8 +57,8 @@
 
                 <div class="column">
                     <div class="sidebar-heading">X values:</div>
-                    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xcols method="GET" action="/" style="width:167px">
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
+                        <select title=xcols name=xcols method="GET" action="/" style="width:114px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>"
                             {% endfor %}
@@ -67,15 +67,27 @@
                 </div>
 
                 <div class="column">
-                    <div class="sidebar-heading">Y values:</div>
-                    <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select name=ycols method="GET" action="/" style="width:167px">
+                    <div class="sidebar-heading" style="padding-left: 6px;">Y values:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
+                        <select name=ycols method="GET" action="/" style="width:114px">
                             {% for ycol in ycols %}
                                 <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>"
                             {% endfor %}
                         </select>
                     </div>
                 </div>
+
+                <div class="column">
+                    <div class="sidebar-heading" style="padding-left: 6px;">Groups:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
+                        <select name=groups_value method="GET" action="/" style="width:114px">
+                            {% for groups_ in groups %}
+                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>"
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
 
             </div>
 
@@ -106,7 +118,7 @@
 
 
                             <div class="row arg">
-                                <label>title: <input type="text" name="title" value='{{ title }}' style="width:186px;padding-left: 4px">
+                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:186px;padding-left: 4px">
                                 <label> size: <select name=title_size method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
                                         <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>"
@@ -277,14 +289,30 @@
                                         <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>"
                                     {% endfor %}
                                 </select>
-                            </div>
 
-                            <label>&nbsp;..or, <select name=markerstyles_cols method="GET" action="/" style="width:178px">
+                            <label>&nbsp;..or, <select name=markerstyles_cols method="GET" action="/" style="width:175px">
                                 {% for markerstyles_col in markerstyles_cols %}
                                     <option value="{{markerstyles_col}}" {% if markerstyles_col==markerstyles_cols %} selected {% endif %}>{{markerstyles_col}}</option>"
                                 {% endfor %}
                             </select>
 
+                            </div>
+
+
+                            {% if groups_value != "None" %}
+
+                                <div class="row arg">
+                                    <label style="padding-right:4px;">Auto generate groups characteristics: </label>
+                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="groups_auto_generate" {% if groups_auto_generate=="on" %} checked {% elif groups_auto_generate==".on" %} checked {% endif %}/></label>
+                                </div>
+
+                                <div class="row arg">
+                                    <label style="padding-right:4px;">Legend:
+                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
+                                    <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;padding-left:4px;"></label></label>
+                                </div>
+                        
+                            {% endif %}
 
                         </div>
                     </div>

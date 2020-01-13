@@ -13,34 +13,80 @@ def make_figure(df,pa):
     # MAIN FIGURE
     fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
-    if pa["markerstyles_col"] != "select a column..":
-        markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
-        df["__marker__"]=markers
-    else:
-        df["__marker__"]=pa["marker"]
+    # if we have groups
+    # the user can decide how the diferent groups should look like 
+    # by unchecking the groups_autogenerate check box
+
+
+    if pa["groups_value"]!="None":
+        for group in list(OrderedDict.fromkeys(df[pa["groups_value"]].tolist())):
+            tmp=df[df[pa["groups_value"]]==group]
+
+            x=tmp[pa["xvals"]].tolist()
+            y=tmp[pa["yvals"]].tolist()
+
+            if pa["groups_auto_generate"] == "off" :
+
+                if pa["markerstyles_col"] != "select a column..":
+                    marker=[ str(i) for i in tmp[[pa["markerstyles_col"]]].dropna()[pa["markerstyles_col"]].tolist() ][0]
+                else:
+                    marker=pa["marker"]
+
+                if pa["markersizes_col"] != "select a column..":
+                    s=[ float(i) for i in tmp[[pa["markersizes_col"]]].dropna()[pa["markersizes_col"]].tolist() ][0]
+                else:
+                    s=float(pa["markers"])
+
+                if pa["markerc_col"] != "select a column..":
+                    c=[ str(i) for i in tmp[[pa["markerc_col"]]].dropna()[pa["markerc_col"]].tolist()][0]
+                elif str(pa["markerc_write"]) != "":
+                    c=str(pa["markerc_write"])
+                else:
+                    c=pa["markerc"]
+
+                plt.scatter(x, y, \
+                    marker=marker, \
+                    s=s,\
+                    c=c,\
+                    label=group)
+            
+            else:
+                plt.scatter(x, y, \
+                    label=group)
+
+        if pa["show_legend"] != "off" :        
+            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=pa["legend_font_size"])
     
-    for marker in list(OrderedDict.fromkeys(df["__marker__"].tolist())):
-        tmp=df[df["__marker__"]==marker]
+    elif pa["groups_value"]=="None":
 
-        x=tmp[pa["xvals"]].tolist()
-        y=tmp[pa["yvals"]].tolist()
-
-        if pa["markersizes_col"] != "select a column..":
-            s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+        if pa["markerstyles_col"] != "select a column..":
+            markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
+            df["__marker__"]=markers
         else:
-            s=float(pa["markers"])
+            df["__marker__"]=pa["marker"]
+    
+        for marker in list(OrderedDict.fromkeys(df["__marker__"].tolist())):
+            tmp=df[df["__marker__"]==marker]
 
-        if pa["markerc_col"] != "select a column..":
-            c=[ str(i) for i in tmp[pa["markerc_col"]].tolist() ]
-        elif str(pa["markerc_write"]) != "":
-            c=str(pa["markerc_write"])
-        else:
-            c=pa["markerc"]
-        
-        plt.scatter(x, y, \
-            marker=marker, \
-            s=s,\
-            c=c)
+            x=tmp[pa["xvals"]].tolist()
+            y=tmp[pa["yvals"]].tolist()
+
+            if pa["markersizes_col"] != "select a column..":
+                s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+            else:
+                s=float(pa["markers"])
+
+            if pa["markerc_col"] != "select a column..":
+                c=[ str(i) for i in tmp[pa["markerc_col"]].tolist() ]
+            elif str(pa["markerc_write"]) != "":
+                c=str(pa["markerc_write"])
+            else:
+                c=pa["markerc"]
+            
+            plt.scatter(x, y, \
+                marker=marker, \
+                s=s,\
+                c=c)
 
     axes=plt.gca()
 
@@ -102,7 +148,7 @@ def make_figure(df,pa):
         else:
             grid_color=pa["grid_color_value"]
 
-        axes.grid(axis=pa["grid"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=floa(pa["grid_linewidth"]) )
+        axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]) )
     
     #grid(color='r', linestyle='-', linewidth=2)
 
@@ -111,6 +157,8 @@ def make_figure(df,pa):
     #                 # specify integer or one of preset strings, e.g.
     #                 #tick.label.set_fontsize('x-small') 
     #                 tick.label.set_rotation('vertical')
+
+    plt.tight_layout()
 
     return fig
 
@@ -147,6 +195,11 @@ def figure_defaults():
         "xvals":None,\
         "ycols":[],\
         "yvals":None,\
+        "groups":["None"],\
+        "groups_value":"None",\
+        "groups_auto_generate":".on",\
+        "show_legend":".on",\
+        "legend_font_size":"14",\
         "markerstyles":ALLOWED_MARKERS,\
         "marker":".",\
         "markerstyles_cols":["select a column.."],\
@@ -194,7 +247,7 @@ def figure_defaults():
         "grid_colors":STANDARD_COLORS,\
         "grid_color_value":"black",\
         "grid_linestyle":['-', '--', '-.', ':'],\
-        "grid_linestyle_value":':',\
+        "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
@@ -208,7 +261,8 @@ def figure_defaults():
 
 
     checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
-        "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis"]
+            "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
+            "groups_auto_generate","show_legend"]
 
     # not update list
     notUpdateList=["inputsessionfile"]

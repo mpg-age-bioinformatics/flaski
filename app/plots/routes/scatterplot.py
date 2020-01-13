@@ -121,13 +121,11 @@ def scatterplot():
             for k in list(lists.keys()):
                 if k in list(request.form.keys()):
                     plot_arguments[lists[k]]=request.form[k]
+            # checkboxes
             for checkbox in session["checkboxes"]:
-                checkresult=request.form.getlist(checkbox)
-                if len(checkresult) > 0:
+                if checkbox in list(request.form.keys()) :
                     plot_arguments[checkbox]="on"
-                elif plot_arguments[checkbox][0]==".":
-                    plot_arguments[checkbox]="on"
-                else:
+                elif plot_arguments[checkbox][0]!=".":
                     plot_arguments[checkbox]="off"
 
 
@@ -156,6 +154,20 @@ def scatterplot():
                 
                 cols=df.columns.tolist()
 
+                if session["plot_arguments"]["groups"] not in cols:
+                    session["plot_arguments"]["groups"]=["None"]+cols
+
+                if session["plot_arguments"]["markerstyles_cols"] not in cols:
+                    session["plot_arguments"]["markerstyles_cols"]=["select a column.."]+cols
+                
+                if session["plot_arguments"]["markerc_cols"] not in cols:
+                    session["plot_arguments"]["markerc_cols"]=["select a column.."]+cols
+
+                if session["plot_arguments"]["markersizes_cols"] not in cols:
+                    session["plot_arguments"]["markersizes_cols"]=["select a column.."]+cols
+
+
+
                 # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                 if (session["plot_arguments"]["xvals"] not in cols) & (session["plot_arguments"]["yvals"] not in cols):
 
@@ -164,12 +176,7 @@ def scatterplot():
 
                     session["plot_arguments"]["ycols"]=cols
                     session["plot_arguments"]["yvals"]=cols[1]
-
-                    session["plot_arguments"]["markersizes_cols"]=session["plot_arguments"]["markersizes_cols"]+cols
-                    session["plot_arguments"]["markerc_cols"]=session["plot_arguments"]["markerc_cols"]+cols
-                    session["plot_arguments"]["markerstyles_cols"]=session["plot_arguments"]["markerstyles_cols"]+cols
-
-                
+                                  
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]
                     flash(sometext,'info')
@@ -187,6 +194,9 @@ def scatterplot():
                 flash(error_msg,'error')
                 return render_template('/plots/scatterplot.html' , filename="Select file..",  **plot_arguments)
  
+        #if session["plot_arguments"]["groups_value"]=="None":
+        #    session["plot_arguments"]["groups_auto_generate"]=".on"
+
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
@@ -200,7 +210,7 @@ def scatterplot():
 
             # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
             figfile = io.BytesIO()
-            plt.savefig(figfile, format='png')
+            plt.savefig(figfile, format='png', )
             plt.close()
             figfile.seek(0)  # rewind to beginning of file
             figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
