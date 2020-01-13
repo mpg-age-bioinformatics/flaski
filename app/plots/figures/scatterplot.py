@@ -2,9 +2,20 @@
 import matplotlib.pyplot as plt
 import matplotlib
 from collections import OrderedDict
-
+import numpy as np
 
 matplotlib.use('agg')
+
+
+def GET_COLOR(x):
+    if str(x)[:3].lower() == "rgb":
+        vals=x.split("rgb(")[-1].split(")")[0].split(",")
+        vals=[ float(s.strip(" ")) for s in vals ]
+        #vals=tuple(vals)
+        return vals
+    else:
+        return str(x)
+
 
 def make_figure(df,pa):
 
@@ -43,9 +54,13 @@ def make_figure(df,pa):
                     s=float(pa["markers"])
 
                 if pa["markerc_col"] != "select a column..":
-                    c=[ str(i) for i in tmp[[pa["markerc_col"]]].dropna()[pa["markerc_col"]].tolist()][0]
+                    c=[ GET_COLOR(i) for i in tmp[[pa["markerc_col"]]].dropna()[pa["markerc_col"]].tolist()][0]
+                    if type(c) == list:
+                        c=np.array([c]*len(tmp_alpha))/255.0
                 elif str(pa["markerc_write"]) != "":
-                    c=str(pa["markerc_write"])
+                    c=GET_COLOR(pa["markerc_write"])
+                    if type(c) == list:
+                        c=np.array([c]*len(tmp_alpha))/255.0
                 else:
                     c=pa["markerc"]
 
@@ -92,17 +107,23 @@ def make_figure(df,pa):
                     s=float(pa["markers"])
 
                 if pa["markerc_col"] != "select a column..":
-                    c=[ str(i) for i in tmp[pa["markerc_col"]].tolist() ]
+                    c=[ GET_COLOR(i) for i in tmp[pa["markerc_col"]].tolist() ]
+                    if not all(isinstance(i, str) for i in c) :
+                        c=np.array(c)/255.0
                 elif str(pa["markerc_write"]) != "":
-                    c=str(pa["markerc_write"])
+                    c=GET_COLOR(pa["markerc_write"])
+                    if type(c) == list:
+                        c=np.array([c]*len(tmp_alpha))/255.0
                 else:
                     c=pa["markerc"]
-                
+
                 plt.scatter(x, y, \
                     marker=marker, \
                     s=s,\
                     c=c,\
                     alpha=marker_alpha)
+
+                
 
     axes=plt.gca()
 
@@ -160,9 +181,9 @@ def make_figure(df,pa):
 
     if pa["grid_value"] != "None":
         if pa["grid_color_text"]!="":
-            grid_color=pa["grid_color_text"]
+            grid_color=GET_COLOR(pa["grid_color_text"])
         else:
-            grid_color=pa["grid_color_value"]
+            grid_color=GET_COLOR(pa["grid_color_value"])
 
         axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
     
