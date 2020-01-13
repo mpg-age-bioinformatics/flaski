@@ -125,9 +125,12 @@ def scatterplot(download=None):
             for checkbox in session["checkboxes"]:
                 if checkbox in list(request.form.keys()) :
                     plot_arguments[checkbox]="on"
-                elif plot_arguments[checkbox][0]!=".":
-                    plot_arguments[checkbox]="off"
-
+                else:
+                    try:
+                        plot_arguments[checkbox]=request.form[checkbox]
+                    except:
+                        if plot_arguments[checkbox][0]!=".":
+                            plot_arguments[checkbox]="off"
 
             # UPDATE SESSION VALUES
             session["plot_arguments"]=plot_arguments
@@ -141,14 +144,14 @@ def scatterplot(download=None):
             if allowed_file(inputfile.filename):
                 session["filename"]=filename
                 fileread = inputfile.read()
+                filestream=io.BytesIO(fileread)
                 extension=filename.rsplit('.', 1)[1].lower()
                 if extension == "xlsx":
-                    filestream=io.BytesIO(fileread)
                     df=pd.read_excel(filestream)
                 elif extension == "csv":
-                    df=pd.read_csv(fileread)
+                    df=pd.read_csv(filestream)
                 elif extension == "tsv":
-                    df=pd.read_csv(fileread,sep="\t")
+                    df=pd.read_csv(filestream,sep="\t")
                 
                 session["df"]=df.to_json()
                 

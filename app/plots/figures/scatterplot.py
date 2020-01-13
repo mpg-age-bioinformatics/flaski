@@ -186,14 +186,6 @@ def make_figure(df,pa):
             grid_color=GET_COLOR(pa["grid_color_value"])
 
         axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
-    
-    #grid(color='r', linestyle='-', linewidth=2)
-
-    # for tick in ax.xaxis.get_major_ticks():
-    #                 tick.label.set_fontsize(14) 
-    #                 # specify integer or one of preset strings, e.g.
-    #                 #tick.label.set_fontsize('x-small') 
-    #                 tick.label.set_rotation('vertical')
 
     plt.tight_layout()
 
@@ -218,7 +210,6 @@ def figure_defaults():
     # eg.:
     # "title_size":standard_sizes,\
     # "titles":"20"
-
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
