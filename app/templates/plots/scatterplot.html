@@ -498,7 +498,7 @@
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-                <form action="{{ url_for('figure') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ url_for('scatterplot', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Figure
                     </button>
@@ -506,7 +506,7 @@
             </div>
 
             <div style="padding-left: 2px;padding-right: 2px;">
-                <form action="{{ url_for('downloadarguments') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ url_for('download', json_type='arg') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
                     </button>
@@ -514,7 +514,7 @@
             </div>
 
             <div style="padding-left: 2px;">
-                <form action="{{ url_for('downloadsession') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ url_for('download', json_type='ses') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                             <i class="fas fa-th fa-sm text-white-50"></i> Session
                     </button>

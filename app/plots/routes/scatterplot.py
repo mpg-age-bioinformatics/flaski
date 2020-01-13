@@ -33,10 +33,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+@app.route('/scatterplot/<download>', methods=['GET', 'POST'])
 @app.route('/scatterplot', methods=['GET', 'POST'])
 @login_required
-def scatterplot():
+def scatterplot(download=None):
     """ 
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
@@ -212,7 +212,7 @@ def scatterplot():
 
             # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
             figfile = io.BytesIO()
-            plt.savefig(figfile, format='png', )
+            plt.savefig(figfile, format='png')
             plt.close()
             figfile.seek(0)  # rewind to beginning of file
             figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
@@ -225,7 +225,27 @@ def scatterplot():
             return render_template('/plots/scatterplot.html', filename=filename, **plot_arguments)
 
     else:
-        #sometext="get"
+        if download == "download":
+            # READ INPUT DATA FROM SESSION JSON
+            df=pd.read_json(session["df"])
+
+            plot_arguments=session["plot_arguments"]
+
+            # CALL FIGURE FUNCTION
+            fig=make_figure(df,plot_arguments)
+
+            #flash('Figure is being sent to download but will not be updated on your screen.')
+            figfile = io.BytesIO()
+            mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
+            plt.savefig(figfile, format=plot_arguments["downloadf"])
+            plt.close()
+            figfile.seek(0)  # rewind to beginning of file
+
+            eventlog = UserLogging(email=current_user.email,action="download figure scatterplot")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
 
         if "app" not in list(session.keys()):
             return_to_plot=False
@@ -253,40 +273,11 @@ def scatterplot():
         
         return render_template('plots/scatterplot.html',  filename=session["filename"], **session["plot_arguments"])
 
-@app.route('/figure', methods=['GET','POST'])
+@app.route('/download/<json_type>', methods=['GET','POST'])
 @login_required
-def figure():
+def download(json_type="arg"):
     # READ INPUT DATA FROM SESSION JSON
-    df=pd.read_json(session["df"])
-
-    plot_arguments=session["plot_arguments"]
-
-    # CALL FIGURE FUNCTION
-    fig=make_figure(df,plot_arguments)
-
-    #flash('Figure is being sent to download but will not be updated on your screen.')
-    figfile = io.BytesIO()
-    mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
-    plt.savefig(figfile, format=plot_arguments["downloadf"])
-    plt.close()
-    figfile.seek(0)  # rewind to beginning of file
-
-    eventlog = UserLogging(email=current_user.email,action="download figure scatterplot")
-    db.session.add(eventlog)
-    db.session.commit()
-
-    return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
-
-@app.route('/downloadarguments', methods=['GET','POST'])
-@login_required
-def downloadarguments():
-    # READ INPUT DATA FROM SESSION JSON
-    session_=session_to_file(session,"arg")
-    # session_={}
-    # for k in list(session.keys()):
-    #     if k not in ['_permanent','fileread','_flashes',"width","height","df","csrf_token","user_id","_fresh","available_disk_space","_id"]:
-    #         session_[k]=session[k]
-    # session_["ftype"]="arguments"
+    session_=session_to_file(session,json_type)
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
@@ -294,31 +285,8 @@ def downloadarguments():
 
     plot_arguments=session["plot_arguments"]
 
-    eventlog = UserLogging(email=current_user.email,action="download arguments scatterplot")
+    eventlog = UserLogging(email=current_user.email,action="download %s scatterplot" %json_type)
     db.session.add(eventlog)
     db.session.commit()
 
-    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+".arg" )
-
-@app.route('/downloadsession', methods=['GET','POST'])
-@login_required
-def downloadsession():
-    # READ INPUT DATA FROM SESSION JSON
-    session_=session_to_file(session,"arg")
-    # session_={}
-    # for k in list(session.keys()):
-    #     if k not in ['_permanent','fileread','_flashes',"width","height","csrf_token","user_id","_fresh","available_disk_space","_id"]:
-    #         session_[k]=session[k]
-    # session_["ftype"]="session"
-
-    session_file = io.BytesIO()
-    session_file.write(json.dumps(session_).encode())
-    session_file.seek(0)
-
-    plot_arguments=session["plot_arguments"]
-
-    eventlog = UserLogging(email=current_user.email,action="download session scatterplot")
-    db.session.add(eventlog)
-    db.session.commit()
-
-    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_downloadn"]+".ses" )
+    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+"."+json_type )
