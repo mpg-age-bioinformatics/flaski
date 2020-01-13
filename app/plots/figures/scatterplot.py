@@ -96,6 +96,15 @@ def make_figure(df,pa):
     plt.xticks(fontsize=float(pa["xticks_fontsize"]), rotation=float(pa["xticks_rotation"]))
     plt.yticks(fontsize=float(pa["yticks_fontsize"]), rotation=float(pa["yticks_rotation"]))
 
+    if pa["grid_value"] != "None":
+        if pa["grid_color_text"]!="":
+            grid_color=pa["grid_color_text"]
+        else:
+            grid_color=pa["grid_color_value"]
+
+        axes.grid(axis=pa["grid"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=floa(pa["grid_linewidth"]) )
+    
+    #grid(color='r', linestyle='-', linewidth=2)
 
     # for tick in ax.xaxis.get_major_ticks():
     #                 tick.label.set_fontsize(14) 
@@ -111,6 +120,7 @@ ALLOWED_MARKERS=[".",",","o","v","^","<",">",\
             "s","p","*","h","H","+","x",\
             "X","D","d","|","_"]
 TICKS_DIRECTIONS=["in","out","inout"]
+STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 
 def figure_defaults():
@@ -145,7 +155,7 @@ def figure_defaults():
         "markers":"50",\
         "markersizes_cols":["select a column.."],\
         "markersizes_col":"select a column..",\
-        "marker_color":["blue","green","red","cyan","magenta","yellow","black","white"],\
+        "marker_color":STANDARD_COLORS,\
         "markerc":"black",\
         "markerc_write":"",\
         "markerc_cols":["select a column.."],\
@@ -178,6 +188,14 @@ def figure_defaults():
         "y_upper_limit":"",\
         "maxxticks":"",\
         "maxyticks":"",\
+        "grid":["None","both","x","y"],\
+        "grid_value":"None",\
+        "grid_color_text":"",\
+        "grid_colors":STANDARD_COLORS,\
+        "grid_color_value":"black",\
+        "grid_linestyle":['-', '--', '-.', ':'],\
+        "grid_linestyle_value":':',\
+        "grid_linewidth":"1",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
@@ -186,6 +204,8 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.scatter.plot",\
         "inputargumentsfile":"Select file.."
     }
+    # grid colors not implemented in UI
+
 
     checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
         "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis"]
