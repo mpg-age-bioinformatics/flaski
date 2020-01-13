@@ -27,6 +27,11 @@ def make_figure(df,pa):
 
             if pa["groups_auto_generate"] == "off" :
 
+                if pa["markeralpha_col_value"] != "select a column..":
+                    a=[ float(i) for i in tmp[[pa["markeralpha_col_value"]]].dropna()[pa["markeralpha_col_value"]].tolist() ][0]
+                else:
+                    a=float(pa["marker_alpha"])
+
                 if pa["markerstyles_col"] != "select a column..":
                     marker=[ str(i) for i in tmp[[pa["markerstyles_col"]]].dropna()[pa["markerstyles_col"]].tolist() ][0]
                 else:
@@ -48,6 +53,7 @@ def make_figure(df,pa):
                     marker=marker, \
                     s=s,\
                     c=c,\
+                    alpha=a,\
                     label=group)
             
             else:
@@ -59,6 +65,12 @@ def make_figure(df,pa):
     
     elif pa["groups_value"]=="None":
 
+        if pa["markeralpha_col_value"] != "select a column..":
+            markers_alpha=[ float(i) for i in df[pa["markeralpha_col_value"]].tolist() ]
+            df["__alpha__"]=markers_alpha
+        else:
+            df["__alpha__"]=float(pa["marker_alpha"])
+
         if pa["markerstyles_col"] != "select a column..":
             markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
             df["__marker__"]=markers
@@ -68,25 +80,29 @@ def make_figure(df,pa):
         for marker in list(OrderedDict.fromkeys(df["__marker__"].tolist())):
             tmp=df[df["__marker__"]==marker]
 
-            x=tmp[pa["xvals"]].tolist()
-            y=tmp[pa["yvals"]].tolist()
+            for marker_alpha in list(OrderedDict.fromkeys(tmp["__alpha__"].tolist())):
+                tmp_alpha=tmp[tmp["__alpha__"]==marker_alpha]
 
-            if pa["markersizes_col"] != "select a column..":
-                s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
-            else:
-                s=float(pa["markers"])
+                x=tmp_alpha[pa["xvals"]].tolist()
+                y=tmp_alpha[pa["yvals"]].tolist()
 
-            if pa["markerc_col"] != "select a column..":
-                c=[ str(i) for i in tmp[pa["markerc_col"]].tolist() ]
-            elif str(pa["markerc_write"]) != "":
-                c=str(pa["markerc_write"])
-            else:
-                c=pa["markerc"]
-            
-            plt.scatter(x, y, \
-                marker=marker, \
-                s=s,\
-                c=c)
+                if pa["markersizes_col"] != "select a column..":
+                    s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+                else:
+                    s=float(pa["markers"])
+
+                if pa["markerc_col"] != "select a column..":
+                    c=[ str(i) for i in tmp[pa["markerc_col"]].tolist() ]
+                elif str(pa["markerc_write"]) != "":
+                    c=str(pa["markerc_write"])
+                else:
+                    c=pa["markerc"]
+                
+                plt.scatter(x, y, \
+                    marker=marker, \
+                    s=s,\
+                    c=c,\
+                    alpha=marker_alpha)
 
     axes=plt.gca()
 
@@ -148,7 +164,7 @@ def make_figure(df,pa):
         else:
             grid_color=pa["grid_color_value"]
 
-        axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]) )
+        axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
     
     #grid(color='r', linestyle='-', linewidth=2)
 
@@ -213,6 +229,9 @@ def figure_defaults():
         "markerc_write":"",\
         "markerc_cols":["select a column.."],\
         "markerc_col":"select a column..",\
+        "marker_alpha":"1",\
+        "markeralpha_col":["select a column.."],\
+        "markeralpha_col_value":"select a column..",\
         "xlabel":"x",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
@@ -225,8 +244,8 @@ def figure_defaults():
         "upper_axis":".on",\
         "lower_axis":".on",\
         "tick_left_axis":".on" ,\
-        "tick_right_axis":"off",\
-        "tick_upper_axis":"off",\
+        "tick_right_axis":".off",\
+        "tick_upper_axis":".off",\
         "tick_lower_axis":".on",\
         "ticks_direction":TICKS_DIRECTIONS,\
         "ticks_direction_value":TICKS_DIRECTIONS[1],\
@@ -249,6 +268,7 @@ def figure_defaults():
         "grid_linestyle":['-', '--', '-.', ':'],\
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
+        "grid_alpha":"0.1",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\

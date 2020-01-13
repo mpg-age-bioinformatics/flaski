@@ -166,6 +166,8 @@ def scatterplot():
                 if session["plot_arguments"]["markersizes_cols"] not in cols:
                     session["plot_arguments"]["markersizes_cols"]=["select a column.."]+cols
 
+                if session["plot_arguments"]["markeralpha_col"] not in cols:
+                    session["plot_arguments"]["markeralpha_col"]=["select a column.."]+cols
 
 
                 # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT

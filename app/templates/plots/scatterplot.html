@@ -118,7 +118,7 @@
 
 
                             <div class="row arg">
-                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:186px;padding-left: 4px">
+                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:182px;padding-left: 4px">
                                 <label> size: <select name=title_size method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
                                         <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>"
@@ -220,16 +220,17 @@
                                         <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>"
                                     {% endfor %}
                                 </select></label></label>
-
                                 <label style="padding-left:19px;">style: <label style="padding-left:2px;"><select name=grid_linestyle method="GET" action="/" style="width:42px">
                                     {% for grid_linestyle_ in grid_linestyle %}
                                         <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>"
                                     {% endfor %}
                                 </select></label></label>
-
-                                <label style="padding-left:19px;">width: <label style="padding-left:2px;"><input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:40px;padding-left: 4px"></label></label>
-
+                                <label style="padding-left:19px;">width: <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:40px;padding-left: 4px"></label>
                             </div>
+                            <div class="row arg">
+                                <label style="padding-left:0px;">Grid alpha: <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:40px;padding-left: 4px"></label>
+                            </div>
+
 
                         </div>
         
@@ -293,6 +294,17 @@
                             <label>&nbsp;..or, <select name=markerstyles_cols method="GET" action="/" style="width:175px">
                                 {% for markerstyles_col in markerstyles_cols %}
                                     <option value="{{markerstyles_col}}" {% if markerstyles_col==markerstyles_cols %} selected {% endif %}>{{markerstyles_col}}</option>"
+                                {% endfor %}
+                            </select>
+
+                            </div>
+
+                            <div class="row arg">
+                                <label>alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;padding-left:4px;"></label>
+
+                            <label>&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:175px">
+                                {% for markeralpha_col_ in markeralpha_col %}
+                                    <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>"
                                 {% endfor %}
                             </select>
 
