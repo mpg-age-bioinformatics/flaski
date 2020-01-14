@@ -60,7 +60,7 @@
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
                         <select title=xcols name=xcols method="GET" action="/" style="width:114px">
                             {% for xcol in xcols %}
-                                <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>"
+                                <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -71,7 +71,7 @@
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
                         <select name=ycols method="GET" action="/" style="width:114px">
                             {% for ycol in ycols %}
-                                <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>"
+                                <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -82,7 +82,7 @@
                     <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
                         <select name=groups_value method="GET" action="/" style="width:114px">
                             {% for groups_ in groups %}
-                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>"
+                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -112,18 +112,18 @@
                         <div class="row arguments">
 
                             <div class="row arg">
-                                    <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;padding-left: 4px"></label>
-                                    <label style="padding-left: 7px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;padding-left: 4px"></label>
+                                    <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                                    <label style="padding-left: 7px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px"></label>
                             </div>
 
 
                             <div class="row arg">
-                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:182px;padding-left: 4px">
-                                <label> size: <select name=title_size method="GET" action="/" style="width:50px">
+                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
+                                <label style="padding-left: 4px"> size: <select name=title_size method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
-                                        <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>"
+                                        <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
-                                </select>
+                                </select></label>
                             </div>
                         
                         </div>
@@ -144,39 +144,39 @@
                         <div class="row arguments">
                             
                             <div class="row arg">
-                                <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:170px;padding-left: 4px">
-                                <label> size: <select name=xlabel_size method="GET" action="/" style="width:50px">
+                                <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
+                                <label style="padding-left: 4px"> size: <select name=xlabel_size method="GET" action="/" style="width:50px">
                                     {% for xlabel_size_ in xlabel_size %}
-                                        <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>"
+                                        <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
                                     {% endfor %}
-                                </select>
+                                </select></label>
                             </div>
 
                             <div class="row arg">
-                                <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:170px;padding-left: 4px">
-                                <label> size: <select name=ylabel_size method="GET" action="/" style="width:50px">
+                                <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
+                                <label style="padding-left: 4px"> size: <select name=ylabel_size method="GET" action="/" style="width:50px">
                                     {% for ylabel_size_ in ylabel_size %}
-                                        <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>"
+                                        <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>
                                     {% endfor %}
-                                </select>
+                                </select></label>
                             </div>
 
                             <div class="row arg">
                                 <label style="width:46px">Axis:</label>
                                 <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="left_axis" {% if left_axis=="on" %} checked {% elif left_axis==".on" %} checked {% endif %}/> left </label>
-                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="right_axis" {% if right_axis=="on" %} checked {% elif right_axis==".on" %} checked {% endif %}/> right </label>
-                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="upper_axis" {% if upper_axis=="on" %} checked {% elif upper_axis==".on" %} checked {% endif %}/> upper </label>
-                                <label style="padding-left:21px;padding-right:0px;"><input type="checkbox" name="lower_axis" {% if lower_axis=="on" %} checked {% elif lower_axis==".on" %} checked {% endif %}/> lower </label>
+                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="right_axis" {% if right_axis=="on" %} checked {% elif right_axis==".on" %} checked {% endif %}/> right </label>
+                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="upper_axis" {% if upper_axis=="on" %} checked {% elif upper_axis==".on" %} checked {% endif %}/> upper </label>
+                                <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="lower_axis" {% if lower_axis=="on" %} checked {% elif lower_axis==".on" %} checked {% endif %}/> lower </label>
                             </div>
 
                             <div class="row arg">
-                                <label>Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;padding-left: 4px"></label></label>
+                                <label>Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;height:22px;padding-left: 4px"></label></label>
                             </div>
                             <div class="row arg">
-                                <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;padding-left: 4px">
-                                <label style="padding-left:7px;"> Ticks direction: <select name=ticks_direction method="GET" action="/" style="width:64px">
+                                <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;height:22px;padding-left: 4px">
+                                <label style="padding-left:2px;"> Ticks direction: <select name=ticks_direction method="GET" action="/" style="width:64px">
                                     {% for ticks_direction_ in ticks_direction %}
-                                        <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>"
+                                        <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -184,51 +184,54 @@
                             <div class="row arg">
                                 <label style="width:46px">Ticks:</label>
                                 <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="tick_left_axis" {% if tick_left_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/> left </label>
-                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="tick_right_axis" {% if rtick_ight_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
-                                <label style="padding-left:21px;padding-right:4px;"><input type="checkbox" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/> upper </label>
-                                <label style="padding-left:21px;padding-right:0px;"><input type="checkbox" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
+                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="tick_right_axis" {% if rtick_ight_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
+                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/> upper </label>
+                                <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
                             </div>
 
                             <div class="row arg">
-                                <label>X ticks <label>fontsize: <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:66px;padding-left:4px;"></label></label>
-                                <label style="padding-left:14px;"> rotation: <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label>X ticks <label>fontsize: <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
+                                <label style="padding-left:14px;"> rotation: <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
                             <div class="row arg">
-                                <label>Y ticks <label style="padding-left:1px;">fontsize: <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:66px;padding-left:4px;"></label></label>
-                                <label style="padding-left:14px;"> rotation: <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label>Y ticks <label style="padding-left:1px;">fontsize: <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
+                                <label style="padding-left:13px;"> rotation: <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
                             <div class="row arg">
-                                <label>X limits <label style="padding-left:9px;">lower: <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="width:66px;padding-left:4px;"></label></label>
-                                <label style="padding-left:26px;"> upper: <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label>X limits <label style="padding-left:9px;">lower: <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
+                                <label style="padding-left:26px;"> upper: <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
                             <div class="row arg">
-                                <label>Y limits <label style="padding-left:10px;">lower: <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:66px;padding-left:4px;"></label></label>
-                                <label style="padding-left:25px;"> upper: <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label>Y limits <label style="padding-left:10px;">lower: <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
+                                <label style="padding-left:25px;"> upper: <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
                             <div class="row arg">
-                                <label>N ticks <label style="padding-left:10px;">x-axis: <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:66px;padding-left:4px;"></label></label>
-                                <label style="padding-left:25px;"> y-axis: <input type="text" name="maxyticks" value='{{ maxyticks }}' style="width:66px;padding-left:4px;"></label></label>
+                                <label>N ticks <label style="padding-left:10px;">x-axis: <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
+                                <label style="padding-left:25px;"> y-axis: <input type="text" name="maxyticks" value='{{ maxyticks }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
                             <div class="row arg">
-                                <label>Grid: <label style="padding-left:2px;"><select name=grid method="GET" action="/" style="width:64px">
+                                <label>Grid: <label style="padding-left:2px;"><select name=grid method="GET" action="/" style="width:97px">
                                     {% for grid_ in grid %}
-                                        <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>"
+                                        <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                     {% endfor %}
                                 </select></label></label>
-                                <label style="padding-left:19px;">style: <label style="padding-left:2px;"><select name=grid_linestyle method="GET" action="/" style="width:42px">
+
+                                <label style="padding-left:32px;">style: <label style="padding-left:2px;"><select name=grid_linestyle method="GET" action="/" style="width:97px">
                                     {% for grid_linestyle_ in grid_linestyle %}
-                                        <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>"
+                                        <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
                                     {% endfor %}
                                 </select></label></label>
-                                <label style="padding-left:19px;">width: <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:40px;padding-left: 4px"></label>
+
                             </div>
+
                             <div class="row arg">
-                                <label style="padding-left:0px;">Grid alpha: <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:40px;padding-left: 4px"></label>
+                                <label style="padding-left:0px;">Grid alpha: <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:74px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left:35px;"> width: <label style="padding-left:2px;"><input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:74px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
 
@@ -253,13 +256,13 @@
                             <div class="row arg">
                                 <label> size: <select name=markers method="GET" action="/" style="width:50px">
                                     {% for marker_size_ in marker_size %}
-                                        <option value="{{marker_size_}}" {% if marker_size_==markers %} selected {% endif %}>{{marker_size_}}</option>"
+                                        <option value="{{marker_size_}}" {% if marker_size_==markers %} selected {% endif %}>{{marker_size_}}</option>
                                     {% endfor %}
                                 </select>
 
-                                <label> ..or, <select name=markersizes_col method="GET" action="/" style="width:191px">
+                                <label> ..or, <select name=markersizes_col method="GET" action="/" style="width:189px">
                                     {% for markersizes_cols_ in markersizes_cols %}
-                                        <option value="{{markersizes_cols_}}" {% if markersizes_cols_==markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>"
+                                        <option value="{{markersizes_cols_}}" {% if markersizes_cols_==markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
                                     {% endfor %}
                                 </select>
 
@@ -272,41 +275,41 @@
                                     {% endfor %}
                                 </select>
 
-                                <label> ..or, <select name=markerc_col method="GET" action="/" style="width:155px">
+                                <label> ..or, <select name=markerc_col method="GET" action="/" style="width:153px">
                                     {% for markerc_cols_ in markerc_cols %}
-                                        <option value="{{markerc_cols_}}" {% if markerc_cols_==markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>"
+                                        <option value="{{markerc_cols_}}" {% if markerc_cols_==markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
                             <div class="row arg" style="padding-bottom:6px;">
-                                <label> ..or, write a color name <input type="text" name="markerc_write" value='{{ markerc_write }}' style="width:159px;height:22px;padding-left: 4px">
+                                <label> ..or, write a color name <input type="text" name="markerc_write" value='{{ markerc_write }}' style="width:155px;height:22px;padding-left: 4px">
                             </div>
 
 
                             <div class="row arg">
                                 <label>shape: <select name=marker method="GET" action="/" style="width:50px">
                                     {% for markerstyles_ in markerstyles %}
-                                        <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>"
+                                        <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>
                                     {% endfor %}
                                 </select>
 
-                            <label>&nbsp;..or, <select name=markerstyles_col method="GET" action="/" style="width:175px">
-                                {% for markerstyles_cols_ in markerstyles_cols %}
-                                    <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>"
-                                {% endfor %}
-                            </select>
+                                <label>&nbsp;..or, <select name=markerstyles_col method="GET" action="/" style="width:172px">
+                                    {% for markerstyles_cols_ in markerstyles_cols %}
+                                        <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
+                                    {% endfor %}
+                                </select>
 
                             </div>
 
                             <div class="row arg">
-                                <label>alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;padding-left:4px;"></label>
+                                <label>alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
 
-                            <label>&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:175px">
-                                {% for markeralpha_col_ in markeralpha_col %}
-                                    <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>"
-                                {% endfor %}
-                            </select>
+                                <label style="padding-left:1px;">&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px">
+                                    {% for markeralpha_col_ in markeralpha_col %}
+                                        <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
+                                    {% endfor %}
+                                </select></label>
 
                             </div>
 
@@ -321,7 +324,7 @@
                                 <div class="row arg">
                                     <label style="padding-right:4px;">Legend:
                                     <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
-                                    <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;padding-left:4px;"></label></label>
+                                    <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;height:22px;padding-left:4px;"></label></label>
                                 </div>
 
                             {% else %}
@@ -359,10 +362,10 @@
                         <div class="row arguments">
 
                             <div class="row arg">
-                                <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:137px;padding-left: 4px">
+                                <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;height:22px;padding-left: 4px">
                                 <label> format: <select name=download_format method="GET" action="/" style="width:50px">
                                     {% for download_format_ in download_format %}
-                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>"
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}
                                 </select>
                                 
@@ -388,14 +391,14 @@
                             <div class="row arg">
                                 <label>Upload arguments file:
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;height:30px">
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
                                         <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
                                     </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
                             <div class="row arg">
-                                <label>file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:238px;height:30px;padding-left: 4px">
+                                <label>file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:236px;height:30px;padding-left:4px">
                             </div>
                             {% endif %}
 
@@ -408,7 +411,7 @@
             <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
 
             <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
                     <i class="fas fa-fw fa-th" aria-hidden="true"></i>
                     <span>Session</span>
                 </a>
@@ -419,14 +422,14 @@
                             <div class="row arg">
                                 <label>Upload session file:
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;height:30px">
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
                                         <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
                                     </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
                             <div class="row arg">
-                                <label>Download file name:<input type="text" style="width:300px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
                             </div>
                             {% endif %}
 

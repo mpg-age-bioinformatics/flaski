@@ -56,11 +56,11 @@ def make_figure(df,pa):
                 if pa["markerc_col"] != "select a column..":
                     c=[ GET_COLOR(i) for i in tmp[[pa["markerc_col"]]].dropna()[pa["markerc_col"]].tolist()][0]
                     if type(c) == list:
-                        c=np.array([c]*len(tmp_alpha))/255.0
+                        c=np.array([c]*len(tmp))/255.0
                 elif str(pa["markerc_write"]) != "":
                     c=GET_COLOR(pa["markerc_write"])
                     if type(c) == list:
-                        c=np.array([c]*len(tmp_alpha))/255.0
+                        c=np.array([c]*len(tmp))/255.0
                 else:
                     c=pa["markerc"]
 
