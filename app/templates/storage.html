@@ -102,6 +102,7 @@
                 <thead>
                 <tr>
                     <th class="text-xs-right " style="padding-right:0px;" data-sort="int">Load</th>
+                    <th class="text-xs-right " style="padding-right:0px;" data-sort="int">Download</th>
                     <th class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort="string">Name</th>
                     <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Size</th>
                     <th class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort="int">Modified</th>
@@ -119,6 +120,7 @@
                 {% for entry in contents if entry.type == 'dir' %}
                 <tr>
                     <td class="text-xs-left " style="padding-right:0px;"></td>
+                    <td class="text-xs-left " style="padding-right:0px;"></td>
                     <!--do something> if <something is true> else <do something else></do-->
                     {% if path == "" %}
                     <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
@@ -133,8 +135,9 @@
                 {% for entry in contents if entry.type == 'file' %}
                 <tr>
                     <td class="text-xs-left " style="padding-right:0px;" title=Load><a href="/load/{{entry.path}}" class="fas fa-spinner"></a></td> <!-- <i class="fas fa-spinner"></i>-->
-                    <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;
-                    <a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a>
+                    <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" title=Download><a href="/getfile/{{entry.path}}" class="fas fa-download"></a></td> <!-- <i class="fas fa-spinner"></i>-->
+                    <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="file-{{entry.name | lower}}"><i class="fa fa-fw {{entry.name | icon_fmt}} " aria-hidden="true"></i>&nbsp;{{entry.name}}
+                    <!--a {% if entry.name | data_fmt not in ['unknown', 'archive'] %} data-toggle="modal" data-target="#viewer-modal" data-type="{{entry.name | data_fmt}}" {% endif %} href="{{entry.name}}" data-size="{{entry.size | size_fmt}}">{{entry.name}}</a-->
                     </td>
                     <td class="text-xs-right " style="padding-left:0px;padding-right:0px;"data-sort-value="{{entry.size}}" title="{{entry.size}} bytes">{{entry.size | size_fmt}}</td>
                     <td class="text-xs-right " style="padding-left:0px;padding-right:0px;" data-sort-value="{{entry.mtime}}" title="{{entry.mtime | time_fmt}}">{{entry.mtime | humanize}}</td>

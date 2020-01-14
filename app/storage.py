@@ -184,6 +184,14 @@ def load(p):
     flash("`%s` loaded. Press `Submit` to see results." %os.path.basename(path),'info')
     return redirect(url_for(app_redirect))
 
+@app.route('/getfile/<path:p>')
+@login_required
+def getfile(p):
+    path = UserFolder(current_user) + "/" + p
+    res = send_file(path)
+    res.headers.add('Content-Disposition', 'attachment')
+    return res
+
 def get_size(start_path = '.'):
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
