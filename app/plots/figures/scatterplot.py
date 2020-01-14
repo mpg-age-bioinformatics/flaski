@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from collections import OrderedDict
 import numpy as np
+from adjustText import adjust_text
 
 matplotlib.use('agg')
 
@@ -124,7 +125,6 @@ def make_figure(df,pa):
                     alpha=marker_alpha)
 
                 
-
     axes=plt.gca()
 
     for axis in ['top','bottom','left','right']:
@@ -187,6 +187,18 @@ def make_figure(df,pa):
 
         axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
 
+    if pa["labels_col_value"] != "select a column..":
+        tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
+        x=tmp[pa["xvals"]].tolist()
+        y=tmp[pa["yvals"]].tolist()
+        t=tmp[pa["labels_col_value"]].tolist()
+        texts = [plt.text( x[i], y[i], t[i] , size=float(pa["labels_font_size"]), color=pa["labels_font_color_value"] ) for i in range(len(x))]
+        if pa["labels_arrows_value"] != "None":
+            adjust_text(texts, arrowprops=dict(arrowstyle=pa["labels_arrows_value"], color=pa['labels_colors_value'], lw=float(pa["labels_line_width"]), alpha=float(pa["labels_alpha"]) ))
+        else:
+            adjust_text(texts)
+        # alpha
+
     plt.tight_layout()
 
     return fig
@@ -244,6 +256,17 @@ def figure_defaults():
         "marker_alpha":"1",\
         "markeralpha_col":["select a column.."],\
         "markeralpha_col_value":"select a column..",\
+        "labels_col":["select a column.."],\
+        "labels_col_value":"select a column..",\
+        "labels_font_size":"10",\
+        "labels_font_color":STANDARD_COLORS ,\
+        "labels_font_color_value":"black",\
+        "labels_arrows":["None","-","->"],\
+        "labels_arrows_value":"None",\
+        "labels_line_width":"0.5",\
+        "labels_alpha":"0.5",\
+        "labels_colors":STANDARD_COLORS,\
+        "labels_colors_value":"black",\
         "xlabel":"x",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\

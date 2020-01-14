@@ -310,6 +310,40 @@
                                         <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
                                     {% endfor %}
                                 </select></label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>Labels: <select name=labels_col_value method="GET" action="/" style="width:252px">
+                                    {% for labels_col_ in labels_col %}
+                                        <option value="{{labels_col_}}" {% if labels_col_==labels_col_value %} selected {% endif %}>{{labels_col_}}</option>
+                                    {% endfor %}
+                                </select></label>
+                            </div>
+                            <div class="row arg">
+                                <label>Labels font size: <input type="text" name="labels_font_size" value='{{ labels_font_size }}' style="width:70px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left:8px;">color: <select name=labels_font_color_value method="GET" action="/" style="width:80px">
+                                    {% for labels_font_color_ in labels_font_color %}
+                                        <option value="{{labels_font_color_}}" {% if labels_font_color_==labels_colors_value %} selected {% endif %}>{{labels_font_color_}}</option>
+                                    {% endfor %}
+                                </select></label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>Labels arrows: <select name=labels_arrows_value method="GET" action="/" style="width:80px">
+                                    {% for labels_arrows_ in labels_arrows %}
+                                        <option value="{{labels_arrows_}}" {% if labels_arrows_==labels_arrows_value %} selected {% endif %}>{{labels_arrows_}}</option>
+                                    {% endfor %}
+                                </select></label>
+
+                                <label style="padding-left:8px;">color: <select name=labels_colors_value method="GET" action="/" style="width:80px">
+                                    {% for labels_colors_ in labels_colors %}
+                                        <option value="{{labels_colors_}}" {% if labels_colors_==labels_colors_value %} selected {% endif %}>{{labels_colors_}}</option>
+                                    {% endfor %}
+                                </select></label>
+
+                            <div class="row arg">
+                                <label>Arrows line width: <input type="text" name="labels_line_width" value='{{ labels_line_width }}' style="width:64px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left:12px;">alpha: <input type="text" name="labels_alpha" value='{{ labels_alpha }}' style="width:64px;height:22px;padding-left:4px;"></label>
 
                             </div>
 
