@@ -1,0 +1,164 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const text_annotation_1 = require("./text_annotation");
+const dom_1 = require("../../core/dom");
+const visuals_1 = require("../../core/visuals");
+const p = require("../../core/properties");
+class TitleView extends text_annotation_1.TextAnnotationView {
+    initialize() {
+        super.initialize();
+        this.visuals.text = new visuals_1.Text(this.model);
+    }
+    _get_location() {
+        const panel = this.panel;
+        const hmargin = this.model.offset;
+        const vmargin = 5;
+        let sx, sy;
+        switch (panel.side) {
+            case 'above':
+            case 'below': {
+                switch (this.model.vertical_align) {
+                    case 'top':
+                        sy = panel._top.value + vmargin;
+                        break;
+                    case 'middle':
+                        sy = panel._vcenter.value;
+                        break;
+                    case 'bottom':
+                        sy = panel._bottom.value - vmargin;
+                        break;
+                    default: throw new Error("unreachable code");
+                }
+                switch (this.model.align) {
+                    case 'left':
+                        sx = panel._left.value + hmargin;
+                        break;
+                    case 'center':
+                        sx = panel._hcenter.value;
+                        break;
+                    case 'right':
+                        sx = panel._right.value - hmargin;
+                        break;
+                    default: throw new Error("unreachable code");
+                }
+                break;
+            }
+            case 'left': {
+                switch (this.model.vertical_align) {
+                    case 'top':
+                        sx = panel._left.value - vmargin;
+                        break;
+                    case 'middle':
+                        sx = panel._hcenter.value;
+                        break;
+                    case 'bottom':
+                        sx = panel._right.value + vmargin;
+                        break;
+                    default: throw new Error("unreachable code");
+                }
+                switch (this.model.align) {
+                    case 'left':
+                        sy = panel._bottom.value - hmargin;
+                        break;
+                    case 'center':
+                        sy = panel._vcenter.value;
+                        break;
+                    case 'right':
+                        sy = panel._top.value + hmargin;
+                        break;
+                    default: throw new Error("unreachable code");
+                }
+                break;
+            }
+            case 'right': {
+                switch (this.model.vertical_align) {
+                    case 'top':
+                        sx = panel._right.value - vmargin;
+                        break;
+                    case 'middle':
+                        sx = panel._hcenter.value;
+                        break;
+                    case 'bottom':
+                        sx = panel._left.value + vmargin;
+                        break;
+                    default: throw new Error("unreachable code");
+                }
+                switch (this.model.align) {
+                    case 'left':
+                        sy = panel._top.value + hmargin;
+                        break;
+                    case 'center':
+                        sy = panel._vcenter.value;
+                        break;
+                    case 'right':
+                        sy = panel._bottom.value - hmargin;
+                        break;
+                    default: throw new Error("unreachable code");
+                }
+                break;
+            }
+            default: throw new Error("unreachable code");
+        }
+        return [sx, sy];
+    }
+    render() {
+        if (!this.model.visible) {
+            if (this.model.render_mode == 'css')
+                dom_1.undisplay(this.el);
+            return;
+        }
+        const { text } = this.model;
+        if (text == null || text.length == 0)
+            return;
+        this.model.text_baseline = this.model.vertical_align;
+        this.model.text_align = this.model.align;
+        const [sx, sy] = this._get_location();
+        const angle = this.panel.get_label_angle_heuristic('parallel');
+        const draw = this.model.render_mode == 'canvas' ? this._canvas_text.bind(this) : this._css_text.bind(this);
+        draw(this.plot_view.canvas_view.ctx, text, sx, sy, angle);
+    }
+    _get_size() {
+        const { text } = this.model;
+        if (text == null || text.length == 0)
+            return { width: 0, height: 0 };
+        else {
+            this.visuals.text.set_value(this.ctx);
+            const { width, ascent } = this.ctx.measureText(text);
+            return { width, height: ascent * this.visuals.text.text_line_height.value() + 10 };
+        }
+    }
+}
+exports.TitleView = TitleView;
+TitleView.__name__ = "TitleView";
+class Title extends text_annotation_1.TextAnnotation {
+    constructor(attrs) {
+        super(attrs);
+    }
+    static init_Title() {
+        this.prototype.default_view = TitleView;
+        this.mixins(['line:border_', 'fill:background_']);
+        this.define({
+            text: [p.String],
+            text_font: [p.Font, 'helvetica'],
+            text_font_size: [p.FontSizeSpec, '10pt'],
+            text_font_style: [p.FontStyle, 'bold'],
+            text_color: [p.ColorSpec, '#444444'],
+            text_alpha: [p.NumberSpec, 1.0],
+            text_line_height: [p.Number, 1.0],
+            vertical_align: [p.VerticalAlign, 'bottom'],
+            align: [p.TextAlign, 'left'],
+            offset: [p.Number, 0],
+        });
+        this.override({
+            background_fill_color: null,
+            border_line_color: null,
+        });
+        this.internal({
+            text_align: [p.TextAlign, 'left'],
+            text_baseline: [p.TextBaseline, 'bottom'],
+        });
+    }
+}
+exports.Title = Title;
+Title.__name__ = "Title";
+Title.init_Title();

@@ -1,0 +1,110 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const sprintf_js_1 = require("sprintf-js");
+const Numbro = require("numbro");
+const tz = require("timezone");
+const string_1 = require("./string");
+const types_1 = require("./types");
+function sprintf(format, ...args) {
+    return sprintf_js_1.sprintf(format, ...args);
+}
+exports.sprintf = sprintf;
+exports.DEFAULT_FORMATTERS = {
+    numeral: (value, format, _special_vars) => Numbro.format(value, format),
+    datetime: (value, format, _special_vars) => tz(value, format),
+    printf: (value, format, _special_vars) => sprintf(format, value),
+};
+function basic_formatter(value, _format, _special_vars) {
+    if (types_1.isNumber(value)) {
+        const format = (() => {
+            switch (false) {
+                case Math.floor(value) != value:
+                    return "%d";
+                case !(Math.abs(value) > 0.1) || !(Math.abs(value) < 1000):
+                    return "%0.3f";
+                default:
+                    return "%0.3e";
+            }
+        })();
+        return sprintf(format, value);
+    }
+    else
+        return `${value}`; // get strings for categorical types
+}
+exports.basic_formatter = basic_formatter;
+function get_formatter(name, raw_spec, format, formatters) {
+    // no format, use default built in formatter
+    if (format == null)
+        return basic_formatter;
+    // format spec in the formatters dict, use that
+    if (formatters != null && (name in formatters || raw_spec in formatters)) {
+        // some day (Bokeh 2.0) we can get rid of the check for name, and just check the raw spec
+        // keep it now for compatibility but do not demonstrate it anywhere
+        const key = raw_spec in formatters ? raw_spec : name;
+        const formatter = formatters[key];
+        if (types_1.isString(formatter)) {
+            if (formatter in exports.DEFAULT_FORMATTERS)
+                return exports.DEFAULT_FORMATTERS[formatter];
+            else
+                throw new Error(`Unknown tooltip field formatter type '${formatter}'`);
+        }
+        return function (value, format, special_vars) {
+            return formatter.format(value, format, special_vars);
+        };
+    }
+    // otherwise use "numeral" as default
+    return exports.DEFAULT_FORMATTERS.numeral;
+}
+exports.get_formatter = get_formatter;
+function get_value(name, data_source, i, special_vars) {
+    if (name[0] == "$") {
+        if (name.substring(1) in special_vars)
+            return special_vars[name.substring(1)];
+        else
+            throw new Error(`Unknown special variable '${name}'`);
+    }
+    const column = data_source.get_column(name);
+    // missing column
+    if (column == null)
+        return null;
+    // typical (non-image) index
+    if (types_1.isNumber(i))
+        return column[i];
+    // image index
+    const data = column[i.index];
+    if (types_1.isTypedArray(data) || types_1.isArray(data)) {
+        // inspect array of arrays
+        if (types_1.isArray(data[0])) {
+            const row = data[i.dim2];
+            return row[i.dim1];
+        }
+        else
+            return data[i.flat_index]; // inspect flat array
+    }
+    else
+        return data; // inspect per-image scalar data
+}
+exports.get_value = get_value;
+function replace_placeholders(str, data_source, i, formatters, special_vars = {}) {
+    // this extracts the $x, @x, @{x} without any trailing {format}
+    const raw_spec = str.replace(/(?:^|[^@])([@|\$](?:\w+|{[^{}]+}))(?:{[^{}]+})?/g, (_match, raw_spec, _format) => `${raw_spec}`);
+    // this handles the special case @$name, replacing it with an @var corresponding to special_vars.name
+    str = str.replace(/@\$name/g, (_match) => `@{${special_vars.name}}`);
+    // this prepends special vars with "@", e.g "$x" becomes "@$x", so subsequent processing is simpler
+    str = str.replace(/(^|[^\$])\$(\w+)/g, (_match, prefix, name) => `${prefix}@$${name}`);
+    str = str.replace(/(^|[^@])@(?:(\$?\w+)|{([^{}]+)})(?:{([^{}]+)})?/g, (_match, prefix, name, long_name, format) => {
+        name = long_name != null ? long_name : name;
+        const value = get_value(name, data_source, i, special_vars);
+        // missing value, return ???
+        if (value == null)
+            return `${prefix}${string_1.escape("???")}`;
+        // 'safe' format, return the value as-is
+        if (format == 'safe')
+            return `${prefix}${value}`;
+        // format and escape everything else
+        const formatter = get_formatter(name, raw_spec, format, formatters);
+        return `${prefix}${string_1.escape(formatter(value, format, special_vars))}`;
+    });
+    return str;
+}
+exports.replace_placeholders = replace_placeholders;

@@ -5,6 +5,9 @@ from collections import OrderedDict
 import numpy as np
 from adjustText import adjust_text
 
+
+import mpld3
+
 matplotlib.use('agg')
 
 
@@ -23,7 +26,9 @@ def make_figure(df,pa):
     #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
 
     # MAIN FIGURE
-    fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
+    #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
+
+    fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
     # if we have groups
     # the user can decide how the diferent groups should look like 
@@ -65,7 +70,7 @@ def make_figure(df,pa):
                 else:
                     c=pa["markerc"]
 
-                plt.scatter(x, y, \
+                ax.scatter(x, y, \
                     marker=marker, \
                     s=s,\
                     c=c,\
@@ -73,7 +78,7 @@ def make_figure(df,pa):
                     label=group)
             
             else:
-                plt.scatter(x, y, \
+                ax.scatter(x, y, \
                     label=group)
 
         if pa["show_legend"] != "off" :        
@@ -118,7 +123,7 @@ def make_figure(df,pa):
                 else:
                     c=pa["markerc"]
 
-                plt.scatter(x, y, \
+                ax.scatter(x, y, \
                     marker=marker, \
                     s=s,\
                     c=c,\
@@ -197,10 +202,9 @@ def make_figure(df,pa):
             adjust_text(texts, arrowprops=dict(arrowstyle=pa["labels_arrows_value"], color=pa['labels_colors_value'], lw=float(pa["labels_line_width"]), alpha=float(pa["labels_alpha"]) ))
         else:
             adjust_text(texts)
-        # alpha
 
     plt.tight_layout()
-
+    
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]

@@ -323,7 +323,7 @@
                                 <label>Labels font size: <input type="text" name="labels_font_size" value='{{ labels_font_size }}' style="width:70px;height:22px;padding-left:4px;"></label>
                                 <label style="padding-left:8px;">color: <select name=labels_font_color_value method="GET" action="/" style="width:80px">
                                     {% for labels_font_color_ in labels_font_color %}
-                                        <option value="{{labels_font_color_}}" {% if labels_font_color_==labels_colors_value %} selected {% endif %}>{{labels_font_color_}}</option>
+                                        <option value="{{labels_font_color_}}" {% if labels_font_color_==labels_font_color_value %} selected {% endif %}>{{labels_font_color_}}</option>
                                     {% endfor %}
                                 </select></label>
                             </div>

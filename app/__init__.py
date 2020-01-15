@@ -23,7 +23,7 @@ sess.init_app(app)
 
 from app import routes, models, errors, storage
 
-from app.plots.routes import scatterplot
+from app.plots.routes import scatterplot, bokeh
 
 if not app.debug:
     if app.config['MAIL_SERVER']:
@@ -36,7 +36,7 @@ if not app.debug:
         mail_handler = SMTPHandler(
             mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
             fromaddr='no-reply@' + app.config['MAIL_SERVER'],
-            toaddrs=app.config['ADMINS'], subject='Microblog Failure',
+            toaddrs=app.config['ADMINS'], subject='Flaski Failure',
             credentials=auth, secure=secure)
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)

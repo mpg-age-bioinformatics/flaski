@@ -1,0 +1,309 @@
+.bk-root {
+  /* Functional styling;
+ * These styles are required for noUiSlider to function.
+ * You don't need to change these rules to apply your design.
+ */
+  /* Painting and performance;
+ * Browsers can paint handles in their own layer.
+ */
+  /* Slider size and handle placement;
+ */
+  /* Styling;
+ */
+  /* Handles and cursors;
+ */
+  /* Handle stripes;
+ */
+  /* Disabled state;
+ */
+  /* Base;
+ *
+ */
+  /* Values;
+ *
+ */
+  /* Markings;
+ *
+ */
+  /* Horizontal layout;
+ *
+ */
+  /* Vertical layout;
+ *
+ */
+}
+.bk-root .bk-noUi-target,
+.bk-root .bk-noUi-target * {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
+  -ms-touch-action: none;
+  touch-action: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.bk-root .bk-noUi-target {
+  position: relative;
+  direction: ltr;
+}
+.bk-root .bk-noUi-base {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  /* Fix 401 */
+}
+.bk-root .bk-noUi-connect {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+.bk-root .bk-noUi-origin {
+  position: absolute;
+  height: 0;
+  width: 0;
+}
+.bk-root .bk-noUi-handle {
+  position: relative;
+  z-index: 1;
+}
+.bk-root .bk-noUi-state-tap .bk-noUi-connect,
+.bk-root .bk-noUi-state-tap .bk-noUi-origin {
+  -webkit-transition: top 0.3s, right 0.3s, bottom 0.3s, left 0.3s;
+  transition: top 0.3s, right 0.3s, bottom 0.3s, left 0.3s;
+}
+.bk-root .bk-noUi-state-drag * {
+  cursor: inherit !important;
+}
+.bk-root .bk-noUi-base,
+.bk-root .bk-noUi-handle {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+.bk-root .bk-noUi-horizontal {
+  height: 18px;
+}
+.bk-root .bk-noUi-horizontal .bk-noUi-handle {
+  width: 34px;
+  height: 28px;
+  left: -17px;
+  top: -6px;
+}
+.bk-root .bk-noUi-vertical {
+  width: 18px;
+}
+.bk-root .bk-noUi-vertical .bk-noUi-handle {
+  width: 28px;
+  height: 34px;
+  left: -6px;
+  top: -17px;
+}
+.bk-root .bk-noUi-target {
+  background: #FAFAFA;
+  border-radius: 4px;
+  border: 1px solid #D3D3D3;
+  box-shadow: inset 0 1px 1px #F0F0F0, 0 3px 6px -5px #BBB;
+}
+.bk-root .bk-noUi-connect {
+  background: #3FB8AF;
+  border-radius: 4px;
+  box-shadow: inset 0 0 3px rgba(51, 51, 51, 0.45);
+  -webkit-transition: background 450ms;
+  transition: background 450ms;
+}
+.bk-root .bk-noUi-draggable {
+  cursor: ew-resize;
+}
+.bk-root .bk-noUi-vertical .bk-noUi-draggable {
+  cursor: ns-resize;
+}
+.bk-root .bk-noUi-handle {
+  border: 1px solid #D9D9D9;
+  border-radius: 3px;
+  background: #FFF;
+  cursor: default;
+  box-shadow: inset 0 0 1px #FFF, inset 0 1px 7px #EBEBEB, 0 3px 6px -3px #BBB;
+}
+.bk-root .bk-noUi-active {
+  box-shadow: inset 0 0 1px #FFF, inset 0 1px 7px #DDD, 0 3px 6px -3px #BBB;
+}
+.bk-root .bk-noUi-handle:before,
+.bk-root .bk-noUi-handle:after {
+  content: "";
+  display: block;
+  position: absolute;
+  height: 14px;
+  width: 1px;
+  background: #E8E7E6;
+  left: 14px;
+  top: 6px;
+}
+.bk-root .bk-noUi-handle:after {
+  left: 17px;
+}
+.bk-root .bk-noUi-vertical .bk-noUi-handle:before,
+.bk-root .bk-noUi-vertical .bk-noUi-handle:after {
+  width: 14px;
+  height: 1px;
+  left: 6px;
+  top: 14px;
+}
+.bk-root .bk-noUi-vertical .bk-noUi-handle:after {
+  top: 17px;
+}
+.bk-root [disabled] .bk-noUi-connect {
+  background: #B8B8B8;
+}
+.bk-root [disabled].bk-noUi-target,
+.bk-root [disabled].bk-noUi-handle,
+.bk-root [disabled] .bk-noUi-handle {
+  cursor: not-allowed;
+}
+.bk-root .bk-noUi-pips,
+.bk-root .bk-noUi-pips * {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.bk-root .bk-noUi-pips {
+  position: absolute;
+  color: #999;
+}
+.bk-root .bk-noUi-value {
+  position: absolute;
+  white-space: nowrap;
+  text-align: center;
+}
+.bk-root .bk-noUi-value-sub {
+  color: #ccc;
+  font-size: 10px;
+}
+.bk-root .bk-noUi-marker {
+  position: absolute;
+  background: #CCC;
+}
+.bk-root .bk-noUi-marker-sub {
+  background: #AAA;
+}
+.bk-root .bk-noUi-marker-large {
+  background: #AAA;
+}
+.bk-root .bk-noUi-pips-horizontal {
+  padding: 10px 0;
+  height: 80px;
+  top: 100%;
+  left: 0;
+  width: 100%;
+}
+.bk-root .bk-noUi-value-horizontal {
+  -webkit-transform: translate3d(-50%, 50%, 0);
+  transform: translate3d(-50%, 50%, 0);
+}
+.bk-root .bk-noUi-marker-horizontal.bk-noUi-marker {
+  margin-left: -1px;
+  width: 2px;
+  height: 5px;
+}
+.bk-root .bk-noUi-marker-horizontal.bk-noUi-marker-sub {
+  height: 10px;
+}
+.bk-root .bk-noUi-marker-horizontal.bk-noUi-marker-large {
+  height: 15px;
+}
+.bk-root .bk-noUi-pips-vertical {
+  padding: 0 10px;
+  height: 100%;
+  top: 0;
+  left: 100%;
+}
+.bk-root .bk-noUi-value-vertical {
+  -webkit-transform: translate3d(0, 50%, 0);
+  transform: translate3d(0, 50%, 0);
+  padding-left: 25px;
+}
+.bk-root .bk-noUi-marker-vertical.bk-noUi-marker {
+  width: 5px;
+  height: 2px;
+  margin-top: -1px;
+}
+.bk-root .bk-noUi-marker-vertical.bk-noUi-marker-sub {
+  width: 10px;
+}
+.bk-root .bk-noUi-marker-vertical.bk-noUi-marker-large {
+  width: 15px;
+}
+.bk-root .bk-noUi-tooltip {
+  display: block;
+  position: absolute;
+  border: 1px solid #D9D9D9;
+  border-radius: 3px;
+  background: #fff;
+  color: #000;
+  padding: 5px;
+  text-align: center;
+  white-space: nowrap;
+}
+.bk-root .bk-noUi-horizontal .bk-noUi-tooltip {
+  -webkit-transform: translate(-50%, 0);
+  transform: translate(-50%, 0);
+  left: 50%;
+  bottom: 120%;
+}
+.bk-root .bk-noUi-vertical .bk-noUi-tooltip {
+  -webkit-transform: translate(0, -50%);
+  transform: translate(0, -50%);
+  top: 50%;
+  right: 120%;
+}
+.bk-root .bk-noUi-handle {
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+.bk-root .bk-noUi-handle.bk-noUi-active {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+}
+.bk-root .bk-noUi-tooltip {
+  display: none;
+  white-space: nowrap;
+}
+.bk-root .bk-noUi-handle:hover .bk-noUi-tooltip {
+  display: block;
+}
+.bk-root .bk-noUi-horizontal {
+  width: 100%;
+  height: 10px;
+}
+.bk-root .bk-noUi-horizontal.bk-noUi-target {
+  margin: 5px 0px;
+}
+.bk-root .bk-noUi-horizontal .bk-noUi-handle {
+  width: 14px;
+  height: 18px;
+  left: -7px;
+  top: -5px;
+}
+.bk-root .bk-noUi-vertical {
+  width: 10px;
+  height: 100%;
+}
+.bk-root .bk-noUi-vertical.bk-noUi-target {
+  margin: 0px 5px;
+}
+.bk-root .bk-noUi-vertical .bk-noUi-handle {
+  width: 18px;
+  height: 14px;
+  left: -5px;
+  top: -7px;
+}
+.bk-root .bk-noUi-handle:after,
+.bk-root .bk-noUi-handle:before {
+  display: none;
+}
+.bk-root .bk-noUi-connect {
+  box-shadow: none;
+}
