@@ -5,8 +5,16 @@ from collections import OrderedDict
 import numpy as np
 from adjustText import adjust_text
 
+import pandas as pd
+from bokeh.plotting import figure, show, output_file, ColumnDataSource
+from bokeh.sampledata.iris import flowers
+from bokeh import models
+from bokeh.models import LinearAxis, Range1d, DataRange1d
+
 
 import mpld3
+
+import math 
 
 matplotlib.use('agg')
 
@@ -129,100 +137,192 @@ def make_figure(df,pa):
                     c=c,\
                     alpha=marker_alpha)
 
-                
-    axes=plt.gca()
-
-    for axis in ['top','bottom','left','right']:
-        axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
-
-    for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
-        if argv =="on":
-            axes.spines[axis].set_visible(True)
-        else:
-            axes.spines[axis].set_visible(False)
-
-    ticks={}
-    for axis,argv in zip(['top','bottom','left','right'], \
-        [pa["tick_upper_axis"],pa["tick_lower_axis"],pa["tick_left_axis"],pa["tick_right_axis"]]):
-        if argv =="on":
-            show=True
-        else:
-            show=False
-        ticks[axis]=show
-
-    axes.tick_params(right= ticks["right"],top=ticks["top"],\
-        left=ticks["left"], bottom=ticks["bottom"])
-
-    axes.tick_params(direction=pa["ticks_direction_value"], width=float(pa["axis_line_width"]),length=float(pa["ticks_length"]))  
-
-    if (pa["x_lower_limit"]!="") or (pa["x_upper_limit"]!="") :
-        xmin, xmax = axes.get_xlim()
-        if pa["x_lower_limit"]!="":
-            xmin=float(pa["x_lower_limit"])
-        if pa["x_upper_limit"]!="":
-            xmax=float(pa["x_upper_limit"])
-        plt.xlim(xmin, xmax)
-
-    if (pa["y_lower_limit"]!="") or (pa["y_upper_limit"]!="") :
-        ymin, ymax = axes.get_ylim()
-        if pa["y_lower_limit"]!="":
-            ymin=float(pa["y_lower_limit"])
-        if pa["y_upper_limit"]!="":
-            ymax=float(pa["y_upper_limit"])
-        plt.ylim(xmin, ymax)
-
-    if pa["maxxticks"]!="":
-        axes.xaxis.set_major_locator(plt.MaxNLocator(int(pa["maxxticks"])))
-
-    if pa["maxyticks"]!="":
-        axes.yaxis.set_major_locator(plt.MaxNLocator(int(pa["maxyticks"])))
-
-    plt.title(pa['title'], fontsize=int(pa["titles"]))
-    plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
-    plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
-
-    plt.xticks(fontsize=float(pa["xticks_fontsize"]), rotation=float(pa["xticks_rotation"]))
-    plt.yticks(fontsize=float(pa["yticks_fontsize"]), rotation=float(pa["yticks_rotation"]))
-
-    if pa["grid_value"] != "None":
-        if pa["grid_color_text"]!="":
-            grid_color=GET_COLOR(pa["grid_color_text"])
-        else:
-            grid_color=GET_COLOR(pa["grid_color_value"])
-
-        axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
-
     if pa["labels_col_value"] != "select a column..":
         tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
         x=tmp[pa["xvals"]].tolist()
         y=tmp[pa["yvals"]].tolist()
         t=tmp[pa["labels_col_value"]].tolist()
-        texts = [plt.text( x[i], y[i], t[i] , size=float(pa["labels_font_size"]), color=pa["labels_font_color_value"] ) for i in range(len(x))]
-        if pa["labels_arrows_value"] != "None":
-            adjust_text(texts, arrowprops=dict(arrowstyle=pa["labels_arrows_value"], color=pa['labels_colors_value'], lw=float(pa["labels_line_width"]), alpha=float(pa["labels_alpha"]) ))
-        else:
-            adjust_text(texts)
 
-    plt.tight_layout()
+        source = ColumnDataSource(data=dict(
+        x=x,
+        y=y,
+        label=t,
+        ))
 
-    source = ColumnDataSource(data=dict(
-    x=[1, 2, 3, 4, 5],
-    y=[2, 5, 8, 2, 7],
-    desc=['A', 'b', 'C', 'd', 'E'],
-    ))
+        TOOLTIPS = [
+            ("x", "$x"),
+            ("y", "$y"),
+            ("label", "@label"),
+        ]
+    else:
+        tmp=df[[pa["xvals"],pa["yvals"] ]].dropna()
+        x=tmp[pa["xvals"]].tolist()
+        y=tmp[pa["yvals"]].tolist()
 
-    TOOLTIPS = [
-        ("index", "$index"),
-        ("(x,y)", "($x, $y)"),
-        ("desc", "@desc"),
-    ]
+        source = ColumnDataSource(data=dict(
+        x=x,
+        y=y,
+        ))
 
-    p = figure(plot_width=400, plot_height=400, tooltips=TOOLTIPS,
-            title="Mouse over the dots")
+        TOOLTIPS = [
+            ("x", "$x"),
+            ("y", "$y"),
+        ]        
 
-    p.circle('x', 'y', size=20, source=source)
+    fig = figure(plot_width=int(pa["fig_width"]), plot_height=int(pa["fig_height"]), tooltips=TOOLTIPS,
+            title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
+
+    fig.title.text_font_size = pa["titles"]+"pt"#'8pt'
+    fig.title.align = 'center'
+
+    fig.xaxis.axis_label_text_font_size = pa["xlabels"]+"pt"
+    fig.yaxis.axis_label_text_font_size = pa["ylabels"]+"pt"
+
+    if pa["x_lower_limit"]!="":
+        fig.x_range.start=float(pa["x_lower_limit"])
+    if pa["x_upper_limit"]!="":
+        fig.x_range.end=float(pa["x_upper_limit"])
+
+    if pa["y_lower_limit"]!="":
+        fig.y_range.start=float(pa["y_lower_limit"])
+    if pa["y_upper_limit"]!="":
+        fig.y_range.end=float(pa["y_upper_limit"])
+
+    #print(fig.y_range.to_json(include_defaults=True))
+    #ystart=fig.y_range.on_change("start")
+    #yend=fig.y_range.on_change("end")
+
+    #for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
+    #if pa["right_axis"] == "on":
+    fig.extra_y_ranges = {'mocky': DataRange1d(bounds=(None, None)) }
+    fig.add_layout(LinearAxis(y_range_name='mocky'), 'right')
+    #if pa["upper_axis"] == "on":
+    fig.extra_x_ranges = {'mockx': DataRange1d(bounds=(None, None)) }
+    fig.add_layout(LinearAxis(x_range_name='mockx'), 'above')
+
+    #fig.v_symmetry=True
+
+    if pa["maxxticks"]!="":
+        fig.xaxis.ticker.desired_num_ticks=int(pa["maxxticks"])
+    # fig.xaxis[0].ticker.num_minor_ticks=2 # not yet in HTML
+    if pa["maxyticks"]!="":
+        fig.yaxis.ticker.desired_num_ticks=int(pa["maxyticks"])
+    # fig.yaxis[0].ticker.num_minor_ticks=2 # not yet in HTML
+
+    if pa["xticks_rotation"] != "0":
+        fig.xaxis.major_label_orientation=math.radians(float(pa["xticks_rotation"]))
+    if pa["yticks_rotation"] != "0":
+        fig.yaxis.major_label_orientation=math.radians(float(pa["yticks_rotation"]))
+
+    fig.xaxis.major_tick_line_width=float(pa["axis_line_width"])
+    fig.yaxis.major_tick_line_width=float(pa["axis_line_width"])
+    fig.xaxis.minor_tick_line_width=float(pa["axis_line_width"])
+    fig.yaxis.minor_tick_line_width=float(pa["axis_line_width"])
+
+    if pa["lower_axis"] == "on":
+        fig.xaxis[1].axis_line_width = float(pa["axis_line_width"])
+    else:
+        fig.xaxis[1].axis_line_width = 0
+
+    if pa["upper_axis"] == "on":
+        fig.xaxis[0].axis_line_width = float(pa["axis_line_width"])
+    else:
+        fig.xaxis[0].axis_line_width = 0
+
+    if pa["left_axis"] == "on":
+        fig.yaxis[1].axis_line_width = float(pa["axis_line_width"])
+    else:
+        fig.yaxis[1].axis_line_width = 0
+
+    if pa["right_axis"] == "on":
+        fig.yaxis[0].axis_line_width = float(pa["axis_line_width"])
+    else:
+        fig.yaxis[0].axis_line_width = 0
+
+    fig.axis.minor_tick_in = 0
+    fig.axis.major_tick_in = 0
+
+    if pa["tick_lower_axis"] == "on":
+        fig.xaxis[1].major_tick_out = int(float(pa["ticks_length"]))
+        fig.xaxis[1].minor_tick_out = int(float(pa["ticks_length"])/2)
+        fig.xaxis[1].major_label_text_font_size = pa["xticks_fontsize"]+"pt"
+    else:
+        fig.xaxis[1].major_tick_out = 0
+        fig.xaxis[1].minor_tick_out = 0
+        fig.xaxis[1].major_label_text_font_size ="0pt"
+
+    if pa["tick_upper_axis"] == "on":
+        fig.xaxis[0].major_tick_out = int(float(pa["ticks_length"]))
+        fig.xaxis[0].minor_tick_out = int(float(pa["ticks_length"])/2)
+        fig.xaxis[0].major_label_text_font_size = pa["xticks_fontsize"]+"pt"
+    else:
+        fig.xaxis[0].major_tick_out = 0
+        fig.xaxis[0].minor_tick_out = 0
+        fig.xaxis[0].major_label_text_font_size ="0pt"
+
+    if pa["tick_left_axis"] == "on":
+        fig.yaxis[0].major_tick_out = int(float(pa["ticks_length"]))
+        fig.yaxis[0].minor_tick_out = int(float(pa["ticks_length"])/2)
+        fig.yaxis[0].major_label_text_font_size = pa["yticks_fontsize"]+"pt"
+    else:
+        fig.yaxis[0].major_tick_out = 0
+        fig.yaxis[0].minor_tick_out = 0
+        fig.yaxis[0].major_label_text_font_size ="0pt"
+
+    if pa["tick_right_axis"] == "on":
+        fig.yaxis[1].major_tick_out = int(float(pa["ticks_length"]))
+        fig.yaxis[1].minor_tick_out = int(float(pa["ticks_length"])/2)
+        fig.yaxis[1].major_label_text_font_size = pa["yticks_fontsize"]+"pt"
+    else:
+        fig.yaxis[1].major_tick_out = 0
+        fig.yaxis[1].minor_tick_out = 0
+        fig.yaxis[1].major_label_text_font_size ="0pt"
+
+    #fig.yaxis.major_label_text_font_size ="20pt"
+
+    if pa["grid_color_text"]!="":
+        grid_color=GET_COLOR(pa["grid_color_text"])
+    else:
+        grid_color=GET_COLOR(pa["grid_color_value"])
+
+    fig.xgrid.grid_line_color = grid_color
+    fig.ygrid.grid_line_color = grid_color
+
+    if pa["grid_value"] == "None":
+        fig.xgrid.visible = False
+        fig.ygrid.visible = False
+    elif pa["grid_value"] == "both":
+        fig.xgrid.visible = True
+        fig.ygrid.visible = True
+    elif pa["grid_value"] == "x":
+        fig.xgrid.visible = True
+        fig.ygrid.visible = False
+    elif pa["grid_value"] == "y":
+        fig.xgrid.visible = False
+        fig.ygrid.visible = True
     
-    return p
+    fig.grid.grid_line_alpha=float(pa["grid_alpha"])
+    fig.grid.grid_line_width=float(pa["grid_linewidth"])
+    fig.grid.grid_line_dash=pa["grid_linestyle_value"]
+
+    #fig.outline_line_width=float(pa["axis_line_width"])
+    #fig.outline_line_alpha=1
+    #fig.outline_line_color="black"
+
+   
+    #https://rdrr.io/cran/rbokeh/man/x_axis.html
+    #plot.xaxis.visible = False
+    #plot.yaxis.visible = False
+
+    # to-dos
+    # replace x ticks and axis on/off with frame on/off
+  
+    s=[float(i) for  i in x ]
+
+    #fig.circle('x', 'y', source=source,  size=float(pa["markers"]), fill_alpha=float(pa["marker_alpha"]), line_alpha=float(pa["marker_alpha"]) )
+    fig.circle('x', 'y', source=source,  size=float(pa["markers"]), fill_alpha=float(pa["marker_alpha"]), line_alpha=float(pa["marker_alpha"]) )
+
+    return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 ALLOWED_MARKERS=[".",",","o","v","^","<",">",\
@@ -247,11 +347,11 @@ def figure_defaults():
     # "fig_size_y"="6"
 
     plot_arguments={
-        "fig_width":"6.0",\
-        "fig_height":"6.0",\
-        "title":'Scatter plot',\
+        "fig_width":"600",\
+        "fig_height":"600",\
+        "title":'My interactive scatter plot',\
         "title_size":STANDARD_SIZES,\
-        "titles":"20",\
+        "titles":"14",\
         "xcols":[],\
         "xvals":None,\
         "ycols":[],\
@@ -266,7 +366,7 @@ def figure_defaults():
         "markerstyles_cols":["select a column.."],\
         "markerstyles_col":"select a column..",\
         "marker_size":STANDARD_SIZES,\
-        "markers":"50",\
+        "markers":"10",\
         "markersizes_cols":["select a column.."],\
         "markersizes_col":"select a column..",\
         "marker_color":STANDARD_COLORS,\
@@ -274,7 +374,7 @@ def figure_defaults():
         "markerc_write":"",\
         "markerc_cols":["select a column.."],\
         "markerc_col":"select a column..",\
-        "marker_alpha":"1",\
+        "marker_alpha":"0.5",\
         "markeralpha_col":["select a column.."],\
         "markeralpha_col_value":"select a column..",\
         "labels_col":["select a column.."],\
@@ -317,12 +417,12 @@ def figure_defaults():
         "maxxticks":"",\
         "maxyticks":"",\
         "grid":["None","both","x","y"],\
-        "grid_value":"None",\
+        "grid_value":"both",\
         "grid_color_text":"",\
         "grid_colors":STANDARD_COLORS,\
         "grid_color_value":"black",\
-        "grid_linestyle":['-', '--', '-.', ':'],\
-        "grid_linestyle_value":'--',\
+        "grid_linestyle":["solid", "dashed", "dotted", "dotdash", "dashdot"],\
+        "grid_linestyle_value":"dashed",\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
         "download_format":["png","pdf","svg"],\

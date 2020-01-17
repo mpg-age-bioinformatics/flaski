@@ -23,7 +23,7 @@ sess.init_app(app)
 
 from app import routes, models, errors, storage
 
-from app.plots.routes import scatterplot, bokeh
+from app.plots.routes import scatterplot, bokeh, iscatterplot
 
 if not app.debug:
     if app.config['MAIL_SERVER']:

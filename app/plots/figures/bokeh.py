@@ -28,7 +28,6 @@ def create_figure():
 
     # print(source)
 
-
     # p.circle( "petal_length", "petal_width", color="colors", fill_alpha=0.2, size=10, source=source, tooltips=TOOLTIPS )
 
     source = ColumnDataSource(data=dict(
