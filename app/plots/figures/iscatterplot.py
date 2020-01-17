@@ -43,131 +43,57 @@ def make_figure(df,pa):
     # by unchecking the groups_autogenerate check box
 
 
-    if pa["groups_value"]!="None":
-        for group in list(OrderedDict.fromkeys(df[pa["groups_value"]].tolist())):
-            tmp=df[df[pa["groups_value"]]==group]
+    # if pa["groups_value"]!="None":
+    #     for group in list(OrderedDict.fromkeys(df[pa["groups_value"]].tolist())):
+    #         tmp=df[df[pa["groups_value"]]==group]
 
-            x=tmp[pa["xvals"]].tolist()
-            y=tmp[pa["yvals"]].tolist()
+    #         x=tmp[pa["xvals"]].tolist()
+    #         y=tmp[pa["yvals"]].tolist()
 
-            if pa["groups_auto_generate"] == "off" :
-
-                if pa["markeralpha_col_value"] != "select a column..":
-                    a=[ float(i) for i in tmp[[pa["markeralpha_col_value"]]].dropna()[pa["markeralpha_col_value"]].tolist() ][0]
-                else:
-                    a=float(pa["marker_alpha"])
-
-                if pa["markerstyles_col"] != "select a column..":
-                    marker=[ str(i) for i in tmp[[pa["markerstyles_col"]]].dropna()[pa["markerstyles_col"]].tolist() ][0]
-                else:
-                    marker=pa["marker"]
-
-                if pa["markersizes_col"] != "select a column..":
-                    s=[ float(i) for i in tmp[[pa["markersizes_col"]]].dropna()[pa["markersizes_col"]].tolist() ][0]
-                else:
-                    s=float(pa["markers"])
-
-                if pa["markerc_col"] != "select a column..":
-                    c=[ GET_COLOR(i) for i in tmp[[pa["markerc_col"]]].dropna()[pa["markerc_col"]].tolist()][0]
-                    if type(c) == list:
-                        c=np.array([c]*len(tmp))/255.0
-                elif str(pa["markerc_write"]) != "":
-                    c=GET_COLOR(pa["markerc_write"])
-                    if type(c) == list:
-                        c=np.array([c]*len(tmp))/255.0
-                else:
-                    c=pa["markerc"]
-
-                ax.scatter(x, y, \
-                    marker=marker, \
-                    s=s,\
-                    c=c,\
-                    alpha=a,\
-                    label=group)
-            
-            else:
-                ax.scatter(x, y, \
-                    label=group)
-
-        if pa["show_legend"] != "off" :        
-            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=pa["legend_font_size"])
+    #         if pa["groups_auto_generate"] == "off" :
     
-    elif pa["groups_value"]=="None":
+    valid_indexes=df[[pa["xvals"],pa["yvals"] ]].dropna()
+    valid_indexes=valid_indexes.index.tolist()
+    tmp=df[df.index.isin(valid_indexes)]
+   
+    x=tmp[pa["xvals"]].tolist()
+    y=tmp[pa["yvals"]].tolist()
 
-        if pa["markeralpha_col_value"] != "select a column..":
-            markers_alpha=[ float(i) for i in df[pa["markeralpha_col_value"]].tolist() ]
-            df["__alpha__"]=markers_alpha
-        else:
-            df["__alpha__"]=float(pa["marker_alpha"])
-
-        if pa["markerstyles_col"] != "select a column..":
-            markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
-            df["__marker__"]=markers
-        else:
-            df["__marker__"]=pa["marker"]
-    
-        for marker in list(OrderedDict.fromkeys(df["__marker__"].tolist())):
-            tmp=df[df["__marker__"]==marker]
-
-            for marker_alpha in list(OrderedDict.fromkeys(tmp["__alpha__"].tolist())):
-                tmp_alpha=tmp[tmp["__alpha__"]==marker_alpha]
-
-                x=tmp_alpha[pa["xvals"]].tolist()
-                y=tmp_alpha[pa["yvals"]].tolist()
-
-                if pa["markersizes_col"] != "select a column..":
-                    s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
-                else:
-                    s=float(pa["markers"])
-
-                if pa["markerc_col"] != "select a column..":
-                    c=[ GET_COLOR(i) for i in tmp[pa["markerc_col"]].tolist() ]
-                    if not all(isinstance(i, str) for i in c) :
-                        c=np.array(c)/255.0
-                elif str(pa["markerc_write"]) != "":
-                    c=GET_COLOR(pa["markerc_write"])
-                    if type(c) == list:
-                        c=np.array([c]*len(tmp_alpha))/255.0
-                else:
-                    c=pa["markerc"]
-
-                ax.scatter(x, y, \
-                    marker=marker, \
-                    s=s,\
-                    c=c,\
-                    alpha=marker_alpha)
+    data=dict(x=x,y=y)
+    TOOLTIPS = [ ("x", "$x"),("y", "$y") ]
 
     if pa["labels_col_value"] != "select a column..":
-        tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
-        x=tmp[pa["xvals"]].tolist()
-        y=tmp[pa["yvals"]].tolist()
-        t=tmp[pa["labels_col_value"]].tolist()
+        label=tmp[[pa["labels_col_value"]]].astype(str)[pa["labels_col_value"]].tolist()
+        data["label"]=label
+        TOOLTIPS.append(("label", "@label"))
 
-        source = ColumnDataSource(data=dict(
-        x=x,
-        y=y,
-        label=t,
-        ))
-
-        TOOLTIPS = [
-            ("x", "$x"),
-            ("y", "$y"),
-            ("label", "@label"),
-        ]
+    if pa["markersizes_col"] != "select a column..":
+        s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
     else:
-        tmp=df[[pa["xvals"],pa["yvals"] ]].dropna()
-        x=tmp[pa["xvals"]].tolist()
-        y=tmp[pa["yvals"]].tolist()
+        s=[ float(pa["markers"]) for i in x ]
+    data["size"]=s
 
-        source = ColumnDataSource(data=dict(
-        x=x,
-        y=y,
-        ))
+    if pa["markeralpha_col_value"] != "select a column..":
+        a=[ float(i) for i in  tmp[pa["markeralpha_col_value"]].tolist() ]
+    else:
+        a=[ float(pa["marker_alpha"]) for i in x ]
+    data["alpha"]=a
 
-        TOOLTIPS = [
-            ("x", "$x"),
-            ("y", "$y"),
-        ]        
+    if pa["markerc_col"] != "select a column..":
+        c=[ GET_COLOR(i) for i in tmp[pa["markerc_col"]].tolist() ]
+        if not all(isinstance(i, str) for i in c) :
+            c=np.array(c)
+    elif str(pa["markerc_write"]) != "":
+        c=GET_COLOR(pa["markerc_write"])
+        if type(c) == list:
+            c=np.array([c]*len(tmp_alpha))
+    else:
+        c=[ pa["markerc"] for i in x ]
+    data["color"]=c
+
+
+
+    source = ColumnDataSource(data)  
 
     fig = figure(plot_width=int(pa["fig_width"]), plot_height=int(pa["fig_height"]), tooltips=TOOLTIPS,
             title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
@@ -305,22 +231,21 @@ def make_figure(df,pa):
     fig.grid.grid_line_width=float(pa["grid_linewidth"])
     fig.grid.grid_line_dash=pa["grid_linestyle_value"]
 
+    ## other
+
     #fig.outline_line_width=float(pa["axis_line_width"])
     #fig.outline_line_alpha=1
     #fig.outline_line_color="black"
 
-   
     #https://rdrr.io/cran/rbokeh/man/x_axis.html
     #plot.xaxis.visible = False
     #plot.yaxis.visible = False
 
-    # to-dos
-    # replace x ticks and axis on/off with frame on/off
+    # dealing with groups
+    # https://docs.bokeh.org/en/latest/docs/user_guide/categorical.html
   
-    s=[float(i) for  i in x ]
-
     #fig.circle('x', 'y', source=source,  size=float(pa["markers"]), fill_alpha=float(pa["marker_alpha"]), line_alpha=float(pa["marker_alpha"]) )
-    fig.circle('x', 'y', source=source,  size=float(pa["markers"]), fill_alpha=float(pa["marker_alpha"]), line_alpha=float(pa["marker_alpha"]) )
+    fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color' )
 
     return fig
 
