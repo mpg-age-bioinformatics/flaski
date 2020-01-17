@@ -20,14 +20,14 @@ matplotlib.use('agg')
 
 
 def GET_COLOR(x):
-    if str(x)[:3].lower() == "rgb":
-        vals=x.split("rgb(")[-1].split(")")[0].split(",")
-        vals=[ float(s.strip(" ")) for s in vals ]
-        #vals=tuple(vals)
-        return vals
-    else:
-        return str(x)
-
+    #if str(x)[:3].lower() == "rgb":
+    #    vals=x.split("rgb(")[-1].split(")")[0].split(",")
+    #    vals=[ float(s.strip(" ")) for s in vals ]
+    #    vals=tuple(vals)
+    #    return vals
+    #else:
+    #    return str(x)
+    return str(x)
 
 def make_figure(df,pa):
 
@@ -80,13 +80,9 @@ def make_figure(df,pa):
     data["alpha"]=a
 
     if pa["markerc_col"] != "select a column..":
-        c=[ GET_COLOR(i) for i in tmp[pa["markerc_col"]].tolist() ]
-        if not all(isinstance(i, str) for i in c) :
-            c=np.array(c)
+        c=tmp[pa["markerc_col"]].tolist()
     elif str(pa["markerc_write"]) != "":
-        c=GET_COLOR(pa["markerc_write"])
-        if type(c) == list:
-            c=np.array([c]*len(tmp_alpha))
+        c=[ GET_COLOR(pa["markerc_write"]) for i in x ]
     else:
         c=[ pa["markerc"] for i in x ]
     data["color"]=c
@@ -245,7 +241,7 @@ def make_figure(df,pa):
     # https://docs.bokeh.org/en/latest/docs/user_guide/categorical.html
   
     #fig.circle('x', 'y', source=source,  size=float(pa["markers"]), fill_alpha=float(pa["marker_alpha"]), line_alpha=float(pa["marker_alpha"]) )
-    fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color' )
+    fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color' )
 
     return fig
 
