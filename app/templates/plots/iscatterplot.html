@@ -288,13 +288,13 @@
 
 
                             <div class="row arg">
-                                <label>shape: <select name=marker method="GET" action="/" style="width:50px">
+                                <label>shape: <select name=marker method="GET" action="/" style="width:110px">
                                     {% for markerstyles_ in markerstyles %}
                                         <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>
                                     {% endfor %}
                                 </select>
 
-                                <label>&nbsp;..or, <select name=markerstyles_col method="GET" action="/" style="width:172px">
+                                <label>&nbsp;..or, <select name=markerstyles_col method="GET" action="/" style="width:112px">
                                     {% for markerstyles_cols_ in markerstyles_cols %}
                                         <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
                                     {% endfor %}
@@ -351,7 +351,7 @@
                             {% if groups_value != "None" %}
 
                                 <div class="row arg">
-                                    <label style="padding-right:4px;">Auto generate groups characteristics: </label>
+                                    <label style="padding-right:4px;">Auto generate groups characteristics:</label>
                                     <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="groups_auto_generate" {% if groups_auto_generate=="on" %} checked {% elif groups_auto_generate==".on" %} checked {% endif %}/></label>
                                 </div>
 

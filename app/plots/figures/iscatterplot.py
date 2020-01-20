@@ -9,7 +9,9 @@ import pandas as pd
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.sampledata.iris import flowers
 from bokeh import models
-from bokeh.models import LinearAxis, Range1d, DataRange1d
+from bokeh.models import LinearAxis, Range1d, DataRange1d, Legend
+from bokeh.palettes import brewer
+
 
 
 import mpld3
@@ -18,17 +20,6 @@ import math
 
 matplotlib.use('agg')
 
-
-def GET_COLOR(x):
-    #if str(x)[:3].lower() == "rgb":
-    #    vals=x.split("rgb(")[-1].split(")")[0].split(",")
-    #    vals=[ float(s.strip(" ")) for s in vals ]
-    #    vals=tuple(vals)
-    #    return vals
-    #else:
-    #    return str(x)
-    return str(x)
-
 def make_figure(df,pa):
 
     #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
@@ -36,7 +27,7 @@ def make_figure(df,pa):
     # MAIN FIGURE
     #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
-    fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
+    #fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
     # if we have groups
     # the user can decide how the diferent groups should look like 
@@ -54,46 +45,134 @@ def make_figure(df,pa):
     
     valid_indexes=df[[pa["xvals"],pa["yvals"] ]].dropna()
     valid_indexes=valid_indexes.index.tolist()
-    tmp=df[df.index.isin(valid_indexes)]
-   
-    x=tmp[pa["xvals"]].tolist()
-    y=tmp[pa["yvals"]].tolist()
+    valid_df=df[df.index.isin(valid_indexes)]
 
-    data=dict(x=x,y=y)
+    if pa["markerstyles_col"] != "select a column..":
+        marker=[ str(i) for i in valid_df[[pa["markerstyles_col"]]].dropna()[pa["markerstyles_col"]].tolist() ]
+    else:
+        marker=pa["marker"]
+    valid_df["____marker____"]=marker
+
     TOOLTIPS = [ ("x", "$x"),("y", "$y") ]
 
     if pa["labels_col_value"] != "select a column..":
-        label=tmp[[pa["labels_col_value"]]].astype(str)[pa["labels_col_value"]].tolist()
-        data["label"]=label
         TOOLTIPS.append(("label", "@label"))
 
-    if pa["markersizes_col"] != "select a column..":
-        s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
-    else:
-        s=[ float(pa["markers"]) for i in x ]
-    data["size"]=s
-
-    if pa["markeralpha_col_value"] != "select a column..":
-        a=[ float(i) for i in  tmp[pa["markeralpha_col_value"]].tolist() ]
-    else:
-        a=[ float(pa["marker_alpha"]) for i in x ]
-    data["alpha"]=a
-
-    if pa["markerc_col"] != "select a column..":
-        c=tmp[pa["markerc_col"]].tolist()
-    elif str(pa["markerc_write"]) != "":
-        c=[ GET_COLOR(pa["markerc_write"]) for i in x ]
-    else:
-        c=[ pa["markerc"] for i in x ]
-    data["color"]=c
-
-
-
-    source = ColumnDataSource(data)  
-
     fig = figure(plot_width=int(pa["fig_width"]), plot_height=int(pa["fig_height"]), tooltips=TOOLTIPS,
-            title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
+        title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
 
+    #print(pa["markerstyles_col"],marker)
+
+    markers=list(OrderedDict.fromkeys(valid_df["____marker____"].tolist()))
+    for marker in markers:
+        tmp=valid_df[valid_df["____marker____"]==marker]
+   
+        x=tmp[pa["xvals"]].tolist()
+        y=tmp[pa["yvals"]].tolist()
+
+        data=dict(x=x,y=y)
+        #TOOLTIPS = [ ("x", "$x"),("y", "$y") ]
+
+        if pa["labels_col_value"] != "select a column..":
+            label=tmp[[pa["labels_col_value"]]].astype(str)[pa["labels_col_value"]].tolist()
+            data["label"]=label
+            #TOOLTIPS.append(("label", "@label"))
+
+        if pa["markersizes_col"] != "select a column..":
+            s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+        else:
+            s=[ float(pa["markers"]) for i in x ]
+        data["size"]=s
+
+        if pa["markeralpha_col_value"] != "select a column..":
+            a=[ float(i) for i in  tmp[pa["markeralpha_col_value"]].tolist() ]
+        else:
+            a=[ float(pa["marker_alpha"]) for i in x ]
+        data["alpha"]=a
+
+        if pa["markerc_col"] != "select a column..":
+            c=tmp[pa["markerc_col"]].tolist()
+        elif str(pa["markerc_write"]) != "":
+            c=[ pa["markerc_write"] for i in x ]
+        else:
+            c=[ pa["markerc"] for i in x ]
+        data["color"]=c
+
+        if pa["groups_value"]!="None":
+            g=tmp[pa["groups_value"]].tolist()
+            if ( pa["groups_auto_generate"] != "off" ) & (len(set(g)) > 1 ) :
+                category_items = tmp[pa["groups_value"]].unique()
+                palette = brewer['Set2'][len(category_items) + 1]
+                colormap = dict(zip(category_items, palette))
+                data["color"]=tmp[pa["groups_value"]].map(colormap)
+            elif len(set(g)) == 1:
+                g_=g[0]
+                g= [ g_ for i in x ] 
+
+            if pa["show_legend"] != "off":
+                legend_visible=True
+            else:
+                legend_visible=False            
+        else:
+            g= ["group" for i in x ]    
+            legend_visible=False
+
+        data["groups"]=g
+        
+        source = ColumnDataSource(data)
+
+        # fig = figure(plot_width=int(pa["fig_width"]), plot_height=int(pa["fig_height"]), tooltips=TOOLTIPS,
+        #         title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
+
+
+        ALLOWED_MARKERS=["asterisk","circle","circle_cross","circle_x","cross","dash","diamond",\
+            "diamond_cross","inverted_triangle","square","square_cross","square_x",\
+            "triangle","x"]
+   
+        if marker == "asterisk":
+            fig.asterisk('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "circle":
+            fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "circle_cross":
+            fig.circle_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "circle_x":
+            fig.circle_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "cross":
+            fig.cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "dash":
+            fig.dash('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "diamond":
+            fig.diamond('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "diamond_cross":
+            fig.diamond_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "inverted_triangle":
+            fig.inverted_triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "square":
+            fig.square('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "square_cross":
+            fig.square_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "square_x":
+            fig.square_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "triangle":
+            fig.triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+        if marker == "x":
+            fig.x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+
+    fig.legend.label_text_font_size = pa["legend_font_size"]+"pt"
+    fig.legend.visible = legend_visible
+
+    if legend_visible:
+        #legend = Legend(location=(0, -60))
+        #fig.legend.click_policy="mute"
+        new_legend = fig.legend[0]
+        fig.legend[0] = None
+        fig.add_layout(new_legend, 'right')
+        pa["right_axis"] = "off"
+        pa["upper_axis"] = "off"
+
+        fig.legend.click_policy="hide"        
+        #fig.add_layout(legend, 'right')
+    
     fig.title.text_font_size = pa["titles"]+"pt"#'8pt'
     fig.title.align = 'center'
 
@@ -152,14 +231,14 @@ def make_figure(df,pa):
         fig.xaxis[0].axis_line_width = 0
 
     if pa["left_axis"] == "on":
-        fig.yaxis[1].axis_line_width = float(pa["axis_line_width"])
-    else:
-        fig.yaxis[1].axis_line_width = 0
-
-    if pa["right_axis"] == "on":
         fig.yaxis[0].axis_line_width = float(pa["axis_line_width"])
     else:
         fig.yaxis[0].axis_line_width = 0
+
+    if pa["right_axis"] == "on":
+        fig.yaxis[1].axis_line_width = float(pa["axis_line_width"])
+    else:
+        fig.yaxis[1].axis_line_width = 0
 
     fig.axis.minor_tick_in = 0
     fig.axis.major_tick_in = 0
@@ -203,9 +282,9 @@ def make_figure(df,pa):
     #fig.yaxis.major_label_text_font_size ="20pt"
 
     if pa["grid_color_text"]!="":
-        grid_color=GET_COLOR(pa["grid_color_text"])
+        grid_color=pa["grid_color_text"]
     else:
-        grid_color=GET_COLOR(pa["grid_color_value"])
+        grid_color=pa["grid_color_value"]
 
     fig.xgrid.grid_line_color = grid_color
     fig.ygrid.grid_line_color = grid_color
@@ -227,7 +306,7 @@ def make_figure(df,pa):
     fig.grid.grid_line_width=float(pa["grid_linewidth"])
     fig.grid.grid_line_dash=pa["grid_linestyle_value"]
 
-    ## other
+    ## others
 
     #fig.outline_line_width=float(pa["axis_line_width"])
     #fig.outline_line_alpha=1
@@ -237,19 +316,12 @@ def make_figure(df,pa):
     #plot.xaxis.visible = False
     #plot.yaxis.visible = False
 
-    # dealing with groups
-    # https://docs.bokeh.org/en/latest/docs/user_guide/categorical.html
-  
-    #fig.circle('x', 'y', source=source,  size=float(pa["markers"]), fill_alpha=float(pa["marker_alpha"]), line_alpha=float(pa["marker_alpha"]) )
-    fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color' )
-
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-ALLOWED_MARKERS=[".",",","o","v","^","<",">",\
-            "1","2","3","4","8",\
-            "s","p","*","h","H","+","x",\
-            "X","D","d","|","_"]
+ALLOWED_MARKERS=["asterisk","circle","circle_cross","circle_x","cross","dash","diamond",\
+            "diamond_cross","inverted_triangle","square","square_cross","square_x",\
+            "triangle","x"]
 TICKS_DIRECTIONS=["in","out","inout"]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
@@ -283,7 +355,7 @@ def figure_defaults():
         "show_legend":".on",\
         "legend_font_size":"14",\
         "markerstyles":ALLOWED_MARKERS,\
-        "marker":".",\
+        "marker":ALLOWED_MARKERS[1],\
         "markerstyles_cols":["select a column.."],\
         "markerstyles_col":"select a column..",\
         "marker_size":STANDARD_SIZES,\
@@ -355,7 +427,7 @@ def figure_defaults():
         "inputargumentsfile":"Select file.."
     }
     # grid colors not implemented in UI
-
+    # "groups_auto_generate":".on",\ also not implemented in UI
 
     checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
             "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
