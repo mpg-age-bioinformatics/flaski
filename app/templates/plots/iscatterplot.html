@@ -170,16 +170,17 @@
                             </div>
 
                             <div class="row arg">
-                                <label>Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;height:22px;padding-left: 4px"></label></label>
+                                <label>Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:63px;height:22px;padding-left: 4px"></label></label>
+                                <label style="padding-left:9px;">Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:63px;height:22px;padding-left: 4px"></label>
                             </div>
-                            <div class="row arg">
+                            <!--div class="row arg">
                                 <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;height:22px;padding-left: 4px">
                                 <label style="padding-left:2px;"> Ticks direction: <select name=ticks_direction method="GET" action="/" style="width:64px">
                                     {% for ticks_direction_ in ticks_direction %}
                                         <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
                                     {% endfor %}
                                 </select>
-                            </div>
+                            </div-->
 
                             <div class="row arg">
                                 <label style="width:46px">Ticks:</label>
