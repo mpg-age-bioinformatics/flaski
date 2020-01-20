@@ -48,6 +48,7 @@ export MAIL_USERNAME=<your-gmail-username>
 export MAIL_PASSWORD=<your-gmail-password>
 ```
 
+# npm install -g phantomjs-prebuilt (( for bokeh plots exports ))
 
 
 

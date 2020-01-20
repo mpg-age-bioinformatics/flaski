@@ -397,7 +397,7 @@
                         <div class="row arguments">
 
                             <div class="row arg">
-                                <label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;height:22px;padding-left: 4px">
+                                <!--label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;height:22px;padding-left: 4px"-->
                                 <label> format: <select name=download_format method="GET" action="/" style="width:50px">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
@@ -433,7 +433,7 @@
 
                             {% if filename != "Select file.." %}
                             <div class="row arg">
-                                <label>file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:236px;height:30px;padding-left:4px">
+                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
                             </div>
                             {% endif %}
 
@@ -554,13 +554,13 @@
 
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
-            <div style="padding-right: 2px;">
-                <form action="{{ url_for('scatterplot', download='download') }}" method="get">
+            <!--div style="padding-right: 2px;">
+                <form action="{{ url_for('iscatterplot', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Figure
                     </button>
                 </form>
-            </div>
+            </div-->
 
             <div style="padding-left: 2px;padding-right: 2px;">
                 <form action="{{ url_for('download', json_type='arg') }}" method="get">

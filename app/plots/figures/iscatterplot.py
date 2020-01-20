@@ -1,4 +1,3 @@
-#from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib
 from collections import OrderedDict
@@ -8,40 +7,16 @@ from adjustText import adjust_text
 import pandas as pd
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.sampledata.iris import flowers
-from bokeh import models
+from bokeh import models#
 from bokeh.models import LinearAxis, Range1d, DataRange1d, Legend
 from bokeh.palettes import brewer
-
-
 
 import mpld3
 
 import math 
 
-matplotlib.use('agg')
 
 def make_figure(df,pa):
-
-    #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
-
-    # MAIN FIGURE
-    #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-
-    #fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-
-    # if we have groups
-    # the user can decide how the diferent groups should look like 
-    # by unchecking the groups_autogenerate check box
-
-
-    # if pa["groups_value"]!="None":
-    #     for group in list(OrderedDict.fromkeys(df[pa["groups_value"]].tolist())):
-    #         tmp=df[df[pa["groups_value"]]==group]
-
-    #         x=tmp[pa["xvals"]].tolist()
-    #         y=tmp[pa["yvals"]].tolist()
-
-    #         if pa["groups_auto_generate"] == "off" :
     
     valid_indexes=df[[pa["xvals"],pa["yvals"] ]].dropna()
     valid_indexes=valid_indexes.index.tolist()
@@ -60,8 +35,10 @@ def make_figure(df,pa):
 
     fig = figure(plot_width=int(pa["fig_width"]), plot_height=int(pa["fig_height"]), tooltips=TOOLTIPS,
         title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
+    #fig.add_tools(CustomSaveTool(save_name = 'custom name 1'))
 
-    #print(pa["markerstyles_col"],marker)
+    fig.output_backend = {"png":"canvas","svg":"svg"}.get(pa["downloadf"])
+    fig.title.vertical_align = 'top'
 
     if pa["groups_value"]!="None":
         valid_df["___groups___"]=valid_df[pa["groups_value"]].tolist()
@@ -92,12 +69,10 @@ def make_figure(df,pa):
             y=tmp[pa["yvals"]].tolist()
 
             data=dict(x=x,y=y)
-            #TOOLTIPS = [ ("x", "$x"),("y", "$y") ]
 
             if pa["labels_col_value"] != "select a column..":
                 label=tmp[[pa["labels_col_value"]]].astype(str)[pa["labels_col_value"]].tolist()
                 data["label"]=label
-                #TOOLTIPS.append(("label", "@label"))
 
             if pa["markersizes_col"] != "select a column..":
                 s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
@@ -128,40 +103,38 @@ def make_figure(df,pa):
                 "triangle","x"]
     
             if marker == "asterisk":
-                fig.asterisk('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.asterisk('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "circle":
-                fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "circle_cross":
-                fig.circle_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.circle_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "circle_x":
-                fig.circle_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.circle_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "cross":
-                fig.cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "dash":
-                fig.dash('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.dash('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "diamond":
-                fig.diamond('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.diamond('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "diamond_cross":
-                fig.diamond_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.diamond_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "inverted_triangle":
-                fig.inverted_triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.inverted_triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "square":
-                fig.square('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.square('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "square_cross":
-                fig.square_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.square_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "square_x":
-                fig.square_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.square_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "triangle":
-                fig.triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
             if marker == "x":
-                fig.x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+                fig.x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_label=group)#, legend_group="groups")
 
     fig.legend.label_text_font_size = pa["legend_font_size"]+"pt"
     fig.legend.visible = legend_visible
 
     if legend_visible:
-        #legend = Legend(location=(0, -60))
-        #fig.legend.click_policy="mute"
         new_legend = fig.legend[0]
         fig.legend[0] = None
         fig.add_layout(new_legend, 'right')
@@ -169,7 +142,6 @@ def make_figure(df,pa):
         pa["upper_axis"] = "off"
 
         fig.legend.click_policy="hide"        
-        #fig.add_layout(legend, 'right')
     
     fig.title.text_font_size = pa["titles"]+"pt"#'8pt'
     fig.title.align = 'center'
@@ -314,6 +286,14 @@ def make_figure(df,pa):
     #plot.xaxis.visible = False
     #plot.yaxis.visible = False
 
+    #fig.tools[3].name="myname"
+    #print(fig.tools[3].name)#, .SaveTool)
+
+    #fig.plot_view.save("my_oh_my_bokeh_plot")
+    #from bokeh.models import SaveTool
+
+    #print(help(SaveTool))
+
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
@@ -416,8 +396,8 @@ def figure_defaults():
         "grid_linestyle_value":"dashed",\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
-        "download_format":["png","pdf","svg"],\
-        "downloadf":"pdf",\
+        "download_format":["png","svg"],\
+        "downloadf":"png",\
         "downloadn":"scatterplot",\
         "session_downloadn":"MySession.scatter.plot",\
         "inputsessionfile":"Select file..",\

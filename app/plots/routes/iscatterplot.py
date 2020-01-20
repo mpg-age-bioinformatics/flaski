@@ -212,41 +212,46 @@ def iscatterplot(download=None):
         df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
-        #try:
-        fig=make_figure(df,plot_arguments)
-
-        # TRANSFORM FIGURE TO HTML components
-        script, div = components(fig)
-
-        return render_template('/plots/iscatterplot.html', the_script=script, the_div=div, filename=filename, **plot_arguments)
-
-        # except Exception as e:
-        #     flash(e,'error')
-
-        #     return render_template('/plots/iscatterplot.html', filename=filename, **plot_arguments)
-
-    else:
-        if download == "download":
-            # READ INPUT DATA FROM SESSION JSON
-            df=pd.read_json(session["df"])
-
-            plot_arguments=session["plot_arguments"]
-
-            # CALL FIGURE FUNCTION
+        try:
             fig=make_figure(df,plot_arguments)
 
-            #flash('Figure is being sent to download but will not be updated on your screen.')
-            figfile = io.BytesIO()
-            mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
-            plt.savefig(figfile, format=plot_arguments["downloadf"])
-            plt.close()
-            figfile.seek(0)  # rewind to beginning of file
+            # TRANSFORM FIGURE TO HTML components
+            script, div = components(fig)
 
-            eventlog = UserLogging(email=current_user.email,action="download figure iscatterplot")
-            db.session.add(eventlog)
-            db.session.commit()
+            return render_template('/plots/iscatterplot.html', the_script=script, the_div=div, filename=filename, **plot_arguments)
 
-            return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
+        except Exception as e:
+            flash(e,'error')
+
+            return render_template('/plots/iscatterplot.html', filename=filename, **plot_arguments)
+
+    else:
+        # if download == "download":
+        #     # READ INPUT DATA FROM SESSION JSON
+        #     df=pd.read_json(session["df"])
+
+        #     plot_arguments=session["plot_arguments"]
+
+        #     # CALL FIGURE FUNCTION
+        #     fig=make_figure(df,plot_arguments)
+
+        #     #flash('Figure is being sent to download but will not be updated on your screen.')
+        #     figfile = io.BytesIO()
+        #     figfile = io.StringIO()
+
+        #     mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
+        #     if plot_arguments["downloadf"] == "svg":
+        #         from bokeh.io import export_svgs
+        #         export_svgs(fig, filename=fout)
+        #     #plt.savefig(figfile, format=plot_arguments["downloadf"])
+        #     #plt.close()
+        #     figfile.seek(0)  # rewind to beginning of file
+
+        #     eventlog = UserLogging(email=current_user.email,action="download figure iscatterplot")
+        #     db.session.add(eventlog)
+        #     db.session.commit()
+
+        #     return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
 
         if "app" not in list(session.keys()):
             return_to_plot=False
