@@ -63,100 +63,98 @@ def make_figure(df,pa):
 
     #print(pa["markerstyles_col"],marker)
 
-    markers=list(OrderedDict.fromkeys(valid_df["____marker____"].tolist()))
-    for marker in markers:
-        tmp=valid_df[valid_df["____marker____"]==marker]
-   
-        x=tmp[pa["xvals"]].tolist()
-        y=tmp[pa["yvals"]].tolist()
+    if pa["groups_value"]!="None":
+        valid_df["___groups___"]=valid_df[pa["groups_value"]].tolist()
+        if ( pa["groups_auto_generate"] != "off" ) & (len(set(valid_df[pa["groups_value"]].tolist())) > 1 ) :
+            category_items = valid_df[pa["groups_value"]].unique()
+            palette = brewer['Set2'][len(category_items) + 1]
+            colormap = dict(zip(category_items, palette))
+            valid_df["___groups_color___"]=valid_df[pa["groups_value"]].map(colormap)
 
-        data=dict(x=x,y=y)
-        #TOOLTIPS = [ ("x", "$x"),("y", "$y") ]
-
-        if pa["labels_col_value"] != "select a column..":
-            label=tmp[[pa["labels_col_value"]]].astype(str)[pa["labels_col_value"]].tolist()
-            data["label"]=label
-            #TOOLTIPS.append(("label", "@label"))
-
-        if pa["markersizes_col"] != "select a column..":
-            s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+        if pa["show_legend"] != "off":
+            legend_visible=True
         else:
-            s=[ float(pa["markers"]) for i in x ]
-        data["size"]=s
+            legend_visible=False            
+    else:
+        valid_df["___groups___"]="groups"
+        legend_visible=False
 
-        if pa["markeralpha_col_value"] != "select a column..":
-            a=[ float(i) for i in  tmp[pa["markeralpha_col_value"]].tolist() ]
-        else:
-            a=[ float(pa["marker_alpha"]) for i in x ]
-        data["alpha"]=a
+    groups=list(OrderedDict.fromkeys(valid_df["___groups___"].tolist()))
 
-        if pa["markerc_col"] != "select a column..":
-            c=tmp[pa["markerc_col"]].tolist()
-        elif str(pa["markerc_write"]) != "":
-            c=[ pa["markerc_write"] for i in x ]
-        else:
-            c=[ pa["markerc"] for i in x ]
-        data["color"]=c
+    for group in groups:
+        group_df=valid_df[valid_df["___groups___"]==group]
 
-        if pa["groups_value"]!="None":
-            g=tmp[pa["groups_value"]].tolist()
-            if ( pa["groups_auto_generate"] != "off" ) & (len(set(g)) > 1 ) :
-                category_items = tmp[pa["groups_value"]].unique()
-                palette = brewer['Set2'][len(category_items) + 1]
-                colormap = dict(zip(category_items, palette))
-                data["color"]=tmp[pa["groups_value"]].map(colormap)
-            elif len(set(g)) == 1:
-                g_=g[0]
-                g= [ g_ for i in x ] 
+        markers=list(OrderedDict.fromkeys(group_df["____marker____"].tolist()))
+        for marker in markers:
+            tmp=group_df[group_df["____marker____"]==marker]
+    
+            x=tmp[pa["xvals"]].tolist()
+            y=tmp[pa["yvals"]].tolist()
 
-            if pa["show_legend"] != "off":
-                legend_visible=True
+            data=dict(x=x,y=y)
+            #TOOLTIPS = [ ("x", "$x"),("y", "$y") ]
+
+            if pa["labels_col_value"] != "select a column..":
+                label=tmp[[pa["labels_col_value"]]].astype(str)[pa["labels_col_value"]].tolist()
+                data["label"]=label
+                #TOOLTIPS.append(("label", "@label"))
+
+            if pa["markersizes_col"] != "select a column..":
+                s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
             else:
-                legend_visible=False            
-        else:
-            g= ["group" for i in x ]    
-            legend_visible=False
+                s=[ float(pa["markers"]) for i in x ]
+            data["size"]=s
 
-        data["groups"]=g
-        
-        source = ColumnDataSource(data)
+            if pa["markeralpha_col_value"] != "select a column..":
+                a=[ float(i) for i in  tmp[pa["markeralpha_col_value"]].tolist() ]
+            else:
+                a=[ float(pa["marker_alpha"]) for i in x ]
+            data["alpha"]=a
 
-        # fig = figure(plot_width=int(pa["fig_width"]), plot_height=int(pa["fig_height"]), tooltips=TOOLTIPS,
-        #         title=pa["title"], x_axis_label=pa["xlabel"], y_axis_label=pa["ylabel"])
+            if  "___groups_color___" in tmp.columns.tolist():
+                c=tmp["___groups_color___"].tolist()
+            elif pa["markerc_col"] != "select a column..":
+                c=tmp[pa["markerc_col"]].tolist()
+            elif str(pa["markerc_write"]) != "":
+                c=[ pa["markerc_write"] for i in x ]               
+            else:
+                c=[ pa["markerc"] for i in x ]
+            data["color"]=c
+            
+            source = ColumnDataSource(data)
 
-
-        ALLOWED_MARKERS=["asterisk","circle","circle_cross","circle_x","cross","dash","diamond",\
-            "diamond_cross","inverted_triangle","square","square_cross","square_x",\
-            "triangle","x"]
-   
-        if marker == "asterisk":
-            fig.asterisk('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "circle":
-            fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "circle_cross":
-            fig.circle_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "circle_x":
-            fig.circle_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "cross":
-            fig.cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "dash":
-            fig.dash('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "diamond":
-            fig.diamond('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "diamond_cross":
-            fig.diamond_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "inverted_triangle":
-            fig.inverted_triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "square":
-            fig.square('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "square_cross":
-            fig.square_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "square_x":
-            fig.square_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "triangle":
-            fig.triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
-        if marker == "x":
-            fig.x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend_group="groups")
+            ALLOWED_MARKERS=["asterisk","circle","circle_cross","circle_x","cross","dash","diamond",\
+                "diamond_cross","inverted_triangle","square","square_cross","square_x",\
+                "triangle","x"]
+    
+            if marker == "asterisk":
+                fig.asterisk('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "circle":
+                fig.circle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "circle_cross":
+                fig.circle_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "circle_x":
+                fig.circle_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "cross":
+                fig.cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "dash":
+                fig.dash('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "diamond":
+                fig.diamond('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "diamond_cross":
+                fig.diamond_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "inverted_triangle":
+                fig.inverted_triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "square":
+                fig.square('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "square_cross":
+                fig.square_cross('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "square_x":
+                fig.square_x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "triangle":
+                fig.triangle('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
+            if marker == "x":
+                fig.x('x', 'y', source=source,  size="size", fill_alpha="alpha", line_alpha="alpha", color='color', line_color='color', legend=group)#, legend_group="groups")
 
     fig.legend.label_text_font_size = pa["legend_font_size"]+"pt"
     fig.legend.visible = legend_visible
