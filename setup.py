@@ -21,7 +21,7 @@ setup(name = 'flaski',
       author = 'Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing',
       author_email = 'bioinformatics@age.mpg.de',
       license = 'MIT',
-      packages = [ 'flaski','app' ],
+      packages = [ 'flaski' ],
       zip_safe = False )
 
 

@@ -1,1 +1,1 @@
-from app.plots.figures.iscatterplot import *
+../app/plots/figures/iscatterplot.py
