@@ -1,7 +1,5 @@
-2019-12-17 15:29:20,273 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 15:30:00,557 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 15:31:55,636 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 15:32:04,914 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
+2019-12-18 08:56:24,944 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 08:56:32,743 ERROR: Exception on / [GET] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
 Traceback (most recent call last):
   File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
     response = self.full_dispatch_request()
@@ -17,100 +15,112 @@ Traceback (most recent call last):
     return self.view_functions[rule.endpoint](**req.view_args)
   File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
     return func(*args, **kwargs)
-  File "/Users/jboucas/flask_dashboard/app/routes.py", line 244, in index
+  File "/Users/jboucas/flask_dashboard/app/routes.py", line 177, in index
+    maxHeightSideBar=int(float(session["width"])*0.9)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/werkzeug/local.py", line 378, in <lambda>
+    __getitem__ = lambda x, i: x._get_current_object()[i]
+KeyError: 'width'
+2019-12-18 08:58:44,982 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:00:03,929 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:00:21,476 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:00:35,799 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:00:50,883 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:01:18,342 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:10:19,095 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:11:58,823 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:12:24,327 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:13:50,420 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:14:04,946 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1951, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1820, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1949, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1935, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "/Users/jboucas/flask_dashboard/app/routes.py", line 250, in index
+    df=pd.read_json(session["df"])
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/werkzeug/local.py", line 378, in <lambda>
+    __getitem__ = lambda x, i: x._get_current_object()[i]
+KeyError: 'df'
+2019-12-18 09:14:26,284 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1951, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1820, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1949, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1935, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "/Users/jboucas/flask_dashboard/app/routes.py", line 182, in index
+    session_=json.load(inputsessionfile)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/json/__init__.py", line 296, in load
+    parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/json/__init__.py", line 343, in loads
+    s = s.decode(detect_encoding(s), 'surrogatepass')
+UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 15-16: invalid continuation byte
+2019-12-18 09:15:47,908 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:15:53,996 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2897, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 107, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 131, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1607, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1614, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: None
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1951, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1820, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1949, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1935, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "/Users/jboucas/flask_dashboard/app/routes.py", line 253, in index
     fig=make_figure(df,plot_arguments)
-  File "/Users/jboucas/flask_dashboard/app/routes.py", line 46, in make_figure
-    fig=plt.figure(figsize(6,6))
-NameError: name 'figsize' is not defined
-2019-12-17 15:32:51,563 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 15:42:39,309 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 16:02:41,514 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 16:03:18,802 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 16:04:04,661 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 16:06:13,035 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:12:57,640 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:17:11,334 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:18:39,112 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:19:26,857 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:19:52,827 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:21:38,826 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:22:35,745 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:30:36,648 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:31:06,880 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
-Traceback (most recent call last):
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1951, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1820, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
-    raise value
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1949, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1935, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
-    return func(*args, **kwargs)
-  File "/Users/jboucas/flask_dashboard/app/routes.py", line 242, in index
-    return render_template('index.html', maxHeightSideBar=maxHeightSideBar , filename=filename, sometext=sometext, **plot_arguments)
-UnboundLocalError: local variable 'maxHeightSideBar' referenced before assignment
-2019-12-17 20:31:58,452 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:34:12,976 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:40:19,268 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:40:25,972 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
-Traceback (most recent call last):
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1951, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1820, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
-    raise value
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1949, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1935, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
-    return func(*args, **kwargs)
-  File "/Users/jboucas/flask_dashboard/app/routes.py", line 242, in index
-    return render_template('index.html', maxHeightSideBar=maxHeightSideBar , filename=filename, sometext=sometext, **plot_arguments)
-UnboundLocalError: local variable 'maxHeightSideBar' referenced before assignment
-2019-12-17 20:40:32,477 ERROR: Exception on /index [POST] [in /Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py:1891]
-Traceback (most recent call last):
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 2446, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1951, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1820, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
-    raise value
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1949, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask/app.py", line 1935, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/flask_login/utils.py", line 261, in decorated_view
-    return func(*args, **kwargs)
-  File "/Users/jboucas/flask_dashboard/app/routes.py", line 242, in index
-    return render_template('index.html', maxHeightSideBar=maxHeightSideBar , filename=filename, sometext=sometext, **plot_arguments)
-UnboundLocalError: local variable 'maxHeightSideBar' referenced before assignment
-2019-12-17 20:41:18,837 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:43:23,866 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:43:53,821 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:44:09,310 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:44:40,510 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:45:07,868 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:45:36,850 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:45:56,168 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:46:37,332 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:48:04,980 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:48:40,185 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:49:15,725 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:49:43,319 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:50:35,745 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:51:03,054 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:51:22,975 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:51:44,385 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
-2019-12-17 20:52:08,471 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+  File "/Users/jboucas/flask_dashboard/app/routes.py", line 41, in make_figure
+    x=df[pa["xvals"]].tolist()
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2995, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/jboucas/flask_dashboard/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2899, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 107, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 131, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1607, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1614, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: None
+2019-12-18 09:16:47,694 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:17:49,775 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:18:24,283 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:19:08,754 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:20:25,519 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2019-12-18 09:21:01,331 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:45]
+2020-01-28 15:30:57,524 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:54]
+2020-01-28 15:36:48,678 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:54]
+2020-01-28 15:38:49,126 INFO: Scatterplot startup [in /Users/jboucas/flask_dashboard/app/__init__.py:54]

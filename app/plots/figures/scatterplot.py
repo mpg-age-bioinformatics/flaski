@@ -136,7 +136,7 @@ def make_figure(df,pa):
         axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
 
     for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
-        if argv =="on":
+        if (argv =="on") | (argv ==".on"):
             axes.spines[axis].set_visible(True)
         else:
             axes.spines[axis].set_visible(False)
@@ -144,7 +144,7 @@ def make_figure(df,pa):
     ticks={}
     for axis,argv in zip(['top','bottom','left','right'], \
         [pa["tick_upper_axis"],pa["tick_lower_axis"],pa["tick_left_axis"],pa["tick_right_axis"]]):
-        if argv =="on":
+        if (argv =="on") | (argv ==".on"):
             show=True
         else:
             show=False
