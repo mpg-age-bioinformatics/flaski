@@ -47,11 +47,3 @@ if [[ "$FLASK_ENV" == "development" ]] ; \
  python3 -m smtpd -n -c DebuggingServer localhost:8025 & \
 fi ; \
 redis-server redis.conf --daemonize yes &&  flask run --host 0.0.0.0'
-
-
-# if [[ ! -e /home/mpiage/${f} ]] ; \
-#     then cp -vr /home/_mpiage/${f} /home/mpiage/${f}; \
-#   fi \
-# done \
-# && source /home/mpiage/.bashrc \
-# && /bin/bash'
