@@ -97,7 +97,6 @@ https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/
 Static files need to be included in the `MANIFEST.in`.
 
 ```
-pip3 install wheel
 python3 setup.py bdist_wheel
 pip3 install flaski-0.1.0-py3-none-any.whl
 ```
