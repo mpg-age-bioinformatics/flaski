@@ -6,6 +6,8 @@
 /build/
 /venv/
 site
+migrations
+__pycache__
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info

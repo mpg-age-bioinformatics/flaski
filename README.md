@@ -1,17 +1,52 @@
 # flask_dashboard
 
-### redis
+# Development
 
-starting redis:
-
-```
-redis-server redis.conf
-```
-
-### Databases
+### Build the docker image and run the container
 
 ```
-rm -rf app.db migrations
+docker build -t flaski .
+mkdir -p ~/flaski_data/data ~/flaski_data/redis ~/flaski_data/users ~/flaski_data/logs
+docker run -p 5000:5000 -p 8888:8888 -e FLASK_ENV=development -v ~/flask_dashboard:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+```
+
+### Start flask, redis, and python email dev logger
+
+```
+python3 -m smtpd -n -c DebuggingServer localhost:8025 & redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
+```
+
+# Production
+
+### Run the docker image
+
+Make sure the `my_redis_password` in `requirepass my_redis_password` of the redis.conf line 507 matches the `my_redis_password` you will be issuing with `-e`.
+
+```
+docker run -p 5000:5000 -p 8888:8888 
+-v ~/flask_dashboard:/flaski -v ~/flaski_data:/data -v ~/flaski_redis:/redis 
+-e REDIS_PASSWORD=my_redis_password 
+-e SESSION_TYPE=redis 
+-e REDIS_ADDRESS='127.0.0.1:6379/0'
+-e DATABASE_URL='sqlite:///data/app.db'
+-e MAIL_SERVER='mail.age.mpg.de'
+-e MAIL_PORT=25
+-e MAIL_USE_TLS=1
+-e MAIL_USERNAME='flaski@age.mpg.de'
+-e MAIL_PASSWORD='my_flaski_email_password'
+--name flaski -it flaski /bin/bash
+```
+
+### Start flask, redis
+
+```
+redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
+```
+
+# Databases
+
+```
+rm -rf app.db migrations /flaski_data/data/*
 flask db init
 flask db migrate -m "users table"
 flask db upgrade 
@@ -23,13 +58,13 @@ flask db migrate -m "new fields in user model"
 flask db upgrade
 ```
 
-### Logging
+# Logging
 
 There are two approaches to test email logging. The easiest one is to use the SMTP debugging server from Python. 
 This is a fake email server that accepts emails, but instead of sending them, it prints them to the console. 
 To run this server, open a second terminal session and run the following command on it:
 ```
-python -m smtpd -n -c DebuggingServer localhost:8025 
+python3 -m smtpd -n -c DebuggingServer localhost:8025 & 
 ```
 and 
 ```
@@ -47,49 +82,3 @@ export MAIL_USE_TLS=1
 export MAIL_USERNAME=<your-gmail-username>
 export MAIL_PASSWORD=<your-gmail-password>
 ```
-
-# npm install -g phantomjs-prebuilt (( for bokeh plots exports ))
-
-
-
-                                {% if path == "" %}
-                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
-                                {% else %}
-                                <td class="text-xs-left " style="padding-left:0px;padding-right:0px;" data-sort-value="dir-{{entry.name | lower}}"><i class="fa fa-fw fa-folder " aria-hidden="true"></i>&nbsp;<a href="{{path}}{% '/' if path != '' else '' %}{{entry.name}}" ><strong>{{entry.name}}</strong></a></td>
-                                {% endif %}
-
-
-
-  <script src="https://kit.fontawesome.com/609ed3ec10.js" crossorigin="anonymous"></script>
-
-  <!-- Custom fonts for this template-->
-  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-  <!-- Custom styles for this template-->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" type="text/css">
-
-
-
-
-
-
-
-
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
-
-    <!-- Page level plugins -->
-    <script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>

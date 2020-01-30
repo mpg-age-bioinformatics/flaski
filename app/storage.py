@@ -22,7 +22,7 @@ from app import app, sess
 
 def UserFolder(u):
     if u.is_authenticated:
-        root = "/Users/jboucas/Desktop/flaski_user_space/%s" %str(u.id)
+        root = "/flaski_data/users/%s" %str(u.id)
         if not os.path.isdir(root):
             os.makedirs(root)
     else:

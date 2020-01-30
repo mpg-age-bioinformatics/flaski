@@ -51,4 +51,4 @@ if not app.debug:
     app.logger.addHandler(file_handler)
 
     app.logger.setLevel(logging.INFO)
-    app.logger.info('Scatterplot startup')
+    app.logger.info('Flaski startup')
