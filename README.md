@@ -82,3 +82,12 @@ export MAIL_USE_TLS=1
 export MAIL_USERNAME=<your-gmail-username>
 export MAIL_PASSWORD=<your-gmail-password>
 ```
+
+$ Build and Install
+
+https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/
+
+```
+pip3 install wheel
+python3 setup.py bdist_wheel
+pip2 install flaski-1.0.0-py3-none-any.whl

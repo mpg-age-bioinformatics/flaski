@@ -1,1 +1,0 @@
-../app/plots/figures/scatterplot.py
