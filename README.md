@@ -16,6 +16,12 @@ docker run -p 5000:5000 -p 8888:8888 -e FLASK_ENV=development -v ~/flask_dashboa
 python3 -m smtpd -n -c DebuggingServer localhost:8025 & redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
 ```
 
+### or ..
+
+```
+utils/run.dev.sh
+
+
 # Production
 
 ### Run the docker image
@@ -45,6 +51,7 @@ redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
 
 ## Databases
 
+Starting
 ```
 rm -rf app.db migrations /flaski_data/data/*
 flask db init
@@ -52,7 +59,7 @@ flask db migrate -m "users table"
 flask db upgrade 
 ```
 
-alternative
+upgrading
 ```
 flask db migrate -m "new fields in user model"
 flask db upgrade
