@@ -8,8 +8,7 @@ from flask_login import LoginManager
 import os
 from flask_mail import Mail
 from flask_session import Session
-
-
+from waitress import serve
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -41,10 +40,9 @@ if not app.debug:
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
 
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-    file_handler = RotatingFileHandler('logs/flaski.log', maxBytes=10240,
-                                       backupCount=10)
+    if not os.path.exists('/flaski_data/logs'):
+        os.mkdir('/flaski_data/logs')
+    file_handler = RotatingFileHandler('/flaski_data/logs/flaski.log', maxBytes=10240, backupCount=10)
     file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
     file_handler.setLevel(logging.INFO)
@@ -52,3 +50,7 @@ if not app.debug:
 
     app.logger.setLevel(logging.INFO)
     app.logger.info('Flaski startup')
+
+if __name__ == "__main__":
+   #app.run() ##Replaced with below code to run it using waitress 
+   serve(app, host='0.0.0.0', port=8000)

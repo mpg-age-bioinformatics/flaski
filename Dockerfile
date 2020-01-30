@@ -20,6 +20,7 @@ RUN apt-get update && apt-get -yq dist-upgrade && \
 apt-get install -yq --no-install-recommends locales && \
 apt-get install -yq python3 python3-pip && \
 apt-get install -yq redis-server && \
+apt-get install -yq libcairo2-dev pkg-config python3-dev && \
 apt-get clean && rm -rf /var/lib/apt/lists/* && \
 echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
 
@@ -45,5 +46,6 @@ ENTRYPOINT /bin/bash -c '\
 if [[ "$FLASK_ENV" == "development" ]] ; \
  then \
  python3 -m smtpd -n -c DebuggingServer localhost:8025 & \
-fi ; \
-redis-server redis.conf --daemonize yes &&  flask run --host 0.0.0.0'
+fi && \
+redis-server redis.conf --daemonize yes && \
+/bin/bash'

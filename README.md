@@ -7,19 +7,8 @@
 ```
 docker build -t flaski .
 mkdir -p ~/flaski_data/data ~/flaski_data/redis ~/flaski_data/users ~/flaski_data/logs
-docker run -p 5000:5000 -p 8888:8888 -e FLASK_ENV=development -v ~/flask_dashboard:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
-```
-
-### Start flask, redis, and python email dev logger
-
-```
-python3 -m smtpd -n -c DebuggingServer localhost:8025 & redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
-```
-
-### or ..
-
-```
-utils/run.dev.sh
+docker run -p 5000:5000 -p 8888:8888 -e FLASK_ENV=development -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+flask run --host 0.0.0.0
 ```
 
 # Production
@@ -30,7 +19,7 @@ Make sure the `my_redis_password` in `requirepass my_redis_password` of the `red
 
 ```
 docker run -p 5000:5000 -p 8888:8888 
--v ~/flask_dashboard:/flaski -v ~/flaski_data:/data -v ~/flaski_redis:/redis 
+-v ~/flaski:/flaski -v ~/flaski_data:/data -v ~/flaski_redis:/redis 
 -e REDIS_PASSWORD=my_redis_password 
 -e SESSION_TYPE=redis 
 -e REDIS_ADDRESS='127.0.0.1:6379/0'
@@ -40,13 +29,17 @@ docker run -p 5000:5000 -p 8888:8888
 -e MAIL_USE_TLS=1
 -e MAIL_USERNAME='flaski@age.mpg.de'
 -e MAIL_PASSWORD='my_flaski_email_password'
---name flaski -it flaski /bin/bash
+--name flaski -it flaski
 ```
 
-### Start flask, redis
+```
+docker run -p 5000:5000 -p 8888:8888 -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+```
+
+### Start flask
 
 ```
-redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
+waitress-serve --call 'flaski:create_app'
 ```
 
 ## Databases
