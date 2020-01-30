@@ -20,6 +20,8 @@ mail = Mail(app)
 sess = Session()
 sess.init_app(app)
 
+#wsgi_app = app.wsgi_app
+
 from flaski import routes, models, errors, storage
 
 from flaski.plots.routes import scatterplot, iscatterplot

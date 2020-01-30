@@ -18,8 +18,8 @@ flask run --host 0.0.0.0
 Make sure the `my_redis_password` in `requirepass my_redis_password` of the `redis.conf` line 507 matches the `my_redis_password` you will be issuing with `-e`.
 
 ```
-docker run -p 5000:5000 -p 8888:8888 
--v ~/flaski:/flaski -v ~/flaski_data:/data -v ~/flaski_redis:/redis 
+docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080
+-v ~/flaski_data:/flaski_data -v ~/flaski:/flaski
 -e REDIS_PASSWORD=my_redis_password 
 -e SESSION_TYPE=redis 
 -e REDIS_ADDRESS='127.0.0.1:6379/0'
@@ -33,13 +33,19 @@ docker run -p 5000:5000 -p 8888:8888
 ```
 
 ```
-docker run -p 5000:5000 -p 8888:8888 -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080 -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
 ```
 
 ### Start flask
 
 ```
-waitress-serve --call 'flaski:create_app'
+waitress-serve 'flaski:app'
+```
+
+or 
+
+```
+waitress-serve --port=8041 --url-scheme=https 'flaski:app'
 ```
 
 ## Databases
