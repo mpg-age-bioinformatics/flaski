@@ -20,7 +20,7 @@ python3 -m smtpd -n -c DebuggingServer localhost:8025 & redis-server redis.conf 
 
 ```
 utils/run.dev.sh
-
+```
 
 # Production
 
