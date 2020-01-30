@@ -26,7 +26,7 @@ utils/run.dev.sh
 
 ### Run the docker image
 
-Make sure the `my_redis_password` in `requirepass my_redis_password` of the redis.conf line 507 matches the `my_redis_password` you will be issuing with `-e`.
+Make sure the `my_redis_password` in `requirepass my_redis_password` of the `redis.conf` line 507 matches the `my_redis_password` you will be issuing with `-e`.
 
 ```
 docker run -p 5000:5000 -p 8888:8888 
