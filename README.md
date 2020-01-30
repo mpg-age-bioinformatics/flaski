@@ -1,6 +1,6 @@
-# flask_dashboard
+# Flaski
 
-# Development
+## Development
 
 ### Build the docker image and run the container
 
@@ -43,7 +43,7 @@ docker run -p 5000:5000 -p 8888:8888
 redis-server redis.conf --daemonize yes && flask run --host 0.0.0.0
 ```
 
-# Databases
+## Databases
 
 ```
 rm -rf app.db migrations /flaski_data/data/*
@@ -58,7 +58,7 @@ flask db migrate -m "new fields in user model"
 flask db upgrade
 ```
 
-# Logging
+## Logging
 
 There are two approaches to test email logging. The easiest one is to use the SMTP debugging server from Python. 
 This is a fake email server that accepts emails, but instead of sending them, it prints them to the console. 
@@ -83,7 +83,7 @@ export MAIL_USERNAME=<your-gmail-username>
 export MAIL_PASSWORD=<your-gmail-password>
 ```
 
-# Build and Install
+## Build and Install
 
 https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/
 
