@@ -53,6 +53,6 @@ if not app.debug:
     app.logger.setLevel(logging.INFO)
     app.logger.info('Flaski startup')
 
-if __name__ == "__main__":
-   #app.run() ##Replaced with below code to run it using waitress 
-   serve(app, host='0.0.0.0', port=8000)
+# if __name__ == "__main__":
+#    #app.run() ##Replaced with below code to run it using waitress 
+#    serve(app, host='0.0.0.0', port=8000)

@@ -6,9 +6,10 @@
 
 ```
 docker build -t flaski .
-mkdir -p ~/flaski_data/data ~/flaski_data/redis ~/flaski_data/users ~/flaski_data/logs
-docker run -p 5000:5000 -p 8888:8888 -e FLASK_ENV=development -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
-flask run --host 0.0.0.0
+mkdir -p ~/flaski_data/data ~/flaski_data/redis ~/flaski_data/users ~/flaski_data/logs ~/flaski_data/certificates
+openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/certificates/key.pem -out ~/flaski_data/certificates/cert.pem -subj "/C=DE/ST=NRW/L=Cologne/O=MPS/CN=flaski"
+docker run -p 5000:5000 -e FLASK_ENV=development -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+ningx stop && flask run --host 0.0.0.0
 ```
 
 # Production
@@ -23,7 +24,7 @@ docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080
 -e REDIS_PASSWORD=my_redis_password 
 -e SESSION_TYPE=redis 
 -e REDIS_ADDRESS='127.0.0.1:6379/0'
--e DATABASE_URL='sqlite:///data/app.db'
+-e DATABASE_URL='mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski'
 -e MAIL_SERVER='mail.age.mpg.de'
 -e MAIL_PORT=25
 -e MAIL_USE_TLS=1
@@ -32,30 +33,29 @@ docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080
 --name flaski -it flaski
 ```
 
+or, during testing:
+
 ```
-docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080 -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+docker run -p 80:80 -e DATABASE_URL='mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski' -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
 ```
 
 ### Start flask
 
 ```
-waitress-serve 'flaski:app'
+gunicorn -b localhost:8000 -w 4 flaski:app
 ```
 
 or 
 
 ```
-waitress-serve --port=8041 --url-scheme=https 'flaski:app'
+
 ```
 
 ## Databases
 
 Starting
 ```
-rm -rf app.db migrations /flaski_data/data/*
-flask db init
-flask db migrate -m "users table"
-flask db upgrade 
+rm -rf app.db migrations /flaski_data/data/* && flask db init && flask db migrate -m "users table" && flask db upgrade 
 ```
 
 upgrading
