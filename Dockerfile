@@ -73,15 +73,11 @@ RUN rm /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
 COPY flaski.conf /etc/nginx/sites-enabled/flaski.conf
 COPY flaski.conf /etc/nginx/sites-available/flaski.conf
 
-ENTRYPOINT /bin/bash -c '\
+ENTRYPOINT /bin/bash -c 'redis-server redis.conf --daemonize yes && service mysql restart && \
 if [[ "$FLASK_ENV" == "development" ]] ; \
- then \
- python3 -m smtpd -n -c DebuggingServer localhost:8025 & \
-fi && \
-service mysql restart && service nginx reload && /etc/init.d/nginx start && redis-server redis.conf --daemonize yes && \
-if [[ "$FLASK_ENV" != "development" ]] ; \
- then \
- gunicorn -b localhost:8000 -w 4 flaski:app & \
-else /etc/init.d/nginx stop && flask run --host 0.0.0.0 & \
-fi && \
+  then \
+    python3 -m smtpd -n -c DebuggingServer localhost:8025 & flask run --host 0.0.0.0 ; \
+  else \
+    service nginx reload && /etc/init.d/nginx start && gunicorn -b localhost:8000 -w 4 flaski:app ; \
+fi ; \
 /bin/bash'

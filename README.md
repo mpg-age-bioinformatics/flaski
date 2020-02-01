@@ -1,25 +1,24 @@
 # Flaski
 
-## Development
-
-### Build the docker image and run the container
+## Build docker image and generate certificates
 
 ```
 docker build -t flaski .
 mkdir -p ~/flaski_data/data ~/flaski_data/redis ~/flaski_data/users ~/flaski_data/logs ~/flaski_data/certificates
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/certificates/key.pem -out ~/flaski_data/certificates/cert.pem -subj "/C=DE/ST=NRW/L=Cologne/O=MPS/CN=flaski"
-docker run -p 5000:5000 -e FLASK_ENV=development -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
-ningx stop && flask run --host 0.0.0.0
 ```
 
-# Production
+## Development
+```
+docker run -p 5000:5000 -e FLASK_ENV=development -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
+```
 
-### Run the docker image
+## Production
 
 Make sure the `my_redis_password` in `requirepass my_redis_password` of the `redis.conf` line 507 matches the `my_redis_password` you will be issuing with `-e`.
 
 ```
-docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080
+docker run -p 5000:5000 -p 443:443 -p 8888:8888 -p 8041:8041 -p 8080:8080
 -v ~/flaski_data:/flaski_data -v ~/flaski:/flaski
 -e REDIS_PASSWORD=my_redis_password 
 -e SESSION_TYPE=redis 
@@ -36,19 +35,7 @@ docker run -p 5000:5000 -p 8888:8888 -p 8041:8041 -p 8080:8080
 or, during testing:
 
 ```
-docker run -p 80:80 -e DATABASE_URL='mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski' -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
-```
-
-### Start flask
-
-```
-gunicorn -b localhost:8000 -w 4 flaski:app
-```
-
-or 
-
-```
-
+docker run -p 80:80 -p 443:443 -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data --name flaski -it flaski
 ```
 
 ## Databases
@@ -59,6 +46,7 @@ rm -rf app.db migrations /flaski_data/data/* && flask db init && flask db migrat
 ```
 
 upgrading
+
 ```
 flask db migrate -m "new fields in user model"
 flask db upgrade

@@ -14,7 +14,7 @@ class Config(object):
     REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS') or '127.0.0.1:6379/0'
     SESSION_REDIS = redis.from_url('redis://:%s@%s' %(redis_password,REDIS_ADDRESS))
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join('/flaski_data/data/', 'app.db')
+        'mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski' #'sqlite:///' + os.path.join('/flaski_data/data/', 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 8025)
