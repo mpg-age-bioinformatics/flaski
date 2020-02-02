@@ -1,0 +1,57 @@
+version: '3.7'
+
+services:
+
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+    volumes:
+      - /Users/jboucas/flaski_data:/flaski_data
+    environment:
+      - FLASK_ENV=production
+      - REDIS_PASSWORD=my_redis_password 
+      - SESSION_TYPE=redis
+      - REDIS_ADDRESS='127.0.0.1:6379/0'
+      - DATABASE_URL='mysql+pymysql://mariadb_flaski_user:flaskidbpass@localhost:3306/flaski'
+    depends_on:
+      - mariadb
+      - redis
+
+  mariadb:
+    build:
+      context: ./services/mariadb
+      dockerfile: Dockerfile
+    expose:
+      - 3306
+    environment:
+      - myqsl_password=myqsl_password
+      - MAINDB=mariadb_flaski_user
+      - PASSWDDB=flaskidbpass
+
+  redis:
+    build:
+      context: ./services/redis
+      dockerfile: Dockerfile
+    expose:
+      - 6379
+    volumes:
+      - /Users/jboucas/flaski_data:/flaski_data
+    environment:
+      - REDIS_PASSWORD=my_redis_password
+
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /Users/jboucas/flaski_data:/flaski_data
+    depends_on:
+      - server

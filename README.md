@@ -42,7 +42,7 @@ docker run -p 80:80 -p 443:443 -v ~/flaski:/flaski -v ~/flaski_data:/flaski_data
 
 Starting
 ```
-rm -rf app.db migrations /flaski_data/data/* && flask db init && flask db migrate -m "users table" && flask db upgrade 
+rm -rf migrations && flask db init && flask db migrate -m "users table" && flask db upgrade 
 ```
 
 upgrading
