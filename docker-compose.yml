@@ -28,6 +28,8 @@ services:
       dockerfile: Dockerfile
     expose:
       - 3306
+    volumes:
+      - /Users/jboucas/flaski_data/mariadb:/var/lib/mysql
     environment:
       - myqsl_password=myqsl_password
       - MAINDB=mariadb_flaski_user
@@ -40,7 +42,7 @@ services:
     expose:
       - 6379
     volumes:
-      - /Users/jboucas/flaski_data:/flaski_data
+      - /Users/jboucas/flaski_data/redis:/faski_data/redis
     environment:
       - REDIS_PASSWORD=my_redis_password
 
@@ -52,6 +54,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - /Users/jboucas/flaski_data:/flaski_data
+      - /Users/jboucas/flaski_data/certificates:/flaski_data/certificates
+      - /Users/jboucas/flaski_data/logs:/flaski_data/logs
     depends_on:
       - server
