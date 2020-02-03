@@ -22,9 +22,8 @@ flask db init && flask db migrate -m "users table" && flask db upgrade
 
 fi
 
-if [[ "$FLASK_ENV" == "development" ]] ;
-  then
-    python3 -m smtpd -n -c DebuggingServer localhost:8025 & flask run --host 0.0.0.0 --port 8000 
-  else \
-    gunicorn -b localhost:8000 -w 4 flaski:app
+if [[ "$FLASK_ENV" == "development" ]] ; then
+  flask run --host 0.0.0.0 --port 8000 # python3 -m smtpd -n -c DebuggingServer localhost:8025
+else
+  gunicorn -b 0.0.0.0:8000 -w 4 flaski:app
 fi

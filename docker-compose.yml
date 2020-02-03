@@ -6,16 +6,19 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    ports:
+      - 8001:8000
     expose:
       - 8000
     volumes:
       - /Users/jboucas/flaski:/flaski
       - /Users/jboucas/flaski_data:/flaski_data
     environment:
-      - FLASK_ENV=production
+      - FLASK_ENV=development
+      - MAILSERVER=mail
       - REDIS_PASSWORD=my_redis_password 
       - SESSION_TYPE=redis
-      - REDIS_ADDRESS=127.0.0.1:6379/0
+      - REDIS_ADDRESS=redis:6379/0
       - MAINDB=flaski
       - MYSQL_ROOT_PASSWORD=mypass
       - DATABASE_URL=mysql+pymysql://root:mypass@mariadb:3306/flaski
@@ -31,31 +34,20 @@ services:
       - MYSQL_ROOT_PASSWORD=mypass
 
   redis:
-    build:
-      context: ./services/redis
-      dockerfile: Dockerfile
+    image: redis
     expose:
       - 6379
-    volumes:
-      - /Users/jboucas/flaski_data/redis/redis.log:/flaski_data/redis/redis.log
-      - ./services/redis/redis.conf:/redis.conf
-    environment:
-      - REDIS_PASSWORD=my_redis_password
-    stdin_open: true
-    #tty: true
+    command: redis-server --requirepass my_redis_password
 
   nginx:
-    build:
-      context: ./services/nginx
-      dockerfile: Dockerfile
+    image: nginx
     ports:
       - 80:80
       - 443:443
     volumes:
-      - /Users/jboucas/flaski_data/certificates:/flaski_data/certificates
-      - /Users/jboucas/flaski_data/logs:/flaski_data/logs
+      - /Users/jboucas/flaski_data/certificates/cert.pem:/cert.pem
+      - /Users/jboucas/flaski_data/certificates/key.pem:/key.pem
+      - /Users/jboucas/flaski/services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - server
-    stdin_open: true
-    #tty: true
 

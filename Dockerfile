@@ -2,9 +2,29 @@
 # Distributed under the terms of the Modified BSD License.
 
 # Debian buster-slim (10.1)
-FROM flaski/debian
+FROM debian@sha256:11253793361a12861562d1d7b15b8b7e25ac30dd631e3d206ed1ca969bf97b7d
 
 LABEL maintainer "bioinformatics@age.mpg.de"
+
+USER root
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN echo "deb http://ftp.debian.org/debian buster main non-free contrib" >> /etc/apt/sources.list && \
+echo "deb-src http://ftp.debian.org/debian buster main non-free contrib" >> /etc/apt/sources.list && \
+echo "deb http://ftp.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list && \
+echo "deb-src http://ftp.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list && \
+echo "deb http://cdn-fastly.deb.debian.org/debian buster main\ndeb http://cdn-fastly.deb.debian.org/debian-security buster/updates main" > /etc/apt/sources.list
+
+RUN apt-get update && apt-get -yq dist-upgrade && \
+apt-get install -yq --no-install-recommends locales && \
+apt-get clean && rm -rf /var/lib/apt/lists/* && \
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+
+ENV SHELL /bin/bash
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 
 RUN apt-get update && apt-get -yq dist-upgrade && \
 apt-get install -yq python3 python3-pip libcairo2-dev pkg-config python3-dev mariadb-client && \
@@ -13,9 +33,9 @@ apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip3 install pymysql
 
 # data folders
-RUN mkdir -p /flaski/flaski /faski_data/users /faski_data/logs
+RUN mkdir -p /flaski/ /faski_data/users /faski_data/logs
 
-COPY flaski .flaskenv config.py flaski.py LICENSE.md MANIFEST.in README.md requirements.txt setup.py pyflaski /flaski/
+COPY flaski .flaskenv config.py flaski.py LICENSE.md MANIFEST.in README.md requirements.txt setup.py pyflaski services /flaski/
 
 RUN pip3 install -r /flaski/requirements.txt
 
@@ -26,73 +46,4 @@ EXPOSE 8000
 
 WORKDIR /flaski
 
-COPY docker-entrypoint.sh /flaski/
-
-ENTRYPOINT /bin/bash -c '/flaski/docker-entrypoint.sh && bin/bash'
-
-# ENTRYPOINT /bin/bash -c 'rm -rf migrations && \
-# if mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mariadb -e "use flaski";
-# flask db init && \
-# flask db migrate -m "users table" && \
-# flask db upgrade && \
-# if [[ "$FLASK_ENV" == "development" ]] ; \
-#   then \
-#     python3 -m smtpd -n -c DebuggingServer localhost:8025 & flask run --host 0.0.0.0 --port 8000 ; \
-#   else \
-#     gunicorn -b localhost:8000 -w 4 flaski:app ; \
-# fi ; \
-# /bin/bash'
-
-# if mysql --user=root --password=mypass --host=mariadb -e "use flaski";
-
-# ENTRYPOINT /bin/bash -c 'rm -rf migrations && \
-# while ! mysqladmin ping -h "mariadb:mypass" --silent ; do echo -n $(date "+%d/%m/%Y %H:%M:%S"); echo "    Waiting for MySQL to be up..." ; sleep 2 ; done ; \
-# /bin/bash'
-
-# flask db init && \
-# flask db migrate -m "users table" && \
-# flask db upgrade && \
-# if [[ "$FLASK_ENV" == "development" ]] ; \
-#   then \
-#     python3 -m smtpd -n -c DebuggingServer localhost:8025 & flask run --host 0.0.0.0 --port 8000 ; \
-#   else \
-#     gunicorn -b localhost:8000 -w 4 flaski:app ; \
-# fi ; \
-# /bin/bash'
-
-# ENTRYPOINT /bin/bash -c 'rm -rf migrations && \
-# while ! mysqladmin ping -h "mariadb" --silent ; do echo "Waiting for MySQL to be up..." ; sleep 1 ; done ; \
-# flask db init && \
-# flask db migrate -m "users table" && \
-# flask db upgrade && \
-# if [[ "$FLASK_ENV" == "development" ]] ; \
-#   then \
-#     python3 -m smtpd -n -c DebuggingServer localhost:8025 & flask run --host 0.0.0.0 --port 8000 ; \
-#   else \
-#     gunicorn -b localhost:8000 -w 4 flaski:app ; \
-# fi ; \
-# /bin/bash'
-
-
-# ENTRYPOINT /bin/bash -c 'rm -rf migrations && \
-# flask db init && \
-# flask db migrate -m "users table" && \
-# flask db upgrade && \
-# if [[ "$FLASK_ENV" == "development" ]] ; \
-#   then \
-#     python3 -m smtpd -n -c DebuggingServer localhost:8025 & flask run --host 0.0.0.0 --port 8000 ; \
-#   else \
-#     gunicorn -b localhost:8000 -w 4 flaski:app ; \
-# fi ; \
-# /bin/bash'
-
-# docker build -t flaski/app .
-#docker run -d 
-#-v ~/flaski_data:/flaski_data -v ~/flaski:/flaski
-#-e REDIS_PASSWORD=my_redis_password 
-#-e SESSION_TYPE=redis 
-#-e REDIS_ADDRESS='127.0.0.1:6379/0'
-#-e DATABASE_URL='mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski'
-#--name flaski -it flaski
-
-# docker run -v ~/flaski_data:/flaski_data -v ~/flaski:/flaski -e FLASK_ENV=development --name flaski -it flaski/app
+ENTRYPOINT /bin/bash -c '/flaski/services/server/docker-entrypoint.sh ; bin/bash'
