@@ -15,7 +15,7 @@ RUN mkdir -p /faski_data/redis
 
 EXPOSE 6379
 
-ENTRYPOINT /bin/bash -c 'redis-server redis.conf --requirepass $REDIS_PASSWORD'
+ENTRYPOINT /bin/bash -c 'ls /faski_data/redis && redis-server /redis.conf --requirepass $REDIS_PASSWORD && /bin/bash'
 
 # docker build -t flaski/redis .
 # docker run -d -e REDIS_PASSWORD=REDIS_PASSWORD --name redis -it flaski/redis

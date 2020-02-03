@@ -7,33 +7,28 @@ services:
       context: ./
       dockerfile: Dockerfile
     expose:
-      - 5000
-    ports:
-      - 5000:5000
+      - 8000
     volumes:
+      - /Users/jboucas/flaski:/flaski
       - /Users/jboucas/flaski_data:/flaski_data
     environment:
       - FLASK_ENV=production
       - REDIS_PASSWORD=my_redis_password 
       - SESSION_TYPE=redis
-      - REDIS_ADDRESS='127.0.0.1:6379/0'
-      - DATABASE_URL='mysql+pymysql://mariadb_flaski_user:flaskidbpass@localhost:3306/flaski'
+      - REDIS_ADDRESS=127.0.0.1:6379/0
+      - MAINDB=flaski
+      - MYSQL_ROOT_PASSWORD=mypass
+      - DATABASE_URL=mysql+pymysql://root:mypass@mariadb:3306/flaski
     depends_on:
       - mariadb
       - redis
 
   mariadb:
-    build:
-      context: ./services/mariadb
-      dockerfile: Dockerfile
+    image: mariadb/server
     expose:
       - 3306
-    volumes:
-      - /Users/jboucas/flaski_data/mariadb:/var/lib/mysql
     environment:
-      - myqsl_password=myqsl_password
-      - MAINDB=mariadb_flaski_user
-      - PASSWDDB=flaskidbpass
+      - MYSQL_ROOT_PASSWORD=mypass
 
   redis:
     build:
@@ -42,9 +37,12 @@ services:
     expose:
       - 6379
     volumes:
-      - /Users/jboucas/flaski_data/redis:/faski_data/redis
+      - /Users/jboucas/flaski_data/redis/redis.log:/flaski_data/redis/redis.log
+      - ./services/redis/redis.conf:/redis.conf
     environment:
       - REDIS_PASSWORD=my_redis_password
+    stdin_open: true
+    #tty: true
 
   nginx:
     build:
@@ -58,3 +56,6 @@ services:
       - /Users/jboucas/flaski_data/logs:/flaski_data/logs
     depends_on:
       - server
+    stdin_open: true
+    #tty: true
+

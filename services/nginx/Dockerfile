@@ -17,7 +17,7 @@ RUN mkdir -p /flaski_data/certificates /flaski_data/logs && rm /etc/nginx/sites-
 COPY flaski.conf /etc/nginx/sites-enabled/flaski.conf
 COPY flaski.conf /etc/nginx/sites-available/flaski.conf
 
-ENTRYPOINT /bin/bash -c 'service nginx reload && /etc/init.d/nginx start
+ENTRYPOINT /bin/bash -c 'service nginx reload && /etc/init.d/nginx start && /bin/bash'
 
 # docker build -t flaski/nginx .
 # docker run -d \
