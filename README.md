@@ -29,6 +29,14 @@ For stopping and removing a container,
 ```bash
 docker-compose stop mariadb && docker-compose rm mariadb
 ```
+Stopping and removing all containers:
+```bash
+docker-compose down
+```
+Stopping and removing all containers as well as all volumes (this will destroy the volumes and contained data):
+```bash
+docker-compose down -v
+```
 To remove a volume, eg.
 ```bash
 docker volume rm db
