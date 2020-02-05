@@ -13,6 +13,7 @@ services:
       - data:/flaski_data/users/
     environment:
       - FLASK_ENV=development
+      - ADMINS=jboucas@age.mpg.de,jorge.boucas@age.mpg.de
       - REDIS_ADDRESS=redis:6379/0
       - REDIS_PASSWORD=my_redis_password 
       - MYSQL_USER=root

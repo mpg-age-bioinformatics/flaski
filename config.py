@@ -1,6 +1,7 @@
 import os
 import secrets
 import redis
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 with open(basedir+"/.git/refs/heads/master", "r") as f:
@@ -18,13 +19,11 @@ class Config(object):
     MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'mariadb'
     MYSQL_PORT = os.environ.get('MYSQL_PORT') or '3306'
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%s:%s@%s:%s/flaski' %(MYSQL_USER,MYSQL_ROOT_PASSWORD,MYSQL_HOST,MYSQL_PORT)
-    #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-    #        'mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski' #'sqlite:///' + os.path.join('/flaski_data/data/', 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 8025)
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    ADMINS = ['jboucas@age.mpg.de']
+    ADMINS = os.environ.get('ADMINS').split(",") or ['jboucas@age.mpg.de']
     COMMIT = commit
