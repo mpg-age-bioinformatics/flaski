@@ -115,7 +115,7 @@ chown -R mysql:mysql /var/lib/mysql/
 
 ```bash
 mkdir ~/flaski_backups
-docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rsync -rtvh --delete /backups /host
+docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rsync -rtvh --delete /backups/ /host
 ```
 
 optionally remove mysql backups from volume:
