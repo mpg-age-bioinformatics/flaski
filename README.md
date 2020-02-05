@@ -91,19 +91,3 @@ Static files need to be included in the `MANIFEST.in`.
 python3 setup.py bdist_wheel
 pip3 install flaski-0.1.0-py3-none-any.whl
 ```
-
-
-  mariadb:
-    build:
-      context: ./services/mariadb
-      dockerfile: Dockerfile
-    ports:
-      - 3306:3306
-    expose:
-      - 3306
-    volumes:
-      - /Users/jboucas/flaski_data/mariadb:/var/lib/mysql
-    environment:
-      - myqsl_password=myqsl_password
-      - MAINDB=mariadb_flaski_user
-      - PASSWDDB=flaskidbpass

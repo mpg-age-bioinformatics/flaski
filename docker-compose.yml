@@ -10,7 +10,7 @@ services:
       - 8000
     volumes:
       - /Users/jboucas/flaski:/flaski
-      - /Users/jboucas/flaski_data:/flaski_data
+      - data:/flaski_data/users/
     environment:
       - FLASK_ENV=development
       - REDIS_PASSWORD=my_redis_password 
@@ -25,19 +25,24 @@ services:
 
   mariadb:
     image: mariadb/server
+    restart: always
     expose:
       - 3306
+    volumes:
+      - db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=mypass
 
   redis:
     image: redis
+    restart: always
     expose:
       - 6379
     command: redis-server --requirepass my_redis_password
 
   nginx:
     image: nginx
+    restart: always
     ports:
       - 80:80
       - 443:443
@@ -48,3 +53,8 @@ services:
     depends_on:
       - server
 
+volumes:
+  data:
+    external: false
+  db:
+    external: false
