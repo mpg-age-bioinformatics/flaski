@@ -16,5 +16,3 @@ COPY run-backups.sh /run-backups.sh
 COPY cron.job /cron.job
 
 RUN crontab /cron.job
-
-ENTRYPOINT /bin/bash -c '/bin/bash'
