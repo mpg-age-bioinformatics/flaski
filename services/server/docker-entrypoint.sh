@@ -1,17 +1,17 @@
 #!/bin/bash
 
 
-while ! mysqladmin --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mariadb status ; 
+while ! mysqladmin --user=${MYSQL_USER} --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} status ; 
   do echo "Waiting for mysql.. " && sleep 4
 done
 
-if mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mariadb -e "use flaski";
+if mysql --user=${MYSQL_USER} --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} -e "use flaski";
   then
     echo "Flaski database already exists."
   else
-mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mariadb << _EOF_
+mysql --user=${MYSQL_USER} --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} << _EOF_
 CREATE DATABASE flaski /*\!40100 DEFAULT CHARACTER SET utf8 */;
-GRANT ALL PRIVILEGES ON flaski.* TO 'root'@'%';
+GRANT ALL PRIVILEGES ON flaski.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 _EOF_
 

@@ -9,16 +9,22 @@ services:
     expose:
       - 8000
     volumes:
-      - /Users/jboucas/flaski:/flaski
+      - ./:/flaski
       - data:/flaski_data/users/
     environment:
       - FLASK_ENV=development
-      - REDIS_PASSWORD=my_redis_password 
-      - SESSION_TYPE=redis
       - REDIS_ADDRESS=redis:6379/0
-      - MAINDB=flaski
+      - REDIS_PASSWORD=my_redis_password 
+      - MYSQL_USER=root
       - MYSQL_ROOT_PASSWORD=mypass
-      - DATABASE_URL=mysql+pymysql://root:mypass@mariadb:3306/flaski
+      - MYSQL_HOST=mariadb
+      - MYSQL_PORT=3306
+      - MAIL_SERVER=localhost # smtp.googlemail.com
+      - MAIL_PORT=8025 #587
+      #- MAIL_USE_TLS=1
+      #- MAIL_USERNAME=<your-gmail-username>
+      #- MAIL_PASSWORD=<your-gmail-password>
+
     depends_on:
       - mariadb
       - redis

@@ -13,8 +13,13 @@ class Config(object):
     redis_password = os.environ.get('REDIS_PASSWORD') or 'REDIS_PASSWORD'
     REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS') or '127.0.0.1:6379/0'
     SESSION_REDIS = redis.from_url('redis://:%s@%s' %(redis_password,REDIS_ADDRESS))
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski' #'sqlite:///' + os.path.join('/flaski_data/data/', 'app.db')
+    MYSQL_USER = os.environ.get('MYSQL_USER') or 'root'
+    MYSQL_ROOT_PASSWORD = os.environ.get('MYSQL_ROOT_PASSWORD') or 'mypass'
+    MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'mariadb'
+    MYSQL_PORT = os.environ.get('MYSQL_PORT') or '3306'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%s:%s@%s:%s/flaski' %(MYSQL_USER,MYSQL_ROOT_PASSWORD,MYSQL_HOST,MYSQL_PORT)
+    #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+    #        'mysql+pymysql://flaski:flaskidbpass@localhost:3306/flaski' #'sqlite:///' + os.path.join('/flaski_data/data/', 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 8025)
