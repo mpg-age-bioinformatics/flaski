@@ -35,8 +35,10 @@ RUN pip3 install pymysql
 # data folders
 RUN mkdir -p /flaski/ /faski_data/users /faski_data/logs
 
-COPY flaski .flaskenv config.py flaski.py LICENSE.md MANIFEST.in README.md requirements.txt setup.py pyflaski services /flaski/
+#comment during development
+#COPY * /flaski/
 
+COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt
 
 # Jupyter port

@@ -29,7 +29,24 @@ services:
     depends_on:
       - mariadb
       - redis
-
+  
+  # backup:
+  #   build:
+  #     context: ./services/backup
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   environment:
+  #     - MYSQL_USER=root
+  #     - MYSQL_ROOT_PASSWORD=mypass
+  #     - MYSQL_HOST=mariadb
+  #     - MYSQL_PORT=3306
+  #   volumes:
+  #     - data:/flaski_data/users/
+  #     - backups:/backups
+  #     - ./services/backup/run-backups.sh:/run-backups.sh
+  #   depends_on:
+  #     - server
+  
   mariadb:
     image: mariadb/server
     restart: always
@@ -65,3 +82,5 @@ volumes:
     external: false
   db:
     external: false
+  # backups:
+  #   external: false

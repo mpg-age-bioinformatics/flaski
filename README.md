@@ -54,6 +54,58 @@ upgrading
 flask db migrate -m "new fields in user model"
 flask db upgrade
 ```
+Backup a database:
+docker-compose exec mariadb /usr/bin/mysqldump -u root --password=mypass flaski > dump.sql
+
+Restore a database from backup:
+```
+cat dump.sql | docker-compose exec mariadb mysql --user=root --password=mypass flaski
+```
+
+*Backup with `mariabackup`*
+
+1st backup:
+```
+mariabackup --backup \
+   --target-dir=/var/mariadb/backup/ \
+   --user=root --password=mypass
+```
+
+2nd backup:
+```
+mariabackup --backup \
+   --incremental-basedir=/var/mariadb/backup/
+   --target-dir=/var/mariadb/inc1/ \
+   --user=root --password=mypass
+```
+
+3rd backup:
+```
+mariabackup --backup \
+   --target-dir=/var/mariadb/inc2/ \
+   --incremental-basedir=/var/mariadb/inc1/ \
+   --user=root --password=mypass
+```
+
+*Restore from incremental backups with `mariabackup`*
+```
+mariabackup --prepare \
+   --target-dir=/var/mariadb/backup
+mariabackup --prepare \
+   --target-dir=/var/mariadb/backup \
+   --incremental-dir=/var/mariadb/inc1
+.
+.
+.
+mariabackup --prepare \
+   --target-dir=/var/mariadb/backup \
+   --incremental-dir=/var/mariadb/incN
+
+mariabackup --copy-back \
+   --target-dir=/var/mariadb/backup/
+
+chown -R mysql:mysql /var/lib/mysql/
+```
 
 ## Build and Install
 
