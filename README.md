@@ -34,6 +34,18 @@ To remove a volume, eg.
 docker volume rm db
 ```
 
+## Backup of mysql and user files to host
+
+```bash
+mkdir ~/flaski_backups
+docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rsync -rtvh --delete /backups/ /host
+```
+
+optionally remove mysql backups from volume:
+```bash
+docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rm -rf /backups/mariadb/*
+```
+
 ## Email logging
 
 To use the SMTP debugging server from Python. 
@@ -109,18 +121,6 @@ mariabackup --copy-back \
    --target-dir=/var/mariadb/backup/
 
 chown -R mysql:mysql /var/lib/mysql/
-```
-
-## Backup of mysql and user files to host
-
-```bash
-mkdir ~/flaski_backups
-docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rsync -rtvh --delete /backups/ /host
-```
-
-optionally remove mysql backups from volume:
-```bash
-docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rm -rf /backups/mariadb/*
 ```
 
 ## Build and Install
