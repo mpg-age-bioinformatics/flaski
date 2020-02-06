@@ -33,8 +33,13 @@ import pandas as pd
 import base64
 
 @app.route('/', methods=['GET', 'POST'])
-def landingpage():
-    return redirect(url_for('login'))
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    if current_user.is_authenticated:
+        return render_template('index.html',userlogged="yes")
+    else:
+        return render_template('index.html',userlogged="no")
+    #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
 # @app.route('/login/<width>/<height>',methods=['GET', 'POST'])
@@ -48,7 +53,7 @@ def login(width=None, height=None):
     #     </script>
     #     """
     if current_user.is_authenticated:
-        return redirect(url_for('scatterplot'))
+        return redirect(url_for('index'))
         
     form = LoginForm()
     if form.validate_on_submit():
@@ -61,7 +66,7 @@ def login(width=None, height=None):
         # session["width"]=width
         # session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('scatterplot')
+            next_page = url_for('index')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -73,7 +78,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('scatterplot'))
+        return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(firstname=form.firstname.data,\
@@ -108,7 +113,7 @@ def confirm(token):
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
-        return redirect(url_for('scatterplot'))
+        return redirect(url_for('index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -122,10 +127,10 @@ def reset_password_request():
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('scatterplot'))
+        return redirect(url_for('index'))
     user = User.verify_reset_password_token(token)
     if not user:
-        return redirect(url_for('scatterplot'))
+        return redirect(url_for('index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.password_set=datetime.utcnow()
