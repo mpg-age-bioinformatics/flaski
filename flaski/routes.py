@@ -20,25 +20,31 @@ import sys
 import random
 import json
 
-import matplotlib
-matplotlib.use('agg')
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.backends.backend_svg import FigureCanvasSVG
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import mpld3
+# import matplotlib
+# matplotlib.use('agg')
+# from matplotlib.backends.backend_agg import FigureCanvasAgg
+# from matplotlib.backends.backend_svg import FigureCanvasSVG
+# from matplotlib.figure import Figure
+# import matplotlib.pyplot as plt
+# import mpld3
 
 import pandas as pd
 
 import base64
 
+FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
+    { "name":"iScatter plot", "id":'iscatterplot_more',"link":'scatterplot' ,"java":"javascript:ReverseDisplay('iscatterplot_more')", "description":"An intreactive scatterplot app."} ]
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    apps=FREEAPPS
     if current_user.is_authenticated:
-        return render_template('index.html',userlogged="yes")
+        apps=apps+session["PRIVATE_APPS"]
+        return render_template('index.html',userlogged="yes", apps=apps)
     else:
-        return render_template('index.html',userlogged="no")
+        return render_template('index.html',userlogged="no",apps=apps)  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
@@ -52,7 +58,31 @@ def login(width=None, height=None):
     #     ['', window.innerWidth, window.innerHeight].join('/'))()
     #     </script>
     #     """
+    def read_private_apps(useremail):
+        PRIVATE_APPS=[]
+        if app.config['PRIVATE_APPS']:
+            df=pd.read_csv(app.config['PRIVATE_APPS'],index_col="app",sep="\t")
+            df=df.transpose()
+            dic=df.to_dict()
+            for entry in list(dic.keys()):
+                private_app=dic[entry]
+                allowed=private_app["allowed"].split(",")
+                if "all" in allowed:
+                    del(private_app["allowed"])
+                    PRIVATE_APPS.append(private_app)
+                elif useremail in allowed:
+                    del(private_app["allowed"])
+                    PRIVATE_APPS.append(private_app)
+                elif len([ s for s in allowed if s[0] == "#" ]) > 0 :
+                    for domain in [ s for s in allowed if s[0] == "#" ]:
+                        if domain[1:] in useremail:
+                            del(private_app["allowed"])
+                            PRIVATE_APPS.append(private_app)
+                            break
+        return PRIVATE_APPS
+
     if current_user.is_authenticated:
+        session["PRIVATE_APPS"]=read_private_apps(current_user.email)
         return redirect(url_for('index'))
         
     form = LoginForm()
@@ -67,6 +97,7 @@ def login(width=None, height=None):
         # session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
+        session["PRIVATE_APPS"]=read_private_apps(current_user.email)
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 

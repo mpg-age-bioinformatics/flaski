@@ -26,4 +26,5 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = os.environ.get('ADMINS').split(",") or ['jboucas@age.mpg.de']
+    PRIVATE_APPS = os.environ.get('PRIVATE_APPS') or None
     COMMIT = commit

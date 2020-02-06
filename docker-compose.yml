@@ -11,6 +11,7 @@ services:
     volumes:
       - ./:/flaski
       - data:/flaski_data/users/
+      #- ./utils/private.apps.tsv:/private.apps.tsv
     environment:
       - FLASK_ENV=development
       - ADMINS=jboucas@age.mpg.de,jorge.boucas@age.mpg.de
@@ -25,6 +26,7 @@ services:
       #- MAIL_USE_TLS=1
       #- MAIL_USERNAME=<your-gmail-username>
       #- MAIL_PASSWORD=<your-gmail-password>
+      #- PRIVATE_APPS=/private.apps.xlsx
 
     depends_on:
       - mariadb
