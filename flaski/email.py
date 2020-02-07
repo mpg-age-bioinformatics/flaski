@@ -33,3 +33,13 @@ def send_validate_email(user):
                                          user=user, token=token),
                html_body=render_template('email/validate_email.html',
                                          user=user, token=token))
+
+def send_files_deletion_email(user,files):
+    with app.app_context():
+        send_email('[Flaski] Files deletion warning',
+                sender=app.config['ADMINS'][0],
+                recipients=[user.email],
+                text_body=render_template('email/files_deletion.txt',
+                                            user=user, files=files),
+                html_body=render_template('email/files_deletion.html',
+                                            user=user, files=files))

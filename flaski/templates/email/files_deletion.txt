@@ -1,0 +1,15 @@
+Hi {{ user.firstname }},
+
+Some of your files have gotten old and will removed if not changed within the next 30 days.
+
+Here the list of files:
+
+{% for f in files %}
+{{f}}
+{% endfor %}
+
+Cheers!
+
+Sincerely,
+
+Flaski

@@ -24,7 +24,7 @@ from flaski import app, sess
 
 def UserFolder(u):
     if u.is_authenticated:
-        root = "/flaski_data/users/%s" %str(u.id)
+        root = app.config['USERS_DATA']+str(u.id)
         if not os.path.isdir(root):
             os.makedirs(root)
     else:

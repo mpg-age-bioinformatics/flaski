@@ -42,9 +42,9 @@ if not app.debug:
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
 
-    if not os.path.exists('/flaski_data/logs'):
-        os.mkdir('/flaski_data/logs')
-    file_handler = RotatingFileHandler('/flaski_data/logs/flaski.log', maxBytes=10240, backupCount=10)
+    if not os.path.exists(app.config['LOGS']):
+        os.mkdir(app.config['LOGS'])
+    file_handler = RotatingFileHandler(app.config['LOGS']+'flaski.log', maxBytes=10240, backupCount=10)
     file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
     file_handler.setLevel(logging.INFO)

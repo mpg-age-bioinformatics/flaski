@@ -7,6 +7,8 @@ from flask_login import UserMixin
 from time import time
 import jwt
 from flaski import app
+from sqlalchemy.types import PickleType
+
 
 class UserLogging(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +23,7 @@ class User(UserMixin, db.Model):
     organization = db.Column(db.String(120), index=True)
     email = db.Column(db.String(120), index=True, unique=True)
     disk_quota = db.Column(db.Float, nullable=False, default=2.5e+8)
+    mailed_files = db.Column( PickleType )
     registered_on = db.Column(db.DateTime, default=datetime.utcnow)
     password_set = db.Column(db.DateTime, default=datetime.utcnow)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
