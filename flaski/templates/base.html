@@ -95,12 +95,15 @@
                   Apps
                 </a>
                 <div class="dropdown-menu dropdown-menu-right animated--fade-in" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="#">Scatter plot</a>
+
+                  {% block apps_dropdown %}{% endblock %}
+                  
+                  <!--a class="dropdown-item" href="#">Scatter plot</a>
                   <a class="dropdown-item" href="#">Line plot</a>
                   <a class="dropdown-item" href="#">Heatmap</a>
                   <a class="dropdown-item" href="#">Venn diagram</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Something else here</a>
+                  <a class="dropdown-item" href="#">Something else here</a-->
                 </div>
               </li>
             </ul>

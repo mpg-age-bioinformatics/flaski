@@ -176,11 +176,12 @@ color: White ;
             {% for app in apps %}
 
 	          <div id="{{ app.id }}" class="col-lg-12 text-center" style="display:none;">
-	          <p class="lead"><h2><b>"{{ app.name }}"</b></h2>
+	          <p class="lead"><h2><b>{{ app.name }}</b></h2>
               <div class="service-item">
                 <span class="fa-stack fa-4x">
                   <i class="fa fa-circle fa-stack-2x"></i>
-                  <i class="fa fa-flask fa-stack-1x text-primary"></i>
+                  <a href="/{{app.link}}" class="fa fa-flask fa-stack-1x text-primary"></a>
+                  <!--i class="fa fa-flask fa-stack-1x text-primary"></i-->
                 </span>
               </div>
 	            <p class="lead">{{ app.description }}<br><br><br></p>

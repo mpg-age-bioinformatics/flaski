@@ -10,6 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.plots.figures.scatterplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file
+from flaski.routes import FREEAPPS
 
 import os
 import io
@@ -42,6 +43,8 @@ def scatterplot(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
 
+    apps=FREEAPPS+session["PRIVATE_APPS"]
+
     if request.method == 'POST':
 
         # READ SESSION FILE IF AVAILABLE 
@@ -52,20 +55,20 @@ def scatterplot(download=None):
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename=session["filename"], **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
             session_=json.load(inputsessionfile)
             if session_["ftype"]!="session":
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename=session["filename"], **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
             if session_["app"]!="scatterplot":
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename=session["filename"], **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
     
             del(session_["ftype"])
             del(session_["COMMIT"])
@@ -83,20 +86,20 @@ def scatterplot(download=None):
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename=session["filename"], **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
             session_=json.load(inputargumentsfile)
             if session_["ftype"]!="arguments":
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename=session["filename"], **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
             if session_["app"]!="scatterplot":
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename=session["filename"], **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
             del(session_["ftype"])
             del(session_["COMMIT"])
@@ -188,19 +191,19 @@ def scatterplot(download=None):
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]
                     flash(sometext,'info')
-                    return render_template('/plots/scatterplot.html' , filename=filename, **plot_arguments)
+                    return render_template('/plots/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                 error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                 has the correct format and respective extension and try uploadling it again." %filename
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename="Select file..", **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename="Select file..", apps=apps, **plot_arguments)
         
         if "df" not in list(session.keys()):
                 error_message="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
-                return render_template('/plots/scatterplot.html' , filename="Select file..",  **plot_arguments)
+                return render_template('/plots/scatterplot.html' , filename="Select file..", apps=apps,  **plot_arguments)
  
         #if session["plot_arguments"]["groups_value"]=="None":
         #    session["plot_arguments"]["groups_auto_generate"]=".on"
@@ -223,12 +226,12 @@ def scatterplot(download=None):
             figfile.seek(0)  # rewind to beginning of file
             figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
-            return render_template('/plots/scatterplot.html', figure_url=figure_url, filename=filename, **plot_arguments)
+            return render_template('/plots/scatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
             flash(e,'error')
 
-            return render_template('/plots/scatterplot.html', filename=filename, **plot_arguments)
+            return render_template('/plots/scatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":
@@ -277,7 +280,7 @@ def scatterplot(download=None):
         db.session.add(eventlog)
         db.session.commit()
         
-        return render_template('plots/scatterplot.html',  filename=session["filename"], **session["plot_arguments"])
+        return render_template('plots/scatterplot.html',  filename=session["filename"], apps=apps, **session["plot_arguments"])
 
 @app.route('/download/<json_type>', methods=['GET','POST'])
 @login_required

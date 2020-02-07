@@ -14,6 +14,8 @@ from pathlib2 import Path
 from copy import copy
 import shutil
 import io
+from flaski.routes import FREEAPPS
+
 
 from flaski.routines import session_to_file
 from flaski import app, sess
@@ -206,6 +208,7 @@ def get_size(start_path = '.'):
 class PathView(MethodView):
     @login_required
     def get(self, p=''):
+        apps=FREEAPPS+session["PRIVATE_APPS"]
         """
         downloading files
         """
@@ -256,7 +259,7 @@ class PathView(MethodView):
             else:
                 progress_bar_background="bg-success"
 
-            page = render_template('storage.html', path=p, contents=contents, percent_used=percent_used , progress_bar_background=progress_bar_background, total=total, hide_dotfile=hide_dotfile)
+            page = render_template('storage.html', path=p, contents=contents, percent_used=percent_used , progress_bar_background=progress_bar_background, total=total, hide_dotfile=hide_dotfile, apps=apps)
             res = make_response(page, 200)
             res.set_cookie('hide-dotfile', hide_dotfile, max_age=16070400)
         elif os.path.isfile(path):

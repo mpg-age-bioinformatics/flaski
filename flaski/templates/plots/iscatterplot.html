@@ -8,6 +8,11 @@
 
 {% endblock %}
 
+{% block apps_dropdown %}
+{% for app in apps %}
+<a class="dropdown-item" href="/{{app.link}}">{{ app.name }}</a>
+{% endfor %}
+{% endblock %}
 
 {% block side_bar_content %}
 
