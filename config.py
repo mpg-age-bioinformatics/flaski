@@ -9,7 +9,7 @@ with open(basedir+"/.git/refs/heads/master", "r") as f:
 
 class Config(object):
     USERS_DATA = os.environ.get('USERS_DATA') or "/flaski_data/users/"
-    'LOGS'=os.environ.get('LOGS') or '/flaski_data/logs/'
+    LOGS=os.environ.get('LOGS') or '/flaski_data/logs/'
     session_token=secrets.token_urlsafe(16)
     SECRET_KEY = os.environ.get('SECRET_KEY') or session_token
     SESSION_TYPE = os.environ.get('SESSION_TYPE') or 'redis'

@@ -18,7 +18,7 @@ _EOF_
 echo "mysql database created"
 
 rm -rf migrations 
-flask db init && flask db migrate -m "users table" && flask db upgrade
+flask db init && flask db migrate -m "users table" && flask db migrate -m "userloggings table" && flask db upgrade
 
 fi
 
