@@ -18,12 +18,12 @@ import sys
 import random
 import json
 
-import matplotlib
-matplotlib.use('agg')
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.backends.backend_svg import FigureCanvasSVG
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
+# import matplotlib
+# matplotlib.use('agg')
+# from matplotlib.backends.backend_agg import FigureCanvasAgg
+# from matplotlib.backends.backend_svg import FigureCanvasSVG
+# from matplotlib.figure import Figure
+# import matplotlib.pyplot as plt
 
 import pandas as pd
 

@@ -6,14 +6,19 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    expose:
+    ports:
       - 8000
+      - 443
+    expose:
+      - 443
     volumes:
       - ./:/flaski
       - data:/flaski_data/users/
       #- ./utils/private.apps.tsv:/private.apps.tsv
+      - /Users/jboucas/flaski_data/certificates/cert.pem:/cert.pem
+      - /Users/jboucas/flaski_data/certificates/key.pem:/key.pem
     environment:
-      - FLASK_ENV=development
+      #- FLASK_ENV=development
       - ADMINS=jboucas@age.mpg.de,jorge.boucas@age.mpg.de
       - REDIS_ADDRESS=redis:6379/0
       - REDIS_PASSWORD=my_redis_password 

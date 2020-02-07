@@ -7,7 +7,7 @@ from adjustText import adjust_text
 import pandas as pd
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.sampledata.iris import flowers
-from bokeh import models#
+from bokeh import models
 from bokeh.models import LinearAxis, Range1d, DataRange1d, Legend
 from bokeh.palettes import brewer
 
