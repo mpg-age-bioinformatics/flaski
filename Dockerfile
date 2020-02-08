@@ -27,7 +27,7 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
 RUN apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq python3 python3-pip libcairo2-dev pkg-config python3-dev mariadb-client && \
+apt-get install -yq python3 python3-pip libcairo2-dev pkg-config python3-dev mariadb-client cron && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install pymysql
@@ -40,6 +40,8 @@ RUN mkdir -p /flaski/ /faski_data/users /faski_data/logs
 
 COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt
+
+RUN echo "0 0 1,15 * * python3 /flaski/manage.py > /clean.flaski.out 2>&1" > /cron.job && crontab /cron.job
 
 # Jupyter port
 EXPOSE 8888

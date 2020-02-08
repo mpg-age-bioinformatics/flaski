@@ -1,1 +1,0 @@
-0 0 * * * bash /run-backups.sh > /run-backups.sh.out 2>&1

@@ -13,6 +13,4 @@ apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY run-backups.sh /run-backups.sh
 
-COPY cron.job /cron.job
-
-RUN crontab /cron.job
+RUN echo "0 0 * * * bash /run-backups.sh > /run-backups.sh.out 2>&1" > /cron.job && crontab /cron.job
