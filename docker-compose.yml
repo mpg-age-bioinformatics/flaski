@@ -6,17 +6,12 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    ports:
-      - 8000
-      - 443
     expose:
       - 443
     volumes:
       - ./:/flaski
       - data:/flaski_data/users/
       #- ./utils/private.apps.tsv:/private.apps.tsv
-      - /Users/jboucas/flaski_data/certificates/cert.pem:/cert.pem
-      - /Users/jboucas/flaski_data/certificates/key.pem:/key.pem
     environment:
       #- FLASK_ENV=development
       - ADMINS=jboucas@age.mpg.de,jorge.boucas@age.mpg.de
@@ -80,7 +75,8 @@ services:
     volumes:
       - /Users/jboucas/flaski_data/certificates/cert.pem:/cert.pem
       - /Users/jboucas/flaski_data/certificates/key.pem:/key.pem
-      - /Users/jboucas/flaski/services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf
+      - ./services/nginx/dhparam.pem:/dhparam.pem
+      - ./services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - server
 
