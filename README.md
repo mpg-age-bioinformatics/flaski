@@ -65,6 +65,23 @@ docker-compose exec server python3 -m smtpd -n -c DebuggingServer localhost:8025
 
 ## Databases
 
+For handling database entries you can start the `flask shell` by:
+```bash
+docker-compose exec server flask shell 
+```
+and then for removing a user from the db:
+```python
+u=User.query.filter_by(email=<user_email>).first()
+db.session.delete(u)
+```
+for editing entries eg.:
+```python
+user=User.query.filter_by(email=<user_email>).first()
+user.active = False
+db.session.add(user)
+db.session.commit()
+```
+
 If you need to re-iniate your database
 ```bash
 rm -rf migrations && flask db init && flask db migrate -m "users table" && flask db upgrade 
