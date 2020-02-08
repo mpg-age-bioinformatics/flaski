@@ -12,6 +12,10 @@ class Config(object):
     LOGS=os.environ.get('LOGS') or '/flaski_data/logs/'
     session_token=secrets.token_urlsafe(16)
     SECRET_KEY = os.environ.get('SECRET_KEY') or session_token
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
     SESSION_TYPE = os.environ.get('SESSION_TYPE') or 'redis'
     redis_password = os.environ.get('REDIS_PASSWORD') or 'REDIS_PASSWORD'
     REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS') or '127.0.0.1:6379/0'
