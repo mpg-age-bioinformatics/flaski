@@ -27,7 +27,6 @@ services:
       - MAIL_USERNAME=bioflaski@gmail.com
       - MAIL_PASSWORD=$EMAILPASS
       #- PRIVATE_APPS=/private.apps.xlsx
-
     depends_on:
       - mariadb
       - redis
@@ -40,7 +39,7 @@ services:
     environment:
       - MYSQL_USER=root
       - MYSQL_ROOT_PASSWORD=mypass
-      - MYSQL_HOST=mariadb
+      - MYSQL_HOST=haproxy
       - MYSQL_PORT=3306
     volumes:
       - data:/flaski_data/users/
@@ -48,7 +47,43 @@ services:
       - ./services/backup/run-backups.sh:/run-backups.sh
     depends_on:
       - server
+      - mariadb
+
+  # haproxy:
+  #   image: haproxy
+  #   expose:
+  #     - 3306
+  #   volumes:
+  #     - ./services/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  #   command: 'haproxy -f /usr/local/etc/haproxy/haproxy.cfg'
+  #   depends_on:
+  #     - mariadb-galera
+  #     - mariadb-galera-1
   
+  # mariadb-galera:
+  #   image: bitnami/mariadb-galera
+  #   environment:
+  #     - MARIADB_USER=my_user
+  #     - MARIADB_PASSWORD=my_password
+  #     - MARIADB_GALERA_CLUSTER_BOOTSTRAP=yes
+  #     - MARIADB_GALERA_CLUSTER_NAME=my_galera
+  #     - MARIADB_GALERA_MARIABACKUP_USER=my_mariabackup_user
+  #     - MARIADB_GALERA_MARIABACKUP_PASSWORD=my_mariabackup_password
+  #     - MARIADB_ROOT_PASSWORD=mypass
+  #     - MARIADB_USER=root
+  #     - MARIADB_PASSWORD=mypass
+  #     - MARIADB_DATABASE=my_database
+
+  # mariadb-galera-1:
+  #   image: bitnami/mariadb-galera
+  #   environment:
+  #     - MARIADB_GALERA_CLUSTER_NAME=my_galera
+  #     - MARIADB_GALERA_CLUSTER_ADDRESS=gcomm://mariadb-galera
+  #     - MARIADB_GALERA_MARIABACKUP_USER=my_mariabackup_user
+  #     - MARIADB_GALERA_MARIABACKUP_PASSWORD=my_mariabackup_password
+  #   depends_on:
+  #     - mariadb-galera
+    
   mariadb:
     image: mariadb/server
     restart: always
@@ -58,6 +93,21 @@ services:
       - db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=mypass
+
+  # dbslave_1:
+  #   image: mariadb/server
+  #   restart: always
+  #   expose:
+  #     - 3306
+  #     - 4444 
+  #     - 4567 
+  #     - 4568
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=mypass
+  #   volumes:
+  #     - ./services/dbslave/my.cnf:/etc/mysql/my.cnf
+  #   depends_on:
+  #     - mariadb
 
   redis:
     image: redis
