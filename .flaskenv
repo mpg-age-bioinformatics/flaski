@@ -1,1 +1,1 @@
-FLASK_APP=manage.py
+FLASK_APP=flaski.py

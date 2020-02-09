@@ -42,16 +42,16 @@ COPY requirements.txt /flaski/
 
 RUN if [[ "$(uname -m)" == "armv7l" ]] ; then \
 apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq libjpeg-dev libopenjp2-tools
-apt-get install libtiff5-dev libopenjp2-7-dev zlib1g-dev \
+apt-get install -yq libjpeg-dev libopenjp2-tools && \
+apt-get install -yq libtiff5-dev libopenjp2-7-dev zlib1g-dev \
     libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk \
     libharfbuzz-dev libfribidi-dev libjpeg-turbo-progs && \
-apt-get install -y libblas-dev liblapack-dev python3-sklearn python3-sklearn-lib python3-scipy && \
-sed -i 's/scipy==1.3.3/scipy/g' requirements.txt ; fi
+apt-get install -yq libblas-dev liblapack-dev python3-sklearn python3-sklearn-lib python3-scipy && \
+sed -i 's/scipy==1.3.3/scipy/g' /flaski/requirements.txt ; fi
 
 RUN pip3 install -r /flaski/requirements.txt
 
-RUN echo "0 0 1,15 * * python3 /flaski/manage.py > /clean.flaski.out 2>&1" > /cron.job && crontab /cron.job
+RUN echo "0 0 1,15 * * python3 /flaski/flaski.py > /clean.flaski.out 2>&1" > /cron.job && crontab /cron.job
 
 # Jupyter port
 EXPOSE 8888
