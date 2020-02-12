@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1beta1 # for versions before 1.14 use extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    ingress.kubernetes.io/affinity: cookie
+    ingress.kubernetes.io/enable-cors: "false"
+    ingress.kubernetes.io/session-cookie-hash: sha1
+    ingress.kubernetes.io/session-cookie-name: route
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.org/ssl-services: nginx
+spec:
+  tls:
+    - secretName: 192-168-64-12-nip-io-tls
+      hosts:
+        - '*.192.168.64.12.nip.io'
+  rules:
+  - host: nginx.192.168.64.12.nip.io
+    http:
+      paths:
+        - backend:
+            serviceName: nginx
+            servicePort: 80

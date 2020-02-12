@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backup
+  name: backup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: backup
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_HOST
+          value: mariadb
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_ROOT_PASSWORD
+          value: mypass
+        - name: MYSQL_USER
+          value: root
+        image: hub.age.mpg.de/flaski/backup
+        name: backup
+        resources: {}
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: hubsecret
+status: {}

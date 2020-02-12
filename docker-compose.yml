@@ -3,17 +3,18 @@ version: '3.7'
 services:
 
   server:
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    image: hub.age.mpg.de/flaski/server
+    #build:
+    #  context: ./services/server
+    #  dockerfile: Dockerfile
     expose:
       - 443
-    volumes:
-      - ./:/flaski
-      - data:/flaski_data/users/
+    #volumes:
+      #- ./:/flaski
+      ##- data:/flaski_data/users/
       #- ./utils/private.apps.tsv:/private.apps.tsv
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
       - ADMINS=jboucas@age.mpg.de,jorge.boucas@age.mpg.de
       - REDIS_ADDRESS=redis:6379/0
       - REDIS_PASSWORD=my_redis_password 
@@ -32,19 +33,19 @@ services:
       - redis
   
   backup:
-    build:
-      context: ./services/backup
-      dockerfile: Dockerfile
+    image: hub.age.mpg.de/flaski/backup
+    # build:
+    #   context: ./services/backup
+    #   dockerfile: Dockerfile
     restart: always
     environment:
       - MYSQL_USER=root
       - MYSQL_ROOT_PASSWORD=mypass
-      - MYSQL_HOST=haproxy
+      - MYSQL_HOST=mariadb
       - MYSQL_PORT=3306
-    volumes:
-      - data:/flaski_data/users/
-      - backups:/backups
-      - ./services/backup/run-backups.sh:/run-backups.sh
+    ##volumes:
+      ##- data:/flaski_data/users/
+      ##- backups:/backups
     depends_on:
       - server
       - mariadb
@@ -54,8 +55,8 @@ services:
     restart: always
     expose:
       - 3306
-    volumes:
-      - db:/var/lib/mysql
+    ##volumes:
+    ##  - db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=mypass
 
@@ -67,23 +68,24 @@ services:
     command: redis-server --requirepass my_redis_password
 
   nginx:
-    image: nginx
+    image: hub.age.mpg.de/flaski/nginx
+    #image: nginx
     restart: always
     ports:
       - 80:80
       - 443:443
-    volumes:
-      - /Users/jboucas/flaski_data/certificates/cert.pem:/cert.pem
-      - /Users/jboucas/flaski_data/certificates/key.pem:/key.pem
-      - ./services/nginx/dhparam.pem:/dhparam.pem
-      - ./services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf
+    #volumes:
+    #  - /Users/jboucas/flaski_data/certificates/cert.pem:/cert.pem
+    #  - /Users/jboucas/flaski_data/certificates/key.pem:/key.pem
+    #  - ./services/nginx/dhparam.pem:/dhparam.pem
+    #  - ./services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - server
 
-volumes:
-  data:
-    external: false
-  db:
-    external: false
-  backups:
-    external: false
+# volumes:
+#   data:
+#     external: false
+#   db:
+#     external: false
+#   backups:
+#     external: false

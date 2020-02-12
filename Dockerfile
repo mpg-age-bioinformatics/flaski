@@ -33,23 +33,18 @@ apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip3 install pymysql
 
 # data folders
-RUN mkdir -p /flaski/ /faski_data/users /faski_data/logs
-
-#comment during development
-#COPY * /flaski/
+RUN mkdir -p /flaski_data/logs /flaski/.git /flaski/flaski /flaski/utils /flaski/services /flaski/pyflaski /faski_data/users /faski_data/logs
 
 COPY requirements.txt /flaski/
-
-RUN /bin/bash -c 'if [[ "$(uname -m)" == "armv7l" ]] ; then \
-apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq libjpeg-dev libopenjp2-tools && \
-apt-get install -yq libtiff5-dev libopenjp2-7-dev zlib1g-dev \
-    libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk \
-    libharfbuzz-dev libfribidi-dev libjpeg-turbo-progs && \
-apt-get install -yq libblas-dev liblapack-dev python3-sklearn python3-sklearn-lib python3-scipy && \
-sed -i "s/scipy==1.3.3/scipy/g" /flaski/requirements.txt ; fi'
-
 RUN pip3 install -r /flaski/requirements.txt
+
+#comment during development
+COPY flaski.py  LICENSE.md README.md config.py  requirements.txt setup.py .flaskenv /flaski/
+COPY pyflaski /flaski/pyflaski
+COPY services /flaski/services
+COPY utils /flaski/utils
+COPY flaski /flaski/flaski
+COPY .git /flaski/.git
 
 RUN echo "0 0 1,15 * * python3 /flaski/flaski.py > /clean.flaski.out 2>&1" > /cron.job && crontab /cron.job
 
