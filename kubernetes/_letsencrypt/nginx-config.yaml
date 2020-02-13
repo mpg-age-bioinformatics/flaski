@@ -5,6 +5,10 @@ metadata:
 data:
   default.conf: |
     server {
+        # Add upstream for letsencrypt job
+        upstream letsencrypt {
+          server letsencrypt:80 max_fails=0 fail_timeout=1s;
+        }
         # listen on port 80 (http)
         listen 80;
         listen [::]:80;
@@ -16,5 +20,9 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        # Redirect all traffic in /.well-known/ to letsencrypt
+        location ^~ /.well-known/acme-challenge/ {
+          proxy_pass http://letsencrypt;
         }
     }

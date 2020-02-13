@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1beta1 # for versions before 1.14 use extensions/v1beta1
 kind: Ingress
 metadata:
-  name: server-ingress
+  name: nginx-ingress
 spec:
   tls:
     - secretName: 192-168-64-12-nip-io-tls
       hosts:
         - '*.192.168.64.12.nip.io'
-  rules:
-  - host: server.192.168.64.12.nip.io
+  rules:  
+  - host: nginx.192.168.64.12.nip.io
     http:
       paths:
         - backend:
-            serviceName: server
+            serviceName: nginx
             servicePort: 80
 
 # https://vocon-it.com/2018/12/31/kubernetes-6-https-applications-via-ingress-controller-on-minikube/
