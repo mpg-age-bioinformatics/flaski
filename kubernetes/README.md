@@ -1,16 +1,16 @@
 # Kubernetes
 
-1. `minikube` and `kubctl`
+## 1. `minikube` and `kubctl`
 
 For running a local kubernetes development cluster you will need to install `minikube`. Please follow the instructions [here](https://kubernetes.io/docs/tasks/tools/install-minikube/).
 
 You will also need to install Kubernetes command line tool as shown [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
-2. Starting a Kubernetes cluster
+## 2. Starting a Kubernetes cluster
 
 You can either run a local cluster with minikube (ideal for development) or deploy your containers on the cloud (eg. Google Compute Platform).
 
-a) minikube
+**a) minikube**
 
 To start `minikube` run:
 ```bash
@@ -25,12 +25,12 @@ and control that your ingress pod is running:
 ```bash
 kubectl get pods -n kube-system
 ```
-To stop and delete minikube run:
+If you need to stop and delete minikube run:
 ```bash
 minikube stop && minikube delete
 ```
 
-b) Google Cloud Compute
+**b) Google Cloud Compute**
 
 Start by installing Google Cloud SDK as shown [here](https://cloud.google.com/sdk/install).
 
@@ -47,7 +47,7 @@ Set a Google Kubernetes Engine (GKE) cluster:
 gcloud container clusters get-credentials <cluster-name>
 ```
 
-3. Deploy you App
+## 3. Deploy you App
 If you need to get registry authorization to pull containers you will need to create a matching secret. eg.:
 ```bash
 kubectl create secret docker-registry <secret name> --docker-server=<registry address> --docker-username=<registry user name> --docker-password=<registry password> --docker-email=<your associated email>
@@ -90,11 +90,11 @@ To delete a service:
 kubectl delete service <service name>
 ```
 
-4. Create an ingress
+## 4. Create an ingress
 
 If you want to access your App from the web you will need to create an ingress.
 
-a) Deploy with self-signed key
+**a) Deploy with self-signed key**
 
 Create certificates:
 ```bash
@@ -115,7 +115,7 @@ spec:
   - host: <FLASKI WEB ADDRESS>
 ```
 
-b) Deploy on GKE with letsencrypt
+**b) Deploy on GKE with letsencrypt**
 
 This section is based on a [digitalocean.com tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes).
 
