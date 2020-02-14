@@ -173,7 +173,7 @@ spec:
             serviceName: server
             servicePort: 80
 ```
-If you don't have a domain you can always use your IP's address as domain eg. `<IP>.nip.io' and subsequently as a Flaski address `flaski.<IP>.nip.io`. You can also comment out the `tls` block as well as the `cert-manager.io` entries to ty your App on `http` withouth tls.
+If you don't have a domain you can always use your IP's address as domain eg. `<IP>.nip.io` and subsequently as a Flaski address `flaski.<IP>.nip.io`. You can also comment out the `tls` block as well as the `cert-manager.io` entries to ty your App on `http` withouth tls.
 
 Apply the ingress:
 ```bash
