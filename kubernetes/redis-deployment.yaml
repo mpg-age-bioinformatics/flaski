@@ -32,10 +32,16 @@ spec:
         app: redis
     spec:
       containers:
+      - env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: REDIS_PASSWORD
       - args:
         - redis-server
         - --requirepass
-        - my_redis_password
+        - $(REDIS_PASSWORD)
         image: redis
         name: redis
         ports:

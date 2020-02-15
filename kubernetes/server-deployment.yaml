@@ -35,6 +35,12 @@ spec:
       - env:
         - name: ADMINS
           value: jboucas@age.mpg.de,jorge.boucas@age.mpg.de
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: SECRET_KEY
+          # value: MY_VERY_SAFE_SECRET_KEY
         - name: FLASK_ENV
           value: production
         - name: MAIL_PASSWORD
@@ -55,13 +61,21 @@ spec:
         - name: MYSQL_PORT
           value: "3306"
         - name: MYSQL_ROOT_PASSWORD
-          value: mypass
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: MYSQL_ROOT_PASSWORD
+        #  value: mypass
         - name: MYSQL_USER
           value: root
         - name: REDIS_ADDRESS
           value: redis:6379/0
         - name: REDIS_PASSWORD
-          value: my_redis_password
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: REDIS_PASSWORD
+          # value: my_redis_password
         image: jorgeboucas/image_drops:flaski-server #hub.age.mpg.de/flaski/server
         imagePullPolicy: Always
         ports:

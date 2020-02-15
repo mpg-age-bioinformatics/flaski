@@ -56,6 +56,12 @@ Create a secret for flaskis' mail account:
 ```bash
 kubectl create secret generic gmailpass --from-literal=pass='<password>'
 ```
+Edit `secrets.yaml` and create required flaski secrets:
+```bash
+kubectl apply -f secrets.yaml
+```
+You can use `openssl` to generate safe keys `openssl rand -base64 <desired_length>`.
+
 Create persistent volumes and persistent volumes claims for persistent data:
 ```bash
 kubectl apply -f users-volume.yaml
@@ -288,7 +294,6 @@ and finally
 curl https://<FLASKI WEB ADDRESS>
 ```
 
+## 5. Backups
 
-
-
-
+For setting up scheduled backups of your kubernetes cluster check [velero](https://github.com/vmware-tanzu/velero)'s documentation.

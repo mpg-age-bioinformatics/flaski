@@ -25,5 +25,5 @@ fi
 if [[ "$FLASK_ENV" == "development" ]] ; then
   flask run --host 0.0.0.0 --port 8000 # python3 -m smtpd -n -c DebuggingServer localhost:8025
 else
-  gunicorn -b 0.0.0.0:8000 -w 1 flaski:app
+  gunicorn -b 0.0.0.0:8000 -w 4 flaski:app
 fi
