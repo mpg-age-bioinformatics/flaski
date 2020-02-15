@@ -38,6 +38,10 @@ spec:
         - name: FLASK_ENV
           value: production
         - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gmailpass
+              key: pass
         - name: MAIL_PORT
           value: "587"
         - name: MAIL_SERVER
@@ -65,8 +69,15 @@ spec:
             containerPort: 8000
         name: server
         resources: {}
+        volumeMounts:
+        - name: users-volume-mount
+          mountPath: /flaski_data/users/
       restartPolicy: Always
       imagePullSecrets:
         - name: dockerhub
-        #- name: hubsecret
+      volumes:
+      - name: users-volume-mount
+        persistentVolumeClaim:
+          claimName: users-pvc
+
 status: {}

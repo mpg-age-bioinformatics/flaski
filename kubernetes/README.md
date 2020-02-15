@@ -52,6 +52,17 @@ If you need to get registry authorization to pull containers you will need to cr
 ```bash
 kubectl create secret docker-registry <secret name> --docker-server=<registry address> --docker-username=<registry user name> --docker-password=<registry password> --docker-email=<your associated email>
 ```
+Create a secret for flaskis' mail account:
+```bash
+kubectl create secret generic gmailpass --from-literal=pass='<password>'
+```
+Create persistent volumes and persistent volumes claims for persistent data:
+```bash
+kubectl apply -f users-volume.yaml
+kubectl apply -f users-volume-claim.yaml
+kubectl apply -f db-volume.yaml
+kubectl apply -f db-volume-claim.yaml
+```
 Use deployments to start your pods:
 ```bash
 kubectl apply -f mariadb-deployment.yaml
@@ -99,12 +110,12 @@ If you want to access your App from the web you will need to create an ingress.
 Create certificates:
 ```bash
 export DOMAIN=<my domain name>
-openssl req -x509 -newkey rsa:4096 -sha256 -nodes -keyout ~/tls_self.key -out ~/tls_self.crt -subj "/CN=*.${DOMAIN}" -days 365
+openssl req -x509 -newkey rsa:4096 -sha256 -nodes -keyout ${HOME}/tls_self.key -out ${HOME}/tls_self.crt -subj "/CN=*.${DOMAIN}" -days 365
 SECRET_NAME=$(echo $DOMAIN | sed 's/\./-/g')-tls; echo $SECRET_NAME
-kubectl create secret tls $SECRET_NAME --cert=~/tls_self.crt --key=~/tls_self.key
+kubectl create secret tls $SECRET_NAME --cert=${HOME}/tls_self.crt --key=${HOME}/tls_self.key
 ```
 
-Edit the `server-ingress.yaml` accordingly:
+Edit the `nignx/server-ingress.yaml` accordingly:
 ```bash
 spec:
   tls:
@@ -114,6 +125,19 @@ spec:
   rules:
   - host: <FLASKI WEB ADDRESS>
 ```
+Apply the config:
+```bash
+kubectl apply -f nginx/nginx-config.yaml
+```
+Deploy nginx:
+```bash
+kubectl apply -f nginx/nginx-deployment.yaml
+```
+Apply the ingress:
+```bash
+kubectl apply -f nginx/nginx-ingress.yaml
+```
+You can now access you application over the given `<FLASKI WEB ADDRESS>`.
 
 **b) Deploy on GKE with letsencrypt**
 
@@ -237,7 +261,7 @@ Apply the ingress:
 ```bash
 kubectl apply -f letsencrypt/server-ingress.yaml
 ```
-And check the status o your certificate:
+And check the status of your certificate:
 ```bash
 kubectl describe certificate server-tls
 ```

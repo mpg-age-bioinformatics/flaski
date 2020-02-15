@@ -13,8 +13,9 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN echo "deb http://ftp.debian.org/debian buster main non-free contrib" >> /etc/apt/sources.list && \
 echo "deb-src http://ftp.debian.org/debian buster main non-free contrib" >> /etc/apt/sources.list && \
 echo "deb http://ftp.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list && \
-echo "deb-src http://ftp.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list && \
-echo "deb http://cdn-fastly.deb.debian.org/debian buster main\ndeb http://cdn-fastly.deb.debian.org/debian-security buster/updates main" > /etc/apt/sources.list
+echo "deb-src http://ftp.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list 
+# && \
+#echo "deb http://cdn-fastly.deb.debian.org/debian buster main\ndeb http://cdn-fastly.deb.debian.org/debian-security buster/updates main" > /etc/apt/sources.list
 
 RUN apt-get update && apt-get -yq dist-upgrade && \
 apt-get install -yq --no-install-recommends locales && \
@@ -39,7 +40,7 @@ COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt
 
 #comment during development
-COPY flaski.py  LICENSE.md README.md config.py  requirements.txt setup.py .flaskenv /flaski/
+COPY LICENSE.md README.md config.py flaski.py MANIFEST.in requirements.txt setup.py .flaskenv /flaski/
 COPY pyflaski /flaski/pyflaski
 COPY services /flaski/services
 COPY utils /flaski/utils

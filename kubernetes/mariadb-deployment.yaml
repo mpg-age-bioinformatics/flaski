@@ -40,5 +40,17 @@ spec:
           - name: mariadb
             containerPort: 3306
         resources: {}
+        volumeMounts:
+          - name: db-volume-mount
+            mountPath: /var/lib/mysql
       restartPolicy: Always
+      volumes:
+        - name: db-volume-mount
+          persistentVolumeClaim:
+            claimName: db-pvc
+
 status: {}
+
+
+
+db:/var/lib/mysql

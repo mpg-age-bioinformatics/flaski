@@ -4,11 +4,11 @@ metadata:
   name: nginx-ingress
 spec:
   tls:
-    - secretName: 192-168-64-12-nip-io-tls
+    - secretName: 192-168-99-113-nip-io-tls
       hosts:
-        - '*.192.168.64.12.nip.io'
+        - '*.192.168.99.113.nip.io'
   rules:  
-  - host: nginx.192.168.64.12.nip.io
+  - host: nginx.192.168.99.113.nip.io
     http:
       paths:
         - backend:
@@ -17,6 +17,7 @@ spec:
 
 # https://vocon-it.com/2018/12/31/kubernetes-6-https-applications-via-ingress-controller-on-minikube/
 # export DOMAIN=$(minikube ip).nip.io
-# openssl req -x509 -newkey rsa:4096 -sha256 -nodes -keyout ~/tls_self.key -out ~/tls_self.crt -subj "/CN=*.${DOMAIN}" -days 365
+# openssl req -x509 -newkey rsa:4096 -sha256 -nodes -keyout ${HOME}/tls_self.key -out ${HOME}/tls_self.crt -subj "/CN=*.${DOMAIN}" -days 365
 # SECRET_NAME=$(echo $DOMAIN | sed 's/\./-/g')-tls; echo $SECRET_NAME
-# kubectl create secret tls $SECRET_NAME --cert=~/tls_self.crt --key=~/tls_self.key
+# kubectl create secret tls $SECRET_NAME --cert=${HOME}/tls_self.crt --key=${HOME}/tls_self.key
+# rm -rf ${HOME}/tls_self.crt ${HOME}/tls_self.key
