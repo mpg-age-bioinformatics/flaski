@@ -9,8 +9,8 @@
 {% endblock %}
 
 {% block apps_dropdown %}
-{% for app in apps %}
-<a class="dropdown-item" href="/{{app.link}}">{{ app.name }}</a>
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
 {% endfor %}
 {% endblock %}
 
