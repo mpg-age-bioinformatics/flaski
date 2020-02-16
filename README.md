@@ -9,6 +9,14 @@ openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/c
 ```
 If running flaski on development mode make sure that you change the variable `FLASK_ENV` to `development`.
 
+Export secret variables:
+```bash
+export MAIL_PASSWORD="<mail password>"
+export MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
+export REDIS_PASSWORD=$(openssl rand -base64 20)
+export SECRET_KEY=$(openssl rand -base64 20)
+```
+
 To deploy Flaski edit the `docker-compose.yml` accordingly and then:
 ```bash
 docker-compose up -d --build
@@ -155,3 +163,4 @@ python3 setup.py bdist_wheel
 pip3 install flaski-0.1.0-py3-none-any.whl
 ```
 Static files need to be included in the `MANIFEST.in`.
+
