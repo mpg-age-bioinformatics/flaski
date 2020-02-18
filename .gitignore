@@ -6,6 +6,7 @@
 /build/
 /venv/
 site
+tmp
 migrations
 __pycache__
 

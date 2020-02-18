@@ -11,8 +11,9 @@ from werkzeug.urls import url_parse
 from flaski.forms import ResetPasswordRequestForm
 from flaski.email import send_password_reset_email, send_validate_email
 from flaski.forms import ResetPasswordForm
+from flaski.routines import session_to_file
 #from app.token import generate_confirmation_token, confirm_token
-from flaski.plots.figures.scatterplot import make_figure, figure_defaults
+#from flaski.plots.figures.scatterplot import make_figure, figure_defaults
 from flaski.routines import read_private_apps
 
 import os
@@ -165,3 +166,21 @@ def reset_plot():
     app=session["app"]
     session["app"]=None
     return redirect(url_for(app))
+
+@app.route('/download/<json_type>', methods=['GET','POST'])
+@login_required
+def download(json_type="arg"):
+    # READ INPUT DATA FROM SESSION JSON
+    session_=session_to_file(session,json_type)
+
+    session_file = io.BytesIO()
+    session_file.write(json.dumps(session_).encode())
+    session_file.seek(0)
+
+    plot_arguments=session["plot_arguments"]
+
+    eventlog = UserLogging(email=current_user.email,action="download %s %s" %(json_type, session["app"]))
+    db.session.add(eventlog)
+    db.session.commit()
+
+    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+"."+json_type )

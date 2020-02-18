@@ -1,1 +1,1 @@
-../../app/plots/figures/scatterplot.py
+../../flaski/apps/main/scatterplot.py

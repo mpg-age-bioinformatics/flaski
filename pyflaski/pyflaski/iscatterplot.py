@@ -1,1 +1,1 @@
-../../app/plots/figures/iscatterplot.py
+../../flaski/apps/main/iscatterplot.py
