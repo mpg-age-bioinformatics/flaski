@@ -124,7 +124,7 @@
 
                             <div class="row arg">
                                 <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=title_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=titles method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
                                         <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
@@ -150,7 +150,7 @@
                             
                             <div class="row arg">
                                 <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=xlabel_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=xlabels method="GET" action="/" style="width:50px">
                                     {% for xlabel_size_ in xlabel_size %}
                                         <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
                                     {% endfor %}
@@ -159,7 +159,7 @@
 
                             <div class="row arg">
                                 <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=ylabel_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=ylabels method="GET" action="/" style="width:50px">
                                     {% for ylabel_size_ in ylabel_size %}
                                         <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>
                                     {% endfor %}
@@ -179,7 +179,7 @@
                             </div>
                             <div class="row arg">
                                 <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;height:22px;padding-left: 4px">
-                                <label style="padding-left:2px;"> Ticks direction: <select name=ticks_direction method="GET" action="/" style="width:64px">
+                                <label style="padding-left:2px;"> Ticks direction: <select name=ticks_direction_value method="GET" action="/" style="width:64px">
                                     {% for ticks_direction_ in ticks_direction %}
                                         <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
                                     {% endfor %}
@@ -220,13 +220,13 @@
                             </div>
 
                             <div class="row arg">
-                                <label>Grid: <label style="padding-left:2px;"><select name=grid method="GET" action="/" style="width:97px">
+                                <label>Grid: <label style="padding-left:2px;"><select name=grid_value method="GET" action="/" style="width:97px">
                                     {% for grid_ in grid %}
                                         <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                     {% endfor %}
                                 </select></label></label>
 
-                                <label style="padding-left:32px;">style: <label style="padding-left:2px;"><select name=grid_linestyle method="GET" action="/" style="width:97px">
+                                <label style="padding-left:32px;">style: <label style="padding-left:2px;"><select name=grid_linestyle_value method="GET" action="/" style="width:97px">
                                     {% for grid_linestyle_ in grid_linestyle %}
                                         <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
                                     {% endfor %}
@@ -404,7 +404,7 @@
                                 <label>Download file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
                             </div>   
                             <div class="row arg">
-                                <label> format: <select name=download_format method="GET" action="/" style="width:50px">
+                                <label> format: <select name=downloadf method="GET" action="/" style="width:50px">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}

@@ -63,7 +63,7 @@
                 <div class="column">
                     <div class="sidebar-heading">X values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xcols method="GET" action="/" style="width:114px">
+                        <select title=xcols name=xvals method="GET" action="/" style="width:114px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
@@ -74,7 +74,7 @@
                 <div class="column">
                     <div class="sidebar-heading" style="padding-left: 6px;">Y values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
-                        <select name=ycols method="GET" action="/" style="width:114px">
+                        <select name=yvals method="GET" action="/" style="width:114px">
                             {% for ycol in ycols %}
                                 <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>
                             {% endfor %}
@@ -124,7 +124,7 @@
 
                             <div class="row arg">
                                 <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=title_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=titles method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
                                         <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
@@ -150,7 +150,7 @@
                             
                             <div class="row arg">
                                 <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=xlabel_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=xlabels method="GET" action="/" style="width:50px">
                                     {% for xlabel_size_ in xlabel_size %}
                                         <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
                                     {% endfor %}
@@ -159,7 +159,7 @@
 
                             <div class="row arg">
                                 <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=ylabel_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=ylabels method="GET" action="/" style="width:50px">
                                     {% for ylabel_size_ in ylabel_size %}
                                         <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>
                                     {% endfor %}
@@ -221,13 +221,13 @@
                             </div>
 
                             <div class="row arg">
-                                <label>Grid: <label style="padding-left:2px;"><select name=grid method="GET" action="/" style="width:97px">
+                                <label>Grid: <label style="padding-left:2px;"><select name=grid_value method="GET" action="/" style="width:97px">
                                     {% for grid_ in grid %}
                                         <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                     {% endfor %}
                                 </select></label></label>
 
-                                <label style="padding-left:32px;">style: <label style="padding-left:2px;"><select name=grid_linestyle method="GET" action="/" style="width:97px">
+                                <label style="padding-left:32px;">style: <label style="padding-left:2px;"><select name=grid_linestyle_value method="GET" action="/" style="width:97px">
                                     {% for grid_linestyle_ in grid_linestyle %}
                                         <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
                                     {% endfor %}
@@ -403,7 +403,7 @@
 
                             <div class="row arg">
                                 <!--label>file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:133px;height:22px;padding-left: 4px"-->
-                                <label> format: <select name=download_format method="GET" action="/" style="width:50px">
+                                <label> format: <select name=downloadf method="GET" action="/" style="width:50px">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}

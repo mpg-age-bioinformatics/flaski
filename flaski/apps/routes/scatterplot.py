@@ -119,11 +119,11 @@ def scatterplot(download=None):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
                     plot_arguments[a]=request.form[a]
 
-            # VALUES SELECTED FROM SELECTION LISTS 
-            # GET UPDATED TO THE LATEST CHOICE
-            for k in list(lists.keys()):
-                if k in list(request.form.keys()):
-                    plot_arguments[lists[k]]=request.form[k]
+            # # VALUES SELECTED FROM SELECTION LISTS 
+            # # GET UPDATED TO THE LATEST CHOICE
+            # for k in list(lists.keys()):
+            #     if k in list(request.form.keys()):
+            #         plot_arguments[lists[k]]=request.form[k]
             # checkboxes
             for checkbox in session["checkboxes"]:
                 if checkbox in list(request.form.keys()) :
@@ -191,7 +191,7 @@ def scatterplot(download=None):
                     sometext="Please select which values should map to the x and y axes."
                     plot_arguments=session["plot_arguments"]
                     flash(sometext,'info')
-                    return render_template('/plots/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
+                    return render_template('/apps/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE

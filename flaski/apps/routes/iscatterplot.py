@@ -122,11 +122,11 @@ def iscatterplot(download=None):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
                     plot_arguments[a]=request.form[a]
 
-            # VALUES SELECTED FROM SELECTION LISTS 
-            # GET UPDATED TO THE LATEST CHOICE
-            for k in list(lists.keys()):
-                if k in list(request.form.keys()):
-                    plot_arguments[lists[k]]=request.form[k]
+            # # VALUES SELECTED FROM SELECTION LISTS 
+            # # GET UPDATED TO THE LATEST CHOICE
+            # for k in list(lists.keys()):
+            #     if k in list(request.form.keys()):
+            #         plot_arguments[lists[k]]=request.form[k]
             # checkboxes
             for checkbox in session["checkboxes"]:
                 if checkbox in list(request.form.keys()) :
