@@ -3,45 +3,59 @@ import numpy as np
 import matplotlib
 import matplotlib.pylab as plt
 import seaborn as sns
+import sys
 from scipy.cluster.hierarchy import fcluster
 
 matplotlib.use('agg')
+STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
+STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
+
 
 def make_figure(df,pa):
     tmp=df.copy()
     tmp.index=tmp[tmp.columns.tolist()[0]].tolist()
     tmp=tmp[pa["yvals"]]
 
-    if pa["yvals_colors"] != "":
-        pa["yvals_colors"]=list( tmp[ tmp.index == pa["yvals_colors"] ].values[0] )
-        tmp=tmp[tmp.index != pa["yvals_colors"]]
+    #print(tmp,pa["yvals"])
+    pa_={}
+    if pa["yvals_colors"] != "select a column..":
+        pa_["yvals_colors"]=list( tmp[ tmp.index == pa["yvals_colors"] ].values[0] )
+        tmp=tmp[tmp.index != pa_["yvals_colors"]]
     else :
-        pa["yvals_colors"]=None
+        pa_["yvals_colors"]=None
 
-    if "xvals_colors" != "":
-        pa["xvals_colors"]=df[ pa["xvals_colors"] ].tolist()
+    if pa["xvals_colors"] != 'select a row..':
+        pa_["xvals_colors"]=df[ pa["xvals_colors"] ].tolist()
     else :
-        pa["xvals_colors"]=None
+        pa_["xvals_colors"]=None
 
-    checkboxes=["row_cluster","col_cluster","robust","xticklabels","yticklabels"]
+    checkboxes=["row_cluster","col_cluster","robust","xticklabels","yticklabels","annotate"]
 
     for c in checkboxes:
         if (pa[c] =="on") | (pa[c] ==".on"):
-            pa[c]=True
+            pa_[c]=True
         else:
-            pa[c]=False
+            pa_[c]=False
 
     for v in ["vmin","vmax","center"]:
         if pa[v] == "":
-            pa[v]=None
+            pa_[v]=None
+        else:
+            pa_[v]=float(pa[v])
 
-    if "color_bar_label" == "":
-        pa["color_bar_label"]={}
+    if pa["color_bar_label"] == "":
+        pa_["color_bar_label"]={}
     else:
-        pa["color_bar_label"]={'label': pa["color_bar_label"]}
+        pa_["color_bar_label"]={'label': pa["color_bar_label"]}
+
 
     if pa["zscore_value"] == "none":
-        pa["zscore_value"]=None
+        pa_["zscore_value"]=None
+    elif pa["zscore_value"] == "row":
+        pa_["zscore_value"]=0
+    elif pa["zscore_value"] == "columns":
+        pa_["zscore_value"]=1
+
 
     if (int(pa["n_cols_cluster"]) > 0) | (int(pa["n_rows_cluster"]) > 0):
         g = sns.clustermap(heatmap,method=pa["method_value"], metric=pa["distance_value"],row_cluster=pa["row_cluster"], col_cluster=pa["col_cluster"])
@@ -87,28 +101,32 @@ def make_figure(df,pa):
         plt.close()
 
     g = sns.clustermap(tmp, \
-                        xticklabels=pa["xticklabels"], \
-                        yticklabels=pa["yticklabels"], \
+                        xticklabels=pa_["yticklabels"], \
+                        yticklabels=pa_["xticklabels"], \
                         linecolor=pa["linecolor"],\
-                        linewidths=pa["linewidths"], \
+                        linewidths=float(pa["linewidths"]), \
                         method=pa["method_value"], \
-                        metric=pa["distance_value"],\ 
-                        col_colors=pa["yvals_colors"], \
-                        row_colors=pa["xvals_colors"], \
+                        metric=pa["distance_value"], \
+                        col_colors=pa_["yvals_colors"], \
+                        row_colors=pa_["xvals_colors"], \
                         cmap=pa["cmap_value"],\
-                        vmin=pa["vmin"], vmax=pa["vmax"], \
-                        cbar_kws=pa["color_bar_label"],\
-                        center=pa["center"], \
+                        vmin=pa_["vmin"], vmax=pa_["vmax"], \
+                        cbar_kws=pa_["color_bar_label"],\
+                        center=pa_["center"], \
                         mask=tmp.isnull(), \
-                        row_cluster=pa["row_cluster"], \
-                        col_cluster=pa["col_cluster"],\
+                        row_cluster=pa_["row_cluster"], \
+                        col_cluster=pa_["col_cluster"],\
                         figsize=(float(pa["fig_width"]),float(pa["fig_height"])),\
                         robust=pa["robust"], \
-                        annot=None, \
                         dendrogram_ratio=(float(pa["col_dendogram_ratio"]),float(pa["row_dendogram_ratio"])),\
-                        z_score=pa["zscore_value"])
+                        z_score=pa_["zscore_value"])
 
-    plt.suptitle(pa["title"], fontsize=pa["title_size_value"])
+    plt.suptitle(pa["title"], fontsize=float(pa["title_size_value"]))
+    g.ax_heatmap.set_xticklabels(g.ax_heatmap.get_xmajorticklabels(), fontsize = float(pa["yaxis_font_size"]))
+    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize = float(pa["xaxis_font_size"]))
+
+
+
 
     return g
 
@@ -118,7 +136,7 @@ def figure_defaults():
         "fig_height":"6.0",\
         "xcols":[],\
         "xvals":"",\
-        "xvals_colors":"",\    
+        "xvals_colors":"",\
         "ycols":[],\
         "yvals":"",\
         "yvals_colors":"",\
@@ -163,6 +181,7 @@ def figure_defaults():
         "zscore_value":"none",\
         "xaxis_font_size":"10",\
         "yaxis_font_size":"10",\
+        "annotate":".off",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"heatmap",\

@@ -117,13 +117,16 @@ def heatmap(download=None):
             plot_arguments = session["plot_arguments"]
             for a in list(plot_arguments.keys()):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                    plot_arguments[a]=request.form[a]
+                    if a == "yvals":
+                        plot_arguments[a]=request.form.getlist(a)
+                    else:
+                        plot_arguments[a]=request.form[a]
 
-            # VALUES SELECTED FROM SELECTION LISTS 
-            # GET UPDATED TO THE LATEST CHOICE
-            for k in list(lists.keys()):
-                if k in list(request.form.keys()):
-                    plot_arguments[lists[k]]=request.form[k]
+            # # VALUES SELECTED FROM SELECTION LISTS 
+            # # GET UPDATED TO THE LATEST CHOICE
+            # for k in list(lists.keys()):
+            #     if k in list(request.form.keys()):
+            #         plot_arguments[lists[k]]=request.form[k]
             # checkboxes
             for checkbox in session["checkboxes"]:
                 if checkbox in list(request.form.keys()) :
@@ -150,27 +153,27 @@ def heatmap(download=None):
                 filestream=io.BytesIO(fileread)
                 extension=filename.rsplit('.', 1)[1].lower()
                 if extension == "xlsx":
-                    df=pd.read_excel(filestream)
+                    df=pd.read_excel(filestream, index_col=False)
                 elif extension == "csv":
-                    df=pd.read_csv(filestream)
+                    df=pd.read_csv(filestream, index_col=False)
                 elif extension == "tsv":
-                    df=pd.read_csv(filestream,sep="\t")
+                    df=pd.read_csv(filestream,sep="\t", index_col=False)
                 
                 session["df"]=df.to_json()
                 
                 cols=df.columns.tolist()
 
-                if session["plot_arguments"]["yvals_colors"] not in cols:
-                    session["plot_arguments"]["yvals_colors"]=["None"]+cols
+                # if session["plot_arguments"]["yvals_colors"] not in cols:
+                #     session["plot_arguments"]["yvals_colors"]=["None"]+cols
 
-                if session["plot_arguments"]["xvals_colors"] not in df[cols[0]].tolist():
-                    session["plot_arguments"]["xvals_colors"]=["select a row.."]+df[cols[0]].tolist()
+                # if session["plot_arguments"]["xvals_colors"] not in df[cols[0]].tolist():
+                #     session["plot_arguments"]["xvals_colors"]=["select a row.."]+df[cols[0]].tolist()
 
 
                 # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                 if (session["plot_arguments"]["yvals"] not in cols):
 
-                    #session["plot_arguments"]["xcols"]=cols
+                    session["plot_arguments"]["xcols"]=["select a row.."]+df[cols[0]].tolist()
                     #session["plot_arguments"]["xvals"]=cols[0]
 
                     session["plot_arguments"]["ycols"]=cols
@@ -179,7 +182,7 @@ def heatmap(download=None):
                     sometext="Please select which columns should be used for plotting."
                     plot_arguments=session["plot_arguments"]
                     flash(sometext,'info')
-                    return render_template('/plots/heatmap.html' , filename=filename, apps=apps,**plot_arguments)
+                    return render_template('/apps/heatmap.html' , filename=filename, apps=apps,**plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
@@ -204,22 +207,22 @@ def heatmap(download=None):
         df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
-        try:
-            fig=make_figure(df,plot_arguments)
+        # try:
+        fig=make_figure(df,plot_arguments)
 
-            # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-            figfile = io.BytesIO()
-            plt.savefig(figfile, format='png')
-            plt.close()
-            figfile.seek(0)  # rewind to beginning of file
-            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+        # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+        figfile = io.BytesIO()
+        plt.savefig(figfile, format='png')
+        plt.close()
+        figfile.seek(0)  # rewind to beginning of file
+        figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
-            return render_template('/apps/heatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+        return render_template('/apps/heatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-        except Exception as e:
-            flash(e,'error')
+        # except Exception as e:
+        #     flash(e,'error')
 
-            return render_template('/apps/heatmap.html', filename=filename, apps=apps, **plot_arguments)
+        #     return render_template('/apps/heatmap.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":
