@@ -56,4 +56,4 @@ EXPOSE 8000
 
 WORKDIR /flaski
 
-ENTRYPOINT /bin/bash -c '/flaski/services/server/docker-entrypoint.sh ; bin/bash'
+ENTRYPOINT /bin/bash -c '/flaski/services/server/docker-entrypoint.sh ; tail -f /dev/null'
