@@ -135,7 +135,7 @@ def heatmap(download=None):
                     try:
                         plot_arguments[checkbox]=request.form[checkbox]
                     except:
-                        if plot_arguments[checkbox][0]!=".":
+                        if (plot_arguments[checkbox][0]!="."):
                             plot_arguments[checkbox]="off"
 
             # UPDATE SESSION VALUES
@@ -207,22 +207,22 @@ def heatmap(download=None):
         df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
-        # try:
-        fig=make_figure(df,plot_arguments)
+        try:
+            fig, cols_cluster_numbers, index_cluster_numbers=make_figure(df,plot_arguments)
 
-        # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-        figfile = io.BytesIO()
-        plt.savefig(figfile, format='png')
-        plt.close()
-        figfile.seek(0)  # rewind to beginning of file
-        figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+            # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+            figfile = io.BytesIO()
+            plt.savefig(figfile, format='png')
+            plt.close()
+            figfile.seek(0)  # rewind to beginning of file
+            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
-        return render_template('/apps/heatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/heatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-        # except Exception as e:
-        #     flash(e,'error')
+        except Exception as e:
+            flash(e,'error')
 
-        #     return render_template('/apps/heatmap.html', filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/heatmap.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":
@@ -232,7 +232,7 @@ def heatmap(download=None):
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION
-            fig=make_figure(df,plot_arguments)
+            fig, cols_cluster_numbers, index_cluster_numbers=make_figure(df,plot_arguments)
 
             #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
@@ -246,6 +246,52 @@ def heatmap(download=None):
             db.session.commit()
 
             return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
+
+        if download == "clusters":
+
+            plot_arguments=session["plot_arguments"]
+            if int(plot_arguments["n_cols_cluster"]) == 0:
+                fixed_cols=True
+                plot_arguments["n_cols_cluster"]=1
+            else:
+                fixed_cols=False
+
+            if int(plot_arguments["n_rows_cluster"]) == 0:
+                fixed_rows=True
+                plot_arguments["n_rows_cluster"]=1
+            else:
+                fixed_rows=False
+
+            # READ INPUT DATA FROM SESSION JSON
+            df=pd.read_json(session["df"])
+
+            plot_arguments=session["plot_arguments"]
+
+            # CALL FIGURE FUNCTION
+
+            fig, cols_cluster_numbers, index_cluster_numbers=make_figure(df,plot_arguments)
+
+            excelfile = io.BytesIO()
+            EXC=pd.ExcelWriter(excelfile)
+            cols_cluster_numbers.to_excel(EXC,sheet_name="rows",index=None)
+            index_cluster_numbers.to_excel(EXC,sheet_name="cols",index=None)
+            EXC.save()
+
+            excelfile.seek(0)
+           
+            if fixed_rows:
+                plot_arguments["n_rows_cluster"]=0
+
+            if fixed_cols:
+                plot_arguments["n_cols_cluster"]=0
+
+            eventlog = UserLogging(email=current_user.email,action="download figure heatmap clusters")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
+
+            return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
 
         if "app" not in list(session.keys()):
             return_to_plot=False

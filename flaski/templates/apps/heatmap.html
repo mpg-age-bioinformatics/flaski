@@ -152,8 +152,8 @@
                             <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="row_cluster" {% if row_cluster=="on" %} checked {% elif row_cluster==".on" %} checked {% endif %}/> Row cluster </label>
 
                             <label style="width:300px">Dendogram-to-figure ratio:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:97px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px"></label>
 
                             <label style="width:300px">Number of clusters to highlight:</label>
                             <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="n_cols_cluster" value='{{ n_cols_cluster }}' style="width:97px;height:22px;padding-left: 4px"></label>
@@ -229,13 +229,13 @@
                             </select></label>
 
                             <label style="padding-left:0px;padding-right:0px;"><input type="checkbox" name="robust" {% if robust=="on" %} checked {% elif robust==".on" %} checked {% endif %}/> Robust</label>
-                            <label style="padding-left:110px;padding-right:0px;">Center: <input type="text" name="center" value='{{ center }}' style="width:80px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">Min: <input type="text" name="vmin" value='{{ vmin }}' style="width:80px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:76px;padding-right:0px;">Max: <input type="text" name="vmax" value='{{ vmax }}' style="width:80px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:76px;padding-right:0px;">Center: <input type="text" name="center" value='{{ center }}' style="width:114px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:0px;padding-right:0px;">Min: <input type="text" name="vmin" value='{{ vmin }}' style="width:114px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:8px;padding-right:0px;">Max: <input type="text" name="vmax" value='{{ vmax }}' style="width:114px;height:22px;padding-left:4px"></label>
                             <label style="padding-left:0px;padding-right:0px;">Color bar label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:202px;height:22px;padding-left: 4px"></label>
 
-                            <label style="padding-left:0x;padding-right:4px;">Line width: <input type="text" name="linewidths" value='{{ linewidths }}' style="width:30px;height:22px;padding-left: 4px"></label>
-                            <label  style="padding-left:48px;">Line color: <select name=linecolor_value method="GET" action="/">
+                            <label style="padding-left:0x;padding-right:4px;">Line width: <input type="text" name="linewidths" value='{{ linewidths }}' style="width:50px;height:22px;padding-left: 4px"></label>
+                            <label  style="padding-left:8px">Line color: <select style="width:98px;"name=linecolor_value method="GET" action="/">
                                 {% for linecolor_ in linecolor %}
                                     <option value="{{linecolor_}}" {% if linecolor_==linecolor_value %} selected {% endif %}>{{linecolor_}}</option>
                                 {% endfor %}
@@ -420,6 +420,14 @@
                 <form action="{{ url_for('heatmap', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Figure
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left:2px;padding-right:2px;">
+                <form action="{{ url_for('heatmap', download='clusters') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Clusters
                     </button>
                 </form>
             </div>

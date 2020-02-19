@@ -58,7 +58,13 @@ def make_figure(df,pa):
 
 
     if (int(pa["n_cols_cluster"]) > 0) | (int(pa["n_rows_cluster"]) > 0):
-        g = sns.clustermap(heatmap,method=pa["method_value"], metric=pa["distance_value"],row_cluster=pa["row_cluster"], col_cluster=pa["col_cluster"])
+        g = sns.clustermap(tmp,\
+                            method=pa["method_value"],\
+                            metric=pa["distance_value"],\
+                            row_cluster=pa["row_cluster"],\
+                            col_cluster=pa["col_cluster"],\
+                            xticklabels=False, \
+                            yticklabels=False )
 
         if int(pa["n_cols_cluster"]) > 0:
             def extract_cols_colors(g, k=int(pa["n_cols_cluster"])):
@@ -66,7 +72,7 @@ def make_figure(df,pa):
                 cols_linkage=g.dendrogram_col.linkage
                 
                 clusters = fcluster(cols_linkage, k, criterion='maxclust')
-                original_order=pd.DataFrame({"col":heatmap.columns.tolist(),"cluster":clusters})
+                original_order=pd.DataFrame({"col":tmp.columns.tolist(),"cluster":clusters})
                 
                 cols_cluster=original_order["cluster"].tolist()
                 cols_cluster_=list(set(cols_cluster))
@@ -74,10 +80,15 @@ def make_figure(df,pa):
                 for c in cols_cluster_:
                     cols_cluster_dic[c]=np.random.rand(3,)
                 cols_cluster=[ cols_cluster_dic[s] for s in cols_cluster ]
+
+                reordered_cols=pd.DataFrame(index=reordered_cols)
+                original_order=pd.merge(reordered_cols,original_order,\
+                                        how="left",left_index=True, right_index=True)
+
                 return cols_cluster, original_order
             
             cols_cluster, cols_cluster_numbers=extract_cols_colors(g)
-            pa["yvals_colors"]=cols_cluster
+            pa_["yvals_colors"]=cols_cluster
             
         if int(pa["n_rows_cluster"]) > 0:
             def extract_rows_colors(g, k=int(pa["n_rows_cluster"])):
@@ -85,7 +96,7 @@ def make_figure(df,pa):
                 index_linkage=g.dendrogram_row.linkage
                 
                 clusters = fcluster(index_linkage, k, criterion='maxclust')
-                original_order=pd.DataFrame({"col":heatmap.index.tolist(),"cluster":clusters})
+                original_order=pd.DataFrame({"col":tmp.index.tolist(),"cluster":clusters})
                 
                 cols_cluster=original_order["cluster"].tolist()
                 cols_cluster_=list(set(cols_cluster))
@@ -93,12 +104,22 @@ def make_figure(df,pa):
                 for c in cols_cluster_:
                     cols_cluster_dic[c]=np.random.rand(3,)
                 cols_cluster=[ cols_cluster_dic[s] for s in cols_cluster ]
+
+                reordered_index=pd.DataFrame(index=reordered_index)
+                original_order=pd.merge(reordered_index,original_order,\
+                                        how="left",left_index=True, right_index=True)    
+
                 return cols_cluster, original_order
 
             cluster_index, index_cluster_numbers = extract_rows_colors(g)
-            pa["xvals_colors"]=cluster_index
+            pa_["xvals_colors"]=cluster_index
         
         plt.close()
+
+    else:
+        cols_cluster_numbers = None
+        index_cluster_numbers = None
+
 
     g = sns.clustermap(tmp, \
                         xticklabels=pa_["yticklabels"], \
@@ -125,10 +146,7 @@ def make_figure(df,pa):
     g.ax_heatmap.set_xticklabels(g.ax_heatmap.get_xmajorticklabels(), fontsize = float(pa["yaxis_font_size"]))
     g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize = float(pa["xaxis_font_size"]))
 
-
-
-
-    return g
+    return g, cols_cluster_numbers, index_cluster_numbers
 
 def figure_defaults():
     plot_arguments={
@@ -143,7 +161,7 @@ def figure_defaults():
         "title":'',\
         "title_size":STANDARD_SIZES,\
         "title_size_value":"10",\
-        "xticklabels":'.on',\
+        "xticklabels":'.off',\
         "yticklabels":".on",\
         "method":['single','complete','average', 'weighted','centroid','median','ward'],\
         "method_value":"ward",\
