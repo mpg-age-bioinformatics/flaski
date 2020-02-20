@@ -208,7 +208,7 @@ def heatmap(download=None):
 
         # CALL FIGURE FUNCTION
         try:
-            fig, cols_cluster_numbers, index_cluster_numbers=make_figure(df,plot_arguments)
+            fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
             # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
             figfile = io.BytesIO()
@@ -232,7 +232,7 @@ def heatmap(download=None):
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION
-            fig, cols_cluster_numbers, index_cluster_numbers=make_figure(df,plot_arguments)
+            fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
             #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
@@ -269,10 +269,11 @@ def heatmap(download=None):
 
             # CALL FIGURE FUNCTION
 
-            fig, cols_cluster_numbers, index_cluster_numbers=make_figure(df,plot_arguments)
+            fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
             excelfile = io.BytesIO()
             EXC=pd.ExcelWriter(excelfile)
+            df_.to_excel(EXC,sheet_name="heatmap",index=None)
             cols_cluster_numbers.to_excel(EXC,sheet_name="rows",index=None)
             index_cluster_numbers.to_excel(EXC,sheet_name="cols",index=None)
             EXC.save()

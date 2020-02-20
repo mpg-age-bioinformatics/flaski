@@ -57,16 +57,16 @@ def make_figure(df,pa):
         pa_["zscore_value"]=1
 
 
-    if (int(pa["n_cols_cluster"]) > 0) | (int(pa["n_rows_cluster"]) > 0):
+    if ( (int(pa["n_cols_cluster"]) > 0) | (int(pa["n_rows_cluster"]) > 0) ) and ( (pa_["row_cluster"]) and (pa_["col_cluster"])  ):
         g = sns.clustermap(tmp,\
                             method=pa["method_value"],\
                             metric=pa["distance_value"],\
-                            row_cluster=pa["row_cluster"],\
-                            col_cluster=pa["col_cluster"],\
+                            row_cluster=pa_["row_cluster"],\
+                            col_cluster=pa_["col_cluster"],\
                             xticklabels=False, \
                             yticklabels=False )
 
-        if int(pa["n_cols_cluster"]) > 0:
+        if ( int(pa["n_cols_cluster"]) > 0) & (pa_["col_cluster"]):
             def extract_cols_colors(g, k=int(pa["n_cols_cluster"])):
                 reordered_cols=g.dendrogram_col.reordered_ind
                 cols_linkage=g.dendrogram_col.linkage
@@ -90,7 +90,7 @@ def make_figure(df,pa):
             cols_cluster, cols_cluster_numbers=extract_cols_colors(g)
             pa_["yvals_colors"]=cols_cluster
             
-        if int(pa["n_rows_cluster"]) > 0:
+        if ( int(pa["n_rows_cluster"]) > 0 ) & (pa_["row_cluster"]):
             def extract_rows_colors(g, k=int(pa["n_rows_cluster"])):
                 reordered_index=g.dendrogram_row.reordered_ind
                 index_linkage=g.dendrogram_row.linkage
@@ -146,7 +146,24 @@ def make_figure(df,pa):
     g.ax_heatmap.set_xticklabels(g.ax_heatmap.get_xmajorticklabels(), fontsize = float(pa["yaxis_font_size"]))
     g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize = float(pa["xaxis_font_size"]))
 
-    return g, cols_cluster_numbers, index_cluster_numbers
+    if type(index_cluster_numbers) != type(None):
+        index_cluster_numbers_=index_cluster_numbers.copy()
+        df_=pd.DataFrame( index= index_cluster_numbers_[index_cluster_numbers_.columns.tolist()[0]].tolist() )
+        df_=pd.merge(df_, tmp, how="left", left_index=True, right_index=True)
+    else:
+        df_=tmp.copy()
+
+    if type(cols_cluster_numbers) != type(None):
+        cols_cluster_numbers_=cols_cluster_numbers.copy()
+        cols_cluster_numbers_=cols_cluster_numbers_[cols_cluster_numbers_.columns.tolist()[0]].tolist()
+        df_=df_[cols_cluster_numbers_]
+
+    df_.reset_index(inplace=True, drop=False)
+    cols=df_.columns.tolist()
+    cols[0]="rows"
+    df_.columns=cols
+
+    return g, cols_cluster_numbers, index_cluster_numbers, df_
 
 def figure_defaults():
     plot_arguments={
