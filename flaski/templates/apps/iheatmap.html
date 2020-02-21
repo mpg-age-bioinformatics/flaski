@@ -409,12 +409,11 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 
-        <div class="chart" id="heatmap">
+        <div class="chart" id="heatmap" style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
             <script>
                 var graphs = {{figure_url | safe}};
                 Plotly.plot('heatmap',graphs,{});
             </script>
-        </div>
 
 
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">

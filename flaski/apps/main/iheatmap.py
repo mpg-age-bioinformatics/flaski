@@ -4,7 +4,8 @@ from scipy import stats
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from scipy.cluster.hierarchy import fcluster
-
+import numpy as np
+import pandas as pd
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
@@ -56,24 +57,12 @@ def make_figure(df,pa):
     labels=tmp.columns.tolist()
     rows=tmp.index.tolist()
 
-    distdic={ 'euclidean':scs.distance.euclidean,'minkowski':scs.distance.minkowski,\
-            'cityblock':scs.distance.cityblock,'seuclidean':scs.distance.seuclidean,\
-            'sqeuclidean':scs.distance.sqeuclidean,'cosine':scs.distance.cosine,\
-            'correlation':scs.distance.correlation,'hamming':scs.distance.hamming,\
-            'jaccard':scs.distance.jaccard,'chebyshev':scs.distance.chebyshev,\
-            'canberra':scs.distance.canberra,'braycurtis':scs.distance.braycurtis,\
-            'mahalanobis':scs.distance.mahalanobis,'yule':scs.distance.yule,\
-            'matching':scs.distance.matching,'dice':scs.distance.dice,\
-            'kulsinski':scs.distance.kulsinski,'rogerstanimoto':scs.distance.rogerstanimoto,\
-            'russellrao':scs.distance.russellrao,'sokalmichener':scs.distance.sokalmichener,\
-            'sokalsneath':scs.distance.sokalsneath,'wminkowski':scs.distance.wminkowski  }
-
     if not pa_["col_color_threshold"]:
         import sys
         print(pa["method_value"],pa["distance_value"])
         sys.stdout.flush()
         fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels,\
-                            distfun = distdic[pa["distance_value"]],\
+                            distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]) ,\
                             linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
         dists=[]
         for d in fig["data"]:
@@ -82,8 +71,8 @@ def make_figure(df,pa):
         pa_["col_color_threshold"]=color_threshold
 
     if not pa_["row_color_threshold"]:
-        dendro_side = ff.create_dendrogram(data_array, orientation='bottom', labels=labels, color_threshold=None,\
-                            distfun = distdic[pa["distance_value"]],\
+        dendro_side = ff.create_dendrogram(data_array, orientation='bottom', labels=rows,\
+                            distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
                             linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
         dists=[]
         for d in dendro_side["data"]:
@@ -93,15 +82,14 @@ def make_figure(df,pa):
         
     # Initialize figure by creating upper dendrogram
     fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels, color_threshold=pa_["col_color_threshold"],\
-                            distfun = distdic[pa["distance_value"]],\
+                            distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
                             linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
     for i in range(len(fig['data'])):
         fig['data'][i]['yaxis'] = 'y2'
     dendro_leaves_y_labels = fig['layout']['xaxis']['ticktext']
     dendro_leaves_y = [ labels.index(i) for i in dendro_leaves_y_labels ]
 
-    d = distdic[pa["distance_value"]]
-    d = d(data_array_)
+    d = scs.distance.pdist(data_array_, metric=pa["distance_value"])
     Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
     max_d = pa_["col_color_threshold"]
     clusters_cols = fcluster(Z, max_d, criterion='distance')
@@ -109,15 +97,14 @@ def make_figure(df,pa):
 
     # Create Side Dendrogram
     dendro_side = ff.create_dendrogram(data_array, orientation='right', labels=rows, color_threshold=pa_["row_color_threshold"],\
-                                        distfun = distdic[pa["distance_value"]],\
+                                        distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
                                         linkagefun= lambda x: sch.linkage(x, pa["method_value"] ))
     for i in range(len(dendro_side['data'])):
         dendro_side['data'][i]['xaxis'] = 'x2'
     dendro_leaves_x_labels = dendro_side['layout']['yaxis']['ticktext']
     dendro_leaves_x = [ rows.index(i) for i in dendro_leaves_x_labels ]
 
-    d = distdic[pa["distance_value"]]
-    d = d(data_array)
+    d = scs.distance.pdist(data_array, metric=pa["distance_value"])
     Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
     max_d =pa_["row_color_threshold"]
     clusters_rows = fcluster(Z, max_d, criterion='distance')
@@ -179,7 +166,7 @@ def make_figure(df,pa):
                                     'ticks':""})
 
     # Edit yaxis 
-    fig.update_layout(yaxis={'domain': [0, 1-float(pa["col_dendogram_ratio"]) ],
+    fig.update_layout(yaxis={'domain': [0, 1-float(pa["col_dendogram_ratio"])+0.04 ],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
@@ -191,7 +178,7 @@ def make_figure(df,pa):
                                     'ticktext':dendro_leaves_x_labels})
 
     # Edit yaxis2 showticklabels
-    fig.update_layout(yaxis2={'domain':[1-float(pa["col_dendogram_ratio"]), .975],
+    fig.update_layout(yaxis2={'domain':[1-float(pa["col_dendogram_ratio"]), 1],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
@@ -200,8 +187,6 @@ def make_figure(df,pa):
                                     'ticks':""})
 
     fig.update_layout(template='plotly_white')
-
-    #fig.update_layout(font={"size":2})
 
     fig.update_layout(title={"text":pa["title"],"yanchor":"top","font":{"size":float(pa["title_size_value"])}})
 
@@ -217,10 +202,6 @@ def make_figure(df,pa):
     clusters_cols=pd.merge(clusters_cols_,clusters_cols,on=["col"],how="left")
     clusters_rows_=pd.DataFrame({"col":df_.index.tolist()})
     clusters_rows=pd.merge(clusters_rows_,clusters_rows,on=["col"],how="left")
-
-    # Plot!
-    #fig.show()
-
 
     return fig, clusters_cols, clusters_rows, df_
 
