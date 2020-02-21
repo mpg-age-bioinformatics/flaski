@@ -24,7 +24,7 @@ sess.init_app(app)
 
 from flaski import routes, models, errors, storage
 
-from flaski.apps.routes import scatterplot, iscatterplot, heatmap
+from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap
 
 if not app.debug:
     if app.config['MAIL_SERVER']:

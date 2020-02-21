@@ -3,6 +3,7 @@ import scipy.spatial as scs
 from scipy import stats
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
+from scipy.cluster.hierarchy import fcluster
 
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
@@ -27,24 +28,23 @@ def make_figure(df,pa):
     # else :
     #     pa_["xvals_colors"]=None
 
-    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels","annotate"] # "robust"
+    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels","row_dendogram_dist", "col_dendogram_dist"] # "robust"
     for c in checkboxes:
         if (pa[c] =="on") | (pa[c] ==".on"):
             pa_[c]=True
         else:
             pa_[c]=False
 
-    # for v in ["vmin","vmax","center"]:
-    #     if pa[v] == "":
-    #         pa_[v]=None
-    #     else:
-    #         pa_[v]=float(pa[v])
+    for v in ["col_color_threshold","row_color_threshold"]:
+        if pa[v] == "":
+            pa_[v]=None
+        else:
+            pa_[v]=float(pa[v])
 
     # if pa["color_bar_label"] == "":
     #     pa_["color_bar_label"]={}
     # else:
     #     pa_["color_bar_label"]={'label': pa["color_bar_label"]}
-
 
     if pa["zscore_value"] == "row":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=1, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
@@ -56,51 +56,91 @@ def make_figure(df,pa):
     labels=tmp.columns.tolist()
     rows=tmp.index.tolist()
 
+    distdic={ 'euclidean':scs.distance.euclidean,'minkowski':scs.distance.minkowski,\
+            'cityblock':scs.distance.cityblock,'seuclidean':scs.distance.seuclidean,\
+            'sqeuclidean':scs.distance.sqeuclidean,'cosine':scs.distance.cosine,\
+            'correlation':scs.distance.correlation,'hamming':scs.distance.hamming,\
+            'jaccard':scs.distance.jaccard,'chebyshev':scs.distance.chebyshev,\
+            'canberra':scs.distance.canberra,'braycurtis':scs.distance.braycurtis,\
+            'mahalanobis':scs.distance.mahalanobis,'yule':scs.distance.yule,\
+            'matching':scs.distance.matching,'dice':scs.distance.dice,\
+            'kulsinski':scs.distance.kulsinski,'rogerstanimoto':scs.distance.rogerstanimoto,\
+            'russellrao':scs.distance.russellrao,'sokalmichener':scs.distance.sokalmichener,\
+            'sokalsneath':scs.distance.sokalsneath,'wminkowski':scs.distance.wminkowski  }
+
+    if not pa_["col_color_threshold"]:
+        import sys
+        print(pa["method_value"],pa["distance_value"])
+        sys.stdout.flush()
+        fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels,\
+                            distfun = distdic[pa["distance_value"]],\
+                            linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
+        dists=[]
+        for d in fig["data"]:
+            dists.append(d["y"][2])
+        color_threshold=abs(np.percentile(dists,50))
+        pa_["col_color_threshold"]=color_threshold
+
+    if not pa_["row_color_threshold"]:
+        dendro_side = ff.create_dendrogram(data_array, orientation='bottom', labels=labels, color_threshold=None,\
+                            distfun = distdic[pa["distance_value"]],\
+                            linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
+        dists=[]
+        for d in dendro_side["data"]:
+            dists.append(d["x"][2])
+        color_threshold=abs(np.percentile(dists,50))
+        pa_["row_color_threshold"]=color_threshold
+        
     # Initialize figure by creating upper dendrogram
-    fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels, color_threshold=1.5,\
-                            distfun = scs.distance.pdist,\
-                            linkagefun= lambda x: sch.linkage(x, "complete"))
+    fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels, color_threshold=pa_["col_color_threshold"],\
+                            distfun = distdic[pa["distance_value"]],\
+                            linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
     for i in range(len(fig['data'])):
         fig['data'][i]['yaxis'] = 'y2'
     dendro_leaves_y_labels = fig['layout']['xaxis']['ticktext']
     dendro_leaves_y = [ labels.index(i) for i in dendro_leaves_y_labels ]
 
-    #print(dendro_leaves_y)
+    d = distdic[pa["distance_value"]]
+    d = d(data_array_)
+    Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
+    max_d = pa_["col_color_threshold"]
+    clusters_cols = fcluster(Z, max_d, criterion='distance')
+    clusters_cols=pd.DataFrame({"col":tmp.columns.tolist(),"cluster":list(clusters_cols)})
 
     # Create Side Dendrogram
-    dendro_side = ff.create_dendrogram(data_array, orientation='right', labels=rows, color_threshold=1.5,\
-                                        distfun = scs.distance.pdist,\
-                                        linkagefun= lambda x: sch.linkage(x, "complete"))
+    dendro_side = ff.create_dendrogram(data_array, orientation='right', labels=rows, color_threshold=pa_["row_color_threshold"],\
+                                        distfun = distdic[pa["distance_value"]],\
+                                        linkagefun= lambda x: sch.linkage(x, pa["method_value"] ))
     for i in range(len(dendro_side['data'])):
         dendro_side['data'][i]['xaxis'] = 'x2'
     dendro_leaves_x_labels = dendro_side['layout']['yaxis']['ticktext']
     dendro_leaves_x = [ rows.index(i) for i in dendro_leaves_x_labels ]
+
+    d = distdic[pa["distance_value"]]
+    d = d(data_array)
+    Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
+    max_d =pa_["row_color_threshold"]
+    clusters_rows = fcluster(Z, max_d, criterion='distance')
+    clusters_rows = pd.DataFrame({"col":tmp.index.tolist(),"cluster":list(clusters_rows)})
 
     # Add Side Dendrogram Data to Figure
     for data in dendro_side['data']:
         fig.add_trace(data)
 
     # Create Heatmap
-    #print(dendro_leaves_x)
-
-    #dendro_leaves = list(map(int, dendro_leaves))
-    #data_dist = pdist(data_array)
-    #heat_data = squareform(data_dist)
     heat_data=data_array
     heat_data = heat_data[dendro_leaves_x,:]
     heat_data = heat_data[:,dendro_leaves_y]
-
-    #print(len(dendro_leaves_x_labels),len(dendro_leaves_y_labels))
 
     heatmap = [
         go.Heatmap(
             x = dendro_leaves_x_labels,
             y = dendro_leaves_y_labels,
             z = heat_data,
-            colorscale = 'Blues',
-            colorbar={"title":{"text":"Number of Bills per Cell" ,"font":{"size":10}},
-                    "lenmode":"pixels", "len":800/4,
-                    "xpad":100,"tickfont":{"size":10}}
+            colorscale = pa['colorscale_value'],
+            colorbar={"title":{"text":pa["color_bar_label"] ,"font":{"size": float(pa["color_bar_font_size"]) }},
+                    "lenmode":"pixels", "len":float(pa["fig_height"])/4,
+                    "xpad":float(pa["color_bar_horizontal_padding"]),"tickfont":{"size":float(pa["color_bar_ticks_font_size"])}}
         )
     ]
 
@@ -112,124 +152,86 @@ def make_figure(df,pa):
         fig.add_trace(data)
 
     # Edit Layout
-    fig.update_layout({'width':800, 'height':800,
+    fig.update_layout({'width':float(pa["fig_width"]), 'height':float(pa["fig_height"]),
                             'showlegend':False, 'hovermode': 'closest',
                             "yaxis":{"mirror" : "allticks", 
                                     'side': 'right',
-                                    'showticklabels':True,
+                                    'showticklabels':pa_["xticklabels"],
                                     'ticktext':dendro_leaves_x_labels}})
 
     # Edit xaxis
-    fig.update_layout(xaxis={'domain': [.15, 1],
+    fig.update_layout(xaxis={'domain': [ float(pa["row_dendogram_ratio"]), 1],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
                                     'zeroline': False,
-                                    'showticklabels': True,
-                                    "tickfont":{"size":10},
+                                    'showticklabels': pa_["yticklabels"],
+                                    "tickfont":{"size":float(pa["yaxis_font_size"])},
                                     'ticks':"",\
                                     'ticktext':dendro_leaves_y_labels})
     # Edit xaxis2
-    fig.update_layout(xaxis2={'domain': [0, .15],
+    fig.update_layout(xaxis2={'domain': [0, float(pa["row_dendogram_ratio"])],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
                                     'zeroline': False,
-                                    'showticklabels': False,
+                                    'showticklabels': pa_["row_dendogram_dist"],
                                     'ticks':""})
 
     # Edit yaxis 
-    fig.update_layout(yaxis={'domain': [0, .85],
+    fig.update_layout(yaxis={'domain': [0, 1-float(pa["col_dendogram_ratio"]) ],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
                                     'zeroline': False,
-                                    'showticklabels': True,
-                                    "tickfont":{"size":8},
+                                    'showticklabels': pa_["xticklabels"],
+                                    "tickfont":{"size":float(pa["xaxis_font_size"])} ,
                                     'ticks': "",\
                                     'tickvals':dendro_side['layout']['yaxis']['tickvals'],\
                                     'ticktext':dendro_leaves_x_labels})
 
     # Edit yaxis2 showticklabels
-    fig.update_layout(yaxis2={'domain':[.825, .975],
+    fig.update_layout(yaxis2={'domain':[1-float(pa["col_dendogram_ratio"]), .975],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
                                     'zeroline': False,
-                                    'showticklabels': False,
+                                    'showticklabels': pa_["col_dendogram_dist"],
                                     'ticks':""})
 
     fig.update_layout(template='plotly_white')
 
-    fig.update_layout(font={"size":2})
+    #fig.update_layout(font={"size":2})
 
-    fig.update_layout(title={"text":"Heatmap title","yanchor":"top","font":{"size":25}})
+    fig.update_layout(title={"text":pa["title"],"yanchor":"top","font":{"size":float(pa["title_size_value"])}})
 
-    # fig.update_layout(
-    #     yaxis = dict(
-    #         tickmode = 'array',
-    #         ticktext = dendro_leaves_x_labels ) )
+    cols=list(fig['layout']['xaxis']['ticktext'])
+    rows=list(fig['layout']['yaxis']['ticktext'])
+    df_=pd.DataFrame({"i":range(len(rows))}, index=rows )
+    df_=df_.sort_values(by=["i"], ascending=False)
+    df_=df_.drop(["i"], axis=1)    
+    df_=pd.merge(df_,tmp, how="left", left_index=True, right_index=True)
+    df_=df_[cols]
+
+    clusters_cols_=pd.DataFrame({"col":cols})
+    clusters_cols=pd.merge(clusters_cols_,clusters_cols,on=["col"],how="left")
+    clusters_rows_=pd.DataFrame({"col":df_.index.tolist()})
+    clusters_rows=pd.merge(clusters_rows_,clusters_rows,on=["col"],how="left")
 
     # Plot!
-    fig.show()
+    #fig.show()
 
 
-
-
-    # g = sns.clustermap(tmp, \
-    #                     xticklabels=pa_["yticklabels"], \
-    #                     yticklabels=pa_["xticklabels"], \
-    #                     linecolor=pa["linecolor"],\
-    #                     linewidths=float(pa["linewidths"]), \
-    #                     method=pa["method_value"], \
-    #                     metric=pa["distance_value"], \
-    #                     col_colors=pa_["yvals_colors"], \
-    #                     row_colors=pa_["xvals_colors"], \
-    #                     cmap=pa["cmap_value"],\
-    #                     vmin=pa_["vmin"], vmax=pa_["vmax"], \
-    #                     cbar_kws=pa_["color_bar_label"],\
-    #                     center=pa_["center"], \
-    #                     mask=tmp.isnull(), \
-    #                     row_cluster=pa_["row_cluster"], \
-    #                     col_cluster=pa_["col_cluster"],\
-    #                     figsize=(float(pa["fig_width"]),float(pa["fig_height"])),\
-    #                     robust=pa["robust"], \
-    #                     dendrogram_ratio=(float(pa["col_dendogram_ratio"]),float(pa["row_dendogram_ratio"])),\
-    #                     z_score=pa_["zscore_value"])
-
-    # plt.suptitle(pa["title"], fontsize=float(pa["title_size_value"]))
-    # g.ax_heatmap.set_xticklabels(g.ax_heatmap.get_xmajorticklabels(), fontsize = float(pa["yaxis_font_size"]))
-    # g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize = float(pa["xaxis_font_size"]))
-
-    # if type(index_cluster_numbers) != type(None):
-    #     index_cluster_numbers_=index_cluster_numbers.copy()
-    #     df_=pd.DataFrame( index= index_cluster_numbers_[index_cluster_numbers_.columns.tolist()[0]].tolist() )
-    #     df_=pd.merge(df_, tmp, how="left", left_index=True, right_index=True)
-    # else:
-    #     df_=tmp.copy()
-
-    # if type(cols_cluster_numbers) != type(None):
-    #     cols_cluster_numbers_=cols_cluster_numbers.copy()
-    #     cols_cluster_numbers_=cols_cluster_numbers_[cols_cluster_numbers_.columns.tolist()[0]].tolist()
-    #     df_=df_[cols_cluster_numbers_]
-
-    # df_.reset_index(inplace=True, drop=False)
-    # cols=df_.columns.tolist()
-    # cols[0]="rows"
-    # df_.columns=cols
-
-    return g, cols_cluster_numbers, index_cluster_numbers, df_
+    return fig, clusters_cols, clusters_rows, df_
 
 def figure_defaults():
     plot_arguments={
-        "fig_width":"6.0",\
-        "fig_height":"6.0",\
+        "fig_width":"800",\
+        "fig_height":"800",\
         "xcols":[],\
         "xvals":"",\
-        "xvals_colors":"",\
         "ycols":[],\
         "yvals":"",\
-        "yvals_colors":"",\
         "title":'',\
         "title_size":STANDARD_SIZES,\
         "title_size_value":"10",\
@@ -242,42 +244,40 @@ def figure_defaults():
                    "braycurtis","mahalanobis","yule","matching","dice","kulsinski","rogerstanimoto",\
                    "russellrao","sokalmichener","sokalsneath","wminkowski"],\
         "distance_value":"euclidean",\
-        "n_cols_cluster":"0",\
-        "n_rows_cluster":"0",\
-        "cmap":["viridis","plasma","inferno","magma","cividis","Greys","Purples",\
-               "Blues","Greens","Oranges","Reds","YlOrBr","YlOrRd","OrRd","PuRd",\
-               "RdPu","BuPu","GnBu","PuBu","YlGnBu","PuBuGn","BuGn","YlGn",\
-               "binary","gist_yard","gist_gray","gray","bone","pink","spring",\
-               "summer","autumn","winter","cool","Wistia","hot","afmhot","gist_heat",\
-               "copper","PiYg","PRGn","BrBG","PuOr","RdGy","RdBu","RdYlBu","Spectral",\
-               "coolwarm","bwr","seismic","Pastel1","Pastel2","Paired","Accent","Dark2",\
-               "Set1","Set2","Set3","tab10","tab20","tab20b","tab20c","flag","prism","ocean",\
-               "gist_earth", "gnuplot","gnuplot2","CMRmap","cubehelix","brg","hsv",\
-               "gist_rainbow","rainbow","jet","nipy_spectral","gist_ncar"],\
-        "cmap_value":"YlOrRd",\
-        "vmin":"",\
-        "vmax":"",\
-        "linewidths":"0",\
-        "linecolor":STANDARD_COLORS,\
-        "linecolor_value":"white",\
+        "col_color_threshold":"",\
+        "row_color_threshold":"",\
+        "colorscale":['aggrnyl','agsunset','blackbody','bluered','blues','blugrn','bluyl','brwnyl',\
+                    'bugn','bupu','burg','burgyl','cividis','darkmint','electric','emrld','gnbu',\
+                    'greens','greys','hot','inferno','jet','magenta','magma','mint','orrd','oranges',\
+                    'oryel','peach','pinkyl','plasma','plotly3','pubu','pubugn','purd','purp','purples',\
+                    'purpor','rainbow','rdbu','rdpu','redor','reds','sunset','sunsetdark','teal',\
+                    'tealgrn','viridis','ylgn','ylgnbu','ylorbr','ylorrd','algae','amp','deep','dense',\
+                    'gray','haline','ice','matter','solar','speed','tempo','thermal','turbid','armyrose',\
+                    'brbg','earth','fall','geyser','prgn','piyg','picnic','portland','puor','rdgy',\
+                    'rdylbu','rdylgn','spectral','tealrose','temps','tropic','balance','curl','delta',\
+                        'edge','hsv','icefire','phase','twilight','mrybm','mygbm'],\
+        "colorscale_value":"blues",\
         "color_bar_label":"",\
-        "center":"",\
+        "color_bar_font_size":"10",\
+        "color_bar_ticks_font_size":"10",\
+        "color_bar_horizontal_padding":"100",\
         "row_cluster":".on",\
         "col_cluster":".on",\
         "robust":".on",\
-        "col_dendogram_ratio":"0.25",\
-        "row_dendogram_ratio":"0.25",\
+        "col_dendogram_ratio":"0.15",\
+        "row_dendogram_ratio":"0.15",\
+        "row_dendogram_dist":".off", \
+        "col_dendogram_dist":".off",\
         "zscore":["none","row","columns"],\
         "zscore_value":"none",\
         "xaxis_font_size":"10",\
         "yaxis_font_size":"10",\
-        "annotate":".off",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"heatmap",\
-        "session_downloadn":"MySession.heatmap",\
+        "session_downloadn":"MySession.iheatmap",\
         "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.heatmap",\
+        "session_argumentsn":"MyArguments.iheatmap",\
         "inputargumentsfile":"Select file.."}
     
     checkboxes=["row_cluster","col_cluster","robust","xticklabels","yticklabels"]
