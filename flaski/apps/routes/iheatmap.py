@@ -11,6 +11,8 @@ from flaski.apps.main.iheatmap import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 import plotly
+import plotly.io as pio
+
 
 
 import os
@@ -209,24 +211,17 @@ def iheatmap(download=None):
         df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
-        # try:
-        fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
+        try:
+            fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
-        # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-        # figfile = io.BytesIO()
-        # plt.savefig(figfile, format='png')
-        # plt.close()
-        # figfile.seek(0)  # rewind to beginning of file
-        # figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+            figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-        figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+            return render_template('/apps/iheatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-        return render_template('/apps/iheatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+        except Exception as e:
+            flash(e,'error')
 
-        # except Exception as e:
-        #     flash(e,'error')
-
-        #     return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":
@@ -238,11 +233,13 @@ def iheatmap(download=None):
             # CALL FIGURE FUNCTION
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
+            pio.orca.config.executable='/miniconda/bin/orca'
+            pio.orca.config.use_xvfb = True
+            #pio.orca.config.save()
             #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
-            plt.savefig(figfile, format=plot_arguments["downloadf"])
-            plt.close()
+            fig.write_image(figfile, format=plot_arguments["downloadf"], height=float(plot_arguments["fig_height"]) , width=float(plot_arguments["fig_width"]))
             figfile.seek(0)  # rewind to beginning of file
 
             eventlog = UserLogging(email=current_user.email,action="download figure heatmap")
@@ -275,8 +272,6 @@ def iheatmap(download=None):
             eventlog = UserLogging(email=current_user.email,action="download figure heatmap clusters")
             db.session.add(eventlog)
             db.session.commit()
-
-            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
 
             return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
 

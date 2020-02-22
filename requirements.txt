@@ -74,6 +74,7 @@ Pillow==7.0.0
 plotly==4.5.0
 prometheus-client==0.7.1
 prompt-toolkit==3.0.3
+psutil==5.7.0
 ptyprocess==0.6.0
 pycairo==1.19.0
 pycrypto==2.6.1

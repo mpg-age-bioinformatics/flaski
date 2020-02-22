@@ -57,10 +57,7 @@ def make_figure(df,pa):
     labels=tmp.columns.tolist()
     rows=tmp.index.tolist()
 
-    if not pa_["col_color_threshold"]:
-        import sys
-        print(pa["method_value"],pa["distance_value"])
-        sys.stdout.flush()
+    if ( not pa_["col_color_threshold"] ) & ( pa_["col_cluster"] ):
         fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels,\
                             distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]) ,\
                             linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
@@ -70,7 +67,7 @@ def make_figure(df,pa):
         color_threshold=abs(np.percentile(dists,50))
         pa_["col_color_threshold"]=color_threshold
 
-    if not pa_["row_color_threshold"]:
+    if ( not pa_["row_color_threshold"] ) & ( pa_["row_cluster"] ): 
         dendro_side = ff.create_dendrogram(data_array, orientation='bottom', labels=rows,\
                             distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
                             linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
@@ -81,38 +78,51 @@ def make_figure(df,pa):
         pa_["row_color_threshold"]=color_threshold
         
     # Initialize figure by creating upper dendrogram
-    fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels, color_threshold=pa_["col_color_threshold"],\
-                            distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
-                            linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
-    for i in range(len(fig['data'])):
-        fig['data'][i]['yaxis'] = 'y2'
-    dendro_leaves_y_labels = fig['layout']['xaxis']['ticktext']
-    dendro_leaves_y = [ labels.index(i) for i in dendro_leaves_y_labels ]
+    if pa_["col_cluster"]:
+        fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels, color_threshold=pa_["col_color_threshold"],\
+                                distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
+                                linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
+        for i in range(len(fig['data'])):
+            fig['data'][i]['yaxis'] = 'y2'
+        dendro_leaves_y_labels = fig['layout']['xaxis']['ticktext']
+        dendro_leaves_y = [ labels.index(i) for i in dendro_leaves_y_labels ]
 
-    d = scs.distance.pdist(data_array_, metric=pa["distance_value"])
-    Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
-    max_d = pa_["col_color_threshold"]
-    clusters_cols = fcluster(Z, max_d, criterion='distance')
-    clusters_cols=pd.DataFrame({"col":tmp.columns.tolist(),"cluster":list(clusters_cols)})
+        d = scs.distance.pdist(data_array_, metric=pa["distance_value"])
+        Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
+        max_d = pa_["col_color_threshold"]
+        clusters_cols = fcluster(Z, max_d, criterion='distance')
+        clusters_cols=pd.DataFrame({"col":tmp.columns.tolist(),"cluster":list(clusters_cols)})
+    else:
+        dendro_leaves_y_labels=tmp.columns.tolist()
+        dendro_leaves_y = [ labels.index(i) for i in dendro_leaves_y_labels ]
 
     # Create Side Dendrogram
-    dendro_side = ff.create_dendrogram(data_array, orientation='right', labels=rows, color_threshold=pa_["row_color_threshold"],\
-                                        distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
-                                        linkagefun= lambda x: sch.linkage(x, pa["method_value"] ))
-    for i in range(len(dendro_side['data'])):
-        dendro_side['data'][i]['xaxis'] = 'x2'
-    dendro_leaves_x_labels = dendro_side['layout']['yaxis']['ticktext']
-    dendro_leaves_x = [ rows.index(i) for i in dendro_leaves_x_labels ]
+    if pa_["row_cluster"]:
+        dendro_side = ff.create_dendrogram(data_array, orientation='right', labels=rows, color_threshold=pa_["row_color_threshold"],\
+                                            distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
+                                            linkagefun= lambda x: sch.linkage(x, pa["method_value"] ))
+        for i in range(len(dendro_side['data'])):
+            dendro_side['data'][i]['xaxis'] = 'x2'
+        dendro_leaves_x_labels = dendro_side['layout']['yaxis']['ticktext']
+        dendro_leaves_x = [ rows.index(i) for i in dendro_leaves_x_labels ]
 
-    d = scs.distance.pdist(data_array, metric=pa["distance_value"])
-    Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
-    max_d =pa_["row_color_threshold"]
-    clusters_rows = fcluster(Z, max_d, criterion='distance')
-    clusters_rows = pd.DataFrame({"col":tmp.index.tolist(),"cluster":list(clusters_rows)})
+        d = scs.distance.pdist(data_array, metric=pa["distance_value"])
+        Z = sch.linkage(d, pa["method_value"]) #linkagefun(d)
+        max_d =pa_["row_color_threshold"]
+        clusters_rows = fcluster(Z, max_d, criterion='distance')
+        clusters_rows = pd.DataFrame({"col":tmp.index.tolist(),"cluster":list(clusters_rows)})
 
-    # Add Side Dendrogram Data to Figure
-    for data in dendro_side['data']:
-        fig.add_trace(data)
+        if pa_["col_cluster"]:
+            # Add Side Dendrogram Data to Figure
+            for data in dendro_side['data']:
+                fig.add_trace(data)
+        else:
+            fig=dendro_side
+
+    else:
+        dendro_leaves_x_labels=tmp.index.tolist()
+        dendro_leaves_x = [ rows.index(i) for i in dendro_leaves_x_labels ]
+
 
     # Create Heatmap
     heat_data=data_array
@@ -130,13 +140,24 @@ def make_figure(df,pa):
                     "xpad":float(pa["color_bar_horizontal_padding"]),"tickfont":{"size":float(pa["color_bar_ticks_font_size"])}}
         )
     ]
+    
+    if pa_["col_cluster"]:
+        heatmap[0]['x'] = fig['layout']['xaxis']['tickvals']
+    else:
+        heatmap[0]['x'] = dendro_leaves_y_labels
 
-    heatmap[0]['x'] = fig['layout']['xaxis']['tickvals']
-    heatmap[0]['y'] = dendro_side['layout']['yaxis']['tickvals']
+    if pa_["row_cluster"]:
+        heatmap[0]['y'] = dendro_side['layout']['yaxis']['tickvals']
+    else:
+        heatmap[0]['y']=dendro_leaves_x_labels
 
     # Add Heatmap Data to Figure
-    for data in heatmap:
-        fig.add_trace(data)
+    if (pa_["col_cluster"]) | (pa_["row_cluster"]):
+        for data in heatmap:
+            fig.add_trace(data)
+    else:
+        fig = go.Figure(data=heatmap[0])
+        print()
 
     # Edit Layout
     fig.update_layout({'width':float(pa["fig_width"]), 'height':float(pa["fig_height"]),
@@ -144,7 +165,11 @@ def make_figure(df,pa):
                             "yaxis":{"mirror" : "allticks", 
                                     'side': 'right',
                                     'showticklabels':pa_["xticklabels"],
-                                    'ticktext':dendro_leaves_x_labels}})
+                                    'ticktext':dendro_leaves_x_labels},
+                            "xaxis":{"mirror" : "allticks", 
+                                    'side': 'right',
+                                    'showticklabels':pa_["yticklabels"],
+                                    'ticktext':dendro_leaves_y_labels}} )
 
     # Edit xaxis
     fig.update_layout(xaxis={'domain': [ float(pa["row_dendogram_ratio"]), 1],
@@ -156,17 +181,21 @@ def make_figure(df,pa):
                                     "tickfont":{"size":float(pa["yaxis_font_size"])},
                                     'ticks':"",\
                                     'ticktext':dendro_leaves_y_labels})
+    # print(dendro_leaves_y_labels, dendro_leaves_y)
+    # import sys
+    # sys.stdout.flush()
     # Edit xaxis2
-    fig.update_layout(xaxis2={'domain': [0, float(pa["row_dendogram_ratio"])],
-                                    'mirror': False,
-                                    'showgrid': False,
-                                    'showline': False,
-                                    'zeroline': False,
-                                    'showticklabels': pa_["row_dendogram_dist"],
-                                    'ticks':""})
+    if pa_["row_cluster"]:
+        fig.update_layout(xaxis2={'domain': [0, float(pa["row_dendogram_ratio"])],
+                                        'mirror': False,
+                                        'showgrid': False,
+                                        'showline': False,
+                                        'zeroline': False,
+                                        'showticklabels': pa_["row_dendogram_dist"],
+                                        'ticks':""})
 
     # Edit yaxis 
-    fig.update_layout(yaxis={'domain': [0, 1-float(pa["col_dendogram_ratio"])+0.04 ],
+    fig.update_layout(yaxis={'domain': [0, 1-float(pa["col_dendogram_ratio"]) ],
                                     'mirror': False,
                                     'showgrid': False,
                                     'showline': False,
@@ -174,17 +203,18 @@ def make_figure(df,pa):
                                     'showticklabels': pa_["xticklabels"],
                                     "tickfont":{"size":float(pa["xaxis_font_size"])} ,
                                     'ticks': "",\
-                                    'tickvals':dendro_side['layout']['yaxis']['tickvals'],\
+                                    'tickvals':heatmap[0]['y'],\
                                     'ticktext':dendro_leaves_x_labels})
-
+    #'tickvals':dendro_side['layout']['yaxis']['tickvals'],\
     # Edit yaxis2 showticklabels
-    fig.update_layout(yaxis2={'domain':[1-float(pa["col_dendogram_ratio"]), 1],
-                                    'mirror': False,
-                                    'showgrid': False,
-                                    'showline': False,
-                                    'zeroline': False,
-                                    'showticklabels': pa_["col_dendogram_dist"],
-                                    'ticks':""})
+    if pa_["col_cluster"]:
+        fig.update_layout(yaxis2={'domain':[1-float(pa["col_dendogram_ratio"]), 1],
+                                        'mirror': False,
+                                        'showgrid': False,
+                                        'showline': False,
+                                        'zeroline': False,
+                                        'showticklabels': pa_["col_dendogram_dist"],
+                                        'ticks':""})
 
     fig.update_layout(template='plotly_white')
 
@@ -199,9 +229,21 @@ def make_figure(df,pa):
     df_=df_[cols]
 
     clusters_cols_=pd.DataFrame({"col":cols})
-    clusters_cols=pd.merge(clusters_cols_,clusters_cols,on=["col"],how="left")
+    if pa_["col_cluster"]:
+        clusters_cols=pd.merge(clusters_cols_,clusters_cols,on=["col"],how="left")
+    else:
+        clusters_cols=clusters_cols_
+
     clusters_rows_=pd.DataFrame({"col":df_.index.tolist()})
-    clusters_rows=pd.merge(clusters_rows_,clusters_rows,on=["col"],how="left")
+    if pa_["row_cluster"]:
+        clusters_rows=pd.merge(clusters_rows_,clusters_rows,on=["col"],how="left")
+    else:
+        clusters_rows=clusters_rows_
+
+    df_.reset_index(inplace=True, drop=False)
+    cols=df_.columns.tolist()
+    cols[0]="rows"
+    df_.columns=cols
 
     return fig, clusters_cols, clusters_rows, df_
 

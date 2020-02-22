@@ -31,6 +31,20 @@ RUN apt-get update && apt-get -yq dist-upgrade && \
 apt-get install -yq python3 python3-pip libcairo2-dev pkg-config python3-dev mariadb-client cron && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# RUN apt-get update && apt-get -yq dist-upgrade && \
+# apt-get install -yq curl wget xvfb && \
+# curl -sL https://deb.nodesource.com/setup_13.x | bash - && apt-get install -yq nodejs && \
+# npm install electron --save-dev && \
+# npm install orca && \
+# apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# plotly saving of images to file
+RUN apt-get update && apt-get -yq dist-upgrade && \
+apt-get install -yq wget libgtk2.0-0 libxtst-dev libxss-dev libgconf2-dev libnss3 libasound2-dev && \
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && bash Miniconda3-latest-Linux-x86_64.sh  -b -p /miniconda && \
+/miniconda/bin/conda install -c plotly plotly-orca psutil requests && \
+apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN pip3 install pymysql
 
 # data folders

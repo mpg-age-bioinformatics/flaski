@@ -273,7 +273,7 @@
                                 <label>Download file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
                             </div>   
                             <div class="row arg">
-                                <label> format: <select name=download_format method="GET" action="/" style="width:50px">
+                                <label> format: <select name=downloadf method="GET" action="/" style="width:50px">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}
