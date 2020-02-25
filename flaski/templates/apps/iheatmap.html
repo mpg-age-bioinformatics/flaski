@@ -60,16 +60,16 @@
             <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
             <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
 
-                <!--div class="column">
-                    <div class="sidebar-heading">X values:</div>
+                <div class="column">
+                    <div class="sidebar-heading">Row names:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xcols method="GET" action="/" style="width:114px">
+                        <select title=xcols name=xvals method="GET" action="/" style="width:365px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
                         </select>
                     </div>
-                </div-->
+                </div>
 
                 <div class="column">
                     <div class="sidebar-heading">Data columns:</div>
@@ -124,9 +124,9 @@
 
                             <div class="row arg">
                                 <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=title_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=title_size_value method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
-                                        <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
+                                        <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
                                 </select></label>
                             </div>
@@ -151,16 +151,7 @@
                             <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="col_cluster" {% if col_cluster=="on" %} checked {% elif col_cluster==".on" %} checked {% endif %}/> Columns cluster </label>
                             <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="row_cluster" {% if row_cluster=="on" %} checked {% elif row_cluster==".on" %} checked {% endif %}/> Row cluster </label>
 
-                            <label style="width:300px">Dendogram-to-figure ratio:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px"></label>
-
-                            <label style="width:300px">Number of clusters to highlight:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="n_cols_cluster" value='{{ n_cols_cluster }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="n_rows_cluster" value='{{ n_rows_cluster }}' style="width:98px;height:22px;padding-left: 4px"></label>
-
-
-                            <label>Method: <select name=method method="GET" action="/" style="width:78px">
+                            <label>Method: <select name=method_value method="GET" action="/" style="width:78px">
                                 {% for method_ in method %}
                                     <option value="{{method_}}" {% if method_==method_value %} selected {% endif %}>{{method_}}</option>
                                 {% endfor %}
@@ -172,23 +163,17 @@
                                 {% endfor %}
                             </select></label>
 
-                            <label style="width:300px">Pre-defined markers:</label>
-                            <label style="padding-left:16px;">columns: <select name=xvals_colors method="GET" action="/" style="width:225px">
-                                {% for xcols_ in xcols %}
-                                    <option value="{{xcols_}}" {% if xcols_==xvals_colors %} selected {% endif %}>{{xcols_}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <label style="width:300px">Cluster distance values:</label>
+                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="col_dendogram_dist" {% if col_dendogram_dist=="on" %} checked {% elif col_dendogram_dist==".on" %} checked {% endif %}/> columns </label>
+                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="row_dendogram_dist" {% if row_dendogram_dist=="on" %} checked {% elif row_dendogram_dist==".on" %} checked {% endif %}/> rows </label>
 
-                            <label style="padding-left:16px;">rows: <select name=yvals_colors method="GET" action="/" style="width:246px">
-                                {% if yvals_colors=="" %}
-                                    <option value="select a column.." selected>select a column..</option>
-                                {% else %}
-                                    <option value="select a column..">select a column..</option>
-                                {% endif %}
-                                {% for ycols_ in ycols %}
-                                    <option value="{{ycols_}}" {% if ycols_==yvals_colors %} selected {% endif %}>{{ycols_}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <label style="width:300px">Distance cuttoff for cluster defenition:</label>
+                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="col_color_threshold" value='{{ col_color_threshold }}' style="width:97px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="row_color_threshold" value='{{ row_color_threshold }}' style="width:98px;height:22px;padding-left: 4px"></label>
+
+                            <label style="width:300px">Dendogram-to-figure ratio:</label>
+                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:97px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px"></label>
 
                         </div>
         
@@ -208,33 +193,32 @@
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
+                            <label style="padding-left:0px;padding-right:0px;"> Robustness percentil (0 - 100): <input type="text" name="robust" value='{{ robust }}' style="width:103px;height:22px;padding-left:4px;"></label>
 
                             <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/> Column labels</label>
                             <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/> Row labels</label>
-                            <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="col_dendogram_dist" {% if col_dendogram_dist=="on" %} checked {% elif col_dendogram_dist==".on" %} checked {% endif %}/> Column dist.</label>
-                            <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="row_dendogram_dist" {% if row_dendogram_dist=="on" %} checked {% elif row_dendogram_dist==".on" %} checked {% endif %}/> Row dist.</label>
-
 
                             <label>Labels font size: </label>
                             <label style="padding-left:21px;padding-right:0px;"> columns: <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
                             <label style="padding-left:21px;padding-right:0px;"> rows: <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
 
-                            <label>CMAP: <select name=cmap_value method="GET" action="/">
-                                {% for cmap_ in cmap %}
-                                    <option value="{{cmap_}}" {% if cmap_==cmap_value %} selected {% endif %}>{{cmap_}}</option>
+                            <label>CMAP: <select name=colorscale_value method="GET" action="/">
+                                {% for colorscale_ in colorscale %}
+                                    <option value="{{colorscale_}}" {% if colorscale_==colorscale_value %} selected {% endif %}>{{colorscale_}}</option>
                                 {% endfor %}
                             </select></label>
 
-                            <label style="padding-left:24px;">z-score: <select name=zscore_value method="GET" action="/">
+                            <label style="padding-left:34px;">z-score: <select name=zscore_value method="GET" action="/">
                                 {% for zscore_ in zscore %}
                                     <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
                                 {% endfor %}
                             </select></label>
 
-                            <label style="padding-left:0px;padding-right:0px;"><input type="checkbox" name="robust" {% if robust=="on" %} checked {% elif robust==".on" %} checked {% endif %}/> Robust</label>
-                            <label style="padding-left:0px;padding-right:0px;">Color bar label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:202px;height:22px;padding-left: 4px"></label>
-
-
+                            <label style="width:263px;">Color bar: </label>
+                            <label style="padding-left:0px;padding-right:0px;">label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:263px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0px;padding-right:0px;">label font size: <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:50px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:8px;padding-right:0px;">tickts font size: <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:52px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0px;padding-right:0px;">padding: <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:86px;height:22px;padding-left: 4px"></label>
 
                             <!--label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="annotate" {% if annotate=="on" %} checked {% elif annotate==".on" %} checked {% endif %}/> Annotate</label-->
 

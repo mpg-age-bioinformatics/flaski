@@ -177,8 +177,8 @@ def iheatmap(download=None):
                 # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                 if (session["plot_arguments"]["yvals"] not in cols):
 
-                    session["plot_arguments"]["xcols"]=["select a row.."]+df[cols[0]].tolist()
-                    #session["plot_arguments"]["xvals"]=cols[0]
+                    session["plot_arguments"]["xcols"]=cols
+                    session["plot_arguments"]["xvals"]=cols[0]
 
                     session["plot_arguments"]["ycols"]=cols
                     session["plot_arguments"]["yvals"]=cols[1:]
@@ -186,7 +186,7 @@ def iheatmap(download=None):
                     sometext="Please select which columns should be used for plotting."
                     plot_arguments=session["plot_arguments"]
                     flash(sometext,'info')
-                    return render_template('/apps/iheatmap.html' , filename=filename, apps=apps,**plot_arguments)
+                    return render_template('/apps/iheatmap.html' , filename=filename, apps=apps, **plot_arguments)
                 
             else:
                 # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
@@ -295,7 +295,7 @@ def iheatmap(download=None):
             session["app"]="iheatmap"
             session["checkboxes"]=checkboxes
 
-        eventlog = UserLogging(email=current_user.email, action="visit heatmap")
+        eventlog = UserLogging(email=current_user.email, action="visit iheatmap")
         db.session.add(eventlog)
         db.session.commit()
         

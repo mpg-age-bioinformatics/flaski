@@ -123,6 +123,13 @@ def make_figure(df,pa):
         dendro_leaves_x_labels=tmp.index.tolist()
         dendro_leaves_x = [ rows.index(i) for i in dendro_leaves_x_labels ]
 
+    if pa["robust"] != "":
+        vals=tmp.values.flatten()
+        up=np.percentile(vals, 100-float(pa["robust"]) )
+        down=np.percentile(vals, float(pa["robust"]) )
+        tmp[ tmp>up ] = up
+        tmp[ tmp<down ] = down
+        data_array=tmp.values
 
     # Create Heatmap
     heat_data=data_array
@@ -157,7 +164,6 @@ def make_figure(df,pa):
             fig.add_trace(data)
     else:
         fig = go.Figure(data=heatmap[0])
-        print()
 
     # Edit Layout
     fig.update_layout({'width':float(pa["fig_width"]), 'height':float(pa["fig_height"]),
@@ -286,7 +292,7 @@ def figure_defaults():
         "color_bar_horizontal_padding":"100",\
         "row_cluster":".on",\
         "col_cluster":".on",\
-        "robust":".on",\
+        "robust":"0",\
         "col_dendogram_ratio":"0.15",\
         "row_dendogram_ratio":"0.15",\
         "row_dendogram_dist":".off", \
@@ -303,7 +309,7 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.iheatmap",\
         "inputargumentsfile":"Select file.."}
     
-    checkboxes=["row_cluster","col_cluster","robust","xticklabels","yticklabels"]
+    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels"]
 
     # not update list
     notUpdateList=["inputsessionfile"]
