@@ -171,10 +171,12 @@ def heatmap(download=None):
 
 
                 # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
-                if (session["plot_arguments"]["yvals"] not in cols):
+                if (session["plot_arguments"]["yvals"] not in cols) | (session["plot_arguments"]["xvals"] not in cols):
 
-                    session["plot_arguments"]["xcols"]=["select a row.."]+df[cols[0]].tolist()
-                    #session["plot_arguments"]["xvals"]=cols[0]
+                    session["plot_arguments"]["xcols"]=cols
+                    session["plot_arguments"]["xvals"]=cols[0]
+
+                    session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[session["plot_arguments"]["xvals"]].tolist()
 
                     session["plot_arguments"]["ycols"]=cols
                     session["plot_arguments"]["yvals"]=cols[1:]
@@ -199,12 +201,13 @@ def heatmap(download=None):
         #if session["plot_arguments"]["groups_value"]=="None":
         #    session["plot_arguments"]["groups_auto_generate"]=".on"
 
+        # READ INPUT DATA FROM SESSION JSON
+        df=pd.read_json(session["df"])
+
+        session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[request.form["xvals"]].tolist()
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
-
-        # READ INPUT DATA FROM SESSION JSON
-        df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
         try:

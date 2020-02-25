@@ -60,16 +60,16 @@
             <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
             <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
 
-                <!--div class="column">
+                <div class="column">
                     <div class="sidebar-heading">X values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xcols method="GET" action="/" style="width:114px">
+                        <select title=xcols name=xvals method="GET" action="/" style="width:365px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
                         </select>
                     </div>
-                </div-->
+                </div>
 
                 <div class="column">
                     <div class="sidebar-heading">Data columns:</div>
@@ -174,7 +174,7 @@
 
                             <label style="width:300px">Pre-defined markers:</label>
                             <label style="padding-left:16px;">columns: <select name=xvals_colors method="GET" action="/" style="width:225px">
-                                {% for xcols_ in xcols %}
+                                {% for xcols_ in xvals_colors_list %}
                                     <option value="{{xcols_}}" {% if xcols_==xvals_colors %} selected {% endif %}>{{xcols_}}</option>
                                 {% endfor %}
                             </select></label>

@@ -171,6 +171,7 @@ def figure_defaults():
         "fig_height":"6.0",\
         "xcols":[],\
         "xvals":"",\
+        "xvals_colors_list":[],\
         "xvals_colors":"",\
         "ycols":[],\
         "yvals":"",\
