@@ -124,9 +124,9 @@
 
                             <div class="row arg">
                                 <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=title_size method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 4px"> size: <select name=title_size_value method="GET" action="/" style="width:50px">
                                     {% for title_size_ in title_size %}
-                                        <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
+                                        <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
                                 </select></label>
                             </div>
