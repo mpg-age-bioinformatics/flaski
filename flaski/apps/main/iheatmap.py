@@ -4,6 +4,7 @@ from scipy import stats
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from scipy.cluster.hierarchy import fcluster
+from scipy.spatial.distance import squareform
 import numpy as np
 import pandas as pd
 
@@ -15,6 +16,41 @@ def make_figure(df,pa):
     tmp=df.copy()
     tmp.index=tmp[tmp.columns.tolist()[0]].tolist()
     tmp=tmp[pa["yvals"]]
+
+    if pa["findrow"]!="":
+        rows_to_find=pa["findrow"].split("\n")
+        rows_to_find=[ s.strip("\r") for s in rows_to_find ]
+        rows_to_find=[ s.strip(" ") for s in rows_to_find ]
+
+        d = scs.distance.pdist(tmp, metric=pa["distance_value"])
+        d = squareform(d)
+        d = pd.DataFrame(d,columns=tmp.index.tolist(), index=tmp.index.tolist())
+        d = d[ rows_to_find ]
+
+        rows_to_plot=[]+rows_to_find
+
+        for r in rows_to_find:
+            dfrow=d[[r]]
+
+            if findrowtype=="percentile":
+
+                row_values=dfrow[r].tolist()
+
+                upperc=np.percentile(row_values, float(pa["findrowup"]) )
+                downperc=np.percentile(row_values, float(pa["findrowdown"]) )
+
+                dfrow=dfrow[ ( dfrow[r] >= upperc) | ( dfrow[r] <= downperc) ]
+
+                rows_to_plot=rows_to_plot+dfrow.index.tolist()
+
+            if findrowtype=="absolute":
+                dfrow=dfrow.sort_values(by=[r],ascending=True)
+                row_values=dfrow.index.tolist()
+                rows_to_plot=rows_to_plot+row_values[:int(pa["findrowdown"])]+row_values[-int(pa["findrowup"]):]
+
+            rows_to_plot=list(set(rows_to_plot))
+
+        tmp=tmp[tmp.index.isin(rows_to_plot)]
 
     #print(tmp,pa["yvals"])
     pa_={}
@@ -301,6 +337,7 @@ def figure_defaults():
         "zscore_value":"none",\
         "xaxis_font_size":"10",\
         "yaxis_font_size":"10",\
+        "findrow":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"heatmap",\

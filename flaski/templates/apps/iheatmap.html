@@ -227,6 +227,25 @@
                 </div>
             </li>
 
+                        <!-- -------------------- FIND ROWS ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFindRow" aria-expanded="true" aria-controls="collapseFindRow" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Rows</span>
+                </a>
+                <div id="collapseFindRow" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label style="padding-left:0px;padding-right:8px;"> Find rows: </label><textarea type="text" name="findrow" value='{{ findrow }}' rows="3" cols="30" style="width:200px;height:22px;padding-left:4px;">{{ findrow }}</textarea>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+
             {% endif %}
 
             <!-- Divider -->

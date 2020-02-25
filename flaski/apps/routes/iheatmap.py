@@ -68,7 +68,7 @@ def iheatmap(download=None):
                 flash(error_msg,'error')
                 return render_template('/apps/iheatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-            if session_["app"]!="heatmap":
+            if session_["app"]!="iheatmap":
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
                 flash(error_msg,'error')
@@ -99,7 +99,7 @@ def iheatmap(download=None):
                 flash(error_msg,'error')
                 return render_template('/apps/iheatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-            if session_["app"]!="heatmap":
+            if session_["app"]!="iheatmap":
                 plot_arguments=session["plot_arguments"]
                 error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
                 flash(error_msg,'error')
