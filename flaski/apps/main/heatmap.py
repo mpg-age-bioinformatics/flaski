@@ -15,6 +15,10 @@ def make_figure(df,pa):
     tmp=df.copy()
     tmp.index=tmp[tmp.columns.tolist()[0]].tolist()
     tmp=tmp[pa["yvals"]]
+    if pa["zscore_value"] == "row":
+        tmp=pd.DataFrame(stats.zscore(tmp, axis=1, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
+    elif pa["zscore_value"] == "columns":
+        tmp=pd.DataFrame(stats.zscore(tmp, axis=0, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
 
     #print(tmp,pa["yvals"])
     pa_={}
@@ -49,12 +53,12 @@ def make_figure(df,pa):
         pa_["color_bar_label"]={'label': pa["color_bar_label"]}
 
 
-    if pa["zscore_value"] == "none":
-        pa_["zscore_value"]=None
-    elif pa["zscore_value"] == "row":
-        pa_["zscore_value"]=0
-    elif pa["zscore_value"] == "columns":
-        pa_["zscore_value"]=1
+    # if pa["zscore_value"] == "none":
+    #     pa_["zscore_value"]=None
+    # elif pa["zscore_value"] == "row":
+    #     pa_["zscore_value"]=0
+    # elif pa["zscore_value"] == "columns":
+    #     pa_["zscore_value"]=1
 
 
     if ( (int(pa["n_cols_cluster"]) > 0) | (int(pa["n_rows_cluster"]) > 0) ) and ( (pa_["row_cluster"]) and (pa_["col_cluster"])  ):
@@ -139,8 +143,7 @@ def make_figure(df,pa):
                         col_cluster=pa_["col_cluster"],\
                         figsize=(float(pa["fig_width"]),float(pa["fig_height"])),\
                         robust=pa["robust"], \
-                        dendrogram_ratio=(float(pa["col_dendogram_ratio"]),float(pa["row_dendogram_ratio"])),\
-                        z_score=pa_["zscore_value"])
+                        dendrogram_ratio=(float(pa["col_dendogram_ratio"]),float(pa["row_dendogram_ratio"])))
 
     plt.suptitle(pa["title"], fontsize=float(pa["title_size_value"]))
     g.ax_heatmap.set_xticklabels(g.ax_heatmap.get_xmajorticklabels(), fontsize = float(pa["yaxis_font_size"]))
