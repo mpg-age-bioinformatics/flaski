@@ -7,50 +7,25 @@ from scipy.cluster.hierarchy import fcluster
 from scipy.spatial.distance import squareform
 import numpy as np
 import pandas as pd
+from flask import flash
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 
 def make_figure(df,pa):
+
     tmp=df.copy()
     tmp.index=tmp[tmp.columns.tolist()[0]].tolist()
     tmp=tmp[pa["yvals"]]
 
-    if pa["findrow"]!="":
-        rows_to_find=pa["findrow"].split("\n")
-        rows_to_find=[ s.strip("\r") for s in rows_to_find ]
-        rows_to_find=[ s.strip(" ") for s in rows_to_find ]
+    if pa["add_constant"]!="":
+        tmp=tmp+float(pa["add_constant"])
 
-        d = scs.distance.pdist(tmp, metric=pa["distance_value"])
-        d = squareform(d)
-        d = pd.DataFrame(d,columns=tmp.index.tolist(), index=tmp.index.tolist())
-        d = d[ rows_to_find ]
-
-        rows_to_plot=[]+rows_to_find
-
-        for r in rows_to_find:
-            dfrow=d[[r]]
-
-            if findrowtype=="percentile":
-
-                row_values=dfrow[r].tolist()
-
-                upperc=np.percentile(row_values, float(pa["findrowup"]) )
-                downperc=np.percentile(row_values, float(pa["findrowdown"]) )
-
-                dfrow=dfrow[ ( dfrow[r] >= upperc) | ( dfrow[r] <= downperc) ]
-
-                rows_to_plot=rows_to_plot+dfrow.index.tolist()
-
-            if findrowtype=="absolute":
-                dfrow=dfrow.sort_values(by=[r],ascending=True)
-                row_values=dfrow.index.tolist()
-                rows_to_plot=rows_to_plot+row_values[:int(pa["findrowdown"])]+row_values[-int(pa["findrowup"]):]
-
-            rows_to_plot=list(set(rows_to_plot))
-
-        tmp=tmp[tmp.index.isin(rows_to_plot)]
+    if pa["log_transform_value"] == "log2":
+        tmp=np.log2(tmp)
+    elif pa["log_transform_value"] == "log10":
+        tmp=np.log10(tmp)
 
     #print(tmp,pa["yvals"])
     pa_={}
@@ -87,6 +62,70 @@ def make_figure(df,pa):
         tmp=pd.DataFrame(stats.zscore(tmp, axis=1, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
     elif pa["zscore_value"] == "columns":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=0, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
+
+    if pa["findrow"]!="":
+        rows_to_find=pa["findrow"].split("\n")
+        rows_to_find=[ s.strip("\r") for s in rows_to_find ]
+        rows_to_find=[ s.strip(" ") for s in rows_to_find ]
+
+        possible_rows=tmp.index.tolist()
+        not_found=[ s for s in rows_to_find if s not in possible_rows ]
+        if len(not_found) > 0:
+            message="˜The following rows could not be found: %s. Please check your entries for typos." %(", ".join(not_found) )
+            flash(message,'error')
+
+        rows_to_plot=[]+rows_to_find
+
+
+        if ( pa["findrowup"] != "" ) | (pa["findrowdown"] != ""):
+
+            d = scs.distance.pdist(tmp, metric=pa["distance_value"])
+            d = squareform(d)
+            d = pd.DataFrame(d,columns=tmp.index.tolist(), index=tmp.index.tolist())
+            d = d[ rows_to_find ]
+
+
+            for r in rows_to_find:
+                dfrow=d[[r]]
+
+
+                if pa["findrowtype_value"]=="percentile":
+
+                    row_values=dfrow[r].tolist()
+
+                    if pa["findrowup"] != "":
+                        upperc=np.percentile(row_values, float(pa["findrowup"]) )
+                        upperc=dfrow[ dfrow[r] >= upperc ]
+                        rows_to_plot=rows_to_plot+upperc.index.tolist()
+                    
+                    if pa["findrowdown"] != "":
+                        downperc=np.percentile(row_values, float(pa["findrowdown"]) )
+                        downperc=dfrow[ dfrow[r] <= downperc ]
+                        rows_to_plot=rows_to_plot+downperc.index.tolist()
+
+                if pa["findrowtype_value"]=="n rows":
+                    dfrow=dfrow.sort_values(by=[r],ascending=True)
+                    row_values=dfrow.index.tolist()
+
+                    if pa["findrowdown"] != "":
+                        rows_to_plot=rows_to_plot+row_values[:int(pa["findrowdown"])]
+
+                    if pa["findrowup"] != "":
+                        rows_to_plot=rows_to_plot+row_values[-int(pa["findrowup"]):]
+
+                if pa["findrowtype_value"]=="absolute":
+
+                    if pa["findrowup"] != "":
+                        upperc=dfrow[ dfrow[r] >= float(pa["findrowup"]) ]
+                        rows_to_plot=rows_to_plot+upperc.index.tolist()
+                    
+                    if pa["findrowdown"] != "":
+                        downperc=dfrow[ dfrow[r] <= float(pa["findrowdown"]) ]
+                        rows_to_plot=rows_to_plot+downperc.index.tolist()
+
+                rows_to_plot=list(set(rows_to_plot))
+
+        tmp=tmp[tmp.index.isin(rows_to_plot)]
 
     data_array=tmp.values
     data_array_=tmp.transpose().values
@@ -333,11 +372,18 @@ def figure_defaults():
         "row_dendogram_ratio":"0.15",\
         "row_dendogram_dist":".off", \
         "col_dendogram_dist":".off",\
+        "add_constant":"",\
+        "log_transform":["none","log10","log2"],\
+        "log_transform_value":"none",\
         "zscore":["none","row","columns"],\
         "zscore_value":"none",\
         "xaxis_font_size":"10",\
         "yaxis_font_size":"10",\
         "findrow":"",\
+        "findrowtype":["percentile","n rows", "absolute",],\
+        "findrowtype_value":"percentile",\
+        "findrowup":"",\
+        "findrowdown":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"heatmap",\
