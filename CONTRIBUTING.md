@@ -1,8 +1,10 @@
 # Contributing
 
-If you would like to contribute to flaski please make a fork and submit a pull request once you're with your changes and would like to see them merged to the main branch.
-
 Flaski is a flask based collection of web apps for life-sciences. Flaski can be deployed using the `docker-compose.yml` or on a [kubernetes](https://github.com/mpg-age-bioinformatics/flaski/tree/master/kubernetes#kubernetes) cluster. Within Flaski, `pyflaski` provides access to all the main functions used by the different web applications.
+
+If you would like to contribute to flaski please make a fork and submit a pull request once you're ready with your changes and would like to see them merged to the main branch.
+
+### Apps
 
 Each app is made of 3 parts, `main`, `routes`, and `templates`:
 
@@ -51,6 +53,36 @@ Each app is made of 3 parts, `main`, `routes`, and `templates`:
 .       .
 .       .
 ```
+If adding new apps don't forget to edit `flaski/__init__.py` accordingly:
+```python
+from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram
+```
+and to add the app description to `flaski/__init__.py`:
+```python
+FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
+        { "name":"iScatter plot", "id":'iscatterplot_more',"link":'iscatterplot' ,"java":"javascript:ReverseDisplay('iscatterplot_more')", "description":"An intreactive scatterplot app."},\
+        { "name":"Heatmap", "id":'heatmap_more',"link":'heatmap' ,"java":"javascript:ReverseDisplay('heatmap_more')", "description":"An heatmap plotting app."},\
+        { "name":"iHeatmap", "id":'iheatmap_more',"link":'iheatmap' ,"java":"javascript:ReverseDisplay('iheatmap_more')", "description":"An interactive heatmap plotting app."},\
+        { "name":"Venn diagram", "id":'venndiagram_more',"link":'venndiagram' ,"java":"javascript:ReverseDisplay('venndiagram_more')", "description":"A venn diagram plotting app."} ]
+```
+If you're adding private apps to your deployment ie. apps that will only be available to certain users do not edit `flaski/__init__.py` but instead add the app description to `utils/private.apps.tsv`.
+Use `all` for all logged in users and `#domain.com` if you want to add users from a specific email domain.
+
+### `jupyter`
+
+During development it can be useful to use a `jupyter` in the same build environment as Flaski. For this you can deploy Flaski locally using `docker-compose` 
+and then get an interactive shell in the Flaski container with:
+```bash
+docker-compose exec server /bin/bash
+```
+Once inside the container start `jupyter` with:
+```bash
+jupyter notebook --allow-root --ip=0.0.0.0
+```
+You can now use the displayed link to access `jupyter` in Flaski build environment.
+
+### `pyflaski`
+
 `pyflaski` is maintained in the `pyflaski` folder with symbolic links to `flaski/apps/main`:
 ```
 .
@@ -74,18 +106,6 @@ Each app is made of 3 parts, `main`, `routes`, and `templates`:
 .
 .
 ```
-
-During development it can be useful to use a `jupyter` in the same build environment as Flaski. For this you can deploy Flaski locally using `docker-compose` 
-and then get an interactive shell in the Flaski container with:
-```bash
-docker-compose exec server /bin/bash
-```
-Once inside the container start `jupyter` with:
-```bash
-jupyter notebook --allow-root --ip=0.0.0.0
-```
-You can now use the displayed link to access `jupyter` in Flaski build environment.
-
 When adding new apps don't forget to generate the respective links in `pyflaski` as well as to add the respective imports
 in `pyflaski/pyflaski/__init__.py`:
 ```python
@@ -99,8 +119,9 @@ import pyflaski.venndiagram
 ```
 Please use `jupyter` as described above to test `pyflaski`.
 
+### Dependencies
 
-If new/additional python packages are requiresd please don't forget to add them to `requirements.txt`. Alternatively, run 
+If new/additional python packages are required please don't forget to add them to `requirements.txt`. Alternatively, run 
 ```bash
 ./utils/getenv.sh > requirements.txt
 ```
