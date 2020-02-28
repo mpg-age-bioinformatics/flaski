@@ -255,8 +255,6 @@ def iheatmap(download=None):
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
 
-            plot_arguments=session["plot_arguments"]
-
             # CALL FIGURE FUNCTION
 
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)

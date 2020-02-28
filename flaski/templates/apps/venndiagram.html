@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block app_title %}
+
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">Venn diagram</h1>
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block side_bar_content %}
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+        <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+        <!-- /div -->
+        <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+            </div>
+        <!--/div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
+
+        <form action="{{ url_for('venndiagram') }}" method="post" enctype="multipart/form-data">
+
+            <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item" style="padding-bottom: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Figure</span>
+                </a>
+                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left: 7px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px"></label>
+
+
+                            <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left: 4px"> size: <select name=title_size_value method="GET" action="/" style="width:50px">
+                                {% for title_size_ in title_size %}
+                                    <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-left:0px;padding-right:0px;">Fill alpha: <input type="text" name="fill_alpha" value='{{ fill_alpha }}' style="width:83px;height:22px;padding-left:4px;"></label>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- Set1 ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet1" aria-expanded="true" aria-controls="collapseSet1" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Set 1</span>
+                </a>
+                <div id="collapseSet1" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Name: <input type="text" name="set1_name" value='{{ set1_name }}' style="width:256px;height:22px;padding-left: 4px"/></label>
+
+                            <label style="width:300px">Values:</label>
+                            <textarea type="text" name="set1_values" value='{{ set1_values }}' rows="3" cols="30" style="width:320px;height:66px;padding-left:4px;">{{ set1_values }}</textarea>
+
+                            <label style="padding-top:8px;">Fill color: <select name=set1_color_value method="GET" action="/" style="width:78px;padding-top:8px;">
+                                {% for colors_ in colors %}
+                                    <option value="{{colors_}}" {% if colors_==set1_color_value %} selected {% endif %}>{{colors_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label> ..or, write a color name <input type="text" name="set1_color_rgb" value='{{ set1_color_rgb }}' style="width:155px;height:22px;padding-left: 4px"></label>
+
+                            <label> Line width: <input type="text" name="set1_linewidth" value='{{ set1_linewidth }}' style="width:55px;height:22px;padding-left: 4px"></label>
+
+                            <label style="padding-left:28px;">Line style: <select name=set1_linestyle_value method="GET" action="/" style="width:78px">
+                                {% for linestyles_ in linestyles %}
+                                    <option value="{{linestyles_}}" {% if linestyles_==set1_linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-right:5px;"> Line alpha: </label><input type="text" name="set1_line_alpha" value='{{ set1_line_alpha }}' style="width:55px;height:22px;padding-left: 4px">
+
+                            <label style="padding-left:28px;">Color: <select name=set1_line_color method="GET" action="/" style="width:104px">
+                                {% for colors_ in colors %}
+                                    <option value="{{colors_}}" {% if colors_==set1_line_color %} selected {% endif %}>{{colors_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label> ..or, write a color name <input type="text" name="set1_line_rgb" value='{{ set1_line_rgb }}' style="width:155px;height:22px;padding-left:4px"></label>
+
+                        </div>
+        
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- Set2 ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet2" aria-expanded="true" aria-controls="collapseSet2" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Set 2</span>
+                </a>
+                <div id="collapseSet2" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Name: <input type="text" name="set2_name" value='{{ set2_name }}' style="width:256px;height:22px;padding-left: 4px"/></label>
+
+                            <label style="width:300px">Values:</label>
+                            <textarea type="text" name="set2_values" value='{{ set2_values }}' rows="3" cols="30" style="width:320px;height:66px;padding-left:4px;">{{ set2_values }}</textarea>
+
+                            <label style="padding-top:8px;">Fill color: <select name=set2_color_value method="GET" action="/" style="width:78px;padding-top:8px;">
+                                {% for colors_ in colors %}
+                                    <option value="{{colors_}}" {% if colors_==set2_color_value %} selected {% endif %}>{{colors_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label> ..or, write a color name <input type="text" name="set2_color_rgb" value='{{ set2_color_rgb }}' style="width:155px;height:22px;padding-left: 4px"></label>
+
+                            <label> Line width: <input type="text" name="set2_linewidth" value='{{ set2_linewidth }}' style="width:55px;height:22px;padding-left: 4px"></label>
+
+                            <label style="padding-left:28px;">Line style: <select name=set2_linestyle_value method="GET" action="/" style="width:78px">
+                                {% for linestyles_ in linestyles %}
+                                    <option value="{{linestyles_}}" {% if linestyles_==set2_linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-right:5px;"> Line alpha: </label><input type="text" name="set2_line_alpha" value='{{ set2_line_alpha }}' style="width:55px;height:22px;padding-left: 4px">
+
+                            <label style="padding-left:28px;">Color: <select name=set2_line_color method="GET" action="/" style="width:104px">
+                                {% for colors_ in colors %}
+                                    <option value="{{colors_}}" {% if colors_==set2_line_color %} selected {% endif %}>{{colors_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label> ..or, write a color name <input type="text" name="set2_line_rgb" value='{{ set2_line_rgb }}' style="width:155px;height:22px;padding-left:4px"></label>
+
+                        </div>
+        
+                    </div>
+                </div>
+            </li>
+            
+
+            <!-- -------------------- Set3 ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet3" aria-expanded="true" aria-controls="collapseSet3" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Set 3</span>
+                </a>
+                <div id="collapseSet3" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Name: <input type="text" name="set3_name" value='{{ set3_name }}' style="width:256px;height:22px;padding-left: 4px"/></label>
+
+                            <label style="width:300px">Values:</label>
+                            <textarea type="text" name="set3_values" value='{{ set3_values }}' rows="3" cols="30" style="width:320px;height:66px;padding-left:4px;">{{ set3_values }}</textarea>
+
+                            <label style="padding-top:8px;">Fill color: <select name=set3_color_value method="GET" action="/" style="width:78px;padding-top:8px;">
+                                {% for colors_ in colors %}
+                                    <option value="{{colors_}}" {% if colors_==set3_color_value %} selected {% endif %}>{{colors_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label> ..or, write a color name <input type="text" name="set3_color_rgb" value='{{ set3_color_rgb }}' style="width:155px;height:22px;padding-left: 4px"></label>
+
+                            <label> Line width: <input type="text" name="set3_linewidth" value='{{ set3_linewidth }}' style="width:55px;height:22px;padding-left: 4px"></label>
+
+                            <label style="padding-left:28px;">Line style: <select name=set3_linestyle_value method="GET" action="/" style="width:78px">
+                                {% for linestyles_ in linestyles %}
+                                    <option value="{{linestyles_}}" {% if linestyles_==set3_linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-right:5px;"> Line alpha: </label><input type="text" name="set3_line_alpha" value='{{ set3_line_alpha }}' style="width:55px;height:22px;padding-left: 4px">
+
+                            <label style="padding-left:28px;">Color: <select name=set3_line_color method="GET" action="/" style="width:104px">
+                                {% for colors_ in colors %}
+                                    <option value="{{colors_}}" {% if colors_==set3_line_color %} selected {% endif %}>{{colors_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label> ..or, write a color name <input type="text" name="set3_line_rgb" value='{{ set3_line_rgb }}' style="width:155px;height:22px;padding-left:4px"></label>
+
+                        </div>
+        
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
+
+            {% if figure_url %}
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-download"></i>
+                    <span>Figure</span>
+                </a>
+                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
+                            </div>   
+                            <div class="row arg">
+                                <label> format: <select name=downloadf method="GET" action="/" style="width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {% endif %}
+
+            <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Arguments</span>
+                </a>
+                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload arguments file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
+                    <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                    <span>Session</span>
+                </a>
+                <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload session file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+
+            <!-- -------------------- SUBMIT ---------------------- -->
+
+            <div style="padding-right: 15px; padding-left: 15px;" >
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" />
+            </div>
+        </form>
+
+                <!-- Divider -->
+        <!--hr class="sidebar-divider d-none d-md-block"-->
+    </div>
+    
+      <!-- Sidebar Toggler (Sidebar) -->
+      <!-- div class="text-center d-none d-md-inline" -->
+        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
+      <!-- /div -->
+
+</ul>
+
+{% endblock %}
+
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
+{% block content %}
+<div class="container-fluid">
+
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        {% else %}
+        <!-- INFORMATION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if figure_url %}
+        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+        
+            <img src="data:image/png;base64,{{ figure_url }}">
+
+            <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+                
+                <div style="padding-right: 2px;">
+                    <form action="{{ url_for('venndiagram', download='download') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="fas fa-download fa-sm text-white-50"></i> Figure
+                        </button>
+                    </form>
+                </div>
+
+                <div style="padding-left:2px;padding-right:2px;">
+                    <form action="{{ url_for('venndiagram', download='data') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="far fa-file-excel fa-sm text-white-50"></i> Data
+                        </button>
+                    </form>
+                </div>
+
+                <div style="padding-left: 2px;padding-right: 2px;">
+                    <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                        </button>
+                    </form>
+                </div>
+
+                <div style="padding-left: 2px;">
+                    <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas fa-th fa-sm text-white-50"></i> Session
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}
+
+
+
+{% block in_app_footer %}
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+        <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Insitute for Biology of Ageing</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}
