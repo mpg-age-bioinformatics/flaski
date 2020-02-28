@@ -47,7 +47,7 @@ Set a Google Kubernetes Engine (GKE) cluster:
 gcloud container clusters get-credentials <cluster-name>
 ```
 
-## 3. Deploy you App
+## 3. Deploy your App
 If you need to get registry authorization to pull containers you will need to create a matching secret. eg.:
 ```bash
 kubectl create secret docker-registry <secret name> --docker-server=<registry address> --docker-username=<registry user name> --docker-password=<registry password> --docker-email=<your associated email>
