@@ -1,5 +1,7 @@
 # Flaski
 
+Flaski is a flask based collection of web apps for life-sciences. Flaski can be deployed using the docker-compose.yml or on a kubernetes cluster. Within Flaski, pyflaski provides access to all the main functions used by the different web applications.
+
 ## Deploying Flaski
 
 If you need to generate self-signed certificates you can do so by:
