@@ -2,6 +2,6 @@
 
 import pyflaski.iscatterplot
 import pyflaski.scatterplot
-
-# from app.plots.figures.scatterplot import *
-# from app.plots.figures.iscatterplot import *
+import pyflaski.heatmap
+import pyflaski.iheatmap
+import pyflaski.venndiagram

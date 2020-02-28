@@ -7,7 +7,7 @@ If you need to generate self-signed certificates you can do so by:
 mkdir ~/flaski_data/certificates
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/certificates/key.pem -out ~/flaski_data/certificates/cert.pem -subj "/C=DE/ST=NRW/L=Cologne/O=MPS/CN=flaski"
 ```
-If running flaski on development mode make sure that you change the variable `FLASK_ENV` to `development`.
+If running flaski on development mode make sure that you change the variable `FLASK_ENV` to `development` in `docker-compose.yml`.
 
 Export secret variables:
 ```bash
@@ -64,8 +64,8 @@ docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/serv
 
 ## Email logging
 
-To use the SMTP debugging server from Python. 
-This is a fake email server that accepts emails, but instead of sending them, it prints them to the console. 
+To use the SMTP debugging server from Python comment all email related `env` in `docker-compose.yml`.
+You can not using python's fake email server that accepts emails, but instead of sending them, it prints them to the console. 
 To run this server, open a second terminal session and run the following command on it:
 ```bash
 docker-compose exec server python3 -m smtpd -n -c DebuggingServer localhost:8025
