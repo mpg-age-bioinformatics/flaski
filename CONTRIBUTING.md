@@ -84,7 +84,7 @@ Once inside the container start `jupyter` with:
 ```bash
 jupyter notebook --allow-root --ip=0.0.0.0
 ```
-You can not used the displayed link to access `jupyter` in Flaski build environment.
+You can now use the displayed link to access `jupyter` in Flaski build environment.
 
 When adding new apps don't forget to generate the respective links in `pyflaski` as well as to add the respective imports
 in `pyflaski/pyflaski/__init__.py`:
@@ -100,7 +100,7 @@ import pyflaski.venndiagram
 Please use `jupyter` as described above to test `pyflaski`.
 
 
-If new/additional python packages please don't forget to add them to `requirements.txt`. Alternatively, run 
+If new/additional python packages are requiresd please don't forget to add them to `requirements.txt`. Alternatively, run 
 ```bash
 ./utils/getenv.sh > requirements.txt
 ```
