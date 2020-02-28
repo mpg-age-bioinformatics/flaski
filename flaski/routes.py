@@ -163,9 +163,9 @@ def before_request():
             logout_user()
             return redirect(url_for('login'))
 
-@app.route('/reset_plot')
+@app.route('/reset')
 @login_required
-def reset_plot():
+def reset():
     if 'app' in list(session.keys()):
         app=session["app"]
     else:
