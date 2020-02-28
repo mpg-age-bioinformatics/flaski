@@ -53,7 +53,7 @@
             </div>    
 
             <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
+            <hr class="sidebar-divider">
 
             {% if filename != "Select file.." %}
 
@@ -202,14 +202,25 @@
                                 {% endfor %}
                             </select></label>
 
+                            <label>z-score: <select name=zscore_value method="GET" action="/">
+                                {% for zscore_ in zscore %}
+                                    <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
+                                {% endfor %}
+                            </select></label>
+
                             <label style="padding-left:0px;padding-right:0px;"> Robustness percentil (0 - 100): <input type="text" name="robust" value='{{ robust }}' style="width:103px;height:22px;padding-left:4px;"></label>
 
-                            <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/> Column labels</label>
-                            <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/> Row labels</label>
+                            <hr class="black">
+
+                            <label>Show labels: </label>
+                            <label style="padding-left:41px;padding-right:14px;"> columns: </label><label><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:30px;padding-right:14px;"> rows: </label><label><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/></label>
 
                             <label>Labels font size: </label>
                             <label style="padding-left:21px;padding-right:0px;"> columns: <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
                             <label style="padding-left:21px;padding-right:0px;"> rows: <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
+
+                            <hr class="black">
 
                             <label>CMAP: <select name=colorscale_value method="GET" action="/">
                                 {% for colorscale_ in colorscale %}
@@ -217,11 +228,7 @@
                                 {% endfor %}
                             </select></label>
 
-                            <label style="padding-left:34px;">z-score: <select name=zscore_value method="GET" action="/">
-                                {% for zscore_ in zscore %}
-                                    <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
-                                {% endfor %}
-                            </select></label>
+
 
                             <label style="width:263px;">Color bar: </label>
                             <label style="padding-left:0px;padding-right:0px;">label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:263px;height:22px;padding-left: 4px"></label>
