@@ -1,6 +1,6 @@
 # Flaski
 
-Flaski is a flask based collection of web apps for life-sciences. Flaski can be deployed using the docker-compose.yml or on a kubernetes cluster. Within Flaski, pyflaski provides access to all the main functions used by the different web applications.
+Flaski is a flask based collection of web apps for life-sciences. Flaski can be deployed using the `docker-compose.yml` or on a [kubernetes](https://github.com/mpg-age-bioinformatics/flaski/tree/master/kubernetes#kubernetes) cluster. Within Flaski, the companion `pyflaski` package provides access on a python shell to all of the main functions used in the different apps.
 
 ## Deploying Flaski
 

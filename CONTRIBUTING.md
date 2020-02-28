@@ -1,8 +1,8 @@
 # Contributing
 
-Flaski is a flask based collection of web apps for life-sciences. Flaski can be deployed using the `docker-compose.yml` or on a [kubernetes](https://github.com/mpg-age-bioinformatics/flaski/tree/master/kubernetes#kubernetes) cluster. Within Flaski, `pyflaski` provides access to all the main functions used by the different web applications.
+Flaski is a flask based collection of web apps for life-sciences. Flaski can be deployed using the `docker-compose.yml` or on a [kubernetes](https://github.com/mpg-age-bioinformatics/flaski/tree/master/kubernetes#kubernetes) cluster. Within Flaski, the companion `pyflaski` package provides access on a python shell to all of the main functions used in the different apps.
 
-If you would like to contribute to flaski please make a fork and submit a pull request once you're ready with your changes and would like to see them merged to the main branch.
+If you would like to contribute to Flaski please make a fork and submit a pull request once you're ready with your changes and would like to see them merged to the main branch.
 
 ### Apps
 
