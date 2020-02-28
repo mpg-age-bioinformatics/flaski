@@ -68,7 +68,7 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
 If you're adding private apps to your deployment ie. apps that will only be available to certain users do not edit `flaski/__init__.py` but instead add the app description to `utils/private.apps.tsv`.
 Use `all` for all logged in users and `#domain.com` if you want to add users from a specific email domain.
 
-### `jupyter`
+### jupyter
 
 During development it can be useful to use a `jupyter` in the same build environment as Flaski. For this you can deploy Flaski locally using `docker-compose` 
 and then get an interactive shell in the Flaski container with:
@@ -81,7 +81,7 @@ jupyter notebook --allow-root --ip=0.0.0.0
 ```
 You can now use the displayed link to access `jupyter` in Flaski build environment.
 
-### `pyflaski`
+### pyflaski
 
 `pyflaski` is maintained in the `pyflaski` folder with symbolic links to `flaski/apps/main`:
 ```
