@@ -242,7 +242,7 @@ def iheatmap(download=None):
             fig.write_image(figfile, format=plot_arguments["downloadf"], height=float(plot_arguments["fig_height"]) , width=float(plot_arguments["fig_width"]))
             figfile.seek(0)  # rewind to beginning of file
 
-            eventlog = UserLogging(email=current_user.email,action="download figure heatmap")
+            eventlog = UserLogging(email=current_user.email,action="download figure iheatmap")
             db.session.add(eventlog)
             db.session.commit()
 

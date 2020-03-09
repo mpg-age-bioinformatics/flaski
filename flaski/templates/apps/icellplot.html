@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block app_title %}
+
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">iCell plot</h1>
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block side_bar_content %}
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+        <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+        <!-- /div -->
+        <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+            </div>
+        <!--/div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
+
+        <form action="{{ url_for('icellplot') }}" method="post" enctype="multipart/form-data">
+
+            <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
+            <!-- Heading -->
+            <div class="sidebar-heading">DAVID output file:</div>
+
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
+                    <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
+                </div>
+            </div>              
+
+            {% if filename != "Select file.." %}
+
+            <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
+            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:15px">
+                <div class="column">
+                    <div class="sidebar-heading">Terms column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px;" >
+                        <select title=terms_column name=terms_column method="GET" action="/" style="width:365px;">
+                            {% for david_cols_ in david_cols %}
+                                <option value="{{david_cols_}}" {% if david_cols_==terms_column %} selected {% endif %}>{{david_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:5px">
+                <div class="column">
+                    <div class="sidebar-heading">Gene ids column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px;" >
+                        <select title=david_gene_ids name=david_gene_ids method="GET" action="/" style="width:365px;">
+                            {% for david_cols_ in david_cols %}
+                                <option value="{{david_cols_}}" {% if david_cols_==david_gene_ids %} selected {% endif %}>{{david_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:5px">
+                <div class="column">
+                    <div class="sidebar-heading">p values column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px;" >
+                        <select title=pvalue name=pvalue method="GET" action="/" style="width:365px;">
+                            {% for david_cols_ in david_cols %}
+                                <option value="{{david_cols_}}" {% if david_cols_==pvalue %} selected {% endif %}>{{david_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+
+            <hr class="sidebar-divider"><hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Gene expression output file:</div>
+            <div class="input-group margin-bottom-sm" style="padding-right:15px; padding-left:15px;" >
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="ge_inputfile" id="ge_inputfile">
+                    <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
+                    <label class="custom-file-label" for="ge_inputfile" placeholder="Choose File">{{ge_filename}}</label>
+                </div>
+                <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
+                <!--input class="form-control" type="text" placeholder="input file"-->
+            </div>  
+
+            {% if ge_filename != "Select file.." %}
+
+            <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:15px">
+                <div class="column">
+                    <div class="sidebar-heading">Gene ids column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;" >
+                        <select title=gene_identifier name=gene_identifier method="GET" action="/" style="width:365px;">
+                            {% for ge_cols_ in ge_cols %}
+                                <option value="{{ge_cols_}}" {% if ge_cols_==gene_identifier %} selected {% endif %}>{{ge_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:5px">
+                <div class="column">
+                    <div class="sidebar-heading">Expression values column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;" >
+                        <select title=expression_values name=expression_values method="GET" action="/" style="width:365px;">
+                            {% for ge_cols_ in ge_cols %}
+                                <option value="{{ge_cols_}}" {% if ge_cols_==expression_values %} selected {% endif %}>{{ge_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:5px">
+                <div class="column">
+                    <div class="sidebar-heading">Gene names column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;" >
+                        <select title=gene_name name=gene_name method="GET" action="/" style="width:365px;">
+                            {% for ge_cols_ in ge_cols %}
+                                <option value="{{ge_cols_}}" {% if ge_cols_==gene_name %} selected {% endif %}>{{ge_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider"><hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+            Arguments:
+            </div>
+
+            {% if (filename != "Select file..") and (ge_filename != "Select file..") %}
+
+            <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item" style="padding-bottom: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Figure</span>
+                </a>
+                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Width: <input type="text" name="width" value='{{ width }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                                <label style="padding-left: 7px">Height: <input type="text" name="height" value='{{ height }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
+                                <label style="padding-left:4px;"> size: <input type="text" name="title_font_size" value='{{ title_font_size }}' style="width:50px;height:22px;padding-left:4px"></label>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- PLOT ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePlot" aria-expanded="true" aria-controls="collapsePlot" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Plot</span>
+                </a>
+                <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>CMAP: <select name=color_scale_value method="GET" action="/" style="width:252px;"> 
+                                {% for colorscale_ in color_scale %}
+                                    <option value="{{colorscale_}}" {% if colorscale_==color_scale_value %} selected {% endif %}>{{colorscale_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-right:40px;">Color scale percentil range (0-100): </label>
+                            <label style="padding-right:4px;">lower:</label><label><input type="text" name="lower_expression_percentile" value='{{ lower_expression_percentile }}' style="width:100px;height:22px;padding-left:4px;"></label>
+                            <label style="padding-left:12px;padding-right:4px;">upper:</label><label><input type="text" name="upper_expression_percentile" value='{{ upper_expression_percentile }}' style="width:101px;height:22px;padding-left:4px;"></label>
+
+                            <label>Color bar title: <input type="text" name="color_bar_title" value='{{ color_bar_title }}' style="width:133px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:4px;"> size: <input type="text" name="color_bar_title_font_size" value='{{ color_bar_title_font_size }}' style="width:40px;height:22px;padding-left:4px"></label>
+                            
+                            <label style="padding-left:0px;">Tick font size: <input type="text" name="color_bar_tickfont" value='{{ color_bar_tickfont }}' style="width:37px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:4px;">width: <input type="text" name="color_bar_tickwidth" value='{{ color_bar_tickwidth }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:4px;">length: <input type="text" name="color_bar_ticklen" value='{{ color_bar_ticklen }}' style="width:38px;height:22px;padding-left:4px"></label>
+
+                            <label style="padding-left:0px;padding-right:4px;">Y-Axis line: </label><label><input type="checkbox" name="yaxis_line" {% if yaxis_line=="on" %} checked {% elif yaxis_line==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:28px;padding-right:4px;">right side: </label><label><input type="checkbox" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:28px;">width: <input type="text" name="yaxis_linewidth" value='{{ yaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            
+
+
+
+                            <label style="width:250px;">Data transformation: </label>
+
+                            <label style="padding-left:0px;padding-right:0px;">add constant: <input type="text" name="add_constant" value='{{ add_constant }}' style="width:39px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:22px;">log transform: <select name=log_transform_value method="GET" action="/">
+                                {% for log_transform_ in log_transform %}
+                                    <option value="{{log_transform_}}" {% if log_transform_==log_transform_value %} selected {% endif %}>{{log_transform_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label>z-score: <select name=zscore_value method="GET" action="/">
+                                {% for zscore_ in zscore %}
+                                    <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-left:0px;padding-right:0px;"> Robustness percentil (0 - 100): <input type="text" name="robust" value='{{ robust }}' style="width:103px;height:22px;padding-left:4px;"></label>
+
+                            <hr class="black">
+
+                            <label>Show labels: </label>
+                            <label style="padding-left:41px;padding-right:14px;"> columns: </label><label><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:30px;padding-right:14px;"> rows: </label><label><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/></label>
+
+                            <label>Labels font size: </label>
+                            <label style="padding-left:21px;padding-right:0px;"> columns: <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
+                            <label style="padding-left:21px;padding-right:0px;"> rows: <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
+
+                            <hr class="black">
+
+
+
+                            <label style="width:263px;">Color bar: </label>
+                            <label style="padding-left:0px;padding-right:0px;">label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:263px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0px;padding-right:0px;">label font size: <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:50px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:8px;padding-right:0px;">tickts font size: <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:52px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0px;padding-right:0px;">padding: <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:86px;height:22px;padding-left: 4px"></label>
+
+                            <!--label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="annotate" {% if annotate=="on" %} checked {% elif annotate==".on" %} checked {% endif %}/> Annotate</label-->
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+          
+            {% endif %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
+
+            {% if figure_url %}
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-download"></i>
+                    <span>Figure</span>
+                </a>
+                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
+                            </div>   
+                            <div class="row arg">
+                                <label> format: <select name=downloadf method="GET" action="/" style="width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {% endif %}
+
+            <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Arguments</span>
+                </a>
+                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload arguments file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
+                    <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                    <span>Session</span>
+                </a>
+                <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload session file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+
+            <!-- -------------------- SUBMIT ---------------------- -->
+
+            <div style="padding-right: 15px; padding-left: 15px;" >
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" />
+            </div>
+        </form>
+
+                <!-- Divider -->
+        <!--hr class="sidebar-divider d-none d-md-block"-->
+    </div>
+    
+      <!-- Sidebar Toggler (Sidebar) -->
+      <!-- div class="text-center d-none d-md-inline" -->
+        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
+      <!-- /div -->
+
+</ul>
+
+{% endblock %}
+
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
+{% block content %}
+<div class="container-fluid">
+
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        {% else %}
+        <!-- INFORMATION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if figure_url %}
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+        <div class="chart" id="cellplot" style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+            <script>
+                var graphs = {{figure_url | safe}};
+                Plotly.plot('cellplot',graphs,{});
+            </script>
+
+
+        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('icellplot', download='download') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Figure
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+                <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-th fa-sm text-white-50"></i> Session
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}
+
+
+
+{% block in_app_footer %}
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+        <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Insitute for Biology of Ageing</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}
