@@ -78,7 +78,7 @@
                 </div>
             </div>
 
-            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:5px">
+            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:5px;padding-bottom:15px;">
                 <div class="column">
                     <div class="sidebar-heading">p values column:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px;" >
@@ -93,7 +93,7 @@
 
             {% endif %}
 
-            <hr class="sidebar-divider"><hr class="sidebar-divider">
+            <hr class="sidebar-divider">
 
             <div class="sidebar-heading">Gene expression output file:</div>
             <div class="input-group margin-bottom-sm" style="padding-right:15px; padding-left:15px;" >
@@ -135,7 +135,7 @@
                 </div>
             </div>
 
-            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:5px">
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:5px;padding-bottom:15px;">
                 <div class="column">
                     <div class="sidebar-heading">Gene names column:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;" >
@@ -151,14 +151,15 @@
             {% endif %}
 
             <!-- Divider -->
-            <hr class="sidebar-divider"><hr class="sidebar-divider">
+            <hr class="sidebar-divider">
+
+
+            {% if (filename != "Select file..") and (ge_filename != "Select file..") %}
 
             <!-- Heading -->
             <div class="sidebar-heading">
             Arguments:
             </div>
-
-            {% if (filename != "Select file..") and (ge_filename != "Select file..") %}
 
             <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
 

@@ -1,3 +1,18 @@
+https://github.com/fradelg/docker-mysql-cron-backup
+
+Variables
+MYSQL_HOST: The host/ip of your mysql database.
+MYSQL_PORT: The port number of your mysql database.
+MYSQL_USER: The username of your mysql database.
+MYSQL_PASS: The password of your mysql database.
+MYSQL_DB: The database name to dump. Default: --all-databases.
+MYSQLDUMP_OPTS: Command line arguments to pass to mysqldump. Example: --single-transaction.
+CRON_TIME: The interval of cron job to run mysqldump. 0 3 * * sun by default, which is every Sunday at 03:00.
+MAX_BACKUPS: The number of backups to keep. When reaching the limit, the old backup will be discarded. No limit by default.
+INIT_BACKUP: If set, create a backup when the container starts.
+INIT_RESTORE_LATEST: If set, restores latest backup.
+TIMEOUT: Wait a given number of seconds for the database to be ready and make the first backup, 10s by default. After that time, the initial attempt for backup gives up and only the Cron job will try to make a backup.
+
 # README
 
 *forked from [jmfederico/run-xtrabackup.sh](https://gist.github.com/jmfederico/1495347)*

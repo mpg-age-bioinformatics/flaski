@@ -170,7 +170,7 @@ def reset():
         app=session["app"]
     else:
         app="index"
-    session["app"]=None
+    session["app"]='reset'
     return redirect(url_for(app))
 
 @app.route('/download/<json_type>', methods=['GET','POST'])

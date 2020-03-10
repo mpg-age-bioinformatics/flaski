@@ -1,16 +1,16 @@
-# Copyright (c) Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing.
-# Distributed under the terms of the Modified BSD License.
+FROM jwilder/dockerize
 
-FROM mariadb/server
+LABEL maintainer "Daniel Rosskopp <drosskopp@upcal.de>"
 
-LABEL maintainer "bioinformatics@age.mpg.de"
+RUN apk add --update bash mysql-client gzip openssl rsync && rm -rf /var/cache/apk/*
 
-RUN mkdir -p /backups/mariadb /backups/users /flaski_data/users 
+ENV CRON_TIME="0 3 * * *" \
+    MYSQL_HOST="mariadb" \
+    MYSQL_PORT="3306" \
+    TIMEOUT="30s"
 
-RUN apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq cron && \
-apt-get clean && rm -rf /var/lib/apt/lists/*
+COPY ["run.sh", "backup.sh", "restore.sh", "/"]
+RUN mkdir -p /backup /databack /flaski_data && chmod u+x /backup.sh /restore.sh /run.sh
+VOLUME ["/backup"]
 
-COPY run-backups.sh /run-backups.sh
-
-RUN echo "0 0 * * * bash /run-backups.sh > /run-backups.sh.out 2>&1" > /cron.job && crontab /cron.job
+CMD dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh
