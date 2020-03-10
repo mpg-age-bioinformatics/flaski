@@ -17,7 +17,7 @@ def make_figure(david_df, ge_df, pa):
         if pa[n] == "":
             pa_[n]=None
         else:
-            pa_[n]=pa[n]
+            pa_[n]=float(pa[n])
 
     gedic=ge_df[[ pa["gene_identifier"] , pa["expression_values"] ]]
     gedic.loc[:, pa["gene_identifier"] ]=gedic.loc[:, pa["gene_identifier"] ].apply(lambda x: x.upper() )
@@ -61,8 +61,8 @@ def make_figure(david_df, ge_df, pa):
              hover_name="gene_name", hover_data=["expression", "term p value","n_genes"],\
              title=pa["title"],\
              range_color=[low,high],\
-             width=float(pa_["width"]),\
-             height=float(pa_["height"]) )
+             width=pa_["width"],\
+             height=pa_["height"] )
 
     fig.update_layout({"yaxis":{"tickfont":{"size": float(pa["yaxis_font_size"]) }}, "xaxis":{"tickfont":{"size":float(pa["xaxis_font_size"])}} })
 

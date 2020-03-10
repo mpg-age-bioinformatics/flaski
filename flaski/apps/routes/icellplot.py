@@ -281,10 +281,19 @@ def icellplot(download=None):
             for v in ["height","width"]:
                 if plot_arguments[v] != "":
                     pa_[v]=None
+                elif plot_arguments[v]:
+                    pa_[v]=float(plot_arguments[v])
                 else:
-                    pa_=float(plot_arguments[v])
+                    pa_[v]=None
 
-            fig.write_image( figfile, format=plot_arguments["downloadf"], height=pa_["height"] , width=pa_["width"] )
+            if pa_["height"]:
+                if pa_["width"]:
+                    fig.write_image( figfile, format=plot_arguments["downloadf"], height=pa_["height"] , width=pa_["width"] )
+                else:
+                    fig.write_image( figfile, format=plot_arguments["downloadf"] )
+            else:
+                fig.write_image( figfile, format=plot_arguments["downloadf"] )
+
             figfile.seek(0)  # rewind to beginning of file
 
             eventlog = UserLogging(email=current_user.email,action="download figure icellplot")

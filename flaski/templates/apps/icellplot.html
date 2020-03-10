@@ -216,51 +216,24 @@
                             <label style="padding-left:4px;">width: <input type="text" name="color_bar_tickwidth" value='{{ color_bar_tickwidth }}' style="width:38px;height:22px;padding-left:4px"></label>
                             <label style="padding-left:4px;">length: <input type="text" name="color_bar_ticklen" value='{{ color_bar_ticklen }}' style="width:38px;height:22px;padding-left:4px"></label>
 
-                            <label style="padding-left:0px;padding-right:4px;">Y-Axis line: </label><label><input type="checkbox" name="yaxis_line" {% if yaxis_line=="on" %} checked {% elif yaxis_line==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:28px;padding-right:4px;">right side: </label><label><input type="checkbox" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:0px;padding-right:5px;">Y-Axis line: </label><label><input type="checkbox" name="yaxis_line" {% if yaxis_line=="on" %} checked {% elif yaxis_line==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:27px;padding-right:4px;">right side: </label><label><input type="checkbox" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/></label>
                             <label style="padding-left:28px;">width: <input type="text" name="yaxis_linewidth" value='{{ yaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label>
                             
+                            <label style="padding-left:0px;padding-right:4px;">X-Axis line: </label><label><input type="checkbox" name="xaxis_line" {% if xaxis_line=="on" %} checked {% elif xaxis_line==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:35px;padding-right:4px;">top side: </label><label><input type="checkbox" name="topxaxis_line" {% if topxaxis_line=="on" %} checked {% elif topxaxis_line==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:28px;">width: <input type="text" name="xaxis_linewidth" value='{{ xaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            
+                            <label style="padding-left:0px;padding-right:4px;">Font size: </label>
+                            <label style="padding-left:31px;padding-right:4px;">Y-Axis: </label><label><input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:32px;padding-right:4px;">X-Axis: </label><label><input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:38px;height:22px;padding-left:4px"></label>
+                          
+                            <label style="padding-left:0px;padding-right:4px;">X-Axis tick: </label>
+                            <label style="padding-left:25px;padding-right:4px;">width: </label><label><input type="text" name="xaxis_tickwidth" value='{{ xaxis_tickwidth }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:34px;padding-right:4px;">length: </label><label><input type="text" name="xaxis_ticklen" value='{{ xaxis_ticklen }}' style="width:38px;height:22px;padding-left:4px"></label>
 
-
-
-                            <label style="width:250px;">Data transformation: </label>
-
-                            <label style="padding-left:0px;padding-right:0px;">add constant: <input type="text" name="add_constant" value='{{ add_constant }}' style="width:39px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:22px;">log transform: <select name=log_transform_value method="GET" action="/">
-                                {% for log_transform_ in log_transform %}
-                                    <option value="{{log_transform_}}" {% if log_transform_==log_transform_value %} selected {% endif %}>{{log_transform_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label>z-score: <select name=zscore_value method="GET" action="/">
-                                {% for zscore_ in zscore %}
-                                    <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-left:0px;padding-right:0px;"> Robustness percentil (0 - 100): <input type="text" name="robust" value='{{ robust }}' style="width:103px;height:22px;padding-left:4px;"></label>
-
-                            <hr class="black">
-
-                            <label>Show labels: </label>
-                            <label style="padding-left:41px;padding-right:14px;"> columns: </label><label><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:30px;padding-right:14px;"> rows: </label><label><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/></label>
-
-                            <label>Labels font size: </label>
-                            <label style="padding-left:21px;padding-right:0px;"> columns: <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
-                            <label style="padding-left:21px;padding-right:0px;"> rows: <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
-
-                            <hr class="black">
-
-
-
-                            <label style="width:263px;">Color bar: </label>
-                            <label style="padding-left:0px;padding-right:0px;">label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:263px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">label font size: <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:50px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:8px;padding-right:0px;">tickts font size: <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:52px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">padding: <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:86px;height:22px;padding-left: 4px"></label>
-
-                            <!--label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="annotate" {% if annotate=="on" %} checked {% elif annotate==".on" %} checked {% endif %}/> Annotate</label-->
+                            <label style="padding-left:0px;padding-right:4px;">Grid: </label><label><input type="checkbox" name="grid" {% if grid=="on" %} checked {% elif grid==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:115px;padding-right:4px;">N terms to plot: </label><label><input type="text" name="number_of_terms" value='{{ number_of_terms }}' style="width:38px;height:22px;padding-left:4px"></label>
 
                         </div>
                     </div>
