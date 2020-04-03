@@ -47,8 +47,13 @@ apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install pymysql
 
-# data folders
-RUN mkdir -p /flaski_data/logs /flaski/.git /flaski/flaski /flaski/utils /flaski/services /flaski/pyflaski /faski_data/users /faski_data/logs
+# Add flaski user for running the service
+RUN useradd -m flaski --uid=1000 && echo "flaski:4.iMkMm4zFoNViof" | \
+    chpasswd
+
+# data folders and access rights
+RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users
+RUN chown -R flaski:flaski /flaski_data /flaski/migrations /var/log/flaski
 
 COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt
@@ -68,6 +73,8 @@ EXPOSE 8888
 # Flask
 EXPOSE 8000
 
+# Setup default user, when enter docker container
+USER flaski:flaski
 WORKDIR /flaski
 
-ENTRYPOINT /bin/bash -c '/flaski/services/server/docker-entrypoint.sh ; tail -f /dev/null'
+ENTRYPOINT /flaski/services/server/docker-entrypoint.sh ; tail -f /dev/null

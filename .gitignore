@@ -9,6 +9,9 @@ site
 tmp
 migrations
 __pycache__
+/services/nginx/certs/
+# environment
+.env
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
