@@ -10,7 +10,7 @@ ENV CRON_TIME="0 3 * * *" \
     TIMEOUT="30s"
 
 COPY ["run.sh", "backup.sh", "restore.sh", "/"]
-RUN mkdir -p /backup /databack /flaski_data && chmod u+x /backup.sh /restore.sh /run.sh
+RUN mkdir -p /backup/users_data /backup/mariadb /flaski_data && chmod u+x /backup.sh /restore.sh /run.sh
 VOLUME ["/backup"]
 
 CMD dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh
