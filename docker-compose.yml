@@ -4,13 +4,15 @@ services:
 
  server:
   container_name: server
-  image: flaski:0.2
+  image: flaski:0.2 # prod
+  # build: # dev
+  #   context: ./
+  #   dockerfile: Dockerfile
   restart: always
   volumes:
    - data:/flaski_data
+  #  - ./:/flaski # dev
   environment:
-   - FLASK_ENV=production #development, production
-   - ADMINS=flaski@age.mpg.de
    - LOGS=/var/log/flaski/
    - SECRET_KEY=${SECRET_KEY}
    - REDIS_ADDRESS=redis:6379/0
@@ -19,11 +21,21 @@ services:
    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
    - MYSQL_HOST=mariadb
    - MYSQL_PORT=3306
-   - MAIL_SERVER=mail.age.mpg.de
    - MAIL_PORT=587
    - MAIL_USE_TLS=1
-   - MAIL_USERNAME=flaski@age.mpg.de
    - MAIL_PASSWORD=${MAIL_PASSWORD}
+  #  - PRIVATE_APPS=/private.apps.xlsx
+    # production envs
+   - FLASK_ENV=production
+   - ADMINS=flaski@age.mpg.de
+   - MAIL_SERVER=mail.age.mpg.de
+   - MAIL_USERNAME=flaski@age.mpg.de
+    # development envs
+  #  - FLASK_ENV=development
+  #  - ADMINS=jboucas@age.mpg.de
+  #  - MAIL_SERVER=smtp.googlemail.com
+  #  - MAIL_USERNAME=bioflaski@gmail.com
+
   links:
    - mariadb
    - redis
@@ -31,15 +43,15 @@ services:
    - mariadb
    - redis
 
- cron-backup:
+ backup:
   container_name: backup
-  image: hub.age.mpg.de/backup:0.1
+  image: hub.age.mpg.de/backup:0.1 # prod
   depends_on:
    - mariadb
   volumes:
-   - /srv/backup/mariadb:/backup
-   - /srv/backup/data:/databack
-   - data:/flaski_data:ro
+   - /srv/backup:/backup # prod (backup  /databack)
+  #  - /Users/jboucas/flaski_backup:/backup # dev
+   - data:/flaski_data:ros
   environment:
    - MYSQL_HOST=mariadb
    - MYSQL_USER=root
@@ -77,10 +89,15 @@ services:
    - 80:80
    - 443:443
   volumes:
-   - /srv/certs/cert.pem:/certs/cert.pem:ro
+   - ./services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf:ro
+    # prod
+   - /srv/certs/cert.pem:/certs/cert.pem:ro 
    - /srv/certs/privkey.pem:/certs/key.pem:ro
    - /srv/certs/chain.pem:/certs/chain.pem:ro
-   - ./services/nginx/flaski.conf:/etc/nginx/conf.d/default.conf:ro
+   # dev
+  #  - /Users/jboucas/flaski_data/certificates/cert.pem:/certs/cert.pem:ro 
+  #  - /Users/jboucas/flaski_data/certificates/key.pem:/certs/key.pem:ro
+  #  - ./services/nginx/dhparam.pem:/certs/chain.pem:ro
   links:
    - server
   depends_on:
@@ -91,5 +108,5 @@ volumes:
   external: false
  db:
   external: false
- backups:
-  external: false
+#  backups:
+#   external: false
