@@ -8,7 +8,9 @@ If you need to generate self-signed certificates you can do so by:
 ```
 mkdir ~/flaski_data/certificates
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/certificates/key.pem -out ~/flaski_data/certificates/cert.pem -subj "/C=DE/ST=NRW/L=Cologne/O=MPS/CN=flaski"
+openssl ca -policy policy_anything -keyfile ~/flaski_data/certificates/A.key -cert ~/flaski_data/certificates/A.pem -out ~/flaski_data/certificates/chain.pem -infiles B.request
 ```
+
 If running flaski on development mode make sure that you change the variable `FLASK_ENV` to `development` in `docker-compose.yml`.
 
 Export secret variables:

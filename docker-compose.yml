@@ -97,7 +97,7 @@ services:
    # dev
   #  - /Users/jboucas/flaski_data/certificates/cert.pem:/certs/cert.pem:ro 
   #  - /Users/jboucas/flaski_data/certificates/key.pem:/certs/key.pem:ro
-  #  - ./services/nginx/dhparam.pem:/certs/chain.pem:ro
+  #  - /Users/jboucas/flaski_data/certificates/chain.pem:/certs/chain.pem:ro
   links:
    - server
   depends_on:
