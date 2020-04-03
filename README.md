@@ -31,7 +31,7 @@ docker-compose logs
 ```
 or for example:
 ```bash
-s
+docker-compose logs -f server
 ```
 If running flaski on development mode you will have to start flask from inside the server container:
 ```
