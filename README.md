@@ -6,9 +6,9 @@ Flaski is a flask based collection of web apps for life-sciences. Flaski can be 
 
 If you need to generate self-signed certificates you can do so by:
 ```
-mkdir ~/flaski_data/certificates
+mkdir ~/flaski_data/certificates 
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/certificates/key.pem -out ~/flaski_data/certificates/cert.pem -subj "/C=DE/ST=NRW/L=Cologne/O=MPS/CN=flaski"
-openssl ca -policy policy_anything -keyfile ~/flaski_data/certificates/A.key -cert ~/flaski_data/certificates/A.pem -out ~/flaski_data/certificates/chain.pem -infiles B.request
+openssl dhparam -out ~/flaski_data/certificates/dhparam.pem 2048
 ```
 
 If running flaski on development mode make sure that you change the variable `FLASK_ENV` to `development` in `docker-compose.yml`.
@@ -31,11 +31,16 @@ docker-compose logs
 ```
 or for example:
 ```bash
-docker-compose logs -f server
+s
+```
+If running flaski on development mode you will have to start flask from inside the server container:
+```
+docker-compose exec server /bin/bash
+flask run --host 0.0.0.0 --port 8000
 ```
 You can connect to any of the running containers by eg. 
 ```bash
-docker-compose exec mariadb /bin/bash
+docker-compose exec mariadb /bin/bashs
 ```
 For stopping and removing a container,
 ```bash

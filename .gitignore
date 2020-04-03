@@ -9,7 +9,7 @@ site
 tmp
 migrations
 __pycache__
-
+/services/nginx/certs/
 # environment
 .env
 
