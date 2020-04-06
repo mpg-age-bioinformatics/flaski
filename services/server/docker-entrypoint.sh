@@ -39,6 +39,10 @@ _EOF_
     fi
   fi
 
+  if [[ "$RESTORE_USERS_DATA" == "1" ]] ; then
+    rsync -rtvh /backup/users_data/ /flaski_data/ >> /rsync.log 2>&1
+  fi
+  
   mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} << _EOF_
 USE flaski
 DROP TABLE IF EXISTS alembic_version;
