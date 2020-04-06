@@ -60,14 +60,14 @@ spec:
           value: mariadb
         - name: MYSQL_PORT
           value: "3306"
-        - name: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
               name: flaski-secrets
-              key: MYSQL_ROOT_PASSWORD
+              key: MYSQL_PASSWORD
         #  value: mypass
         - name: MYSQL_USER
-          value: root
+          value: flaski
         - name: REDIS_ADDRESS
           value: redis:6379/0
         - name: REDIS_PASSWORD
