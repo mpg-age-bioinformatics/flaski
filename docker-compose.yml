@@ -2,6 +2,42 @@ version: '3.7'
 
 services:
 
+ init:
+  container_name: init
+  # image: flaski:0.2 # prod
+  build: # dev
+    context: ./
+    dockerfile: Dockerfile
+  volumes:
+    - data:/flaski_data
+    - ./:/flaski # dev
+  environment:
+    - FLASK_ENV=init
+    - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    - LOGS=/var/log/flaski/
+    - SECRET_KEY=${SECRET_KEY}
+    - REDIS_ADDRESS=redis:6379/0
+    - REDIS_PASSWORD=${REDIS_PASSWORD}
+    - MYSQL_USER=flaski
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_HOST=mariadb
+    - MYSQL_PORT=3306
+    - MAIL_PORT=587
+    - MAIL_USE_TLS=1
+    - MAIL_PASSWORD=${MAIL_PASSWORD}
+     # production envs
+   #  - ADMINS=flaski@age.mpg.de
+   #  - MAIL_SERVER=mail.age.mpg.de
+   #  - MAIL_USERNAME=flaski@age.mpg.de
+     # development envs
+    - ADMINS=jboucas@age.mpg.de
+    - MAIL_SERVER=smtp.googlemail.com
+    - MAIL_USERNAME=bioflaski@gmail.com
+  links:
+    - mariadb
+  depends_on:
+    - mariadb
+
  server:
   container_name: server
   # image: flaski:0.2 # prod
@@ -17,8 +53,8 @@ services:
    - SECRET_KEY=${SECRET_KEY}
    - REDIS_ADDRESS=redis:6379/0
    - REDIS_PASSWORD=${REDIS_PASSWORD}
-   - MYSQL_USER=root
-   - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+   - MYSQL_USER=flaski
+   - MYSQL_PASSWORD=${MYSQL_PASSWORD}
    - MYSQL_HOST=mariadb
    - MYSQL_PORT=3306
    - MAIL_PORT=587
@@ -40,6 +76,7 @@ services:
    - mariadb
    - redis
   depends_on:
+   - init
    - mariadb
    - redis
 
@@ -48,14 +85,15 @@ services:
   image: hub.age.mpg.de/backup:0.1 # prod
   depends_on:
    - mariadb
+   - init
   volumes:
   #  - /srv/backup:/backup # prod (backup  /databack)
    - /Users/jboucas/flaski_backup:/backup # dev
    - data:/flaski_data:ro
   environment:
    - MYSQL_HOST=mariadb
-   - MYSQL_USER=root
-   - MYSQL_PASS=${MYSQL_ROOT_PASSWORD}
+   - MYSQL_USER=flaski
+   - MYSQL_PASS=${MYSQL_PASSWORD}
    - MAX_BACKUPS=15
    - INIT_BACKUP=0
    # Every day at 03:00

@@ -52,7 +52,7 @@ RUN useradd -m flaski --uid=1000 && echo "flaski:4.iMkMm4zFoNViof" | \
     chpasswd
 
 # data folders and access rights
-RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users
+RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users /backup/users_data /backup/mariadb
 RUN chown -R flaski:flaski /flaski_data /flaski/migrations /var/log/flaski
 
 COPY requirements.txt /flaski/
@@ -66,8 +66,6 @@ COPY utils /flaski/utils
 COPY flaski /flaski/flaski
 COPY .git /flaski/.git
 
-RUN echo "0 0 1,15 * * python3 /flaski/flaski.py > /clean.flaski.out 2>&1" > /cron.job && crontab /cron.job
-
 # Jupyter port
 EXPOSE 8888
 # Flask
@@ -77,4 +75,4 @@ EXPOSE 8000
 USER flaski:flaski
 WORKDIR /flaski
 
-ENTRYPOINT /flaski/services/server/docker-entrypoint.sh ; tail -f /dev/null
+ENTRYPOINT /flaski/services/server/docker-entrypoint.sh

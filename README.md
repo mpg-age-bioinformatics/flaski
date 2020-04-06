@@ -16,6 +16,7 @@ If running flaski on development mode make sure that you change the variable `FL
 Export secret variables:
 ```bash
 export MAIL_PASSWORD="<mail password>"
+export MYSQL_PASSWORD=$(openssl rand -base64 20)
 export MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
 export REDIS_PASSWORD=$(openssl rand -base64 20)
 export SECRET_KEY=$(openssl rand -base64 20)
