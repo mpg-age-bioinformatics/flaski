@@ -32,11 +32,11 @@ spec:
     spec:
       containers:
       - env:
-        - name: REDIS_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: flaski-secrets
-              key: REDIS_PASSWORD
+              key: MYSQL_ROOT_PASSWORD
         image: mariadb/server
         name: mariadb
         ports:
