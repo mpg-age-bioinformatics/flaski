@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo $FLASK_ENV
-
 if [[ "$FLASK_ENV" == "init" ]] ; then
 
   while ! mysqladmin --user=root --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} status ; 
@@ -22,17 +20,34 @@ GRANT ALL PRIVILEGES ON flaski.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 _EOF_
 
-    echo "mysql database created.."
-
+      echo "mysql database created.."
   fi
 
-mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} << _EOF_
+  if [[ "$RESTORE_DB" == "1" ]] ; then
+    touch /mysql_backup.log
+    touch /rsync.log
+    tail -F /mysql_backup.log /rsync.log &
+    echo "=> Restore latest backup"
+    LATEST_BACKUP=$(find /backup/mariadb -maxdepth 1 -name '*.sql.gz' | tail -1 )
+    echo "=> Restore database from ${LATEST_BACKUP}"
+    set -o pipefail
+    if gunzip --stdout "${LATEST_BACKUP}" | mysql -h "${MYSQL_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}"
+      then
+        echo "=> Restore succeeded"
+      else
+        echo "=> Restore failed"
+    fi
+  fi
+
+  mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} << _EOF_
 USE flaski
 DROP TABLE IF EXISTS alembic_version;
 _EOF_
 
   rm -rf migrations/* 
   flask db init && flask db migrate -m "users table" && flask db upgrade && flask db migrate -m "userloggings table" && flask db upgrade
+
+  exit
 
 else
 
