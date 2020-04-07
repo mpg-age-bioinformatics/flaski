@@ -53,7 +53,7 @@ RUN groupadd flaski --gid=1000 && useradd -m flaski --uid=1000 --gid=1000 && ech
 
 # data folders and access rights
 RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users /backup/users_data /backup/mariadb
-RUN chown -R flaski:flaski /flaski_data /flaski/migrations /var/log/flaski
+RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /var/log/flaski
 
 COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt

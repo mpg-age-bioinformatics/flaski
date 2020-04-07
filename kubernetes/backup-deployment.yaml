@@ -21,14 +21,27 @@ spec:
           value: mariadb
         - name: MYSQL_PORT
           value: "3306"
-        - name: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_PASSWORD
           value: mypass
         - name: MYSQL_USER
-          value: root
+          value: flaski
+        - name: MAX_BACKUPS
+          value: "15"
+        - name: INIT_BACKUP
+          value: 0
+        - name: CRON_TIME
+          value: 44 13 * * *
         image: hub.age.mpg.de/flaski/backup
         name: backup
         resources: {}
+        volumeMounts:
+          - name: db-backup-volume-mount
+            mountPath: /backup/mariadb
       restartPolicy: Always
       imagePullSecrets:
         - name: hubsecret
+      volumes:
+        - name: db-backup-volume-mount
+          persistentVolumeClaim:
+            claimName: db-bc-pvc
 status: {}

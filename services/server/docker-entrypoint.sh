@@ -40,7 +40,7 @@ _EOF_
   fi
 
   if [[ "$RESTORE_USERS_DATA" == "1" ]] ; then
-    rsync -rtvh /backup/users_data/ /flaski_data/ >> /rsync.log 2>&1
+    rsync -rtvh /backup/users_data/ /flaski_data/users/ >> /rsync.log 2>&1
   fi
   
   mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} << _EOF_

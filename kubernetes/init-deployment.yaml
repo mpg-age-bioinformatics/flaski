@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: init
+  labels:
+    app: init
+spec:
+  selector:
+    app: init
+  ports:
+  - name: init
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: init
+  labels:
+    app: init
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: init
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: init
+    spec:
+      containers:
+      - env:
+        - name: ADMINS
+          value: jboucas@age.mpg.de,jorge.boucas@age.mpg.de
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: SECRET_KEY
+          # value: MY_VERY_SAFE_SECRET_KEY
+        - name: FLASK_ENV
+          value: init
+        - name: RESTORE_DB
+          value: "1"
+        - name: RESTORE_USERS_DATA
+          value: "0"
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gmailpass
+              key: pass
+        - name: MAIL_PORT
+          value: "587"
+        - name: MAIL_SERVER
+          value: smtp.googlemail.com
+        - name: MAIL_USERNAME
+          value: bioflaski@gmail.com
+        - name: MAIL_USE_TLS
+          value: "1"
+        - name: MYSQL_HOST
+          value: mariadb
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: MYSQL_PASSWORD
+        #  value: mypass
+        - name: MYSQL_USER
+          value: flaski
+        - name: REDIS_ADDRESS
+          value: redis:6379/0
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: REDIS_PASSWORD
+          # value: my_redis_password
+        image: jorgeboucas/image_drops:flaski-server #hub.age.mpg.de/flaski/server
+        imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 8000
+        name: server
+        resources: {}
+        volumeMounts:
+        - name: users-volume-mount
+          mountPath: /flaski_data/users/
+        - name: db-backup-volume-mount
+          mountPath: /backup/mariadb
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: dockerhub
+      volumes:
+      - name: users-volume-mount
+        persistentVolumeClaim:
+          claimName: users-pvc
+      - name: db-backup-volume-mount
+        persistentVolumeClaim:
+          claimName: db-bc-pvc
+
+status: {}

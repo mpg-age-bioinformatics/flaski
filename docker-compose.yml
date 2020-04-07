@@ -9,10 +9,12 @@ services:
     context: ./
     dockerfile: Dockerfile
   volumes:
-    - data:/flaski_data
+    - data:/flaski_data/users
     - ./:/flaski # dev
-  #  - /srv/backup:/backup # prod (backup  /databack)
-    - /Users/jboucas/flaski_backup:/backup:ro # dev
+  #  - /srv/backup/users_data:/backup/users_data # prod (backup  /databack)
+  #  - /srv/backup/mariadb:/backup/mariadb # prod (backup  /databack)
+    - /Users/jboucas/flaski_backup/users_data:/backup/users_data:ro # dev
+    - /Users/jboucas/flaski_backup/mariadb:/backup/mariadb:ro # dev
   environment:
     - FLASK_ENV=init
     - RESTORE_DB=1
@@ -49,7 +51,7 @@ services:
     dockerfile: Dockerfile
   restart: always
   volumes:
-   - data:/flaski_data
+   - data:/flaski_data/users
    - ./:/flaski # dev
   environment:
    - LOGS=/var/log/flaski/
@@ -90,9 +92,12 @@ services:
    - mariadb
    - init
   volumes:
-  #  - /srv/backup:/backup # prod (backup  /databack)
-   - /Users/jboucas/flaski_backup:/backup # dev
-   - data:/flaski_data:ro
+  #  - /srv/backup/mariadb:/backup/mariadb # prod (backup  /databack)
+  #  - /srv/backup/users_data:/backup/users_data # prod (backup  /databack)
+   - /Users/jboucas/flaski_backup/mariadb:/backup/mariadb # dev
+   - /Users/jboucas/flaski_backup/users_data:/backup/users_data # dev
+
+   - data:/flaski_data/users:ro
   environment:
    - MYSQL_HOST=mariadb
    - MYSQL_USER=flaski

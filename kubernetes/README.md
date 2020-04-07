@@ -68,12 +68,16 @@ kubectl apply -f users-volume.yaml
 kubectl apply -f users-volume-claim.yaml
 kubectl apply -f db-volume.yaml
 kubectl apply -f db-volume-claim.yaml
+kubectl apply -f db-backup-volume.yaml
+kubectl apply -f db-backup-volume-claim.yaml
 ```
 Use deployments to start your pods:
 ```bash
 kubectl apply -f mariadb-deployment.yaml
 kubectl apply -f redis-deployment.yaml
+kubectl apply -f init-deployment.yaml
 kubectl apply -f server-deployment.yaml
+kubectl apply -f backup-deployment.yaml
 ```
 This will start respective deployments and services. Services make sure that in case pod dies and a new one starts the address in use to contact the pod is not IP dependent.
 
