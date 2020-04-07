@@ -12,7 +12,7 @@ services:
     - data:/flaski_data
     - ./:/flaski # dev
   #  - /srv/backup:/backup # prod (backup  /databack)
-    - /Users/jboucas/flaski_backup:/backup # dev
+    - /Users/jboucas/flaski_backup:/backup:ro # dev
   environment:
     - FLASK_ENV=init
     - RESTORE_DB=1
