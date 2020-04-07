@@ -48,7 +48,7 @@ apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip3 install pymysql
 
 # Add flaski user for running the service
-RUN useradd -m flaski --uid=1000 && echo "flaski:4.iMkMm4zFoNViof" | \
+RUN groupadd flaski --gid=1000 && useradd -m flaski --uid=1000 --gid=1000 && echo "flaski:4.iMkMm4zFoNViof" | \
     chpasswd
 
 # data folders and access rights
