@@ -83,9 +83,10 @@ services:
    - init
    - mariadb
    - redis
+
  backup:
   container_name: backup
-  image: hub.age.mpg.de/backup:0.1 # prod
+  image: flaski/backup:0.1 # prod
   depends_on:
    - mariadb
    - init
@@ -94,7 +95,6 @@ services:
   #  - /srv/backup/users_data:/backup/users_data # prod (backup  /databack)
    - /Users/jboucas/flaski_backup/mariadb:/backup/mariadb # dev
    - /Users/jboucas/flaski_backup/users_data:/backup/users_data # dev
-
    - data:/flaski_data/users:ro
   environment:
    - MYSQL_HOST=mariadb
