@@ -49,7 +49,7 @@ DROP TABLE IF EXISTS alembic_version;
 _EOF_
 
   rm -rf migrations/* 
-  flask db init && flask db migrate -m "users table" && flask db upgrade && flask db migrate -m "userloggings table" && flask db upgrade
+  flask db init && flask db migrate -m "Initial migration." && flask db upgrade
 
   exit
 
