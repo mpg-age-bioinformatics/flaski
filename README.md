@@ -22,6 +22,14 @@ export REDIS_PASSWORD=$(openssl rand -base64 20)
 export SECRET_KEY=$(openssl rand -base64 20)
 ```
 
+or, for local development (quote all mail related entries in the `docker-compose.yml`):
+```
+export MYSQL_PASSWORD=MYSQL_PASSWORD
+export MYSQL_ROOT_PASSWORD=MYSQL_ROOT_PASSWORD
+export REDIS_PASSWORD=REDIS_PASSWORD
+export SECRET_KEY=SECRET_KEY
+```
+
 To deploy Flaski edit the `docker-compose.yml` accordingly and then:
 ```bash
 docker-compose up -d --build
@@ -41,7 +49,7 @@ flask run --host 0.0.0.0 --port 8000
 ```
 You can connect to any of the running containers by eg. 
 ```bash
-docker-compose exec mariadb /bin/bashs
+docker-compose exec mariadb /bin/bash
 ```
 For stopping and removing a container,
 ```bash

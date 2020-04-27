@@ -27,17 +27,17 @@ services:
     - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     - MYSQL_HOST=mariadb
     - MYSQL_PORT=3306
-    - MAIL_PORT=587
-    - MAIL_USE_TLS=1
-    - MAIL_PASSWORD=${MAIL_PASSWORD}
+    #- MAIL_PORT=587
+    #- MAIL_USE_TLS=1
+    #- MAIL_PASSWORD=${MAIL_PASSWORD}
      # production envs
    #  - ADMINS=flaski@age.mpg.de
    #  - MAIL_SERVER=mail.age.mpg.de
    #  - MAIL_USERNAME=flaski@age.mpg.de
      # development envs
     - ADMINS=jboucas@age.mpg.de
-    - MAIL_SERVER=smtp.googlemail.com
-    - MAIL_USERNAME=bioflaski@gmail.com
+    #- MAIL_SERVER=smtp.googlemail.com
+    #- MAIL_USERNAME=bioflaski@gmail.com
   links:
     - mariadb
   depends_on:
@@ -62,9 +62,9 @@ services:
    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
    - MYSQL_HOST=mariadb
    - MYSQL_PORT=3306
-   - MAIL_PORT=587
-   - MAIL_USE_TLS=1
-   - MAIL_PASSWORD=${MAIL_PASSWORD}
+   #- MAIL_PORT=587
+   #- MAIL_USE_TLS=1
+   #- MAIL_PASSWORD=${MAIL_PASSWORD}
   #  - PRIVATE_APPS=/private.apps.xlsx
     # production envs
   #  - FLASK_ENV=production
@@ -74,8 +74,8 @@ services:
     # development envs
    - FLASK_ENV=development
    - ADMINS=jboucas@age.mpg.de
-   - MAIL_SERVER=smtp.googlemail.com
-   - MAIL_USERNAME=bioflaski@gmail.com
+   #- MAIL_SERVER=smtp.googlemail.com
+   #- MAIL_USERNAME=bioflaski@gmail.com
   links:
    - mariadb
    - redis
