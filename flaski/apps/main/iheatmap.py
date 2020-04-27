@@ -392,7 +392,8 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.iheatmap",\
         "inputargumentsfile":"Select file.."}
     
-    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels"]
+    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels",\
+        "row_dendogram_dist","col_dendogram_dist"]
 
     # not update list
     notUpdateList=["inputsessionfile"]
