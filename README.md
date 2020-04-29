@@ -23,7 +23,7 @@ export SECRET_KEY=$(openssl rand -base64 20)
 ```
 
 or, for local development (quote all mail related entries in the `docker-compose.yml`):
-```
+```bash
 export MYSQL_PASSWORD=MYSQL_PASSWORD
 export MYSQL_ROOT_PASSWORD=MYSQL_ROOT_PASSWORD
 export REDIS_PASSWORD=REDIS_PASSWORD
@@ -68,16 +68,11 @@ To remove a volume, eg.
 docker volume rm db
 ```
 
-## Backup of mysql and user files to host
+## Backups
 
 ```bash
-mkdir ~/flaski_backups
-docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rsync -rtvh --delete /backups/ /host
-```
-
-optionally remove mysql backups from volume:
-```bash
-docker run -it -v flaski_backups:/backups -v ~/flaski_backups:/host mariadb/server rm -rf /backups/mariadb/*
+docker-compose exec backup /backup.sh
+docker-compose exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/
 ```
 
 ## Email logging

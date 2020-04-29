@@ -17,8 +17,8 @@ services:
     - /Users/jboucas/flaski_backup/mariadb:/backup/mariadb:ro # dev
   environment:
     - FLASK_ENV=init
-    - RESTORE_DB=0
-    - RESTORE_USERS_DATA=0
+    - RESTORE_DB=1
+    - RESTORE_USERS_DATA=1
     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     - SECRET_KEY=${SECRET_KEY}
     - REDIS_ADDRESS=redis:6379/0
@@ -88,7 +88,7 @@ services:
 
  backup:
   container_name: backup
-  image: flaski/backup:0.1 # prod
+  image: flaski/backup:latest # prod
   depends_on:
    - mariadb
    - init

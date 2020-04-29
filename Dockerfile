@@ -28,7 +28,7 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
 RUN apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq python3 python3-pip libcairo2-dev pkg-config python3-dev mariadb-client cron && \
+apt-get install -yq python3 python3-pip libcairo2-dev pkg-config python3-dev mariadb-client cron rsync && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # RUN apt-get update && apt-get -yq dist-upgrade && \
@@ -53,7 +53,8 @@ RUN groupadd flaski --gid=1000 && useradd -m flaski --uid=1000 --gid=1000 && ech
 
 # data folders and access rights
 RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users /backup/users_data /backup/mariadb
-RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /var/log/flaski
+RUN touch /mysql_backup.log && touch /rsync.log
+RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /var/log/flaski /mysql_backup.log /rsync.log
 
 COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt

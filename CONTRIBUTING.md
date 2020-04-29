@@ -133,12 +133,16 @@ For versioning please follow the rules in https://semver.org. We will use  <majo
 ```bash
 docker build -t flaski/flaski:<major>.<minor>.<patch> .
 docker push flaski/flaski:<major>.<minor>.<patch>
+docker tag flaski/flaski:<major>.<minor>.<patch> flaski/flaski:latest 
+docker push flaski/flaski:latest
 ```
 
 for backup
 ```bash
 docker build -t flaski/backup:<major>.<minor>.<patch> .
 docker push flaski/backup:<major>.<minor>.<patch>
+docker tag flaski/backup:<major>.<minor>.<patch> flaski/backup:latest 
+docker push flaski/backup:latest
 ```
 
 Than make sure you commit the matching code. If you have made changes to the `server` service use `flaski` in the tag. 
@@ -146,5 +150,7 @@ If you do changes to other services eg. `backup` user the `backup` in the tag.
 ```bash
 git add -A .
 git commit -m "<commit message>"
-git tag -a flaski/0.1.0 <commit_sha> -m "< tag message>"
+git tag -a flaski/0.1.0 <commit_sha> -m "<tag message>"
+git push
+git push origin --tags      
 ```
