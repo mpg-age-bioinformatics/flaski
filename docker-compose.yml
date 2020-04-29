@@ -45,6 +45,8 @@ services:
 
  server:
   container_name: server
+  ports: # dev
+    - 8888:8888 #dev jupyterhub 
   # image: flaski:0.2 # prod
   build: # dev
     context: ./

@@ -126,3 +126,25 @@ If new/additional python packages are required please don't forget to add them t
 ./utils/getenv.sh > requirements.txt
 ```
 If new system packages are required please edit the `Dockerfile` accordingly.
+
+### Building and pushing new server versions
+
+For versioning please follow the rules in https://semver.org. We will use  <major>.<minor>.<patch> versioning without the "v" letter before. eg. `flaski/flaski:0.1.0` :
+```bash
+docker build -t flaski/flaski:<major>.<minor>.<patch> .
+docker push flaski/flaski:<major>.<minor>.<patch>
+```
+
+for backup
+```bash
+docker build -t flaski/backup:<major>.<minor>.<patch> .
+docker push flaski/backup:<major>.<minor>.<patch>
+```
+
+Than make sure you commit the matching code. If you have made changes to the `server` service use `flaski` in the tag. 
+If you do changes to other services eg. `backup` user the `backup` in the tag.
+```bash
+git add -A .
+git commit -m "<commit message>"
+git git tag -a flaski:0.1.0 <commit_sha> -m "< tag message>"
+```
