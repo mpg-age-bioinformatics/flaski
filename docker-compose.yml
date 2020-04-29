@@ -4,7 +4,7 @@ services:
 
  init:
   container_name: init
-  # image: init:0.2 # prod
+  # image: flaski/flaski:latest # prod
   build: # dev
     context: ./
     dockerfile: Dockerfile
@@ -47,7 +47,7 @@ services:
   container_name: server
   ports: # dev
     - 8888:8888 #dev jupyterhub 
-  # image: flaski:0.2 # prod
+  # image: flaski/flaski:latest # prod
   build: # dev
     context: ./
     dockerfile: Dockerfile
