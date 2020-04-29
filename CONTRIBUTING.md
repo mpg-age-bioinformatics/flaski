@@ -146,5 +146,5 @@ If you do changes to other services eg. `backup` user the `backup` in the tag.
 ```bash
 git add -A .
 git commit -m "<commit message>"
-git git tag -a flaski:0.1.0 <commit_sha> -m "< tag message>"
+git tag -a flaski/0.1.0 <commit_sha> -m "< tag message>"
 ```
