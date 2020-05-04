@@ -291,6 +291,38 @@
                                 <label> ..or, write a color name <input type="text" name="markerc_write" value='{{ markerc_write }}' style="width:155px;height:22px;padding-left: 4px">
                             </div>
 
+                            <div class="row arg">
+                                <label> line width: <select name=edge_linewidth method="GET" action="/" style="width:50px">
+                                    {% for edge_linewidth_ in edge_linewidths %}
+                                        <option value="{{edge_linewidth_}}" {% if edge_linewidth_==edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <label> ..or, <select name=edge_linewidth_col method="GET" action="/" style="width:152px">
+                                    {% for edge_linewidth_col_ in edge_linewidth_cols %}
+                                        <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg">
+                                <div class="row arg">
+                                    <label> line color: <select name=edgecolor method="GET" action="/" style="width:80px">
+                                        {% for edgecolor_ in edge_colors %}
+                                            <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
+                                        {% endfor %}
+                                    </select>
+    
+                                    <label> ..or, <select name=edgecolor_col method="GET" action="/" style="width:128px">
+                                        {% for edgecolor_col_ in edgecolor_cols %}
+                                            <option value="{{edgecolor_col_}}" {% if edgecolor_col_==edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+    
+                                <div class="row arg" style="padding-bottom:6px;">
+                                    <label> ..or, write a color name <input type="text" name="edgecolor_write" value='{{ edgecolor_write }}' style="width:155px;height:22px;padding-left: 4px">
+                            </div>
 
                             <div class="row arg">
                                 <label>shape: <select name=marker method="GET" action="/" style="width:50px">

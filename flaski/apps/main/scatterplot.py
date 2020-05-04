@@ -71,8 +71,27 @@ def make_figure(df,pa):
                 else:
                     c=pa["markerc"]
 
+
+                if pa["edgecolor_col"] != "select a column..":
+                    edgecolor=[ GET_COLOR(i) for i in tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()][0]
+                    if type(edgecolor) == list:
+                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                elif str(pa["edgecolor_write"]) != "":
+                    edgecolor=GET_COLOR(pa["edgecolor_write"])
+                    if type(edgecolor) == list:
+                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                else:
+                    edgecolor=pa["edgecolor"]
+
+                if pa["edge_linewidth_col"] != "select a column..":
+                    edge_linewidth=[ float(i) for i in tmp[[pa["edge_linewidth_col"]]].dropna()[pa["edge_linewidth_col"]].tolist() ][0]
+                else:
+                    edge_linewidth=float(pa["edge_linewidth"])
+
                 ax.scatter(x, y, \
                     marker=marker, \
+                    edgecolor=edgecolor,\
+                    linewidth=edge_linewidth,\
                     s=s,\
                     c=c,\
                     alpha=a,\
@@ -124,9 +143,26 @@ def make_figure(df,pa):
                 else:
                     c=pa["markerc"]
 
-                #print(x, y, marker, s, c, marker_alpha)
+                if pa["edgecolor_col"] != "select a column..":
+                    edgecolor=[ GET_COLOR(i) for i in tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()][0]
+                    if type(edgecolor) == list:
+                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                elif str(pa["edgecolor_write"]) != "":
+                    edgecolor=GET_COLOR(pa["edgecolor_write"])
+                    if type(edgecolor) == list:
+                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                else:
+                    edgecolor=pa["edgecolor"]
+
+                if pa["edge_linewidth_col"] != "select a column..":
+                    edge_linewidth=[ float(i) for i in tmp[[pa["edge_linewidth_col"]]].dropna()[pa["edge_linewidth_col"]].tolist() ][0]
+                else:
+                    edge_linewidth=float(pa["edge_linewidth"])
+
                 ax.scatter(x, y, \
                     marker=marker, \
+                    edgecolor=edgecolor,\
+                    linewidth=edge_linewidth,\
                     s=s,\
                     c=c,\
                     alpha=marker_alpha)
@@ -262,6 +298,15 @@ def figure_defaults():
         "marker_alpha":"1",\
         "markeralpha_col":["select a column.."],\
         "markeralpha_col_value":"select a column..",\
+        "edge_colors":STANDARD_COLORS,\
+        "edgecolor":"black",\
+        "edgecolor_cols":["select a column.."],\
+        "edgecolor_col":"select a column..",\
+        "edgecolor_write":"",\
+        "edge_linewidth_cols":["select a column.."],\
+        "edge_linewidth_col":"select a column..",\
+        "edge_linewidths":STANDARD_SIZES,\
+        "edge_linewidth":"0",\
         "labels_col":["select a column.."],\
         "labels_col_value":"select a column..",\
         "labels_font_size":"10",\
