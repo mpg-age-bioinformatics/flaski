@@ -45,7 +45,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && ba
 /miniconda/bin/conda install -c plotly plotly-orca psutil requests && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install pymysql
+#RUN pip3 install pymysql
 
 # Add flaski user for running the service
 RUN groupadd flaski --gid=1000 && useradd -m flaski --uid=1000 --gid=1000 && echo "flaski:4.iMkMm4zFoNViof" | \
@@ -58,6 +58,10 @@ RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /v
 
 COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt
+
+#RUN apt-get update && apt-get -yq dist-upgrade && \
+#apt-get install -yq git && \
+#apt-get clean && rm -rf /var/lib/apt/lists/*
 
 #comment during development
 COPY LICENSE.md README.md config.py flaski.py MANIFEST.in requirements.txt setup.py .flaskenv /flaski/
