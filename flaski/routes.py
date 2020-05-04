@@ -41,15 +41,18 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"Venn diagram", "id":'venndiagram_more',"link":'venndiagram' ,"java":"javascript:ReverseDisplay('venndiagram_more')", "description":"A venn diagram plotting app."},\
         { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."} ]
 
+with open("/flaski/.git/refs/heads/master", "r") as master:
+    ashtag=master.readlines()[0][:7]
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     apps=FREEAPPS
     if current_user.is_authenticated:
         apps=apps+session["PRIVATE_APPS"]
-        return render_template('index.html',userlogged="yes", apps=apps)
+        return render_template('index.html',userlogged="yes", apps=apps, ashtag=ashtag)
     else:
-        return render_template('index.html',userlogged="no",apps=apps)  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
+        return render_template('index.html',userlogged="no",apps=apps,ashtag=ashtag)  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
