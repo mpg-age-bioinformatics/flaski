@@ -63,7 +63,7 @@
                 <div class="column">
                     <div class="sidebar-heading">X values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xcols method="GET" action="/" style="width:114px">
+                        <select title=xcols name=xvals method="GET" action="/" style="width:114px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
@@ -74,7 +74,7 @@
                 <div class="column">
                     <div class="sidebar-heading" style="padding-left: 6px;">Y values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
-                        <select name=ycols method="GET" action="/" style="width:114px">
+                        <select name=yvals method="GET" action="/" style="width:114px">
                             {% for ycol in ycols %}
                                 <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>
                             {% endfor %}

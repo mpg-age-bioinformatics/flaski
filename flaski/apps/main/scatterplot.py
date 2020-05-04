@@ -34,8 +34,9 @@ def make_figure(df,pa):
     # the user can decide how the diferent groups should look like 
     # by unchecking the groups_autogenerate check box
 
+    print(pa["xvals"],pa["yvals"])
 
-    if pa["groups_value"]!="None":
+    if str(pa["groups_value"])!="None":
         for group in list(OrderedDict.fromkeys(df[pa["groups_value"]].tolist())):
             tmp=df[df[pa["groups_value"]]==group]
 
@@ -123,6 +124,7 @@ def make_figure(df,pa):
                 else:
                     c=pa["markerc"]
 
+                #print(x, y, marker, s, c, marker_alpha)
                 ax.scatter(x, y, \
                     marker=marker, \
                     s=s,\
