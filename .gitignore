@@ -5,6 +5,7 @@
 /dist/
 /build/
 /venv/
+/src
 site
 tmp
 migrations

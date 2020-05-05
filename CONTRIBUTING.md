@@ -57,7 +57,7 @@ If adding new apps don't forget to edit `flaski/__init__.py` accordingly:
 ```python
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram
 ```
-and to add the app description to `flaski/__init__.py`:
+and to add the app description to `flaski/routes.py`:
 ```python
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
         { "name":"iScatter plot", "id":'iscatterplot_more',"link":'iscatterplot' ,"java":"javascript:ReverseDisplay('iscatterplot_more')", "description":"An intreactive scatterplot app."},\
