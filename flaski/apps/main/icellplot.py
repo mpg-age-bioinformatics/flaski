@@ -20,12 +20,12 @@ def make_figure(david_df, ge_df, pa):
             pa_[n]=float(pa[n])
 
     gedic=ge_df[[ pa["gene_identifier"] , pa["expression_values"] ]]
-    gedic.loc[:, pa["gene_identifier"] ]=gedic.loc[:, pa["gene_identifier"] ].apply(lambda x: x.upper() )
+    gedic.loc[:, pa["gene_identifier"] ]=gedic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
     gedic.index=gedic[ pa["gene_identifier"] ].tolist()
     gedic=gedic.to_dict()[ pa["expression_values"] ]
 
     namesdic=ge_df[[ pa["gene_identifier"] , pa["gene_name"] ]]
-    namesdic.loc[:, pa["gene_identifier"] ]=namesdic.loc[:, pa["gene_identifier"] ].apply(lambda x: x.upper() )
+    namesdic.loc[:, pa["gene_identifier"] ]=namesdic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
     namesdic.index=namesdic[ pa["gene_identifier"] ].tolist()
     namesdic=namesdic.to_dict()[ pa["gene_name"] ]
 
