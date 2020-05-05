@@ -203,21 +203,19 @@
             <!-- Heading -->
             <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
 
-            {% if figure_url %}
-
             <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
 
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-download"></i>
-                    <span>Figure</span>
+                    <span>Output</span>
                 </a>
                 <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
                             <div class="row arg">
-                                <label>Download file name: <input type="text" name="download_name" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
+                                <label>Download file name: <input type="text" name="download_name" value='{{ download_name }}' style="width:298px;height:30px;padding-left: 4px">
                             </div>   
                             <div class="row arg">
                                 <label> format: <select name=download_format_value method="GET" action="/" style="width:50px">
@@ -231,8 +229,6 @@
                     </div>
                 </div>
             </li>
-
-            {% endif %}
 
             <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
 

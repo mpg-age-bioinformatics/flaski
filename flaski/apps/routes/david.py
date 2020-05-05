@@ -172,25 +172,27 @@ def david(download=None):
             report_stats=pd.read_json(session["report_stats"])
 
 
-            if plot_arguments["download_format_value"] == "xlsx":
-                excelfile = io.BytesIO()
-                EXC=pd.ExcelWriter(excelfile)
-                david_df.to_excel(EXC,sheet_name="david",index=None)
-                report_stats.to_excel(EXC,sheet_name="stats",index=None)
-                EXC.save()
-                excelfile.seek(0)
-            elif plot_arguments["download_format_value"] == "tsv":
-                tsvfile = io.BytesIO()
-                david_df.to_csv(tsvfile,sep="\t")
-                excelfile.seek(0)
-
             eventlog = UserLogging(email=current_user.email,action="download david")
             db.session.add(eventlog)
             db.session.commit()
 
-            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
+            if plot_arguments["download_format_value"] == "xlsx":
+                outfile = io.BytesIO()
+                EXC=pd.ExcelWriter(outfile)
+                david_df.to_excel(EXC,sheet_name="david",index=None)
+                report_stats.to_excel(EXC,sheet_name="stats",index=None)
+                EXC.save()
+                outfile.seek(0)
+                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"],as_attachment=True )
 
-            return send_file(excelfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"] )
+            elif plot_arguments["download_format_value"] == "tsv":               
+                return Response(david_df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
+                #outfile.seek(0)
+
+
+            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
+            #print(plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"])
+            #sys.stdout.flush()
 
         if "app" not in list(session.keys()):
             return_to_plot=False

@@ -40,7 +40,7 @@ apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # plotly saving of images to file
 RUN apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq wget libgtk2.0-0 libxtst-dev libxss-dev libgconf2-dev libnss3 libasound2-dev xvfb && \
+apt-get install -yq wget libgtk-3-0 libxtst-dev libxss-dev libgconf2-dev libnss3 libasound2-dev xvfb && \
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && bash Miniconda3-latest-Linux-x86_64.sh  -b -p /miniconda && \
 /miniconda/bin/conda install -c plotly plotly-orca psutil requests && \
 apt-get clean && rm -rf /var/lib/apt/lists/*

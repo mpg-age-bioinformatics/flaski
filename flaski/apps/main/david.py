@@ -51,7 +51,15 @@ def run_david(pa):
     ids=[ s.rstrip("\r").strip(" ") for s in ids if s != " "]
     ids=[ s for s in ids if s != " "]
     ids=[ s for s in ids if len(s) > 0 ]
-    print(" ".join(pa["ids_bg"].split(" ")[:12]) )
+    ids_map={}
+    ids_=[]
+    for query_id in ids:
+      if "\t" in query_id:
+        ids_map[ query_id.split("\t")[0].upper() ] = query_id.split("\t")[1]
+        ids_.append(query_id.split("\t")[0])
+      else:
+        ids_.append(query_id)
+    ids=ids_
     if " ".join( pa["ids_bg"].split(" ")[:12] ) != "Leave empty if you want to use all annotated genes for your":
       ids_bg=pa["ids_bg"].split("\n")
       ids_bg=[ s.rstrip("\r").strip(" ") for s in ids_bg ]
@@ -62,7 +70,7 @@ def run_david(pa):
     else:
       ids_bg=None
     name=pa["name"]
-    if ids_bg != "":
+    if ids_bg is not None:
       name_bg=pa["name_bg"]
     else:
       name_bg=""
@@ -75,6 +83,8 @@ def run_david(pa):
     verbose=True
     ids = ','.join([str(i) for i in ids])
     use_bg = 0
+    #print(ids,ids_bg)
+
     if ids_bg is not None:
       ids_bg = ','.join([str(i) for i in ids_bg])
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -122,6 +132,15 @@ def run_david(pa):
         df.columns=david_fields
         for col in david_fields:
             df[col] = df[col].apply(lambda x: x.decode())
+
+        df.columns=["Category","Term","Count","%","PValue","Genes","List Total","Pop Hits","Pop Total","Fold Enrichment","Bonferroni","Benjamini","FDR"]
+        if len(list(ids_map.keys())) > 0:
+          def get_map(x,ids_map=ids_map):
+            genes=x.split(", ")
+            genes=[ str(ids_map[gene.upper()]) for gene in genes ]
+            genes=", ".join(genes)
+            return genes
+          df["annotation"]=df["Genes"].apply(lambda x:get_map(x) )
     else:
         df=pd.DataFrame()
     report_stats=pd.DataFrame(report_stats,columns=["Field","Value"])
