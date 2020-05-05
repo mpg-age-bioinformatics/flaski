@@ -129,6 +129,10 @@ def david(download=None):
 
         plot_arguments=session["plot_arguments"]
 
+        if plot_arguments["user"] == "":
+            flash('Please give in a register DAVID email in "Input" > "DAVID registered email"','error')
+            return render_template('/apps/david.html', apps=apps, **plot_arguments)
+
         # CALL FIGURE FUNCTION
         try:
             david_df, report_stats=run_david(plot_arguments)
@@ -157,7 +161,6 @@ def david(download=None):
 
         except Exception as e:
             flash(e,'error')
-            del(session["david_in_store"])
             return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
     else:

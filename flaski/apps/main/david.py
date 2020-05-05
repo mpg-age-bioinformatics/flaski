@@ -51,12 +51,22 @@ def run_david(pa):
     ids=[ s.rstrip("\r").strip(" ") for s in ids if s != " "]
     ids=[ s for s in ids if s != " "]
     ids=[ s for s in ids if len(s) > 0 ]
-    ids_bg=pa["ids_bg"].split("\n")
-    ids_bg=[ s.rstrip("\r").strip(" ") for s in ids_bg ]
-    ids_bg=[ s for s in ids_bg if s != " "]
-    ids_bg=[ s for s in ids_bg if len(s) > 0 ]
+    print(" ".join(pa["ids_bg"].split(" ")[:12]) )
+    if " ".join( pa["ids_bg"].split(" ")[:12] ) != "Leave empty if you want to use all annotated genes for your":
+      ids_bg=pa["ids_bg"].split("\n")
+      ids_bg=[ s.rstrip("\r").strip(" ") for s in ids_bg ]
+      ids_bg=[ s for s in ids_bg if s != " "]
+      ids_bg=[ s for s in ids_bg if len(s) > 0 ]
+      if len(ids_bg) == 0:
+        ids_bg = None
+    else:
+      ids_bg=None
     name=pa["name"]
-    name_bg=pa["name_bg"]
+    if ids_bg != "":
+      name_bg=pa["name_bg"]
+    else:
+      name_bg=""
+
     p=pa["p"]
     n=pa["n"]    
     #, categories, user, ids, ids_bg = None, name = '', name_bg = '', verbose = False, p = 0.1, n = 2
@@ -175,7 +185,7 @@ def figure_defaults():
         "download_name":"DAVID",\
         "session_download_name":"MySession.DAVID",\
         "inputsessionfile":"Select file..",\
-        "session_arguments_name":"MyArguments.DAVID",\
+        "session_argumentsn":"MyArguments.DAVID",\
         "inputargumentsfile":"Select file.."}
 
     lists=[]

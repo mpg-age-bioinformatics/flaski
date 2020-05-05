@@ -6,6 +6,11 @@ def session_to_file(session,file_type):
     if file_type=="ses":
         session_["ftype"]="session"
     elif file_type=="arg":
+        if session_["app"] == "david":
+            for k in ["ids","ids_bg"]:
+                del(session_["plot_arguments"][k])
+            for k in ["david_df","report_stats"]:
+                del(session_[k])
         session_["ftype"]="arguments"
         del(session_["df"])
     return session_
