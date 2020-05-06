@@ -164,9 +164,11 @@ def david(download=None):
             return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
     else:
-        plot_arguments=session["plot_arguments"]
 
         if download == "download":
+
+            plot_arguments=session["plot_arguments"]
+
             # READ INPUT DATA FROM SESSION JSON
             david_df=pd.read_json(session["david_df"])
             report_stats=pd.read_json(session["report_stats"])
