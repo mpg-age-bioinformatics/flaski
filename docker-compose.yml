@@ -75,6 +75,7 @@ services:
   #  - MAIL_USERNAME=flaski@age.mpg.de
     # development envs
    - FLASK_ENV=development
+   - INSTANCE=(DEV)
    - ADMINS=jboucas@age.mpg.de
    #- MAIL_SERVER=smtp.googlemail.com
    #- MAIL_USERNAME=bioflaski@gmail.com
