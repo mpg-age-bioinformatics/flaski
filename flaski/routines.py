@@ -1,3 +1,5 @@
+import pandas as pd
+
 def session_to_file(session,file_type):
     session_={}
     for k in list(session.keys()):
