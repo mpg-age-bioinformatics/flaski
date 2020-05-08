@@ -62,7 +62,7 @@ else
 
 
   if [[ "$FLASK_ENV" == "production" ]] ; then
-    gunicorn -b 0.0.0.0:8000 -w 4 flaski:app
+    gunicorn -b 0.0.0.0:8000 --timeout 60000 -w 4 flaski:app
   elif [[ "$FLASK_ENV" == "development" ]] ; then
     tail -f /dev/null
   fi
