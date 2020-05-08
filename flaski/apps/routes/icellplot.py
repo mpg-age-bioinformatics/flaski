@@ -229,7 +229,7 @@ def icellplot(download=None):
 
         if missing_args:                
             plot_arguments=session["plot_arguments"]
-            return render_template('/apps/icellplot.html', filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
         
         if ( "df" not in list(session.keys()) ) | ( "ge_df" not in list(session.keys()) ):
                 error_message="No data to plot, please upload a data or session  file."
