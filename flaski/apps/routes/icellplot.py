@@ -148,14 +148,14 @@ def icellplot(download=None):
                 filestream=io.BytesIO(fileread)
                 extension=filename.rsplit('.', 1)[1].lower()
                 if extension == "xlsx":
-                    df=pd.read_excel(filestream, index_col=False)
+                    df=pd.read_excel(filestream, index_col=False, dtype=str)
                 elif extension == "csv":
-                    df=pd.read_csv(filestream, index_col=False)
+                    df=pd.read_csv(filestream, index_col=False, dtype=str)
                 elif extension == "tsv":
-                    df=pd.read_csv(filestream,sep="\t", index_col=False)
+                    df=pd.read_csv(filestream,sep="\t", index_col=False, dtype=str)
                 
                 session["df"]=df.to_json()
-                
+                                
                 cols=df.columns.tolist()
                 session["plot_arguments"]["david_cols"]=cols
 

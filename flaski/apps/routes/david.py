@@ -143,7 +143,7 @@ def david(download=None):
         # CALL FIGURE FUNCTION
         try:
             david_df, report_stats=run_david(plot_arguments)
-
+        
             ## get this into json like in former apps
             session["david_df"]=david_df.to_json()
             session["report_stats"]=report_stats.to_json()

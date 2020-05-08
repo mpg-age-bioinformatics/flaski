@@ -30,13 +30,13 @@ def make_figure(david_df, ge_df, pa):
     namesdic=namesdic.to_dict()[ pa["gene_name"] ]
 
     david_df=david_df[0: int(pa["number_of_terms"]) ]
-    david_df["-log10(p value)"]=david_df[ pa["pvalue"] ].apply(lambda x: np.log10(x)*-1)
+    david_df["-log10(p value)"]=david_df[ pa["pvalue"] ].apply(lambda x: np.log10(float(x))*-1)
 
     plotdf=pd.DataFrame()
     for term in david_df[ pa["terms_column"]  ].tolist():
         tmp=david_df[david_df[ pa["terms_column"] ]==term]
-        pvalue=tmp.iloc[0,tmp.columns.tolist().index( pa["pvalue"] )]
-        log10p=tmp.iloc[0,tmp.columns.tolist().index("-log10(p value)")]
+        pvalue=float(tmp.iloc[0,tmp.columns.tolist().index( pa["pvalue"] )])
+        log10p=float(tmp.iloc[0,tmp.columns.tolist().index("-log10(p value)")])
         genes=tmp.iloc[0,tmp.columns.tolist().index( pa["david_gene_ids"] )].split(", ")
         tmp=pd.DataFrame({"term":term,"genes":genes})
         tmp["expression"]=tmp["genes"].apply(lambda x: gedic.get(x.upper()) )
