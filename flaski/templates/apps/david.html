@@ -299,7 +299,7 @@
             <!-- -------------------- SUBMIT ---------------------- -->
 
             <div style="padding-right: 15px; padding-left: 15px;" >
-            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" />
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" onclick="loading();" />
             </div>
         </form>
 
@@ -319,9 +319,11 @@
 <!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
 
 {% block content %}
-<div class="container-fluid">
+<div style="margin-left:150px;" id="loading"></div>
+<div id="contentready" class="container-fluid">
 
-    <div style="margin-left:150px;" id="loader"></div>
+    <!--div style="margin-left:150px;" id="loader"></div-->
+
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -386,6 +388,7 @@
         </div>
 
     {% endif %}
+    
 
 </div>
 

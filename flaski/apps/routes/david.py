@@ -133,6 +133,13 @@ def david(download=None):
             flash('Please give in a register DAVID email in "Input" > "DAVID registered email"','error')
             return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
+        # debug bad gateway
+        # import time
+        # time.sleep(30)
+
+        # flash('30 seconds debug')
+        # return render_template('/apps/david.html', apps=apps, **plot_arguments)
+
         # CALL FIGURE FUNCTION
         try:
             david_df, report_stats=run_david(plot_arguments)
