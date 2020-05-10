@@ -51,15 +51,17 @@ def run_david(pa):
     ids=[ s.rstrip("\r").strip(" ") for s in ids if s != " "]
     ids=[ s for s in ids if s != " "]
     ids=[ s for s in ids if len(s) > 0 ]
+    ids=[ s.split("\t") for s in ids ]
+    idsdf=pd.DataFrame(ids)
+    annotations=idsdf.columns.tolist()
+    ids=idsdf[0].tolist()
     ids_map={}
-    ids_=[]
-    for query_id in ids:
-      if "\t" in query_id:
-        ids_map[ query_id.split("\t")[0].upper() ] = query_id.split("\t")[1]
-        ids_.append(query_id.split("\t")[0])
-      else:
-        ids_.append(query_id)
-    ids=ids_
+    if len(annotations) > 1:
+      idsdf[0]=idsdf[0].apply(lambda x: x.upper() )
+      idsdf.index=idsdf[0].tolist()
+      idsdf=idsdf.drop([0],axis=1)
+      ids_map=idsdf.to_dict()
+  
     if " ".join( pa["ids_bg"].split(" ")[:12] ) != "Leave empty if you want to use all annotated genes for your":
       ids_bg=pa["ids_bg"].split("\n")
       ids_bg=[ s.rstrip("\r").strip(" ") for s in ids_bg ]
@@ -135,12 +137,14 @@ def run_david(pa):
 
         df.columns=["Category","Term","Count","%","PValue","Genes","List Total","Pop Hits","Pop Total","Fold Enrichment","Bonferroni","Benjamini","FDR"]
         if len(list(ids_map.keys())) > 0:
-          def get_map(x,ids_map=ids_map):
+          def get_map(x,ids_map):
             genes=x.split(", ")
             genes=[ str(ids_map[gene.upper()]) for gene in genes ]
             genes=", ".join(genes)
             return genes
-          df["annotation"]=df["Genes"].apply(lambda x:get_map(x) )
+          for annotation in list(ids_map.keys()):
+            genes_to_annotation=ids_map[annotation]
+            df["annotation_%s" %str(annotation)]=df["Genes"].apply(lambda x:get_map(x,ids_map=genes_to_annotation) )
     else:
         df=pd.DataFrame()
     report_stats=pd.DataFrame(report_stats,columns=["Field","Value"])
