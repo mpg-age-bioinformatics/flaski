@@ -12,7 +12,7 @@ from waitress import serve
 
 app = Flask(__name__)
 app.config.from_object(Config)
-db = SQLAlchemy(app ,engine_options={"pool_pre_ping":True})
+db = SQLAlchemy(app ,engine_options={"pool_pre_ping":True, "pool_size":0,"pool_recycle":-1} )
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
