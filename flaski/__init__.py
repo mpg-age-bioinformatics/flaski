@@ -37,7 +37,7 @@ if not app.debug:
         mail_handler = SMTPHandler(
             mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
             fromaddr=app.config['ADMINS'][0],
-            toaddrs=app.config['ADMINS'], subject='Flaski Failure',
+            toaddrs=app.config['ADMINS'], subject='%s :: Flaski Failure' %(app.config['INSTANCE']),
             credentials=auth, secure=secure)
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
