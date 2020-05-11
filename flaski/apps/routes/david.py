@@ -103,7 +103,7 @@ def david(download=None):
             values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
             values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
             for a in list(plot_arguments.keys()):
-                if ( a in list(request.form.keys()) ) & ( a not in lists+session["notUpdateList"] ):
+                if ( a in list(request.form.keys()) ) & ( a not in session["notUpdateList"] ):
                     if a in values_list:
                         plot_arguments[a]=request.form.getlist(a)
                     else:
@@ -133,7 +133,7 @@ def david(download=None):
         if plot_arguments["user"] == "":
             flash('Please give in a register DAVID email in "Input" > "DAVID registered email"','error')
             return render_template('/apps/david.html', apps=apps, **plot_arguments)
-
+        
         # debug bad gateway
         # import time
         # time.sleep(30)
