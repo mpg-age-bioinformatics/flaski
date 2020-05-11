@@ -99,8 +99,8 @@ def david(download=None):
             # WITH THE EXCEPTION OF SELECTION LISTS
             plot_arguments = session["plot_arguments"]
             ### WORKING HERE
-            values_list=[ s for s in plot_arguments if "_value" in s ]
-            values_list=[ s for s in values_list if type(s) == list ]
+            values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
+            values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
             for a in list(plot_arguments.keys()):
                 if ( a in list(request.form.keys()) ) & ( a not in lists+session["notUpdateList"] ):
                     if a in values_list:
