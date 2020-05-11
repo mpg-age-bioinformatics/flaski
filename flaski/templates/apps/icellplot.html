@@ -106,7 +106,7 @@
             </div>
 
             {% if categories_column != "select a column.." %}
-            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:15px;">
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
                 <div class="column" >
                     <div class="sidebar-heading">Categories to plot:</div>
                     <div style="padding-left:15px;">
@@ -119,6 +119,32 @@
                 </div>
             </div>
             {% endif %}
+
+            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:0px">
+                <div class="column">
+                    <div class="sidebar-heading">Gene expression annotation column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px;" >
+                        <select title=david_gene_ids name=annotation_column_value method="GET" action="/" style="width:365px;">
+                            {% for david_cols_ in annotation_column %}
+                                <option value="{{david_cols_}}" {% if david_cols_==annotation_column_value %} selected {% endif %}>{{david_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right: 15px; padding-left: 15px;padding-top:5px;padding-bottom:15px">
+                <div class="column">
+                    <div class="sidebar-heading">Gene names annotation column:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px;" >
+                        <select title=david_gene_ids name=annotation2_column_value method="GET" action="/" style="width:365px;">
+                            {% for david_cols_ in annotation_column %}
+                                <option value="{{david_cols_}}" {% if david_cols_==annotation2_column_value %} selected {% endif %}>{{david_cols_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             {% endif %}
 

@@ -23,19 +23,44 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         else:
             pa_[n]=float(pa[n])
 
-    gedic=ge_df[[ pa["gene_identifier"] , pa["expression_values"] ]]
-    gedic.loc[:, pa["gene_identifier"] ]=gedic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
-    gedic.index=gedic[ pa["gene_identifier"] ].tolist()
-    gedic=gedic.to_dict()[ pa["expression_values"] ]
 
-    namesdic=ge_df[[ pa["gene_identifier"] , pa["gene_name"] ]]
-    namesdic.loc[:, pa["gene_identifier"] ]=namesdic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
-    namesdic.index=namesdic[ pa["gene_identifier"] ].tolist()
-    namesdic=namesdic.to_dict()[ pa["gene_name"] ]
 
     david_df=david_df[ david_df[ pa["categories_column"] ].isin( pa["categories_to_plot_value"] ) ]
 
     david_df=david_df[0: int(pa["number_of_terms"]) ]
+
+    if pa["annotation_column_value"]=="none":
+        gedic=ge_df[[ pa["gene_identifier"] , pa["expression_values"] ]]
+        gedic.loc[:, pa["gene_identifier"] ]=gedic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
+        gedic.index=gedic[ pa["gene_identifier"] ].tolist()
+        gedic=gedic.to_dict()[ pa["expression_values"] ]
+    else:
+        gedic=david_df[ [ pa["david_gene_ids"], pa["annotation_column_value"] ]]
+        gedic_keys=gedic[pa["david_gene_ids"]].tolist()
+        gedic_value=gedic[pa["annotation_column_value"]].tolist()
+        gedic_keys=", ".join(gedic_keys).split(", ")
+        gedic_value=", ".join(gedic_value).split(", ")
+        gedic=pd.DataFrame({0:gedic_keys,1:gedic_value})
+        gedic=gedic.drop_duplicates()
+        gedic.index=gedic[0].tolist()
+        gedic=gedic.to_dict()[ 1 ]
+
+    if pa["annotation2_column_value"]=="none":
+        namesdic=ge_df[[ pa["gene_identifier"] , pa["gene_name"] ]]
+        namesdic.loc[:, pa["gene_identifier"] ]=namesdic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
+        namesdic.index=namesdic[ pa["gene_identifier"] ].tolist()
+        namesdic=namesdic.to_dict()[ pa["gene_name"] ]
+    else:
+        namesdic=david_df[ [ pa["david_gene_ids"], pa["annotation2_column_value"] ]]
+        namesdic_keys=namesdic[pa["david_gene_ids"]].tolist()
+        namesdic_value=namesdic[pa["annotation2_column_value"]].tolist()
+        namesdic_keys=", ".join(namesdic_keys).split(", ")
+        namesdic_value=", ".join(namesdic_value).split(", ")
+        namesdic=pd.DataFrame({0:namesdic_keys,1:namesdic_value})
+        namesdic=namesdic.drop_duplicates()
+        namesdic.index=namesdic[0].tolist()
+        namesdic=namesdic.to_dict()[ 1 ]
+
     if pa_["log10transform"]:
         david_df[pa["plotvalue"]]=david_df[ pa["plotvalue"] ].apply(lambda x: np.log10(float(x))*-1)
 
@@ -46,7 +71,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         # log10p=float(tmp.iloc[0,tmp.columns.tolist().index(pa["plotvalue"])])
         genes=tmp.iloc[0,tmp.columns.tolist().index( pa["david_gene_ids"] )].split(", ")
         tmp=pd.DataFrame({"term":term,"genes":genes})
-        tmp["expression"]=tmp["genes"].apply(lambda x: gedic.get(x.upper()) )
+        tmp["expression"]=tmp["genes"].apply(lambda x: float(gedic.get(x.upper()) ) )
         tmp["gene_name"]=tmp["genes"].apply(lambda x: namesdic.get(x.upper()) )
         tmp["n_genes"]=len(genes)
         tmp=tmp.sort_values(by=["expression"], ascending=True)
@@ -177,6 +202,9 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "categories_to_plot":[],\
         "categories_to_plot_value":[],\
         "david_gene_ids":"Genes",\
+        "annotation_column":[],\
+        "annotation_column_value":"none",\
+        "annotation2_column_value":"none",\
         "lower_expression_percentile":"5",\
         "upper_expression_percentile":"95",\
         "color_scale":['aggrnyl','agsunset','blackbody','bluered','blues','blugrn','bluyl','brwnyl',\

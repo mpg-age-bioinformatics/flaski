@@ -163,6 +163,8 @@ def icellplot(download=None):
                                 
                 cols=df.columns.tolist()
                 session["plot_arguments"]["david_cols"]=["select a column.."]+cols
+                session["plot_arguments"]["annotation_column"]=["none"]+cols
+
 
                 # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
                 if (session["plot_arguments"]["terms_column"] not in cols) | (session["plot_arguments"]["terms_column"] == "select a column.."):
@@ -195,57 +197,62 @@ def icellplot(download=None):
                 flash(error_msg,'error')
                 session["filename"]="Select file.."
 
-        ge_inputfile = request.files["ge_inputfile"]
-        if ge_inputfile:
-            filename = secure_filename(ge_inputfile.filename)
-            if allowed_file(ge_inputfile.filename):
-                session["ge_filename"]=filename
-                fileread = ge_inputfile.read()
-                filestream=io.BytesIO(fileread)
-                extension=filename.rsplit('.', 1)[1].lower()
-                if extension == "xlsx":
-                    df=pd.read_excel(filestream, index_col=False)
-                elif extension == "csv":
-                    df=pd.read_csv(filestream, index_col=False)
-                elif extension == "tsv":
-                    df=pd.read_csv(filestream,sep="\t", index_col=False)
-                
-                session["ge_df"]=df.to_json()
-                
-                cols=df.columns.tolist()
-                session["plot_arguments"]["ge_cols"]=["select a column.."]+cols
+        annotation_columns=( session["plot_arguments"]["annotation_column_value"]!="none") & (session["plot_arguments"]["annotation2_column_value"]!="none")
 
-                # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
-                if (session["plot_arguments"]["gene_identifier"] not in cols) | (session["plot_arguments"]["gene_identifier"] == "select a column..") :
-                    session["plot_arguments"]["gene_identifier"]="select a column.."
-                    missing_args=True
-                if (session["plot_arguments"]["expression_values"] not in cols) | (session["plot_arguments"]["expression_values"] == "select a column..") :
-                    session["plot_arguments"]["expression_values"]="select a column.."
-                    missing_args=True
-                if (session["plot_arguments"]["gene_name"] not in cols) | (session["plot_arguments"]["gene_name"] == "select a column..") :
-                    session["plot_arguments"]["gene_name"]="select a column.."
-                    missing_args=True
- 
-                if missing_args:                
-                    sometext="Please select matching columns in gene expression file for mapping."
-                    flash(sometext,'info')
-                           
-            else:
-                # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
-                error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
-                has the correct format and respective extension and try uploadling the gene expression file again." %filename
-                flash(error_msg,'error')
-                session["ge_filename"]="Select file.."
+        if (not annotation_columns ):
+            ge_inputfile = request.files["ge_inputfile"]
+            if ge_inputfile:
+                filename = secure_filename(ge_inputfile.filename)
+                if allowed_file(ge_inputfile.filename):
+                    session["ge_filename"]=filename
+                    fileread = ge_inputfile.read()
+                    filestream=io.BytesIO(fileread)
+                    extension=filename.rsplit('.', 1)[1].lower()
+                    if extension == "xlsx":
+                        df=pd.read_excel(filestream, index_col=False)
+                    elif extension == "csv":
+                        df=pd.read_csv(filestream, index_col=False)
+                    elif extension == "tsv":
+                        df=pd.read_csv(filestream,sep="\t", index_col=False)
+                    
+                    session["ge_df"]=df.to_json()
+                    
+                    cols=df.columns.tolist()
+                    session["plot_arguments"]["ge_cols"]=["select a column.."]+cols
 
-        if (session["ge_filename"]=="Select file..") | (session["filename"]=="Select file..") :
+                    # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
+                    if (session["plot_arguments"]["gene_identifier"] not in cols) | (session["plot_arguments"]["gene_identifier"] == "select a column..") :
+                        session["plot_arguments"]["gene_identifier"]="select a column.."
+                        missing_args=True
+                    if (session["plot_arguments"]["expression_values"] not in cols) | (session["plot_arguments"]["expression_values"] == "select a column..") :
+                        session["plot_arguments"]["expression_values"]="select a column.."
+                        missing_args=True
+                    if (session["plot_arguments"]["gene_name"] not in cols) | (session["plot_arguments"]["gene_name"] == "select a column..") :
+                        session["plot_arguments"]["gene_name"]="select a column.."
+                        missing_args=True
+    
+                    if missing_args:                
+                        sometext="Please select matching columns in gene expression file for mapping."
+                        flash(sometext,'info')
+                            
+                else:
+                    # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
+                    error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
+                    has the correct format and respective extension and try uploadling the gene expression file again." %filename
+                    flash(error_msg,'error')
+                    session["ge_filename"]="Select file.."
+
+        if ( (session["ge_filename"]=="Select file..") & (not annotation_columns ) ) | (session["filename"]=="Select file..")  :
             plot_arguments=session["plot_arguments"]
             return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments) 
 
-        if missing_args:                
+        if missing_args:
             plot_arguments=session["plot_arguments"]
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
         
-        if ( "df" not in list(session.keys()) ) | ( "ge_df" not in list(session.keys()) ):
+        annotation_columns=( session["plot_arguments"]["annotation_column_value"]!="none") & (session["plot_arguments"]["annotation2_column_value"]!="none")
+
+        if ( "df" not in list(session.keys()) ) | ( ( "ge_df" not in list(session.keys())) & (not annotation_columns)  ):
                 error_message="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
                 return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps,  **plot_arguments)
@@ -255,8 +262,10 @@ def icellplot(download=None):
 
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
+        if annotation_columns:
+            ge_df=pd.DataFrame()
         ge_df=pd.read_json(session["ge_df"])
-
+    
         # CALL FIGURE FUNCTION
         try:
             fig=make_figure(df,ge_df, plot_arguments)
