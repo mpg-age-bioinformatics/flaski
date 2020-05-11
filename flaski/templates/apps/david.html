@@ -369,6 +369,14 @@
             </div>
 
             <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('david', download='cellplot') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> iCellplot
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
                 <form action="{{ url_for('download', json_type='arg') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments

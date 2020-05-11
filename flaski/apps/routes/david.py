@@ -10,6 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.apps.main.david import run_david, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
+from flaski.apps.main import icellplot
 
 import os
 import io
@@ -204,6 +205,35 @@ def david(download=None):
             #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
             #print(plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"])
             #sys.stdout.flush()
+
+        if download == "cellplot":
+            # READ INPUT DATA FROM SESSION JSON
+            david_df=pd.read_json(session["david_df"])
+            david_df=david_df.astype(str)
+
+            # INITIATE SESSION
+            session["filename"]="<from DAVID>"
+            session["ge_filename"]="Select file.."
+
+            plot_arguments, lists, notUpdateList, checkboxes=icellplot.figure_defaults()
+
+            session["plot_arguments"]=plot_arguments
+            session["lists"]=lists
+            session["notUpdateList"]=notUpdateList
+            session["COMMIT"]=app.config['COMMIT']
+            session["app"]="icellplot"
+            session["checkboxes"]=checkboxes
+
+            session["df"]=david_df.to_json()
+
+            cols=david_df.columns.tolist()
+            session["plot_arguments"]["david_cols"]=["select a column.."]+cols
+            session["plot_arguments"]["annotation_column"]=["none"]+cols
+            session["plot_arguments"]["categories_to_plot"]=list(set(david_df["Category"].tolist()))
+            session["plot_arguments"]["categories_to_plot_value"]=list(set(david_df["Category"].tolist()))
+            
+            return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
+
 
         if "app" not in list(session.keys()):
             return_to_plot=False
