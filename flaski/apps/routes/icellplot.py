@@ -111,9 +111,14 @@ def icellplot(download=None):
             # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             # WITH THE EXCEPTION OF SELECTION LISTS
             plot_arguments = session["plot_arguments"]
+            values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
+            values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
             for a in list(plot_arguments.keys()):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                    plot_arguments[a]=request.form[a]
+                    if a in values_list:
+                        plot_arguments[a]=request.form.getlist(a)
+                    else:
+                        plot_arguments[a]=request.form[a]
 
             # # VALUES SELECTED FROM SELECTION LISTS 
             # # GET UPDATED TO THE LATEST CHOICE
@@ -157,17 +162,26 @@ def icellplot(download=None):
                 session["df"]=df.to_json()
                                 
                 cols=df.columns.tolist()
-                session["plot_arguments"]["david_cols"]=cols
+                session["plot_arguments"]["david_cols"]=["select a column.."]+cols
 
                 # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
-                if (session["plot_arguments"]["terms_column"] not in cols):
-                    session["plot_arguments"]["terms_column"]=["select a column.."]+cols
+                if (session["plot_arguments"]["terms_column"] not in cols) | (session["plot_arguments"]["terms_column"] == "select a column.."):
+                    session["plot_arguments"]["terms_column"]="select a column.."
                     missing_args=True
-                if (session["plot_arguments"]["david_gene_ids"] not in cols):
-                    session["plot_arguments"]["david_gene_ids"]=["select a column.."]+cols
+
+                if (session["plot_arguments"]["categories_column"] not in cols) | (session["plot_arguments"]["categories_column"] == "select a column.."):
+                    session["plot_arguments"]["categories_column"]="select a column.."
                     missing_args=True
-                if (session["plot_arguments"]["pvalue"] not in cols):
-                    session["plot_arguments"]["pvalue"]=["select a column.."]+cols
+                else:
+                    session["plot_arguments"]["categories_to_plot"]=list(set( df[session["plot_arguments"]["categories_column"]].tolist() ))
+                    session["plot_arguments"]["categories_to_plot_value"]=list(set( df[session["plot_arguments"]["categories_column"]].tolist() ))
+
+                if (session["plot_arguments"]["david_gene_ids"] not in cols)  | (session["plot_arguments"]["david_gene_ids"] == "select a column..") :
+                    session["plot_arguments"]["david_gene_ids"]="select a column.."
+                    missing_args=True
+
+                if (session["plot_arguments"]["plotvalue"] not in cols) | (session["plot_arguments"]["plotvalue"] == "select a column..") :
+                    session["plot_arguments"]["plotvalue"]="select a column.."
                     missing_args=True
  
                 if missing_args:                
@@ -199,17 +213,17 @@ def icellplot(download=None):
                 session["ge_df"]=df.to_json()
                 
                 cols=df.columns.tolist()
-                session["plot_arguments"]["ge_cols"]=cols
+                session["plot_arguments"]["ge_cols"]=["select a column.."]+cols
 
                 # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
-                if (session["plot_arguments"]["gene_identifier"] not in cols):
-                    session["plot_arguments"]["gene_identifier"]=["select a column.."]+cols
+                if (session["plot_arguments"]["gene_identifier"] not in cols) | (session["plot_arguments"]["gene_identifier"] == "select a column..") :
+                    session["plot_arguments"]["gene_identifier"]="select a column.."
                     missing_args=True
-                if (session["plot_arguments"]["expression_values"] not in cols):
-                    session["plot_arguments"]["expression_values"]=["select a column.."]+cols
+                if (session["plot_arguments"]["expression_values"] not in cols) | (session["plot_arguments"]["expression_values"] == "select a column..") :
+                    session["plot_arguments"]["expression_values"]="select a column.."
                     missing_args=True
-                if (session["plot_arguments"]["gene_name"] not in cols):
-                    session["plot_arguments"]["gene_name"]=["select a column.."]+cols
+                if (session["plot_arguments"]["gene_name"] not in cols) | (session["plot_arguments"]["gene_name"] == "select a column..") :
+                    session["plot_arguments"]["gene_name"]="select a column.."
                     missing_args=True
  
                 if missing_args:                
@@ -236,9 +250,6 @@ def icellplot(download=None):
                 flash(error_msg,'error')
                 return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps,  **plot_arguments)
  
-        #if session["plot_arguments"]["groups_value"]=="None":
-        #    session["plot_arguments"]["groups_auto_generate"]=".on"
-
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         plot_arguments=session["plot_arguments"]
 

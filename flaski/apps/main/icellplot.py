@@ -2,10 +2,14 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 
-def make_figure(david_df, ge_df, pa):
+
+CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyaxis_line","grid","reverse_color_scale"]
+
+
+def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
 
     pa_={}
-    checkboxes=["xaxis_line","yaxis_line","topxaxis_line","rightyaxis_line", "grid"] # "robust"
+    # checkboxes=["color_scale_value","log10transform","xaxis_line","yaxis_line","topxaxis_line","rightyaxis_line", "grid"] # "robust"
     for c in checkboxes:
         if (pa[c] =="on") | (pa[c] ==".on"):
             pa_[c]=True
@@ -29,14 +33,17 @@ def make_figure(david_df, ge_df, pa):
     namesdic.index=namesdic[ pa["gene_identifier"] ].tolist()
     namesdic=namesdic.to_dict()[ pa["gene_name"] ]
 
+    david_df=david_df[ david_df[ pa["categories_column"] ].isin( pa["categories_to_plot_value"] ) ]
+
     david_df=david_df[0: int(pa["number_of_terms"]) ]
-    david_df["-log10(p value)"]=david_df[ pa["pvalue"] ].apply(lambda x: np.log10(float(x))*-1)
+    if pa_["log10transform"]:
+        david_df[pa["plotvalue"]]=david_df[ pa["plotvalue"] ].apply(lambda x: np.log10(float(x))*-1)
 
     plotdf=pd.DataFrame()
     for term in david_df[ pa["terms_column"]  ].tolist():
         tmp=david_df[david_df[ pa["terms_column"] ]==term]
-        pvalue=float(tmp.iloc[0,tmp.columns.tolist().index( pa["pvalue"] )])
-        log10p=float(tmp.iloc[0,tmp.columns.tolist().index("-log10(p value)")])
+        plotvalue=float(tmp.iloc[0,tmp.columns.tolist().index( pa["plotvalue"] )])
+        # log10p=float(tmp.iloc[0,tmp.columns.tolist().index(pa["plotvalue"])])
         genes=tmp.iloc[0,tmp.columns.tolist().index( pa["david_gene_ids"] )].split(", ")
         tmp=pd.DataFrame({"term":term,"genes":genes})
         tmp["expression"]=tmp["genes"].apply(lambda x: gedic.get(x.upper()) )
@@ -44,25 +51,89 @@ def make_figure(david_df, ge_df, pa):
         tmp["n_genes"]=len(genes)
         tmp=tmp.sort_values(by=["expression"], ascending=True)
         tmp.reset_index(inplace=True, drop=True)
-        frac=log10p/len(genes)
-        tmp["-log10(p value)"]=frac
-        if pvalue < 0.001:
-            pvalue="{:.3e}".format(pvalue)
-        tmp["term p value"]=pvalue
+        frac=plotvalue/len(genes)
+        tmp[pa["plotvalue"]]=frac
+        if plotvalue < 0.001:
+            plotvalue="{:.3e}".format(plotvalue)
+        tmp["term value"]=plotvalue
         plotdf=pd.concat([plotdf,tmp])
     plotdf.reset_index(inplace=True, drop=True)
 
     expression=plotdf["expression"].tolist()
-    low=np.percentile(expression, float( pa["lower_expression_percentile"] ) )
+
+    if pa["lower_expression_percentile"]=="":
+        pa_["lower_expression_percentile"]=0
+    else:
+        pa_["lower_expression_percentile"]=pa["lower_expression_percentile"]
+
+    if pa["upper_expression_percentile"]=="":
+        pa_["upper_expression_percentile"]=100
+    else:
+        pa_["upper_expression_percentile"]=pa["upper_expression_percentile"]
+
+    low=np.percentile(expression, float( pa_["lower_expression_percentile"] ) )
     high=np.percentile(expression, float(pa["upper_expression_percentile"] ))
 
-    fig = px.bar( plotdf, y="term", x="-log10(p value)", color="expression", orientation="h",
-             color_continuous_scale=pa["color_scale_value"], \
-             hover_name="gene_name", hover_data=["expression", "term p value","n_genes"],\
-             title=pa["title"],\
-             range_color=[low,high],\
-             width=pa_["width"],\
-             height=pa_["height"] )
+    if pa_["reverse_color_scale"]:
+        pa_["color_scale_value"]=pa["color_scale_value"]+"_r"
+    else:
+        pa_["color_scale_value"]=pa["color_scale_value"]
+
+    if pa["color_continuous_midpoint"]=="":
+        pa_["color_continuous_midpoint"]=np.mean([low,high])
+    else:
+        pa_["color_continuous_midpoint"]=float(pa["color_continuous_midpoint"])
+   
+
+    selfdefined_cmap=True
+    for value in ["lower_value","center_value","upper_value","lower_color","center_color","upper_color"]:
+        if pa[value]=="":
+            selfdefined_cmap=False
+            break
+    if selfdefined_cmap:
+        range_diff=float(pa["upper_value"]) - float(pa["lower_value"])
+        center=float(pa["center_value"]) - float(pa["lower_value"])
+        center=center/range_diff
+
+        color_continuous_scale=[ [0, pa["lower_color"]],\
+            [center, pa["center_color"]],\
+            [1, pa["upper_color"] ]]
+
+        fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
+                color_continuous_scale=color_continuous_scale, \
+                hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
+                range_color=[float(pa["lower_value"]),float(pa["upper_value"])],\
+                title=pa["title"],\
+                width=pa_["width"],\
+                height=pa_["height"] )
+ 
+    else:
+        color_continuous_scale=pa_["color_scale_value"]
+        if pa["color_continuous_midpoint"]!="":
+            fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
+                    color_continuous_scale=color_continuous_scale, \
+                    hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
+                    title=pa["title"],\
+                    color_continuous_midpoint=pa_["color_continuous_midpoint"],
+                    width=pa_["width"],\
+                    height=pa_["height"] )
+        else:
+            fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
+                    color_continuous_scale=color_continuous_scale, \
+                    hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
+                    title=pa["title"],\
+                    range_color=[low,high],\
+                    width=pa_["width"],\
+                    height=pa_["height"] )
+
+    # fig.update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
+    #                 marker_line_width=1.5, opacity=0.6)
+
+    fig.update_traces(marker_line_width=0)
+
+    if pa["xaxis_label"]!="":
+        fig.update_layout(xaxis_title=pa["xaxis_label"])
+
 
     fig.update_layout({"yaxis":{"tickfont":{"size": float(pa["yaxis_font_size"]) }}, "xaxis":{"tickfont":{"size":float(pa["xaxis_font_size"])}} })
 
@@ -87,7 +158,7 @@ def make_figure(david_df, ge_df, pa):
 
     return fig
 
-def figure_defaults():
+def figure_defaults(checkboxes=CHECKBOXES):
     plot_arguments={
         "width":"",\
         "height":"",\
@@ -98,10 +169,14 @@ def figure_defaults():
         "gene_identifier":"ensembl_gene_id",\
         "expression_values":"log2FoldChange",\
         "gene_name":"gene_name",\
-        "pvalue":"ease",\
+        "plotvalue":"PValue",\
+        "log10transform":".on",\
         "number_of_terms":"20",\
-        "terms_column":"termName",\
-        "david_gene_ids":"geneIds",\
+        "terms_column":"Term",\
+        "categories_column":"Category",\
+        "categories_to_plot":[],\
+        "categories_to_plot_value":[],\
+        "david_gene_ids":"Genes",\
         "lower_expression_percentile":"5",\
         "upper_expression_percentile":"95",\
         "color_scale":['aggrnyl','agsunset','blackbody','bluered','blues','blugrn','bluyl','brwnyl',\
@@ -115,7 +190,16 @@ def figure_defaults():
                 'rdylbu','rdylgn','spectral','tealrose','temps','tropic','balance','curl','delta',\
                 'edge','hsv','icefire','phase','twilight','mrybm','mygbm'],\
         "color_scale_value":"bluered",\
+        "color_continuous_midpoint":"",\
+        "reverse_color_scale":".off",\
+        "lower_value":"",\
+        "center_value":"",\
+        "upper_value":"",\
+        "lower_color":"",\
+        "center_color":"",\
+        "upper_color":"",\
         "title":"Cell plot",\
+        "xaxis_label":"",\
         "yaxis_font_size":"10",\
         "xaxis_font_size":"10",\
         "title_font_size":"20",\
@@ -135,19 +219,17 @@ def figure_defaults():
         "grid":".on",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
-        "downloadn":"heatmap",\
+        "downloadn":"icellplot",\
         "session_downloadn":"MySession.icellplot",\
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.icellplot",\
         "inputargumentsfile":"Select file.."}    
 
-    checkboxes=["xaxis_line","topxaxis_line","yaxis_line","rightyaxis_line","grid"]
-
     # not update list
     notUpdateList=["inputsessionfile"]
 
     # lists without a default value on the arguments
-    excluded_list=[]
+    excluded_list=["categories_to_plot","categories_to_plot_value"]
 
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
