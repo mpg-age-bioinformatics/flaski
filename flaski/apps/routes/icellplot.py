@@ -261,9 +261,10 @@ def icellplot(download=None):
         plot_arguments=session["plot_arguments"]
 
         # READ INPUT DATA FROM SESSION JSON
-        df=pd.read_json(session["df"])
-        if annotation_columns:
+        df=pd.read_json(session["df"])  
+        if (annotation_columns) & ( "ge_df" not in list(session.keys())):
             ge_df=pd.DataFrame()
+            session["ge_df"]=ge_df.to_json()
         ge_df=pd.read_json(session["ge_df"])
     
         # CALL FIGURE FUNCTION
