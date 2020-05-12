@@ -63,6 +63,10 @@ RUN pip3 install -r /flaski/requirements.txt
 #apt-get install -yq git && \
 #apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get -yq dist-upgrade && \
+apt-get install -yq sudo && \
+apt-get clean && rm -rf /var/lib/apt/lists/*
+
 #comment during development
 COPY LICENSE.md README.md config.py flaski.py MANIFEST.in requirements.txt setup.py .flaskenv /flaski/
 COPY pyflaski /flaski/pyflaski

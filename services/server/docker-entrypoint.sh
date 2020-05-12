@@ -1,5 +1,7 @@
 #!/bin/bash
 
+############ if init than: ############
+
 if [[ "$FLASK_ENV" == "init" ]] ; then
 
   while ! mysqladmin --user=root --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} status ; 
@@ -39,19 +41,27 @@ _EOF_
     fi
   fi
 
-  if [[ "$RESTORE_USERS_DATA" == "1" ]] ; then
-    rsync -rtvh /backup/users_data/ /flaski_data/users/ >> /rsync.log 2>&1
-  fi
-  
-  mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} << _EOF_
+  chown -R flaski:flaski /flaski_data /flaski_data/users /var/log/flaski /mysql_backup.log /rsync.log
+
+sudo -i -u flaski bash << USER_EOF
+if [[ "$RESTORE_USERS_DATA" == "1" ]] ; then
+  rsync -rtvh /backup/users_data/ /flaski_data/users/ >> /rsync.log 2>&1
+fi
+USER_EOF
+
+mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} << _EOF_
 USE flaski
 DROP TABLE IF EXISTS alembic_version;
 _EOF_
 
-  rm -rf migrations/* 
-  flask db init && flask db migrate -m "Initial migration." && flask db upgrade
+rm -rf migrations/* 
+flask db init && flask db migrate -m "Initial migration." && flask db upgrade
 
-  exit
+chown -R flaski:flaski /flaski/migrations /var/log/flaski /mysql_backup.log /rsync.log
+
+exit
+
+############ if not init than: ############
 
 else
 
