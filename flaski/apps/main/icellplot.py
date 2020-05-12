@@ -185,8 +185,8 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
 
 def figure_defaults(checkboxes=CHECKBOXES):
     plot_arguments={
-        "width":"",\
-        "height":"",\
+        "width":"1000",\
+        "height":"600",\
         "david_cols":[],\
         "david_cols_value":"",\
         "ge_cols":[],\
