@@ -15,19 +15,23 @@ If running flaski on development mode make sure that you change the variable `FL
 
 Export secret variables:
 ```bash
-export MAIL_PASSWORD="<mail password>"
-export MYSQL_PASSWORD=$(openssl rand -base64 20)
-export MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
-export REDIS_PASSWORD=$(openssl rand -base64 20)
-export SECRET_KEY=$(openssl rand -base64 20)
+cat << EOF > .env
+MAIL_PASSWORD="<mail password>"
+MYSQL_PASSWORD=$(openssl rand -base64 20)
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
+REDIS_PASSWORD=$(openssl rand -base64 20)
+SECRET_KEY=$(openssl rand -base64 20)
+EOF
 ```
 
 or, for local development (quote all mail related entries in the `docker-compose.yml`):
 ```bash
-export MYSQL_PASSWORD=MYSQL_PASSWORD
-export MYSQL_ROOT_PASSWORD=MYSQL_ROOT_PASSWORD
-export REDIS_PASSWORD=REDIS_PASSWORD
-export SECRET_KEY=SECRET_KEY
+cat << EOF > .env
+MYSQL_PASSWORD=$(openssl rand -base64 20)
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
+REDIS_PASSWORD=$(openssl rand -base64 20)
+SECRET_KEY=$(openssl rand -base64 20)
+EOF
 ```
 
 To deploy Flaski edit the `docker-compose.yml` accordingly and then:
