@@ -4,12 +4,12 @@ services:
 
  init:
   container_name: init
-  image: flaski/flaski:latest # prod
+  image: flaski/flaski:latests
   user: root
   volumes:
    - data:/flaski_data/users
-   - /srv/backup/data/users:/backup/users_data # prod (backup  /databack)
-   - /srv/backup/mariadb:/backup/mariadb # prod (backup  /databack)
+   - /srv/backup/data/users:/backup/users_data
+   - /srv/backup/mariadb:/backup/mariadb
   environment:
    FLASK_ENV: init
    RESTORE_DB: 1
@@ -25,14 +25,9 @@ services:
    MAIL_PORT: 587
    MAIL_USE_TLS: 1
    MAIL_PASSWORD: ${MAIL_PASSWORD}
-   # production envs
    ADMINS: flaski@age.mpg.de
    MAIL_SERVER: mail.age.mpg.de
    MAIL_USERNAME: flaski@age.mpg.de
-   # development envs
-   #ADMINS: jboucas@age.mpg.de
-   #MAIL_SERVER: smtp.googlemail.com
-   #MAIL_USERNAME: bioflaski@gmail.com
   links:
    - mariadb
   depends_on:
@@ -57,16 +52,10 @@ services:
    MAIL_USE_TLS: '1'
    MAIL_PASSWORD: ${MAIL_PASSWORD}
    #PRIVATE_APPS: /private.apps.xlsx
-   # production envs
    FLASK_ENV: production
    ADMINS: flaski@age.mpg.de
    MAIL_SERVER: mail.age.mpg.de
    MAIL_USERNAME: flaski@age.mpg.de
-   # development envs
-   #FLASK_ENV: development
-   #- ADMINS=jboucas@age.mpg.de
-   #- MAIL_SERVER=smtp.googlemail.com
-   #- MAIL_USERNAME=bioflaski@gmail.com
   links:
    - mariadb
    - redis
