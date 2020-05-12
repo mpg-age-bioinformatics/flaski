@@ -7,7 +7,7 @@ services:
   image: flaski/flaski:latest # prod
   user: root
   volumes:
-   - data:/flaski_data/users:ro
+   - data:/flaski_data/users
    - /srv/backup/data/users:/backup/users_data # prod (backup  /databack)
    - /srv/backup/mariadb:/backup/mariadb # prod (backup  /databack)
   environment:
