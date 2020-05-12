@@ -30,7 +30,7 @@ _EOF_
     touch /rsync.log
     tail -F /mysql_backup.log /rsync.log &
     echo "=> Restore latest backup"
-    LATEST_BACKUP=$(find /backup/mariadb -maxdepth 1 -name '*.sql.gz' | tail -1 )
+    LATEST_BACKUP=$(find /backup/mariadb -maxdepth 1 -name 'latest.flaski.sql.gz' | tail -1 )
     echo "=> Restore database from ${LATEST_BACKUP}"
     set -o pipefail
     if gunzip --stdout "${LATEST_BACKUP}" | mysql -h "${MYSQL_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}"
