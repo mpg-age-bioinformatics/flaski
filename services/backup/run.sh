@@ -13,7 +13,7 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
       echo "waiting database container..."
       sleep 1
   done
-find /backup/mariadb -maxdepth 1 -name '*.sql.gz' | tail -1 | xargs /restore.sh
+find /backup/mariadb -maxdepth 1 -name 'latest.flaski.sql.gz' | tail -1 | xargs /restore.sh
 fi
 
 echo "${CRON_TIME} /backup.sh >> /mysql_backup.log 2>&1" > /crontab.conf
