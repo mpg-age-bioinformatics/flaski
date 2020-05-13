@@ -1,6 +1,8 @@
 <p>Hi {{ user.firstname }},</p>
 <p>Welcome!</p>
 <p>Thanks for signing up. Please follow this link to activate your account: <a href="{{ url_for('confirm', token=token, _external=True) }}">click here</a>.</p>
+<p></p>
+<p>Continuous delivery. To ensure you get the latest updates as soon as possible we rollout changes at <b>04:00 CET</b>. During this time you might experience glitches of a few seconds. Check our releases <a href="https://github.com/mpg-age-bioinformatics/flaski/releases">page</a> if you want to know more about delivered updates.</p>
 <p>Cheers!</p>
 <p>Sincerely,</p>
 <p>Flaski</p>

@@ -4,6 +4,8 @@ Welcome! Thanks for signing up. Please follow this link to activate your account
 
 {{ url_for('confirm', token=token, _external=True) }}
 
+Continuous delivery. To ensure you get the latest updates as soon as possible we rollout changes at <b>04:00 CET</b>. During this time you might experience glitches of a few seconds. Check our releases page - https://github.com/mpg-age-bioinformatics/flaski/releases - if you want to know more about delivered updates.
+
 Cheers!
 
 Sincerely,
