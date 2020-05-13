@@ -215,6 +215,25 @@
                 </div>
             </li>
 
+            <!-- -------------------- Hypergeometric test ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHypergeometric" aria-expanded="true" aria-controls="collapseHypergeometric" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Hypergeometric test</span>
+                </a>
+                <div id="collapseHypergeometric" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Population size (eg. number of genes in organism): <input type="text" name="population_size" value='{{ population_size }}' style="width:300px;height:22px;padding-left:4px"/></label>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -366,7 +385,9 @@
                 <h6 class="m-0 font-weight-bold text-primary">Info</h6>
             </div>
             <div class="card-body">
+                {% autoescape false %}
                 {{ message }} 
+                {% endautoescape %}
             </div>
         </div>
         <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->

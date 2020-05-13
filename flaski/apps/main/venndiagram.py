@@ -107,7 +107,30 @@ def make_figure(pa):
 
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
 
-    return fig, df
+    if pa["population_size"]!="":
+        pvalues={}
+        from scipy.stats import hypergeom
+        def hypergeomtest(set_1,set_2):
+            M=float(pa["population_size"]) # total number of geness
+            n=len(sets[set_1]) # genes in group I
+            N=len(sets[set_2]) # genes in group II
+            x=len( [ s for s in list(sets[set_1]) if s in list(sets[set_2]) ] ) # intersect
+            p=hypergeom.sf(x-1, M,n,N)
+            return p, M, n, N, x
+        p, M, n, N, x = hypergeomtest("set1","set2")
+        pvalues["%s vs. %s" %(pa["set1_name"],pa["set2_name"])]={"n %s" %pa["set1_name"]:n,"n %s" %pa["set2_name"]:N,"common":x,"total":M,"p value":str(p)}
+
+        if len( list(sets.keys()) ) == 3:
+            p, M, n, N, x=hypergeomtest("set1","set3")
+            pvalues["%s vs. %s" %(pa["set1_name"],pa["set3_name"])]={"n %s" %pa["set1_name"]:n,"n %s" %pa["set3_name"]:N,"common":x,"total":M,"p value":str(p)}
+
+            p, M, n, N, x=hypergeomtest("set2","set3")
+            pvalues["%s vs. %s" %(pa["set2_name"],pa["set3_name"])]={"n %s" %pa["set2_name"]:n,"n %s" %pa["set3_name"]:N,"common":x,"total":M,"p value":str(p)}
+
+    else:
+        pvalues=None
+
+    return fig, df, pvalues
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
@@ -150,6 +173,7 @@ def figure_defaults():
         "set1_line_rgb":"",\
         "set2_line_rgb":"",\
         "set3_line_rgb":"",\
+        "population_size":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\

@@ -138,7 +138,6 @@ def venndiagram(download=None):
                 if plot_arguments["%s_values" %set_index] != "":
                     i=i+1
         
-        
             if i < 2:
                     error_msg="No data to plot, please upload data."
                     flash(error_msg,'error')
@@ -152,7 +151,7 @@ def venndiagram(download=None):
 
         # CALL FIGURE FUNCTION
         try:
-            fig, df=make_figure(plot_arguments)
+            fig, df, pvalues=make_figure(plot_arguments)
 
             # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
             figfile = io.BytesIO()
@@ -160,6 +159,19 @@ def venndiagram(download=None):
             plt.close()
             figfile.seek(0)  # rewind to beginning of file
             figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+
+            if pvalues:
+                message="Hypergeometric test:<br><br>"
+                for pvalue in list(pvalues.keys()):
+                    samples_keys=list(pvalues[pvalue].keys())
+                    message=message+str(pvalue)+":<br>"+\
+                        "- %s: "%samples_keys[0]  + str(pvalues[pvalue][samples_keys[0]])+"<br>"+\
+                        "- %s: "%samples_keys[1] + str(pvalues[pvalue][samples_keys[1]])+"<br>"+\
+                        "- n common: " + str(pvalues[pvalue]["common"])+"<br>"+\
+                        "- n total: " + str(int(pvalues[pvalue]["total"]))+"<br>"+\
+                        "- p value: " + str(pvalues[pvalue]["p value"])+"<br><br>"
+
+                flash(message)
 
             return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
 
@@ -174,7 +186,7 @@ def venndiagram(download=None):
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION
-            fig, df=make_figure(plot_arguments)
+            fig, df, pvalues=make_figure(plot_arguments)
 
             #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
@@ -196,11 +208,20 @@ def venndiagram(download=None):
             # READ INPUT DATA FROM SESSION JSON
             # CALL FIGURE FUNCTION
 
-            fig, df=make_figure(plot_arguments)
+            fig, df, pvalues=make_figure(plot_arguments)
+
+            if pvalues: 
+                message=pd.DataFrame()
+                for pvalue in pvalues:
+                    tmp=pd.DataFrame(pvalues[pvalue],index=[pvalue])
+                    tmp.columns=["n group 1","n group 2","n common","n total","p value"]
+                    message=pd.concat([message,tmp])
 
             excelfile = io.BytesIO()
             EXC=pd.ExcelWriter(excelfile)
             df.to_excel(EXC,sheet_name="venndiagram",index=None)
+            if pvalues:
+                message.to_excel(EXC, sheet_name="hyperg.test",index=True)
             EXC.save()
             excelfile.seek(0)
 
