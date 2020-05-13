@@ -193,7 +193,7 @@ def venndiagram(download=None):
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
             plt.savefig(figfile, format=plot_arguments["downloadf"])
             plt.close()
-            figfile.seek(0)  # rewind to beginning of file
+            figfile.seek(0)  #rewind to beginning of file
 
             eventlog = UserLogging(email=current_user.email,action="download figure venndiagram")
             db.session.add(eventlog)
