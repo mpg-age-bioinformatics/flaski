@@ -11,12 +11,12 @@ services:
   volumes:
     - data:/flaski_data/users
     - ./:/flaski
-    - /Users/analucia/flaski_backup/users_data:/backup/users_data:ro
-    - /Users/analucia/flaski_backup/mariadb:/backup/mariadb:ro
+    - ~/flaski_backup/users_data:/backup/users_data:ro
+    - ~/flaski_backup/mariadb:/backup/mariadb:ro
   environment:
     - FLASK_ENV=init
-    - RESTORE_DB=0
-    - RESTORE_USERS_DATA=0
+    - RESTORE_DB=1
+    - RESTORE_USERS_DATA=1
     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     - SECRET_KEY=${SECRET_KEY}
     - REDIS_ADDRESS=redis:6379/0
@@ -25,7 +25,7 @@ services:
     - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     - MYSQL_HOST=mariadb
     - MYSQL_PORT=3306
-    - ADMINS=jboucas@age.mpg.de
+    - ADMINS=flaski@age.mpg.de
   links:
     - mariadb
   depends_on:
@@ -53,7 +53,7 @@ services:
    - MYSQL_PORT=3306
    - FLASK_ENV=development
    - INSTANCE=(DEV)
-   - ADMINS=jboucas@age.mpg.de
+   - ADMINS=flaski@age.mpg.de
   links:
    - mariadb
    - redis
@@ -69,8 +69,8 @@ services:
    - mariadb
    - init
   volumes:
-   - /Users/analucia/flaski_backup/mariadb:/backup/mariadb
-   - /Users/analucia/flaski_backup/users_data:/backup/users_data
+   - ~/flaski_backup/mariadb:/backup/mariadb
+   - ~/flaski_backup/users_data:/backup/users_data
    - data:/flaski_data/users:ro
   environment:
    - MYSQL_HOST=mariadb
@@ -110,9 +110,9 @@ services:
    - 443:443
   volumes:
    - ./services/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
-   - /Users/analucia/flaski_data/certificates/cert.pem:/certs/cert.pem:ro 
-   - /Users/analucia/flaski_data/certificates/key.pem:/certs/key.pem:ro
-   - /Users/analucia/flaski_data/certificates/dhparam.pem:/certs/dhparam.pem:ro
+   - ~/flaski_data/certificates/cert.pem:/certs/cert.pem:ro 
+   - ~/flaski_data/certificates/key.pem:/certs/key.pem:ro
+   - ~/flaski_data/certificates/dhparam.pem:/certs/dhparam.pem:ro
   links:
    - server
   depends_on:
