@@ -25,7 +25,7 @@ services:
     - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     - MYSQL_HOST=mariadb
     - MYSQL_PORT=3306
-    - ADMINS=jboucas@age.mpg.de
+    - ADMINS=flaski@age.mpg.de
   links:
     - mariadb
   depends_on:
@@ -53,7 +53,7 @@ services:
    - MYSQL_PORT=3306
    - FLASK_ENV=development
    - INSTANCE=(DEV)
-   - ADMINS=jboucas@age.mpg.de
+   - ADMINS=flaski@age.mpg.de
   links:
    - mariadb
    - redis
