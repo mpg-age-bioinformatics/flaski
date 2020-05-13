@@ -163,6 +163,7 @@ def iheatmap(download=None):
                 elif extension == "tsv":
                     df=pd.read_csv(filestream,sep="\t", index_col=False)
                 
+                df=df.astype(str)
                 session["df"]=df.to_json()
                 
                 cols=df.columns.tolist()

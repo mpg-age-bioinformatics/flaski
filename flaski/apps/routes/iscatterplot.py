@@ -159,6 +159,7 @@ def iscatterplot(download=None):
                 elif extension == "tsv":
                     df=pd.read_csv(filestream,sep="\t")
                 
+                df=df.astype(str)
                 session["df"]=df.to_json()
                 
                 cols=df.columns.tolist()

@@ -131,7 +131,7 @@ def david(download=None):
         plot_arguments=session["plot_arguments"]
 
         if plot_arguments["user"] == "":
-            flash('Please give in a register DAVID email in "Input" > "DAVID registered email"','error')
+            flash('Please give in a register DAVID email in "Input" > "DAVID registered email". If you do not yet have a registered address you need to register with DAVID - https://david.ncifcrf.gov/webservice/register.htm. Please be aware that you will not receive any confirmation email. ','error')
             return render_template('/apps/david.html', apps=apps, **plot_arguments)
         
         # debug bad gateway
