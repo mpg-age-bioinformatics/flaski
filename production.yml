@@ -4,7 +4,7 @@ services:
 
  init:
   container_name: init
-  image: flaski/flaski:latests
+  image: flaski/flaski:latest
   user: root
   volumes:
    - data:/flaski_data/users
