@@ -130,6 +130,21 @@
                                     {% endfor %}
                                 </select></label>
                             </div>
+
+                            {% if groups_value != "None" %}
+
+                            <div class="row arg">
+                                <label style="padding-right:4px;">Legend:
+                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
+                                <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;height:22px;padding-left:4px;"></label></label>
+                            </div>
+
+                            {% else %}
+
+                                <input type="hidden" name ="show_legend" value="{{ show_legend }}">
+                                <input type="hidden" name ="legend_font_size" value="{{ legend_font_size }}">
+
+                            {% endif %}
                         
                         </div>
                     </div>
@@ -258,6 +273,21 @@
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
+                            {% if groups_value != "None" %}
+
+                                <div class="row arg">
+                                    <label style="padding-right:4px;">Auto generate group characteristics: </label>
+                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="groups_auto_generate" {% if groups_auto_generate=="on" %} checked {% elif groups_auto_generate==".on" %} checked {% endif %}/></label>
+                                </div>
+
+                            {% else %}
+
+                                <input type="hidden" name ="groups_auto_generate" value="{{ groups_auto_generate }}">
+
+                            {% endif %}
+
+
+
                             <div class="row arg">
                                 <label> size: <select name=markers method="GET" action="/" style="width:50px">
                                     {% for marker_size_ in marker_size %}
@@ -349,6 +379,22 @@
                                 </select></label>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <!-- -------------------- LABELS ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLabels" aria-expanded="true" aria-controls="collapseLabels" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Labels</span>
+                </a>
+                <div id="collapseLabels" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
                             <div class="row arg">
                                 <label>Labels: <select name=labels_col_value method="GET" action="/" style="width:252px">
                                     {% for labels_col_ in labels_col %}
@@ -381,30 +427,7 @@
                             <div class="row arg">
                                 <label>Arrows line width: <input type="text" name="labels_line_width" value='{{ labels_line_width }}' style="width:64px;height:22px;padding-left:4px;"></label>
                                 <label style="padding-left:12px;">alpha: <input type="text" name="labels_alpha" value='{{ labels_alpha }}' style="width:64px;height:22px;padding-left:4px;"></label>
-
                             </div>
-
-
-                            {% if groups_value != "None" %}
-
-                                <div class="row arg">
-                                    <label style="padding-right:4px;">Auto generate groups characteristics: </label>
-                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="groups_auto_generate" {% if groups_auto_generate=="on" %} checked {% elif groups_auto_generate==".on" %} checked {% endif %}/></label>
-                                </div>
-
-                                <div class="row arg">
-                                    <label style="padding-right:4px;">Legend:
-                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
-                                    <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;height:22px;padding-left:4px;"></label></label>
-                                </div>
-
-                            {% else %}
-
-                                <input type="hidden" name ="groups_auto_generate" value="{{ groups_auto_generate }}">
-                                <input type="hidden" name ="show_legend" value="{{ show_legend }}">
-                                <input type="hidden" name ="legend_font_size" value="{{ legend_font_size }}">
-
-                            {% endif %}
 
                         </div>
                     </div>
