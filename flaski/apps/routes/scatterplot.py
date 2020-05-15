@@ -186,17 +186,22 @@ def scatterplot(download=None):
 
             if plot_arguments["groups_value"]!=request.form["groups_value"]:
                 df=pd.read_json(session["df"])
+                df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
+                df=df.astype(str)
+                session["df"]=df.to_json()
                 groups=df[request.form["groups_value"]]
                 groups=list(set(groups))
                 groups.sort()
+                plot_arguments["list_of_groups"]=groups
                 groups_settings=[]
+                group_dic={}
                 for group in groups:
                     group_dic={"name":group,\
-                        "markers":random.choice(plot_arguments["marker_size"]),\
+                        "markers":plot_arguments["markers"],\
                         "markersizes_col":"select a column..",\
-                        "markerc":random.choice(plot_arguments["marker_color"]),\
+                        "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
                         "markerc_col":"select a column..",\
-                        "markerc_write":"",\
+                        "markerc_write":plot_arguments["markerc_write"],\
                         "edge_linewidth":plot_arguments["edge_linewidth"],\
                         "edge_linewidth_col":"select a column..",\
                         "edgecolor":plot_arguments["edgecolor"],\
@@ -207,10 +212,38 @@ def scatterplot(download=None):
                         "marker_alpha":plot_arguments["marker_alpha"],\
                         "markeralpha_col_value":"select a column.."}
                     groups_settings.append(group_dic)
+                    # for k in list( group_dic[group].keys() ):
+                    #     plot_arguments[k+"_"+group]=group_dic[group][k]
+                plot_arguments["groups_settings"]=groups_settings
+            elif plot_arguments["groups_value"] != "None":
+                # print(list(request.form.keys()) )
+                # import sys
+                # sys.stdout.flush()
+                groups_settings=[]
+                group_dic={}
+                for group in plot_arguments["list_of_groups"]:
+                    group_dic={"name":group,\
+                        "markers":request.form["%s.markers" %group],\
+                        "markersizes_col":request.form["%s.markersizes_col" %group],\
+                        "markerc":request.form["%s.markerc" %group],\
+                        "markerc_col":request.form["%s.markerc_col" %group],\
+                        "markerc_write":request.form["%s.markerc_write" %group],\
+                        "edge_linewidth":request.form["%s.edge_linewidth" %group],\
+                        "edge_linewidth_col":request.form["%s.edge_linewidth_col" %group],\
+                        "edgecolor":request.form["%s.edgecolor" %group],\
+                        "edgecolor_col":request.form["%s.edgecolor_col" %group],\
+                        "edgecolor_write":request.form["%s.edgecolor_write" %group],\
+                        "marker":request.form["%s.marker" %group],\
+                        "markerstyles_col":request.form["%s.markerstyles_col" %group],\
+                        "marker_alpha":request.form["%s.marker_alpha" %group],\
+                        "markeralpha_col_value":request.form["%s.markeralpha_col_value" %group]
+                        }   
+                    groups_settings.append(group_dic)
                 plot_arguments["groups_settings"]=groups_settings
 
             for a in list(plot_arguments.keys()):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
+                    #print(a)
                     plot_arguments[a]=request.form[a]                
 
             # # VALUES SELECTED FROM SELECTION LISTS 
@@ -250,23 +283,22 @@ def scatterplot(download=None):
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])
 
-        # CALL FIGURE FUNCTION
-        try:
-            fig=make_figure(df,plot_arguments)
+        #CALL FIGURE FUNCTION
+        # try:
+        fig=make_figure(df,plot_arguments)
 
-            #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-            figfile = io.BytesIO()
-            plt.savefig(figfile, format='png')
-            plt.close()
-            figfile.seek(0)  # rewind to beginning of file
-            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+        #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+        figfile = io.BytesIO()
+        plt.savefig(figfile, format='png')
+        plt.close()
+        figfile.seek(0)  # rewind to beginning of file
+        figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
-            return render_template('/apps/scatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+        return render_template('/apps/scatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-        except Exception as e:
-            flash(e,'error')
-
-            return render_template('/apps/scatterplot.html', filename=filename, apps=apps, **plot_arguments)
+        # except Exception as e:
+        #     flash(e,'error')
+        #     return render_template('/apps/scatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":

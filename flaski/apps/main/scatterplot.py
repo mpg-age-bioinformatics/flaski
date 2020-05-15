@@ -34,72 +34,66 @@ def make_figure(df,pa):
     # the user can decide how the diferent groups should look like 
     # by unchecking the groups_autogenerate check box
 
-    print(pa["xvals"],pa["yvals"])
-
     if str(pa["groups_value"])!="None":
-        for group in list(OrderedDict.fromkeys(df[pa["groups_value"]].tolist())):
+        for group in pa["list_of_groups"]:
             tmp=df[df[pa["groups_value"]]==group]
 
             x=tmp[pa["xvals"]].tolist()
             y=tmp[pa["yvals"]].tolist()
-
-            if pa["groups_auto_generate"] == "off" :
-
-                if pa["markeralpha_col_value"] != "select a column..":
-                    a=[ float(i) for i in tmp[[pa["markeralpha_col_value"]]].dropna()[pa["markeralpha_col_value"]].tolist() ][0]
-                else:
-                    a=float(pa["marker_alpha"])
-
-                if pa["markerstyles_col"] != "select a column..":
-                    marker=[ str(i) for i in tmp[[pa["markerstyles_col"]]].dropna()[pa["markerstyles_col"]].tolist() ][0]
-                else:
-                    marker=pa["marker"]
-
-                if pa["markersizes_col"] != "select a column..":
-                    s=[ float(i) for i in tmp[[pa["markersizes_col"]]].dropna()[pa["markersizes_col"]].tolist() ][0]
-                else:
-                    s=float(pa["markers"])
-
-                if pa["markerc_col"] != "select a column..":
-                    c=[ GET_COLOR(i) for i in tmp[[pa["markerc_col"]]].dropna()[pa["markerc_col"]].tolist()][0]
-                    if type(c) == list:
-                        c=np.array([c]*len(tmp))/255.0
-                elif str(pa["markerc_write"]) != "":
-                    c=GET_COLOR(pa["markerc_write"])
-                    if type(c) == list:
-                        c=np.array([c]*len(tmp))/255.0
-                else:
-                    c=pa["markerc"]
-
-
-                if pa["edgecolor_col"] != "select a column..":
-                    edgecolor=[ GET_COLOR(i) for i in tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()][0]
-                    if type(edgecolor) == list:
-                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
-                elif str(pa["edgecolor_write"]) != "":
-                    edgecolor=GET_COLOR(pa["edgecolor_write"])
-                    if type(edgecolor) == list:
-                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
-                else:
-                    edgecolor=pa["edgecolor"]
-
-                if pa["edge_linewidth_col"] != "select a column..":
-                    edge_linewidth=[ float(i) for i in tmp[[pa["edge_linewidth_col"]]].dropna()[pa["edge_linewidth_col"]].tolist() ][0]
-                else:
-                    edge_linewidth=float(pa["edge_linewidth"])
-
-                ax.scatter(x, y, \
-                    marker=marker, \
-                    edgecolor=edgecolor,\
-                    linewidth=edge_linewidth,\
-                    s=s,\
-                    c=c,\
-                    alpha=a,\
-                    label=group)
             
+            pa_=[ g for g in pa["groups_settings"] if g["name"]==group ][0]
+            
+            if pa_["markeralpha_col_value"] != "select a column..":
+                a=[ float(i) for i in tmp[[pa_["markeralpha_col_value"]]].dropna()[pa_["markeralpha_col_value"]].tolist() ][0]
             else:
-                ax.scatter(x, y, \
-                    label=group)
+                a=float(pa_["marker_alpha"])
+
+            if pa_["markerstyles_col"] != "select a column..":
+                marker=[ str(i) for i in tmp[[pa_["markerstyles_col"]]].dropna()[pa_["markerstyles_col"]].tolist() ][0]
+            else:
+                marker=pa_["marker"]
+
+            if pa_["markersizes_col"] != "select a column..":
+                s=[ float(i) for i in tmp[[pa_["markersizes_col"]]].dropna()[pa_["markersizes_col"]].tolist() ][0]
+            else:
+                s=float(pa_["markers"])
+
+            if pa_["markerc_col"] != "select a column..":
+                c=[ GET_COLOR(i) for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
+                if type(c) == list:
+                    c=np.array([c]*len(tmp))/255.0
+            elif str(pa["markerc_write"]) != "":
+                c=GET_COLOR(pa_["markerc_write"])
+                if type(c) == list:
+                    c=np.array([c]*len(tmp))/255.0
+            else:
+                c=pa_["markerc"]
+
+
+            if pa_["edgecolor_col"] != "select a column..":
+                edgecolor=[ GET_COLOR(i) for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
+                if type(edgecolor) == list:
+                    edgecolor=np.array([edgecolor]*len(tmp))/255.0
+            elif str(pa_["edgecolor_write"]) != "":
+                edgecolor=GET_COLOR(pa_["edgecolor_write"])
+                if type(edgecolor) == list:
+                    edgecolor=np.array([edgecolor]*len(tmp))/255.0
+            else:
+                edgecolor=pa_["edgecolor"]
+
+            if pa["edge_linewidth_col"] != "select a column..":
+                edge_linewidth=[ float(i) for i in tmp[[pa_["edge_linewidth_col"]]].dropna()[pa_["edge_linewidth_col"]].tolist() ][0]
+            else:
+                edge_linewidth=float(pa_["edge_linewidth"])
+
+            ax.scatter(x, y, \
+                marker=marker, \
+                edgecolor=edgecolor,\
+                linewidth=edge_linewidth,\
+                s=s,\
+                c=c,\
+                alpha=a,\
+                label=group)
 
         if pa["show_legend"] != "off" :        
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=pa["legend_font_size"])
@@ -279,6 +273,7 @@ def figure_defaults():
         "yvals":None,\
         "groups":["None"],\
         "groups_value":"None",\
+        "list_of_groups":[],\
         "groups_settings":[],\
         "show_legend":".on",\
         "legend_font_size":"14",\
@@ -374,7 +369,7 @@ def figure_defaults():
     notUpdateList=["inputsessionfile"]
 
     # lists without a default value on the arguments
-    excluded_list=["groups_settings"]
+    excluded_list=["groups_settings","list_of_groups"]
 
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
