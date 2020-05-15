@@ -186,8 +186,9 @@ def scatterplot(download=None):
 
             if plot_arguments["groups_value"]!=request.form["groups_value"]:
                 df=pd.read_json(session["df"])
-                groups=df[plot_arguments["groups_value"]]
+                groups=df[request.form["groups_value"]]
                 groups=list(set(groups))
+                groups.sort()
                 groups_settings=[]
                 for group in groups:
                     group_dic={"name":group,\
@@ -206,6 +207,7 @@ def scatterplot(download=None):
                         "marker_alpha":plot_arguments["marker_alpha"],\
                         "markeralpha_col_value":"select a column.."}
                     groups_settings.append(group_dic)
+                plot_arguments["groups_settings"]=groups_settings
 
             for a in list(plot_arguments.keys()):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
@@ -249,22 +251,22 @@ def scatterplot(download=None):
         df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
-        # try:
-        fig=make_figure(df,plot_arguments)
+        try:
+            fig=make_figure(df,plot_arguments)
 
-        # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-        figfile = io.BytesIO()
-        plt.savefig(figfile, format='png')
-        plt.close()
-        figfile.seek(0)  # rewind to beginning of file
-        figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+            #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+            figfile = io.BytesIO()
+            plt.savefig(figfile, format='png')
+            plt.close()
+            figfile.seek(0)  # rewind to beginning of file
+            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
-        return render_template('/apps/scatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/scatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-        # except Exception as e:
-        #     flash(e,'error')
+        except Exception as e:
+            flash(e,'error')
 
-        #     return render_template('/apps/scatterplot.html', filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/scatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":

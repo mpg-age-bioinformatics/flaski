@@ -368,7 +368,7 @@ def figure_defaults():
 
     checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
             "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
-            ,"show_legend"]
+            "show_legend"]
 
     # not update list
     notUpdateList=["inputsessionfile"]
