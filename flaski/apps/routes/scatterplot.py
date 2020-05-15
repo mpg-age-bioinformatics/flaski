@@ -107,36 +107,6 @@ def scatterplot(download=None):
                 session[k]=session_[k]
             plot_arguments=session["plot_arguments"]
             flash('Arguments file sucessufuly read.',"info")
-
-        if not inputsessionfile and not inputargumentsfile:
-            # SELECTION LISTS DO NOT GET UPDATED 
-            lists=session["lists"]
-
-            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-            # WITH THE EXCEPTION OF SELECTION LISTS
-            plot_arguments = session["plot_arguments"]
-            for a in list(plot_arguments.keys()):
-                if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                    plot_arguments[a]=request.form[a]
-
-            # # VALUES SELECTED FROM SELECTION LISTS 
-            # # GET UPDATED TO THE LATEST CHOICE
-            # for k in list(lists.keys()):
-            #     if k in list(request.form.keys()):
-            #         plot_arguments[lists[k]]=request.form[k]
-            # checkboxes
-            for checkbox in session["checkboxes"]:
-                if checkbox in list(request.form.keys()) :
-                    plot_arguments[checkbox]="on"
-                else:
-                    try:
-                        plot_arguments[checkbox]=request.form[checkbox]
-                    except:
-                        if plot_arguments[checkbox][0]!=".":
-                            plot_arguments[checkbox]="off"
-
-            # UPDATE SESSION VALUES
-            session["plot_arguments"]=plot_arguments
         
         # IF THE UPLOADS A NEW FILE 
         # THAN UPDATE THE SESSION FILE
@@ -206,6 +176,61 @@ def scatterplot(download=None):
                 flash(error_msg,'error')
                 return render_template('/apps/scatterplot.html' , filename="Select file..", apps=apps, **plot_arguments)
         
+        if not inputsessionfile and not inputargumentsfile:
+            # SELECTION LISTS DO NOT GET UPDATED 
+            lists=session["lists"]
+
+            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+            # WITH THE EXCEPTION OF SELECTION LISTS
+            plot_arguments = session["plot_arguments"]
+
+            if plot_arguments["groups_value"]!=request.form["groups_value"]:
+                df=pd.read_json(session["df"])
+                groups=df[plot_arguments["groups_value"]]
+                groups=list(set(groups))
+                groups_settings=[]
+                for group in groups:
+                    group_dic={"name":group,\
+                        "markers":random.choice(plot_arguments["marker_size"]),\
+                        "markersizes_col":"select a column..",\
+                        "markerc":random.choice(plot_arguments["marker_color"]),\
+                        "markerc_col":"select a column..",\
+                        "markerc_write":"",\
+                        "edge_linewidth":plot_arguments["edge_linewidth"],\
+                        "edge_linewidth_col":"select a column..",\
+                        "edgecolor":plot_arguments["edgecolor"],\
+                        "edgecolor_col":"select a column..",\
+                        "edgecolor_write":"",\
+                        "marker":random.choice(plot_arguments["markerstyles"]),\
+                        "markerstyles_col":"select a column..",\
+                        "marker_alpha":plot_arguments["marker_alpha"],\
+                        "markeralpha_col_value":"select a column.."}
+                    groups_settings.append(group_dic)
+
+            for a in list(plot_arguments.keys()):
+                if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
+                    plot_arguments[a]=request.form[a]                
+
+            # # VALUES SELECTED FROM SELECTION LISTS 
+            # # GET UPDATED TO THE LATEST CHOICE
+            # for k in list(lists.keys()):
+            #     if k in list(request.form.keys()):
+            #         plot_arguments[lists[k]]=request.form[k]
+            # checkboxes
+            for checkbox in session["checkboxes"]:
+                if checkbox in list(request.form.keys()) :
+                    plot_arguments[checkbox]="on"
+                else:
+                    try:
+                        plot_arguments[checkbox]=request.form[checkbox]
+                    except:
+                        if plot_arguments[checkbox][0]!=".":
+                            plot_arguments[checkbox]="off"
+
+            # UPDATE SESSION VALUES
+            session["plot_arguments"]=plot_arguments
+
+
         if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
@@ -217,6 +242,8 @@ def scatterplot(download=None):
         # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
         filename=session["filename"]
         plot_arguments=session["plot_arguments"]
+
+
 
         # READ INPUT DATA FROM SESSION JSON
         df=pd.read_json(session["df"])

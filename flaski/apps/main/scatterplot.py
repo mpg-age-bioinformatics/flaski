@@ -279,7 +279,7 @@ def figure_defaults():
         "yvals":None,\
         "groups":["None"],\
         "groups_value":"None",\
-        "groups_auto_generate":".on",\
+        "groups_settings":[],\
         "show_legend":".on",\
         "legend_font_size":"14",\
         "markerstyles":ALLOWED_MARKERS,\
@@ -368,13 +368,13 @@ def figure_defaults():
 
     checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
             "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
-            "groups_auto_generate","show_legend"]
+            ,"show_legend"]
 
     # not update list
     notUpdateList=["inputsessionfile"]
 
     # lists without a default value on the arguments
-    excluded_list=[]
+    excluded_list=["groups_settings"]
 
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
