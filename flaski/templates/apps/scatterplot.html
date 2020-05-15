@@ -260,105 +260,25 @@
                 </div>
             </li>
 
-            {% for group_setting in groups_settings %}
+            {% for group in groups_settings %}
             <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group_setting.name}}" aria-expanded="true" aria-controls="collapse{{group_setting.name}}" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group.name}}" aria-expanded="true" aria-controls="collapse{{group.name}}" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Marker: {{group_setting.name}}</span>
+                    <span>Marker: {{group.name}}</span>
                 </a>
-                <div id="collapse{{group_setting.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                <div id="collapse{{group.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu"> 
                         <div class="row arguments">
 
                             <div class="row arg">
-                                <label> size: <select name=group_setting.markers method="GET" action="/" style="width:50px">
+                                <label> size: <select name=group.{{group.name}}.markers method="GET" action="/" style="width:50px">
                                     {% for marker_size_ in marker_size %}
-                                        <option value="{{marker_size_}}" {% if marker_size_==group_setting.markers %} selected {% endif %}>{{marker_size_}}</option>
+                                        <option value="{{marker_size_}}" {% if marker_size_==group.markers %} selected {% endif %}>{{marker_size_}}</option>
                                     {% endfor %}
                                 </select>
-
-                                <label> ..or, <select name=group_setting.markersizes_col method="GET" action="/" style="width:189px">
-                                    {% for markersizes_cols_ in markersizes_cols %}
-                                        <option value="{{markersizes_cols_}}" {% if markersizes_cols_==group_setting.markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
-                                    {% endfor %}
-                                </select>
-
-                            </div>
-
-                            <div class="row arg">
-                                <label> color: <select name=group_setting.markerc method="GET" action="/" style="width:80px">
-                                    {% for marker_color_ in marker_color %}
-                                        <option value="{{marker_color_}}" {% if marker_color_==group_setting.markerc %} selected {% endif %}>{{marker_color_}}</option>"
-                                    {% endfor %}
-                                </select>
-
-                                <label> ..or, <select name=group_setting.markerc_col method="GET" action="/" style="width:153px">
-                                    {% for markerc_cols_ in markerc_cols %}
-                                        <option value="{{markerc_cols_}}" {% if markerc_cols_==group_setting.markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
 
                             <div class="row arg" style="padding-bottom:6px;">
-                                <label> ..or, write a color name <input type="text" name=group_setting.markerc_write value='{{ group_setting.markerc_write }}' style="width:155px;height:22px;padding-left: 4px">
-                            </div>
-
-                            <div class="row arg">
-                                <label> line width: <select name=group_setting.edge_linewidth method="GET" action="/" style="width:50px">
-                                    {% for edge_linewidth_ in edge_linewidths %}
-                                        <option value="{{edge_linewidth_}}" {% if edge_linewidth_==group_setting.edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
-                                    {% endfor %}
-                                </select>
-
-                                <label> ..or, <select name=group_setting.edge_linewidth_col method="GET" action="/" style="width:152px">
-                                    {% for edge_linewidth_col_ in edge_linewidth_cols %}
-                                        <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==group_setting.edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="row arg">
-                                <div class="row arg">
-                                    <label> line color: <select name=group_setting.edgecolor method="GET" action="/" style="width:80px">
-                                        {% for edgecolor_ in edge_colors %}
-                                            <option value="{{edgecolor_}}" {% if edgecolor_==group_setting.edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
-                                        {% endfor %}
-                                    </select>
-    
-                                    <label> ..or, <select name=group_setting.edgecolor_col method="GET" action="/" style="width:128px">
-                                        {% for edgecolor_col_ in edgecolor_cols %}
-                                            <option value="{{edgecolor_col_}}" {% if edgecolor_col_==group_setting.edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-    
-                                <div class="row arg" style="padding-bottom:6px;">
-                                    <label> ..or, write a color name <input type="text" name=group_setting.edgecolor_write value='{{ group_setting.edgecolor_write }}' style="width:155px;height:22px;padding-left: 4px">
-                            </div>
-
-                            <div class="row arg">
-                                <label>shape: <select name=group_setting.marker method="GET" action="/" style="width:50px">
-                                    {% for markerstyles_ in markerstyles %}
-                                        <option value="{{markerstyles_}}" {% if markerstyles_==group_setting.marker %} selected {% endif %}>{{markerstyles_}}</option>
-                                    {% endfor %}
-                                </select>
-
-                                <label>&nbsp;..or, <select name=group_setting.markerstyles_col method="GET" action="/" style="width:172px">
-                                    {% for markerstyles_cols_ in markerstyles_cols %}
-                                        <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==group_setting.markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
-                                    {% endfor %}
-                                </select>
-
-                            </div>
-
-                            <div class="row arg">
-                                <label>alpha: <input type="text" name=group_setting.marker_alpha value='{{ group_setting.marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
-
-                                <label style="padding-left:1px;">&nbsp;..or, <select name=group_setting.markeralpha_col_value method="GET" action="/" style="width:172px">
-                                    {% for markeralpha_col_ in markeralpha_col %}
-                                        <option value="{{markeralpha_col_}}" {% if markeralpha_col_==group_setting.markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
-                                    {% endfor %}
-                                </select></label>
+                                <label> ..or, write a color name <input type="text" name=group.{{group.name}}.markerc_write value={{group.markerc_write}} style="width:155px;height:22px;padding-left: 4px">
                             </div>
 
                         </div>
