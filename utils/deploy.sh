@@ -48,26 +48,56 @@ else
     echo "$(date) :: Depolying now!"
 fi
 
+BASE_IMAGES="flaski/flaski:latest"#  flaski/backup:latest redis:5 nginx:alpine mariadb:10.4"
 
-if [[ "$1" == "down" ]] ; 
-    then
+DEPLOY="0"
 
-        docker-compose -f production.yml pull server && \
-        docker-compose -f production.yml exec backup /backup.sh && \
-        docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
-        echo "$(date) :: docker-compose down" && \
-        docker-compose -f production.yml down && \
-        echo "$(date) :: docker-compose up -d" && \
-        docker-compose -f production.yml up -d
+for BASE_IMAGE in ${BASE_IMAGES}; do
 
-    else
+    #REGISTRY="registry.hub.docker.com"
+    #IMAGE="$REGISTRY/$BASE_IMAGE"
+    IMAGE=$BASE_IMAGE
+    CID=$(docker ps | grep $IMAGE | awk '{print $1}')
+    docker pull $IMAGE
 
-        docker-compose -f production.yml pull server && \
-        docker-compose -f production.yml exec backup /backup.sh && \
-        docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
-        echo "$(date) :: docker-compose up -d" && \
-        docker-compose -f production.yml up -d server
+    for im in $CID
+    do
+        LATEST=`docker inspect --format "{{.Id}}" $IMAGE`
+        RUNNING=`docker inspect --format "{{.Image}}" $im`
+        NAME=`docker inspect --format '{{.Name}}' $im | sed "s/\///g"`
+        echo "Latest:" $LATEST
+        echo "Running:" $RUNNING
+        if [ "$RUNNING" != "$LATEST" ];then
+            echo "$(date) :: $NAME needs upgrading"
+            DEPLOY="1"
+        else
+            echo "$(date) :: $NAME up to date"
+        fi
+    done
+done
 
+if [[ "$DEPLOY" == "1" ]] ; then
+
+    if [[ "$1" == "down" ]] ; 
+        then
+
+            docker-compose -f production.yml pull server && \
+            docker-compose -f production.yml exec backup /backup.sh && \
+            docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
+            echo "$(date) :: docker-compose down" && \
+            docker-compose -f production.yml down && \
+            echo "$(date) :: docker-compose up -d" && \
+            docker-compose -f production.yml up -d
+
+        else
+
+            docker-compose -f production.yml pull server && \
+            docker-compose -f production.yml exec backup /backup.sh && \
+            docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
+            echo "$(date) :: docker-compose up -d" && \
+            docker-compose -f production.yml up -d server
+
+    fi
 fi
 
 echo "$(date) :: Done!"

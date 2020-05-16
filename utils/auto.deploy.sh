@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-BASE_IMAGES="flaski/backup:latest flaski/flaski:latest redis:5 nginx:alpine mariadb:10.4"
+BASE_IMAGES="flaski/flaski:latest"#  flaski/backup:latest redis:5 nginx:alpine mariadb:10.4"
 
 DEPLOY="0"
 
