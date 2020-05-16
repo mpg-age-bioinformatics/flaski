@@ -48,7 +48,8 @@ else
     echo "$(date) :: Depolying now!"
 fi
 
-BASE_IMAGES="flaski/flaski:latest"#  flaski/backup:latest redis:5 nginx:alpine mariadb:10.4"
+BASE_IMAGES="flaski/flaski:latest" 
+#  flaski/backup:latest redis:5 nginx:alpine mariadb:10.4"
 
 DEPLOY="0"
 
@@ -65,8 +66,8 @@ for BASE_IMAGE in ${BASE_IMAGES}; do
         LATEST=`docker inspect --format "{{.Id}}" $IMAGE`
         RUNNING=`docker inspect --format "{{.Image}}" $im`
         NAME=`docker inspect --format '{{.Name}}' $im | sed "s/\///g"`
-        echo "Latest:" $LATEST
-        echo "Running:" $RUNNING
+        echo "$(date) :: Latest:" $LATEST
+        echo "$(date) :: Running:" $RUNNING
         if [ "$RUNNING" != "$LATEST" ];then
             echo "$(date) :: $NAME needs upgrading"
             DEPLOY="1"
