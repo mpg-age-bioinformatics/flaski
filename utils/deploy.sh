@@ -59,7 +59,9 @@ for BASE_IMAGE in ${BASE_IMAGES}; do
     #IMAGE="$REGISTRY/$BASE_IMAGE"
     IMAGE=$BASE_IMAGE
     CID=$(docker ps | grep $IMAGE | awk '{print $1}')
+    echo "$(date) :: docker pull $IMAGE started\n####################################"
     docker pull $IMAGE
+    echo "####################################\n$(date) :: docker pull $IMAGE finished\n"
 
     for im in $CID
     do
