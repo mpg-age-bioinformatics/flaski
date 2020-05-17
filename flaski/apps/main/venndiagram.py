@@ -105,6 +105,35 @@ def make_figure(pa):
         tmp=pd.DataFrame( { pa[ "%s_name" %(set_index)]:list(sets[set_index]) } ,index=list(sets[set_index]) )
         df=pd.merge(df,tmp,how="left",left_index=True, right_index=True)
 
+    cols=df.columns.tolist()
+    def check_common(df, left,right,third=None):
+        if not third:
+            left=df[left]
+            right=df[right]
+            if ( str(left) != str(np.nan) ) &  ( str(right) != str(np.nan) ):
+                if left == right:
+                    return "yes"
+                else:
+                    return "no"
+            else:
+                return "no"
+        else:
+            left=df[left]
+            right=df[right]
+            third=df[third]
+            if ( str(left) != str(np.nan) ) &  ( str(right) != str(np.nan) ) & ( str(third) != str(np.nan) ):
+                if (left == right) & (left == third):
+                    return "yes"
+                else:
+                    return "no"
+            else:
+                return "no"
+    df["%s & %s" %(cols[0],cols[1])]=df.apply(check_common,args=(cols[0],cols[1]), axis=1 )
+    if len(cols) == 3:
+        df["%s & %s" %(cols[1],cols[2])]=df.apply(check_common,args=(cols[1],cols[2]), axis=1 )
+        df["%s & %s" %(cols[0],cols[2])]=df.apply(check_common,args=(cols[0],cols[2]), axis=1 )
+        df["%s & %s & %s" %(cols[0],cols[1],cols[2])]=df.apply(check_common,args=(cols[0],cols[1],cols[2]), axis=1 )
+    
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
 
     if pa["population_size"]!="":
