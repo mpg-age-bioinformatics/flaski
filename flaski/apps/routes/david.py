@@ -11,6 +11,8 @@ from flaski.apps.main.david import run_david, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 from flaski.apps.main import icellplot
+from flaski.email import send_exception_email
+
 
 import os
 import io
@@ -169,6 +171,7 @@ def david(download=None):
             return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
 
         except Exception as e:
+            send_exception_email(user=current_user, eapp="david", emsg=e, etime=str(datetime.now())  )
             flash(e,'error')
             session["david_in_store"]=False
             return render_template('/apps/david.html', david_in_store=True, apps=apps, **plot_arguments)

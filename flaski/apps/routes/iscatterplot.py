@@ -11,6 +11,8 @@ from flaski.apps.main.iscatterplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file
 from flaski.routes import FREEAPPS
+from flaski.email import send_exception_email
+
 
 import os
 import io
@@ -226,8 +228,8 @@ def iscatterplot(download=None):
             return render_template('/apps/iscatterplot.html', the_script=script, the_div=div, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
+            send_exception_email( user=current_user, eapp="iscatterplot", emsg=e, etime=str(datetime.now()) )
             flash(e,'error')
-
             return render_template('/apps/iscatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
     else:

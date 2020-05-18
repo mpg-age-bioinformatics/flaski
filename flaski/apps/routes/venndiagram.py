@@ -11,6 +11,8 @@ from flaski.apps.main.venndiagram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file
 from flaski.routes import FREEAPPS
+from flaski.email import send_exception_email
+
 
 import os
 import io
@@ -176,8 +178,8 @@ def venndiagram(download=None):
             return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
 
         except Exception as e:
+            send_exception_email( user=current_user, eapp="venndiagram", emsg=e, etime=str(datetime.now()) )
             flash(e,'error')
-
             return render_template('/apps/venndiagram.html', apps=apps, **plot_arguments)
 
     else:

@@ -12,6 +12,8 @@ from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 import plotly
 import plotly.io as pio
+from flaski.email import send_exception_email
+
 
 
 
@@ -220,6 +222,7 @@ def iheatmap(download=None):
             return render_template('/apps/iheatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
+            send_exception_email( user=current_user, eapp="iheatmap", emsg=e, etime=str(datetime.now()) )
             flash(e,'error')
 
             return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)

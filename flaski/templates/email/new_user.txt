@@ -1,0 +1,8 @@
+New user registration:
+
+First name: {{user.firstname}}
+Last name: {{user.lastname}}
+Organization: {{user.organization}}
+Email: {{user.email}}
+
+Flaski

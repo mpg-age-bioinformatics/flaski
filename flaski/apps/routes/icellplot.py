@@ -12,6 +12,8 @@ from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 import plotly
 import plotly.io as pio
+from flaski.email import send_exception_email
+
 
 import os
 import io
@@ -277,8 +279,8 @@ def icellplot(download=None):
             return render_template('/apps/icellplot.html', figure_url=figure_url, filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
 
         except Exception as e:
+            send_exception_email( user=current_user, eapp="icellplot", emsg=e, etime=str(datetime.now()) )
             flash(e,'error')
-
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
 
     else:

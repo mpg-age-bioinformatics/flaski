@@ -11,6 +11,8 @@ from flaski.apps.main.scatterplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file
 from flaski.routes import FREEAPPS
+from flaski.email import send_exception_email
+
 
 import os
 import io
@@ -297,6 +299,7 @@ def scatterplot(download=None):
             return render_template('/apps/scatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
+            send_exception_email( user=current_user, eapp="scatterplot", emsg=e, etime=str(datetime.now()) )
             flash(e,'error')
             return render_template('/apps/scatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
