@@ -1,38 +1,32 @@
 #from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import matplotlib
+import plotly.express as px
+import plotly.graph_objects as go
+
 from collections import OrderedDict
 import numpy as np
-from adjustText import adjust_text
 
-
-import mpld3
-
-matplotlib.use('agg')
-
-
-def GET_COLOR(x):
-    if str(x)[:3].lower() == "rgb":
-        vals=x.split("rgb(")[-1].split(")")[0].split(",")
-        vals=[ float(s.strip(" ")) for s in vals ]
-        #vals=tuple(vals)
-        return vals
-    else:
-        return str(x)
+# def GET_COLOR(x):
+#     if str(x)[:3].lower() == "rgb":
+#         vals=x.split("rgb(")[-1].split(")")[0].split(",")
+#         vals=[ float(s.strip(" ")) for s in vals ]
+#         #vals=tuple(vals)
+#         return vals
+#     else:
+#         return str(x)
 
 
 def make_figure(df,pa):
 
-    #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
-
     # MAIN FIGURE
-    #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-
-    fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-
     # if we have groups
     # the user can decide how the diferent groups should look like 
     # by unchecking the groups_autogenerate check box
+    pa_={}
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis"]:
+        if arg in ["off",".off"]:
+            pab[arg]=False
+        else:
+            pab[arg]=True
 
     if str(pa["groups_value"])!="None":
         for group in pa["list_of_groups"]:
@@ -59,25 +53,25 @@ def make_figure(df,pa):
                 s=float(pa_["markers"])
 
             if pa_["markerc_col"] != "select a column..":
-                c=[ GET_COLOR(i) for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
-                if type(c) == list:
-                    c=np.array([c]*len(tmp))/255.0
+                c=[ i for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
+                # if type(c) == list:
+                #     c=np.array([c]*len(tmp))/255.0
             elif str(pa["markerc_write"]) != "":
-                c=GET_COLOR(pa_["markerc_write"])
-                if type(c) == list:
-                    c=np.array([c]*len(tmp))/255.0
+                c=pa_["markerc_write"]
+                # if type(c) == list:
+                #     c=np.array([c]*len(tmp))/255.0
             else:
                 c=pa_["markerc"]
 
 
             if pa_["edgecolor_col"] != "select a column..":
-                edgecolor=[ GET_COLOR(i) for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
-                if type(edgecolor) == list:
-                    edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                edgecolor=[ i for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
+                # if type(edgecolor) == list:
+                #     edgecolor=np.array([edgecolor]*len(tmp))/255.0
             elif str(pa_["edgecolor_write"]) != "":
-                edgecolor=GET_COLOR(pa_["edgecolor_write"])
-                if type(edgecolor) == list:
-                    edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                edgecolor=pa_["edgecolor_write"]
+                # if type(edgecolor) == list:
+                #     edgecolor=np.array([edgecolor]*len(tmp))/255.0
             else:
                 edgecolor=pa_["edgecolor"]
 
@@ -86,17 +80,25 @@ def make_figure(df,pa):
             else:
                 edge_linewidth=float(pa_["edge_linewidth"])
 
-            ax.scatter(x, y, \
-                marker=marker, \
-                edgecolor=edgecolor,\
-                linewidth=edge_linewidth,\
-                s=s,\
-                c=c,\
-                alpha=a,\
-                label=group)
+            # https://plotly.com/python/line-and-scatter/
+            # https://plotly.com/python/marker-style/
+            # marker_symbol=marker
+            # circle, square, diamond, cross, x, triangle, pentagon, hexagram, star, diamond, hourglass, bowtie, asterisk, hash, y, and line.
+            fig.add_trace(go.Scatter(x=x, y=y,\
+                mode='markers',
+                marker=dict(symbol=marker,\
+                    color=c,
+                    size=s,
+                    opacity=a,
+                    line=dict(
+                        color=edgecolor,
+                        width=edge_linewidth
+                        )),\
+                showlegend=pab["show_legend"],\
+                name=group) )
 
-        if pa["show_legend"] != "off" :        
-            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=pa["legend_font_size"])
+        #if pa["show_legend"] != "off" :        
+        #    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=pa["legend_font_size"])
     
     elif pa["groups_value"]=="None":
 
@@ -127,24 +129,24 @@ def make_figure(df,pa):
                     s=float(pa["markers"])
 
                 if pa["markerc_col"] != "select a column..":
-                    c=[ GET_COLOR(i) for i in tmp[pa["markerc_col"]].tolist() ]
-                    if not all(isinstance(i, str) for i in c) :
-                        c=np.array(c)/255.0
+                    c=tmp[pa["markerc_col"]].tolist()
+                    # if not all(isinstance(i, str) for i in c) :
+                    #     c=np.array(c)/255.0
                 elif str(pa["markerc_write"]) != "":
-                    c=GET_COLOR(pa["markerc_write"])
-                    if type(c) == list:
-                        c=np.array([c]*len(tmp_alpha))/255.0
+                    c=pa["markerc_write"]
+                    # if type(c) == list:
+                    #     c=np.array([c]*len(tmp_alpha))/255.0
                 else:
                     c=pa["markerc"]
 
                 if pa["edgecolor_col"] != "select a column..":
-                    edgecolor=[ GET_COLOR(i) for i in tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()][0]
-                    if type(edgecolor) == list:
-                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                    edgecolor=tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()
+                    # if type(edgecolor) == list:
+                    #     edgecolor=np.array([edgecolor]*len(tmp))/255.0
                 elif str(pa["edgecolor_write"]) != "":
-                    edgecolor=GET_COLOR(pa["edgecolor_write"])
-                    if type(edgecolor) == list:
-                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                    edgecolor=pa["edgecolor_write"]
+                    # if type(edgecolor) == list:
+                    #     edgecolor=np.array([edgecolor]*len(tmp))/255.0
                 else:
                     edgecolor=pa["edgecolor"]
 
@@ -153,39 +155,61 @@ def make_figure(df,pa):
                 else:
                     edge_linewidth=float(pa["edge_linewidth"])
 
-                ax.scatter(x, y, \
-                    marker=marker, \
-                    edgecolor=edgecolor,\
-                    linewidth=edge_linewidth,\
-                    s=s,\
-                    c=c,\
-                    alpha=marker_alpha)
+                fig.add_trace(go.Scatter(x=x, y=y,\
+                    mode='markers',
+                    marker=dict(symbol=marker,\
+                        color=c,
+                        size=s,
+                        opacity=a,
+                        line=dict(
+                            color=edgecolor,
+                            width=edge_linewidth
+                            )),\
+                    showlegend=pab["show_legend"] ) )
+
+                # ax.scatter(x, y, \
+                #     marker=marker, \
+                #     edgecolor=edgecolor,\
+                #     linewidth=edge_linewidth,\
+                #     s=s,\
+                #     c=c,\
+                #     alpha=marker_alpha)
 
                 
-    axes=plt.gca()
+    # axes=plt.gca()
 
-    for axis in ['top','bottom','left','right']:
-        axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
+    # for axis in ['top','bottom','left','right']:
+    #     axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
 
-    for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
-        if (argv =="on") | (argv ==".on"):
-            axes.spines[axis].set_visible(True)
-        else:
-            axes.spines[axis].set_visible(False)
+    # for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
+    #     if (argv =="on") | (argv ==".on"):
+    #         axes.spines[axis].set_visible(True)
+    #     else:
+    #         axes.spines[axis].set_visible(False)
 
-    ticks={}
-    for axis,argv in zip(['top','bottom','left','right'], \
-        [pa["tick_upper_axis"],pa["tick_lower_axis"],pa["tick_left_axis"],pa["tick_right_axis"]]):
-        if (argv =="on") | (argv ==".on"):
-            show=True
-        else:
-            show=False
-        ticks[axis]=show
+    fig.update_xaxes(showline=pab["lower_axis"], linewidth=float(pa["xaxis_linewidth"]), linecolor='black', mirror=pab["upper_axis"])
+    fig.update_yaxes(showline=pab["left_axis"], linewidth=float(pa["yaxis_linewidth"]), linecolor='black', mirror=pab["right_axis"])
 
-    axes.tick_params(right= ticks["right"],top=ticks["top"],\
-        left=ticks["left"], bottom=ticks["bottom"])
+    # ticks={}
+    # for axis,argv in zip(['top','bottom','left','right'], \
+    #     [pa["tick_upper_axis"],pa["tick_lower_axis"],pa["tick_left_axis"],pa["tick_right_axis"]]):
+    #     if (argv =="on") | (argv ==".on"):
+    #         show=True
+    #     else:
+    #         show=False
+    #     ticks[axis]=show
 
-    axes.tick_params(direction=pa["ticks_direction_value"], width=float(pa["axis_line_width"]),length=float(pa["ticks_length"]))  
+    # axes.tick_params(right= ticks["right"],top=ticks["top"],\
+    #     left=ticks["left"], bottom=ticks["bottom"])
+
+    # axes.tick_params(direction=pa["ticks_direction_value"], width=float(pa["axis_line_width"]),length=float(pa["ticks_length"]))  
+
+    fig.update_xaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    fig.update_yaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+
+    # https://plotly.com/python/axes/
+    # fig.update_yaxes(tickvals=[5.1, 5.9, 6.3, 7.5])
+    # fig.update_yaxes(showticklabels=False)
 
     if (pa["x_lower_limit"]!="") or (pa["x_upper_limit"]!="") :
         xmin, xmax = axes.get_xlim()
@@ -203,18 +227,36 @@ def make_figure(df,pa):
             ymax=float(pa["y_upper_limit"])
         plt.ylim(xmin, ymax)
 
+        #fig.update_xaxes(range=[1.5, 4.5])
+        #fig.update_yaxes(range=[3, 9])
+
     if pa["maxxticks"]!="":
         axes.xaxis.set_major_locator(plt.MaxNLocator(int(pa["maxxticks"])))
 
     if pa["maxyticks"]!="":
         axes.yaxis.set_major_locator(plt.MaxNLocator(int(pa["maxyticks"])))
 
+    # fig.update_yaxes(nticks=20)
+
     plt.title(pa['title'], fontsize=int(pa["titles"]))
     plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
     plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
 
+    # fig.update_layout(
+    # xaxis = dict(
+    #     tickangle = 90,
+    #     title_text = "Month",
+    #     title_font = {"size": 20},
+    #     title_standoff = 25),
+    # yaxis = dict(
+    #     title_text = "Temperature",
+    #     title_standoff = 25))
+
     plt.xticks(fontsize=float(pa["xticks_fontsize"]), rotation=float(pa["xticks_rotation"]))
     plt.yticks(fontsize=float(pa["yticks_fontsize"]), rotation=float(pa["yticks_rotation"]))
+
+    # fig.update_xaxes(tickangle=45, tickfont=dict(family='Rockwell', color='crimson', size=14))
+
 
     if pa["grid_value"] != "None":
         if pa["grid_color_text"]!="":
@@ -223,6 +265,9 @@ def make_figure(df,pa):
             grid_color=GET_COLOR(pa["grid_color_value"])
 
         axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
+
+        #fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightPink')
+
 
     if pa["labels_col_value"] != "select a column..":
         tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
@@ -236,16 +281,17 @@ def make_figure(df,pa):
         else:
             adjust_text(texts)
 
+        # https://plotly.com/python/text-and-annotations/
+
     plt.tight_layout()
     
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-ALLOWED_MARKERS=[".",",","o","v","^","<",">",\
-            "1","2","3","4","8",\
-            "s","p","*","h","H","+","x",\
-            "X","D","d","|","_"]
-TICKS_DIRECTIONS=["in","out","inout"]
+ALLOWED_MARKERS=["circle", "square", "diamond", "cross", "x", "triangle", \
+    "pentagon", "hexagram", "star", "diamond", "hourglass", "bowtie", \
+    "asterisk", "hash", "y", "line"]
+TICKS_DIRECTIONS=["","outside", "inside"]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 
@@ -279,7 +325,7 @@ def figure_defaults():
         "show_legend":".on",\
         "legend_font_size":"14",\
         "markerstyles":ALLOWED_MARKERS,\
-        "marker":".",\
+        "marker":"circle",\
         "markerstyles_cols":["select a column.."],\
         "markerstyles_col":"select a column..",\
         "marker_size":STANDARD_SIZES,\
