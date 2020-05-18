@@ -1,0 +1,9 @@
+{{eapp}}
+
+{{emsg}}
+
+{{user.firstname}} {{user.lastname}}: {{user.email}}
+
+{{etime}}
+
+Flaski
