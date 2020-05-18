@@ -226,6 +226,7 @@ def make_figure(df,pa):
 
     if pa["labels_col_value"] != "select a column..":
         tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
+        tmp=tmp[~tmp[pa["labels_col_value"]].isin(["","nan"]) ]
         x=tmp[pa["xvals"]].tolist()
         y=tmp[pa["yvals"]].tolist()
         t=tmp[pa["labels_col_value"]].tolist()
