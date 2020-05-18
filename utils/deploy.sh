@@ -2,17 +2,17 @@
 
 # usage:
 #
-# deploy 
+# deploy up at 04:00 am
 # $ deploy.sh
 #
-# deploy after docker-compose down
+# deploy at 4 am after doing a docker-compose down
 # $ deploy.sh down
 #
-# deploy at 4 am
-# $ deploy.sh up 04:00 &
+# deploy after now docker-compose down
+# $ deploy.sh down now
 #
-# deploy at 4 am after doing a docker-compose down
-# $ deploy.sh down 04:00 &
+# deploy at a specific time
+# $ deploy.sh up 08:00
 
 set -o errexit
 
@@ -39,13 +39,25 @@ cd /srv/flaski
 
 if [ -z "$2" ] ; 
 then
-    echo "$(date) :: Depolying now!"
-else
-    echo "$(date) :: Deploying at ${2}"
-    until [[ "$(date +%H:%M)" == "${2}" ]]; do
+    echo "$(date) :: Deploying at 04:00"
+    until [[ "$(date +%H:%M)" == "04:00" ]]; do
         sleep 25
     done
     echo "$(date) :: Depolying now!"
+
+else
+
+    if [[ "$2" == "now" ]] ;
+    then
+        echo "$(date) :: Depolying now!"
+    else
+        echo "$(date) :: Deploying at ${2}"
+        until [[ "$(date +%H:%M)" == "${2}" ]]; do
+            sleep 25
+        done
+        echo "$(date) :: Depolying now!"
+    fi
+
 fi
 
 BASE_IMAGES="flaski/flaski:latest" 
