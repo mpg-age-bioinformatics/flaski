@@ -122,12 +122,12 @@ def make_figure(df,pa):
                 y=tmp_alpha[pa["yvals"]].tolist()
 
                 if pa["markersizes_col"] != "select a column..":
-                    s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
+                    s=[ float(i) for i in tmp_alpha[pa["markersizes_col"]].tolist() ]
                 else:
                     s=float(pa["markers"])
 
                 if pa["markerc_col"] != "select a column..":
-                    c=[ GET_COLOR(i) for i in tmp[pa["markerc_col"]].tolist() ]
+                    c=[ GET_COLOR(i) for i in tmp_alpha[pa["markerc_col"]].tolist() ]
                     if not all(isinstance(i, str) for i in c) :
                         c=np.array(c)/255.0
                 elif str(pa["markerc_write"]) != "":
@@ -138,18 +138,18 @@ def make_figure(df,pa):
                     c=pa["markerc"]
 
                 if pa["edgecolor_col"] != "select a column..":
-                    edgecolor=[ GET_COLOR(i) for i in tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()][0]
+                    edgecolor=[ GET_COLOR(i) for i in tmp_alpha[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()][0]
                     if type(edgecolor) == list:
-                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                        edgecolor=np.array([edgecolor]*len(tmp_alpha))/255.0
                 elif str(pa["edgecolor_write"]) != "":
                     edgecolor=GET_COLOR(pa["edgecolor_write"])
                     if type(edgecolor) == list:
-                        edgecolor=np.array([edgecolor]*len(tmp))/255.0
+                        edgecolor=np.array([edgecolor]*len(tmp_alpha))/255.0
                 else:
                     edgecolor=pa["edgecolor"]
 
                 if pa["edge_linewidth_col"] != "select a column..":
-                    edge_linewidth=[ float(i) for i in tmp[[pa["edge_linewidth_col"]]].dropna()[pa["edge_linewidth_col"]].tolist() ][0]
+                    edge_linewidth=[ float(i) for i in tmp_alpha[[pa["edge_linewidth_col"]]].dropna()[pa["edge_linewidth_col"]].tolist() ][0]
                 else:
                     edge_linewidth=float(pa["edge_linewidth"])
 
