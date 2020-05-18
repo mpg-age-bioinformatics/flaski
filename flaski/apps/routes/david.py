@@ -150,28 +150,28 @@ def david(download=None):
             report_stats=report_stats.astype(str)
             session["david_df"]=david_df.to_json()
             session["report_stats"]=report_stats.to_json()
-            flash('Success!')
+            #flash('Success!')
 
-            # if plot_arguments["download_format_value"] == "xlsx":
-            #     excelfile = io.BytesIO()
-            #     EXC=pd.ExcelWriter(excelfile)
-            #     david_df.to_excel(EXC,sheet_name="david",index=None)
-            #     report_stats.to_excel(EXC,sheet_name="stats",index=None)
-            #     EXC.save()
-            #     excelfile.seek(0)
-            # elif plot_arguments["download_format_value"] == "tsv":
-            #     tsvfile = io.BytesIO()
-            #     david_df.to_csv(tsvfile,sep="\t")
-            #     excelfile.seek(0)
-            # return send_file(excelfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"] )
+            table_headers=david_df.columns.tolist()
+            tmp=david_df[:50]
+            for col in ["%","Fold Enrichment"]:
+                tmp[col]=tmp[col].apply(lambda x: "{0:.2f}".format(float(x)))
+            for col in ["PValue","Bonferroni","Benjamini","FDR"]:
+                tmp[col]=tmp[col].apply(lambda x: '{:.2e}'.format(float(x)))
+            for col in ["Genes"]+table_headers[13:]:
+                tmp[col]=tmp[col].apply(lambda x: str(x)[:40]+"..")
+            david_contents=[]
+            for i in tmp.index.tolist():
+                david_contents.append(list(tmp.loc[i,]))
 
             # david_in_store
             session["david_in_store"]=True
-            return render_template('/apps/david.html', david_in_store=True, apps=apps, **plot_arguments)
+            return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
 
         except Exception as e:
             flash(e,'error')
-            return render_template('/apps/david.html', apps=apps, **plot_arguments)
+            session["david_in_store"]=False
+            return render_template('/apps/david.html', david_in_store=True, apps=apps, **plot_arguments)
 
     else:
 
