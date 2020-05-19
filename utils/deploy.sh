@@ -43,19 +43,19 @@ then
     until [[ "$(date +%H:%M)" == "04:00" ]]; do
         sleep 25
     done
-    echo "$(date) :: Depolying now!"
+    echo "$(date) :: Deploying now!"
 
 else
 
     if [[ "$2" == "now" ]] ;
     then
-        echo "$(date) :: Depolying now!"
+        echo "$(date) :: Deploying now!"
     else
         echo "$(date) :: Deploying at ${2}"
         until [[ "$(date +%H:%M)" == "${2}" ]]; do
             sleep 25
         done
-        echo "$(date) :: Depolying now!"
+        echo "$(date) :: Deploying now!"
     fi
 
 fi
