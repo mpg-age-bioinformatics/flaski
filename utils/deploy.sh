@@ -2,21 +2,23 @@
 
 # usage:
 #
-# $ deploy.sh <type> <time> <sleep>
+# $ deploy.sh <type> <time> <monitoring>
 #
 # * type : up | down | default: up
 # * time : now | <hour>:<min> | default: 02:00
-# * sleep : once | <seconds> | default: 3600
+# * monitoring : once | dev | prod | default: prod
 #
 # production:
 # $ deploy.sh
 # 
 # dev:
-# $ deploy.sh up now 30
+# $ deploy.sh up now dev
 
 while true 
 do
 
+    if [[ "${3}" != "dev" ]] ;
+    then
     set -o errexit
 
     readonly LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
@@ -37,6 +39,7 @@ do
     # standard error ends up going to wherever standard
     # out goes (the file).
     exec 2>&1
+    fi
 
     cd /srv/flaski
 
@@ -128,14 +131,14 @@ do
 
     echo "$(date) :: Done!"
 
-    if [ -z "$3" ] ; 
+    if [[ "${3}" == "dev" ]] ; 
         then 
-        sleep 3600
+        sleep 60
     elif [[ "$3" == "once" ]] ;
         then    
         exit
     else
-        sleep ${3}
+        sleep 3600
     fi
 
 done
