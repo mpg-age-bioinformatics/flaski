@@ -77,8 +77,14 @@ do
         echo "$(date) :: docker pull $IMAGE started"
         #echo "####################################"
         docker pull $IMAGE  > /dev/null 2>&1
+        while [ $? -ne 0 ] ; do 
+            echo "$(date) :: docker pull $IMAGE failed"
+            echo "$(date) :: sleeping for 1h"
+            sleep 3600
+            docker pull $IMAGE > /dev/null 2>&1
+        done
         #echo "####################################"
-        echo "$(date) :: docker pull $IMAGE finished"
+        echo "$(date) :: docker pull $IMAGE finished"        echo "$(date) :: docker pull $IMAGE finished"
 
         for im in $CID
         do
