@@ -26,6 +26,9 @@ def make_figure(df,pa):
         df["___label___"]=df.index.tolist()
 
     if str(pa["groups_value"])!="None":
+
+        fig.update_layout(legend_title_text=str(pa["groups_value"]), legend=dict( font=dict( size=float(pa["legend_font_size"])) ) )
+        
         for group in pa["list_of_groups"]:
             tmp=df[df[pa["groups_value"]]==group]
 
@@ -219,43 +222,12 @@ def make_figure(df,pa):
             standoff=4
             yshift=0
         tmp=df[df["___label___"].isin( pa["fixed_labels"]  )]
-
-    #     def annotate_figure(df, fig=fig,fixed=pa["fixed_labels"]):
-    #         x=df[pa["xvals"]]
-    #         y=df[pa["yvals"]]
-    #         text=df["___label___"]
-    #         if text in fixed:
-    #             visible=True
-    #         else:
-    #             visible=False
-    #         fig.add_annotation(
-    #                 x=x,
-    #                 y=y,
-    #                 text=text,
-    #                 showarrow=showarrow,
-    #                 arrowhead=arrowhead,
-    #                 clicktoshow="onoff",
-    #                 visible=visible,
-    #                 standoff=4,
-    #                 arrowwidth=float(pa["labels_line_width"]),
-    #                 arrowcolor=pa["labels_font_color_value"],
-    #                 font=dict(
-    #                     size=float(pa["labels_font_size"]),
-    #                     color=pa["labels_font_color_value"]
-    #                     )
-    #                 )
-    #         return None
-    #     res=df.apply(annotate_figure,axis=1)
             
         x_values=tmp[pa["xvals"]].tolist()
         y_values=tmp[pa["yvals"]].tolist()
         text_values=tmp["___label___"].tolist()
 
         for x,y,text in zip(x_values,y_values,text_values):
-            # if text in pa["fixed_labels"]:
-            #     visible=True
-            # else:
-            #     visible=False
             fig.add_annotation(
                     x=x,
                     y=y,
@@ -273,11 +245,8 @@ def make_figure(df,pa):
                         size=float(pa["labels_font_size"]),
                         color=pa["labels_font_color_value"]
                         )
-                    )#,
-                    # textposition="bottom center",
-
-                    # )
-        fig.update_traces(textposition='top center')
+                    )
+        #fig.update_traces(textposition='top center')
     
     return fig
 
