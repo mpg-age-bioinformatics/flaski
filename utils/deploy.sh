@@ -2,17 +2,17 @@
 
 # usage:
 #
-# deploy up at 04:00 am
+# $ deploy.sh <type> <time> <sleep>
+#
+# * type : up | down | default: up
+# * time : now | <hour>:<min> | default: 02:00
+# * sleep : once | <seconds> | default: 3600
+#
+# production:
 # $ deploy.sh
-#
-# deploy at 4 am after doing a docker-compose down
-# $ deploy.sh down
-#
-# deploy after now docker-compose down
-# $ deploy.sh down now
-#
-# deploy at a specific time
-# $ deploy.sh up 08:00
+# 
+# dev:
+# $ deploy.sh up now 30
 
 while true 
 do
@@ -75,9 +75,9 @@ do
         IMAGE=$BASE_IMAGE
         CID=$(docker ps | grep $IMAGE | awk '{print $1}')
         echo "$(date) :: docker pull $IMAGE started"
-        echo "####################################"
-        docker pull $IMAGE
-        echo "####################################"
+        #echo "####################################"
+        docker pull $IMAGE  > /dev/null 2>&1
+        #echo "####################################"
         echo "$(date) :: docker pull $IMAGE finished"
 
         for im in $CID
@@ -125,8 +125,11 @@ do
     if [ -z "$3" ] ; 
         then 
         sleep 3600
-        else
-        exit 
+    elif [[ "$3" == "once" ]] ;
+        then    
+        exit
+    else ;
+        sleep ${3}
     fi
 
 done
