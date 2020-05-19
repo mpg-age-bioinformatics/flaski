@@ -40,18 +40,16 @@ do
 
     if [[ "$DEPLOY" == "1" ]] ; then
 
-        # maybe need to add this command after the pull and before the up
-        # `docker-compose -f production.yml stop server &&`
-        
         docker-compose -f production.yml pull server && \
-        docker-compose -f production.yml up --no-start server && \
+        docker-compose -f production.yml exec backup /backup.sh && \
+        docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
         echo "$(date) :: docker-compose up -d" && \
-        docker-compose -f production.yml start server
+        docker-compose -f production.yml up -d server
 
     fi
 
     echo "$(date) :: Done!"
 
-
     sleep 30
+
 done
