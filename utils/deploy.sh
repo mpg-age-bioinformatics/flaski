@@ -95,8 +95,8 @@ do
             docker pull $IMAGE > /dev/null 2>&1
         done
         #echo "####################################"
-        echo "$(date) :: docker pull $IMAGE finished"        echo "$(date) :: docker pull $IMAGE finished"
-
+        echo "$(date) :: docker pull $IMAGE finished"
+        
         for im in $CID
         do
             LATEST=`docker inspect --format "{{.Id}}" $IMAGE`
