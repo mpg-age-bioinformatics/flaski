@@ -39,8 +39,8 @@ cd /srv/flaski
 
 if [ -z "$2" ] ; 
 then
-    echo "$(date) :: Deploying at 04:00"
-    until [[ "$(date +%H:%M)" == "04:00" ]]; do
+    echo "$(date) :: Deploying at 02:00 UTC"
+    until [[ "$(date +%H:%M)" == "02:00" ]]; do
         sleep 25
     done
     echo "$(date) :: Deploying now!"
