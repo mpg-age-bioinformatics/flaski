@@ -134,7 +134,7 @@ do
     elif [[ "$3" == "once" ]] ;
         then    
         exit
-    else ;
+    else
         sleep ${3}
     fi
 
