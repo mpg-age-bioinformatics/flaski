@@ -15,6 +15,7 @@
 # $ deploy.sh up 08:00
 
 while true 
+do
 
     set -o errexit
 
