@@ -96,6 +96,21 @@
 
             </div>
 
+            {% if labels_col_value != "select a column.." %}
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Fix labels:</div>
+                    <div style="padding-left:15px;">
+                        <select name="fixed_labels" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_labels %}
+                                <option value="{{label}}" {% if label in fixed_labels %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 

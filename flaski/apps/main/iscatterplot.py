@@ -5,16 +5,6 @@ import plotly.graph_objects as go
 from collections import OrderedDict
 import numpy as np
 
-# def GET_COLOR(x):
-#     if str(x)[:3].lower() == "rgb":
-#         vals=x.split("rgb(")[-1].split(")")[0].split(",")
-#         vals=[ float(s.strip(" ")) for s in vals ]
-#         #vals=tuple(vals)
-#         return vals
-#     else:
-#         return str(x)
-
-
 def make_figure(df,pa):
 
     fig = go.Figure()
@@ -62,24 +52,16 @@ def make_figure(df,pa):
 
             if pa_["markerc_col"] != "select a column..":
                 c=[ i for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
-                # if type(c) == list:
-                #     c=np.array([c]*len(tmp))/255.0
             elif str(pa["markerc_write"]) != "":
                 c=pa_["markerc_write"]
-                # if type(c) == list:
-                #     c=np.array([c]*len(tmp))/255.0
             else:
                 c=pa_["markerc"]
 
 
             if pa_["edgecolor_col"] != "select a column..":
                 edgecolor=[ i for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
-                # if type(edgecolor) == list:
-                #     edgecolor=np.array([edgecolor]*len(tmp))/255.0
             elif str(pa_["edgecolor_write"]) != "":
                 edgecolor=pa_["edgecolor_write"]
-                # if type(edgecolor) == list:
-                #     edgecolor=np.array([edgecolor]*len(tmp))/255.0
             else:
                 edgecolor=pa_["edgecolor"]
 
@@ -90,9 +72,8 @@ def make_figure(df,pa):
 
             # https://plotly.com/python/line-and-scatter/
             # https://plotly.com/python/marker-style/
-            # marker_symbol=marker
-            # circle, square, diamond, cross, x, triangle, pentagon, hexagram, star, diamond, hourglass, bowtie, asterisk, hash, y, and line.
             fig.add_trace(go.Scatter(x=x, y=y, text=text,\
+                hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
                 mode='markers',
                 marker=dict(symbol=marker,\
                     color=c,
@@ -104,17 +85,8 @@ def make_figure(df,pa):
                         )),\
                 showlegend=pab["show_legend"],\
                 name=group) )
-
-        #if pa["show_legend"] != "off" :        
-        #    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=pa["legend_font_size"])
     
     elif pa["groups_value"]=="None":
-
-        #if pa["markeralpha_col_value"] != "select a column..":
-        #    markers_alpha=[ float(i) for i in df[pa["markeralpha_col_value"]].tolist() ]
-        #    df["__alpha__"]=markers_alpha
-        #else:
-        #    df["__alpha__"]=float(pa["marker_alpha"])
 
         if pa["markerstyles_col"] != "select a column..":
             markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
@@ -160,6 +132,8 @@ def make_figure(df,pa):
                 edge_linewidth=float(pa["edge_linewidth"])
 
             fig.add_trace(go.Scatter(x=x, y=y,text=text,\
+                hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
+                hoverinfo='skip',
                 mode='markers',
                 marker=dict(symbol=marker,\
                     color=c,
@@ -169,7 +143,8 @@ def make_figure(df,pa):
                         color=edgecolor,
                         width=edge_linewidth
                         )),\
-                showlegend=False ) )
+                showlegend=False,
+                name="" ) )
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
@@ -232,42 +207,83 @@ def make_figure(df,pa):
 
     fig.update_layout(template='plotly_white')
 
+    if (pa["labels_col_value"] != "select a column..") & (len(pa["fixed_labels"])>0):
+        if pa["labels_arrows_value"] == "None":
+            showarrow=False
+            arrowhead=0
+            standoff=0
+            yshift=10
+        else:
+            showarrow=True
+            arrowhead=int(pa["labels_arrows_value"])
+            standoff=4
+            yshift=0
+        tmp=df[df["___label___"].isin( pa["fixed_labels"]  )]
 
+    #     def annotate_figure(df, fig=fig,fixed=pa["fixed_labels"]):
+    #         x=df[pa["xvals"]]
+    #         y=df[pa["yvals"]]
+    #         text=df["___label___"]
+    #         if text in fixed:
+    #             visible=True
+    #         else:
+    #             visible=False
+    #         fig.add_annotation(
+    #                 x=x,
+    #                 y=y,
+    #                 text=text,
+    #                 showarrow=showarrow,
+    #                 arrowhead=arrowhead,
+    #                 clicktoshow="onoff",
+    #                 visible=visible,
+    #                 standoff=4,
+    #                 arrowwidth=float(pa["labels_line_width"]),
+    #                 arrowcolor=pa["labels_font_color_value"],
+    #                 font=dict(
+    #                     size=float(pa["labels_font_size"]),
+    #                     color=pa["labels_font_color_value"]
+    #                     )
+    #                 )
+    #         return None
+    #     res=df.apply(annotate_figure,axis=1)
+            
+        x_values=tmp[pa["xvals"]].tolist()
+        y_values=tmp[pa["yvals"]].tolist()
+        text_values=tmp["___label___"].tolist()
 
-    # if pa["labels_col_value"] != "select a column..":
-    #     tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
-    #     tmp=tmp[~tmp[pa["labels_col_value"]].isin(["","nan"]) ]
-    #     x=tmp[pa["xvals"]].tolist()
-    #     y=tmp[pa["yvals"]].tolist()
-    #     t=tmp[pa["labels_col_value"]].tolist()
-    #     texts = [plt.text( x[i], y[i], t[i] , size=float(pa["labels_font_size"]), color=pa["labels_font_color_value"] ) for i in range(len(x))]
-    #     if pa["labels_arrows_value"] != "None":
-    #         adjust_text(texts, arrowprops=dict(arrowstyle=pa["labels_arrows_value"], color=pa['labels_colors_value'], lw=float(pa["labels_line_width"]), alpha=float(pa["labels_alpha"]) ))
-    #     else:
-    #         adjust_text(texts)
+        for x,y,text in zip(x_values,y_values,text_values):
+            # if text in pa["fixed_labels"]:
+            #     visible=True
+            # else:
+            #     visible=False
+            fig.add_annotation(
+                    x=x,
+                    y=y,
+                    text=text,
+                    showarrow=showarrow,
+                    arrowhead=arrowhead,
+                    clicktoshow="onoff",
+                    visible=True,
+                    standoff=standoff,
+                    yshift=yshift,
+                    opacity=float(pa["labels_alpha"]),
+                    arrowwidth=float(pa["labels_line_width"]),
+                    arrowcolor=pa["labels_colors_value"],
+                    font=dict(
+                        size=float(pa["labels_font_size"]),
+                        color=pa["labels_font_color_value"]
+                        )
+                    )#,
+                    # textposition="bottom center",
 
-    #     # https://plotly.com/python/text-and-annotations/
-
-    # fig.add_annotation(
-    #         x=2,
-    #         y=5,
-    #         text="dict Text")
-    #     textposition="bottom center",
-    #     textfont=dict(
-    #     family="sans serif",
-    #     size=18,
-    #     color="LightSeaGreen"
-    # )
-
-    print(fig["data"][0])
-    #fig["data"][0]['hovertemplate']='<b>%{hovertext}</b><br>'+pa["expression_values"]+'=%{marker.color}<br><br>term: %{y}<br>term p value=%{customdata[1]}<br>n genes=%{customdata[2]}'
-
+                    # )
+        fig.update_traces(textposition='top center')
     
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 ALLOWED_MARKERS=["circle", "square", "diamond", "cross", "x", "triangle", \
-    "pentagon", "hexagram", "star", "diamond", "hourglass", "bowtie", \
+    "pentagon", "hexagram", "star", "hourglass", "bowtie", \
     "asterisk", "hash", "y", "line"]
 TICKS_DIRECTIONS=["","outside", "inside"]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
@@ -307,7 +323,7 @@ def figure_defaults():
         "markerstyles_cols":["select a column.."],\
         "markerstyles_col":"select a column..",\
         "marker_size":STANDARD_SIZES,\
-        "markers":"50",\
+        "markers":"4",\
         "markersizes_cols":["select a column.."],\
         "markersizes_col":"select a column..",\
         "marker_color":STANDARD_COLORS,\
@@ -327,12 +343,14 @@ def figure_defaults():
         "edge_linewidth_col":"select a column..",\
         "edge_linewidths":STANDARD_SIZES,\
         "edge_linewidth":"0",\
+        "available_labels":[],\
+        "fixed_labels":[],\
         "labels_col":["select a column.."],\
         "labels_col_value":"select a column..",\
         "labels_font_size":"10",\
         "labels_font_color":STANDARD_COLORS ,\
         "labels_font_color_value":"black",\
-        "labels_arrows":["None","-","->"],\
+        "labels_arrows":["None","0","1","2","3","4","5","6","7","8"],\
         "labels_arrows_value":"None",\
         "labels_line_width":"0.5",\
         "labels_alpha":"0.5",\
@@ -383,9 +401,8 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.scatter.plot",\
         "inputargumentsfile":"Select file.."
     }
+
     # grid colors not implemented in UI
-
-
     checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
             "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
             "show_legend"]
@@ -394,7 +411,7 @@ def figure_defaults():
     notUpdateList=["inputsessionfile"]
 
     # lists without a default value on the arguments
-    excluded_list=["groups_settings","list_of_groups"]
+    excluded_list=["groups_settings","list_of_groups","available_labels","fixed_labels"]
 
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
@@ -409,49 +426,3 @@ def figure_defaults():
                 lists[allargs[i]]=allargs[i+1]
 
     return plot_arguments, lists, notUpdateList, checkboxes
-
-# def input_check(df,pa):
-#     errors=[]
-#     try:
-#         pa["title"]=str(pa["title"])
-#     else:
-#         errors=errors+["Could not convert title to string."]
-
-#     try:
-#         pa["titles"]=int(pa["titles"])
-#     except:
-#         errors=errors+["Could not convert title size to int."]
-
-#     for x in pa["xcols"]:
-#         if x not in df.columns.tolist():
-#             errors=errors+["%s could not be found on your dataframe headers." %x]
-
-#     for y in pa["ycols"]:
-#         if y not in df.columns.tolist():
-#             errors=errors+["%s could not be found on your dataframe headers." %y]
-
-#     if type(pa["xvals"]) != list:
-#         if str(pa["xvals"]).lower() == "none":
-#             errors=errors+["No x vals selected."]
-#         else:
-#             errors=errors+["Could not find proper values for x"]
-#     else:
-#         for v in pa["xvals"]:
-#             values=[]
-#             try:
-#                 values=values+[float(v)]
-#             except:
-#                 errors=errors+["Could not find proper values for x"]
-
-    
-
-    
-
-    
-    
-
-        
-
-            
-
-
