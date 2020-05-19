@@ -133,7 +133,7 @@ do
 
     if [[ "${3}" == "dev" ]] ; 
         then 
-        sleep 60
+        sleep 30
     elif [[ "$3" == "once" ]] ;
         then    
         exit
