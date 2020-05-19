@@ -322,19 +322,16 @@ def iscatterplot(download=None):
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
 
             pa_={}
-            for v in ["height","width"]:
+            for v in ["fig_height","fig_width"]:
                 if plot_arguments[v] != "":
-                    pa_[v]=None
+                    pa_[v]=False
                 elif plot_arguments[v]:
                     pa_[v]=float(plot_arguments[v])
                 else:
-                    pa_[v]=None
+                    pa_[v]=False
 
-            if pa_["height"]:
-                if pa_["width"]:
-                    fig.write_image( figfile, format=plot_arguments["downloadf"], height=pa_["height"] , width=pa_["width"] )
-                else:
-                    fig.write_image( figfile, format=plot_arguments["downloadf"] )
+            if (pa_["fig_height"]) & (pa_["fig_width"]):
+                fig.write_image( figfile, format=plot_arguments["downloadf"], height=pa_["fig_height"] , width=pa_["fig_width"] )
             else:
                 fig.write_image( figfile, format=plot_arguments["downloadf"] )
 
