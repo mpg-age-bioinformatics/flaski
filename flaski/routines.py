@@ -1,5 +1,25 @@
 import pandas as pd
 
+
+def reset_all(session):
+    MINIMAL=['_permanent', '_fresh', 'csrf_token', 'user_id', '_id', 'PRIVATE_APPS']
+    for k in list(session.keys()):
+        if k not in MINIMAL:
+            del(session[k])
+
+def check_session_app(session,app):
+    if "app" not in list(session.keys()):
+        return None
+    elif session["app"] == app :
+        return None
+    else:
+        message="Your '%s' session has been reset."  %(session["app"])
+            #Flaski is not yet made for working with multiple Apps nor data simultaneously on one single browser. \
+            #If you wish to use multiple Apps or data simultaneously please use one App/data per web browser eg. Safari + Chrome. \
+            #Your %s session has been reset."
+        reset_all(session)
+        return message
+
 def session_to_file(session,file_type):
     session_={}
     for k in list(session.keys()):

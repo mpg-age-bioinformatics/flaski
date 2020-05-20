@@ -14,7 +14,7 @@ from flaski.forms import ResetPasswordForm
 from flaski.routines import session_to_file
 #from app.token import generate_confirmation_token, confirm_token
 #from flaski.plots.figures.scatterplot import make_figure, figure_defaults
-from flaski.routines import read_private_apps
+from flaski.routines import read_private_apps, reset_all
 
 import os
 import io
@@ -169,11 +169,12 @@ def before_request():
 @login_required
 def reset():
     if 'app' in list(session.keys()):
-        app=session["app"]
+        page=session["app"]
     else:
-        app="index"
-    session["app"]='reset'
-    return redirect(url_for(app))
+        page="index"
+    reset_all(session)
+    #session["app"]='reset'
+    return redirect(url_for(page))
 
 @app.route('/download/<json_type>', methods=['GET','POST'])
 @login_required
