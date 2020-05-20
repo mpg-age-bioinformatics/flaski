@@ -56,18 +56,14 @@ RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /fla
 RUN touch /mysql_backup.log && touch /rsync.log
 RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /var/log/flaski /mysql_backup.log /rsync.log
 
-COPY requirements.txt /flaski/
-RUN pip3 install -r /flaski/requirements.txt
-
-#RUN apt-get update && apt-get -yq dist-upgrade && \
-#apt-get install -yq git && \
-#apt-get clean && rm -rf /var/lib/apt/lists/*
-
 RUN apt-get update && apt-get -yq dist-upgrade && \
 apt-get install -yq sudo && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
-#comment during development
+# comment during development
+COPY requirements.txt /flaski/
+RUN pip3 install -r /flaski/requirements.txt
+
 COPY LICENSE.md README.md config.py flaski.py MANIFEST.in requirements.txt setup.py .flaskenv /flaski/
 COPY pyflaski /flaski/pyflaski
 COPY services /flaski/services
