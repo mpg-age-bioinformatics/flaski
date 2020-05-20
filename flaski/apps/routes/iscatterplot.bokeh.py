@@ -47,6 +47,10 @@ def iscatterplot(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
 
+    reset_info=check_session_app(session,"scatterplot")
+    if reset_info:
+        flash(reset_info,'error')
+
     apps=FREEAPPS+session["PRIVATE_APPS"]
 
 

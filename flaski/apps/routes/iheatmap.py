@@ -10,6 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.apps.main.iheatmap import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
+from flaski.routines import check_session_app
 import plotly
 import plotly.io as pio
 from flaski.email import send_exception_email
@@ -48,6 +49,10 @@ def iheatmap(download=None):
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
+
+    reset_info=check_session_app(session,"iheatmap")
+    if reset_info:
+        flash(reset_info,'error')
 
     apps=FREEAPPS+session["PRIVATE_APPS"]
 

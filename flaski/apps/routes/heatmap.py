@@ -11,6 +11,7 @@ from flaski.apps.main.heatmap import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 from flaski.email import send_exception_email
+from flaski.routines import check_session_app
 
 
 import os
@@ -44,6 +45,10 @@ def heatmap(download=None):
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
+
+    reset_info=check_session_app(session,"heatmap")
+    if reset_info:
+        flash(reset_info,'error')
 
     apps=FREEAPPS+session["PRIVATE_APPS"]
 

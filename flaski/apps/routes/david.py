@@ -12,6 +12,7 @@ from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 from flaski.apps.main import icellplot
 from flaski.email import send_exception_email
+from flaski.routines import check_session_app
 
 
 import os
@@ -28,6 +29,10 @@ import base64
 @app.route('/david', methods=['GET', 'POST'])
 @login_required
 def david(download=None):
+
+    reset_info=check_session_app(session,"david")
+    if reset_info:
+        flash(reset_info,'error')
 
     apps=FREEAPPS+session["PRIVATE_APPS"]
 

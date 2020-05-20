@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.scatterplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file
+from flaski.routines import session_to_file, check_session_app
 from flaski.routes import FREEAPPS
 from flaski.email import send_exception_email
 
@@ -40,6 +40,11 @@ def allowed_file(filename):
 @app.route('/scatterplot', methods=['GET', 'POST'])
 @login_required
 def scatterplot(download=None):
+
+    reset_info=check_session_app(session,"scatterplot")
+    if reset_info:
+        flash(reset_info,'error')
+        
     """ 
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
