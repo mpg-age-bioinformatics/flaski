@@ -29,7 +29,8 @@ do
     then
     set -o errexit
 
-    readonly LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
+    #readonly LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
+    LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
 
     # Create the destination log file that we can
     # inspect later if something goes wrong with the
@@ -96,7 +97,7 @@ do
         done
         #echo "####################################"
         echo "$(date) :: docker pull $IMAGE finished"
-        
+
         for im in $CID
         do
             LATEST=`docker inspect --format "{{.Id}}" $IMAGE`
