@@ -4,7 +4,7 @@ services:
 
  init:
   container_name: init
-  image: flaski/flaski:latest
+  image: flaski/flaski:${IMAGE_TAG}
   user: root
   volumes:
    - data:/flaski_data/users
@@ -35,7 +35,7 @@ services:
 
  server:
   container_name: server
-  image: flaski/flaski:latest
+  image: flaski/flaski:${IMAGE_TAG}
   restart: always
   volumes:
    - data:/flaski_data/users
@@ -56,6 +56,7 @@ services:
    ADMINS: flaski@age.mpg.de
    MAIL_SERVER: mail.age.mpg.de
    MAIL_USERNAME: flaski@age.mpg.de
+   INSTANCE: ${IMAGE_TAG}
   links:
    - mariadb
    - redis
