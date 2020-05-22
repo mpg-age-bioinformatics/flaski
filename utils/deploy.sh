@@ -33,6 +33,7 @@ do
     else
 
     LOG_FILE="/srv/logs/deploy.out"
+    rm -rf ${LOG_FILE}
 
     fi
 
