@@ -1,6 +1,8 @@
 # Compiled python modules.
 *.pyc
 
+pyflaski/build/
+
 # Setuptools distribution folder.
 /dist/
 /build/
@@ -11,6 +13,10 @@ tmp
 migrations
 __pycache__
 /services/nginx/certs/
+pyflaski/dist/
+pyflaski/pyflaski.egg-info/
+*.ipynb_checkpoints*
+
 # environment
 .env
 
