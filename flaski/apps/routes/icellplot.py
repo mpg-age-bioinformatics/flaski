@@ -75,6 +75,7 @@ def icellplot(download=None):
     
             del(session_["ftype"])
             del(session_["COMMIT"])
+            del(session_["PRIVATE_APPS"])
             for k in list(session_.keys()):
                 session[k]=session_[k]
             plot_arguments=session["plot_arguments"]
@@ -106,6 +107,7 @@ def icellplot(download=None):
 
             del(session_["ftype"])
             del(session_["COMMIT"])
+            del(session_["PRIVATE_APPS"])
             for k in list(session_.keys()):
                 session[k]=session_[k]
             plot_arguments=session["plot_arguments"]
