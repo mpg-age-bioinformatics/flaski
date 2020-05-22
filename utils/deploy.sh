@@ -27,10 +27,20 @@ do
 
     if [[ "${3}" != "dev" ]] ;
     then
+
+    LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
+
+    else
+
+    LOG_FILE="/srv/logs/deploy.out"
+
+    fi
+
+
     set -o errexit
 
     #readonly LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
-    LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
+    #LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
 
     # Create the destination log file that we can
     # inspect later if something goes wrong with the
@@ -48,7 +58,6 @@ do
     # standard error ends up going to wherever standard
     # out goes (the file).
     exec 2>&1
-    fi
 
     cd /srv/flaski
 
