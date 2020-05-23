@@ -13,31 +13,21 @@
 # 
 # dev:
 # $ deploy.sh up now dev
-
-if [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q server)` ] ; then 
-    echo "$(date) :: server service not running, starting .."
-    cd /srv/flaski
-    docker-compose -f production.yml up -d
-    sleep 10
-else 
-    echo "$(date) :: server service is running"
-fi
-
 while true 
 do
 
-    if [[ "${3}" != "dev" ]] ;
-    then
+    pkill -f autotail
 
-    LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
+    if [[ "${3}" != "dev" ]] ; then
+
+        LOG_FILE="/srv/logs/deploy.$(date '+%Y%m%d.%H%M%S').out"
 
     else
 
-    LOG_FILE="/srv/logs/deploy.out"
-    rm -rf ${LOG_FILE}
+        LOG_FILE="/srv/logs/deploy.out"
+        rm -rf ${LOG_FILE}
 
     fi
-
 
     set -o errexit
 
@@ -50,7 +40,7 @@ do
     touch $LOG_FILE
 
     # get the LOG_FILE in your stdout
-    tail -F $LOG_FILE &
+    exec -a autotail tail -F $LOG_FILE &
 
     # Open standard out at `$LOG_FILE` for write.
     # This has the effect 
@@ -63,8 +53,25 @@ do
 
     cd /srv/flaski
 
-    if [ -z "$2" ] ; 
-    then
+    RUNNING=$(docker ps -q --no-trunc)
+
+    if [ -z "${RUNNING}" ] ; then
+        echo "$(date) :: server service not running, starting .."
+        cd /srv/flaski       
+        docker-compose -f production.yml up -d
+        sleep 10
+    fi
+
+    if [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q server)` ] ; then 
+        echo "$(date) :: server service not running, starting .."
+        cd /srv/flaski
+        docker-compose -f production.yml up -d
+        sleep 10
+    else 
+        echo "$(date) :: server service is running"
+    fi
+
+    if [ -z "$2" ] ; then
         echo "$(date) :: Deploying at 02:00 UTC"
         until [[ "$(date +%H:%M)" == "02:00" ]]; do
             sleep 25
@@ -73,8 +80,7 @@ do
 
     else
 
-        if [[ "$2" == "now" ]] ;
-        then
+        if [[ "$2" == "now" ]] ; then
             echo "$(date) :: Deploying now!"
         else
             echo "$(date) :: Deploying at ${2}"
@@ -127,35 +133,32 @@ do
 
     if [[ "$DEPLOY" == "1" ]] ; then
 
-        if [[ "$1" == "down" ]] ; 
-            then
+        if [[ "$1" == "down" ]] ; then
 
-                docker-compose -f production.yml pull server && \
-                docker-compose -f production.yml exec backup /backup.sh && \
-                docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
-                echo "$(date) :: docker-compose down" && \
-                docker-compose -f production.yml down && \
-                echo "$(date) :: docker-compose up -d" && \
-                docker-compose -f production.yml up -d
+            docker-compose -f production.yml pull server && \
+            docker-compose -f production.yml exec backup /backup.sh && \
+            docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
+            echo "$(date) :: docker-compose down" && \
+            docker-compose -f production.yml down && \
+            echo "$(date) :: docker-compose up -d" && \
+            docker-compose -f production.yml up -d
 
-            else
+        else
 
-                docker-compose -f production.yml pull server && \
-                docker-compose -f production.yml exec backup /backup.sh && \
-                docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
-                echo "$(date) :: docker-compose up -d" && \
-                docker-compose -f production.yml up -d server
+            docker-compose -f production.yml pull server && \
+            docker-compose -f production.yml exec backup /backup.sh && \
+            docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
+            echo "$(date) :: docker-compose up -d" && \
+            docker-compose -f production.yml up -d server
 
         fi
     fi
 
     echo "$(date) :: Done!"
 
-    if [[ "${3}" == "dev" ]] ; 
-        then 
+    if [[ "${3}" == "dev" ]] ; then 
         sleep 30
-    elif [[ "$3" == "once" ]] ;
-        then    
+    elif [[ "$3" == "once" ]] ; then    
         exit
     else
         sleep 3600
