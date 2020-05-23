@@ -25,7 +25,7 @@ fi
 while true 
 do
 
-    kill -9 $(ps -aux | grep deploy | grep -v grep |  awk '{ print $2 }') 
+    kill -9 $(ps -aux | grep deploy | grep "tail" | grep -v grep |  awk '{ print $2 }') 
 
     if [[ "${3}" != "dev" ]] ;
     then
