@@ -13,10 +13,15 @@
 # 
 # dev:
 # $ deploy.sh up now dev
+
+if [[ "${3}" != "dev" ]] ; then
+    LOG_FILE="/srv/logs/deploy.out"
+    touch $LOG_FILE
+    tail -F $LOG_FILE &
+fi
+
 while true 
 do
-
-    pkill -f autotail
 
     if [[ "${3}" != "dev" ]] ; then
 
@@ -24,7 +29,6 @@ do
 
     else
 
-        LOG_FILE="/srv/logs/deploy.out"
         rm -rf ${LOG_FILE}
 
     fi
@@ -40,7 +44,7 @@ do
     touch $LOG_FILE
 
     # get the LOG_FILE in your stdout
-    exec -a autotail tail -F $LOG_FILE &
+    #exec -a autotail tail -F $LOG_FILE &
 
     # Open standard out at `$LOG_FILE` for write.
     # This has the effect 
