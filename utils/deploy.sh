@@ -85,7 +85,7 @@ do
 
     fi
 
-    BASE_IMAGES=$(docker ps | grep server | awk '{ print $2 }') 
+    BASE_IMAGES=$(docker ps | grep server | grep -v init | awk '{ print $2 }') 
     #  flaski/backup:latest redis:5 nginx:alpine mariadb:10.4"
 
     DEPLOY="0"
