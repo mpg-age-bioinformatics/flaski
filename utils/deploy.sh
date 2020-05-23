@@ -18,6 +18,7 @@ if [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q server)` ] ; then
     echo "$(date) :: server service not running, starting .."
     cd /srv/flaski
     docker-compose -f production.yml up -d
+    sleep 10
 else 
     echo "$(date) :: server service is running"
 fi
@@ -33,7 +34,7 @@ do
     else
 
     LOG_FILE="/srv/logs/deploy.out"
-    #rm -rf ${LOG_FILE}
+    rm -rf ${LOG_FILE}
 
     fi
 
