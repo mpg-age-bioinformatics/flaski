@@ -25,8 +25,6 @@ fi
 while true 
 do
 
-    kill -9 $(ps -aux | grep deploy | grep "tail" | grep -v grep |  awk '{ print $2 }') 
-
     if [[ "${3}" != "dev" ]] ;
     then
 
@@ -51,7 +49,7 @@ do
     touch $LOG_FILE
 
     # get the LOG_FILE in your stdout
-    tail -f $LOG_FILE &
+    #tail -f $LOG_FILE &
 
     # Open standard out at `$LOG_FILE` for write.
     # This has the effect 
