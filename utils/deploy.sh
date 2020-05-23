@@ -50,7 +50,7 @@ do
     touch $LOG_FILE
 
     # get the LOG_FILE in your stdout
-    #tail -f $LOG_FILE &
+    tail -F $LOG_FILE &
 
     # Open standard out at `$LOG_FILE` for write.
     # This has the effect 
