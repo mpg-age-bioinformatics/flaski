@@ -1,5 +1,43 @@
 {% extends "base.html" %}
 
+<style>
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+</style>
+
 {% block app_title %}
 
 <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
@@ -224,39 +262,114 @@
 
 {% block content %}
 <div style="margin-left:150px;" id="loading"></div>
+
 <div id="contentready" class="container-fluid">
 
-    {% if selected_results_files %}
+    <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'Metadata')" id="defaultOpen">Metadata</button>
+    <button class="tablinks" onclick="openCity(event, 'GeneExpression')">Gene Expression</button>
+    {% if selected_dge_50 %}
+    <button class="tablinks" onclick="openCity(event, 'DifferentialGeneExpression')">Differential Gene Expression</button>
+    {% endif %}
+    </div>
 
     <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
-        <table id="listr-table" class="table table-hover">
-            <thead>
+        <div id="Metadata" class="tabcontent">
+            
+            <h2><br>Metadata</h2>
+            <table id="listr-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Set</th>
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Samples</th>
+                    </tr>
+                </thead>
+                <tfoot>
                 <tr>
-                    <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Set</th>
-                    <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Samples</th>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">Selected data.</small>
+                    </td>
                 </tr>
-            </thead>
-            <tfoot>
-            <tr>
-                <td colspan="5">
-                    <small class="pull-xs-left text-muted" dir="ltr">Selected data.</small>
-                </td>
-            </tr>
-            </tfoot>
-            <tbody>
-
-                {% for entry in selected_results_files %}
-                <tr>
-                    {% for col in entry %}
-                    <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                </tfoot>
+                <tbody>
+                    {% for entry in selected_results_files %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-                {% endfor %}
                 </tbody>
             </table>
         </div>
-    {% endif %}
+    <!--/div-->
 
+    <div id="GeneExpression" class="tabcontent">
+        <h2><br>Gene Expression</h2>
+        <!--div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);"-->
+            <table id="listr2-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in selected_ge_50_cols %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">First 50 entries. Download table if you want to see all entries.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+
+                    {% for entry in selected_ge_50 %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        <!--/div-->
+    </div>
+
+    {% if selected_dge_50 %}
+    <div id="DifferentialGeneExpression" class="tabcontent">
+        <h2><br>Differential Gene Expression</h2>
+        <!--div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);"-->
+            <table id="listr3-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in selected_dge_50_cols %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">First 50 entries. Download table if you want to see all entries.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+
+                    {% for entry in selected_dge_50 %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        <!--/div-->
+    </div>
+    {% endif %}
+</div>
 
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -333,6 +446,34 @@
     
 
 </div>
+
+<script>
+    // Get the element with id="defaultOpen" and click on it
+    document.getElementById("defaultOpen").click();
+</script>
+
+<script>
+function openCity(evt, cityName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+  
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+  
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+  
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+</script>
 
 {% endblock %}
 

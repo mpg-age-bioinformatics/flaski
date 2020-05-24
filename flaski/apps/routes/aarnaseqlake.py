@@ -165,7 +165,6 @@ def aarnaseqlake(download=None):
 
         selected_genes=genes[(genes["gene_name"].isin(selected_gene_names)) & \
                              (genes["gene_id"].isin(selected_gene_ids)) ]
-        print(selected_genes.head())
 
         if plot_arguments["selected_gene_ids"] != "":
             selected_gene_ids=list(set(selected_genes['gene_id'].tolist()))
@@ -180,10 +179,10 @@ def aarnaseqlake(download=None):
             plot_arguments["selected_gene_names"]=selected_gene_names
 
         nsets=len(plot_arguments["selected_data_sets"])
-        if nsets > 1:
+        if (nsets > 1) & (plot_arguments["selected_data_sets"][0] != "all"):
             selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
         else:
-            selected_results_files["Labels"]=selected_results_files["Set"]
+            selected_results_files["Labels"]=selected_results_files["Reps"]
         ids2labels=selected_results_files[["IDs","Labels"]].drop_duplicates()
         ids2labels.index=ids2labels["IDs"].tolist()
         ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
@@ -191,11 +190,44 @@ def aarnaseqlake(download=None):
         gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
         selected_ge=gedf[list(ids2labels.keys())]
         
+        cols=selected_ge.columns.tolist()
         selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
         selected_ge=selected_ge.drop(["name_id"],axis=1)
+        selected_ge=selected_ge[:50]
+        for c in cols:
+            selected_ge[c]=selected_ge[c].apply(lambda x: '{:.2f}'.format(x))
         selected_ge.reset_index(inplace=True,drop=True)
         selected_ge.rename(columns=ids2labels,inplace=True)
-        plot_arguments["selected_ge_50"]=selected_ge[:50]
+        plot_arguments["selected_ge_50_cols"]=selected_ge.columns.tolist()
+
+        selected_ge=list(selected_ge.values)
+        selected_ge=[ list(s) for s in selected_ge ]
+        session["plot_arguments"]["selected_ge_50"]=selected_ge
+
+        ngroups=len(plot_arguments["selected_groups"])
+        if (ngroups == 2) & ( nsets == 1 ) & ( plot_arguments["selected_data_sets"][0] != "all" ):
+            groups_to_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"metadata.tsv",sep="\t")
+
+            selected_dge=groups_to_files[ (groups_to_files["Group_1"].isin(plot_arguments["selected_groups"]) ) & \
+                                          (groups_to_files["Group_2"].isin(plot_arguments["selected_groups"]) ) & \
+                                          (groups_to_files["Set"].isin(plot_arguments["selected_data_sets"])  )]["File"].tolist()[0]
+            
+            selected_dge=pd.read_csv(session["plot_arguments"]["path_to_files"]+"pairwise/"+selected_dge,sep="\t", index_col=[0])
+
+            selected_genes_tmp=selected_genes[["gene_name","gene_id"]]
+            selected_dge=pd.merge(selected_genes_tmp,selected_dge,left_on=["gene_id"],right_index=True,how="left")
+            selected_dge.rename(columns=ids2labels,inplace=True)
+            plot_arguments["selected_dge_50_cols"]=selected_dge.columns.tolist()
+            selected_dge=selected_dge[:50]
+            selected_dge=list(selected_dge.values)
+            selected_dge=[ list(s) for s in selected_dge ]
+            plot_arguments["selected_dge_50"]=selected_dge
+                    
+        else:
+            if "selected_dge" in list(plot_arguments.keys()):
+                del(plot_arguments["selected_dge_50"])
+                del(plot_arguments["selected_dge_50_cols"])
+        
 
 
         selected_results_files=selected_results_files.groupby(['Set'])['Reps'].apply(lambda x: getcomma(x) ).reset_index()
@@ -225,9 +257,6 @@ def aarnaseqlake(download=None):
             plot_arguments=session["plot_arguments"]
 
             selected_results_files=pd.read_json(plot_arguments["selected_results_files_"])
-
-
-
 
 
             # READ INPUT DATA FROM SESSION JSON
@@ -305,28 +334,10 @@ def aarnaseqlake(download=None):
             #session["plot_arguments"]["gedf"]=gedf.to_json()
 
             #GO=pd.read_csv(session["plot_arguments"]["path_to_files"]+"GO.tsv",sep="\t")
-            #GO=GO.astype(str)
-            #session["plot_arguments"]["GO"]=GO.to_json()
 
             results_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
-            #results_files=results_files.astype(str)
-            #session["plot_arguments"]["results_files"]=results_files.to_json()
 
             genes=pd.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
-            #genes=genes.astype(str)
-            #session["plot_arguments"]["results_files"]=genes.to_json()
-
-            # with open(session["plot_arguments"]["path_to_files"]+"id_name.json","r") as f:
-            #     id_name=json.load(f)
-            # with open(session["plot_arguments"]["path_to_files"]+"ids2reps.json","r") as f:
-            #     ids2reps=json.load(f)
-            # with open(session["plot_arguments"]["path_to_files"]+"reps2ids.json","r") as f:
-            #     reps2ids=json.load(f)
-            # with open(session["plot_arguments"]["path_to_files"]+"sets2groups.json","r") as f:
-            #     sets2groups=json.load(f)
-            # with open(session["plot_arguments"]["path_to_files"]+"groups.json","r") as f:
-            #     groups=json.load(f)
-
 
             available_data_sets=list(set(results_files["Set"].tolist()))
             available_data_sets.sort()
@@ -362,12 +373,22 @@ def aarnaseqlake(download=None):
             selected_ge=gedf[ list(ids2labels.keys()) ]
             selected_genes=genes.copy()
             #print(selected_genes.head(), selected_ge.head() )
+            cols=selected_ge.columns.tolist()
             selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
             selected_ge=selected_ge.drop(["name_id"],axis=1)
+            selected_ge=selected_ge[:50]
+            for c in cols:
+                selected_ge[c]=selected_ge[c].apply(lambda x: '{:.2f}'.format(x))
+
             selected_ge.reset_index(inplace=True,drop=True)
             selected_ge.rename(columns=ids2labels,inplace=True)
             #session["plot_arguments"]["selected_ge"]=selected_ge
-            session["plot_arguments"]["selected_ge_50"]=selected_ge[:50]
+            session["plot_arguments"]["selected_ge_50_cols"]=selected_ge.columns.tolist()
+
+            selected_ge=list(selected_ge.values)
+            selected_ge=[ list(s) for s in selected_ge ]
+            session["plot_arguments"]["selected_ge_50"]=selected_ge
+
 
             selected_results_files=results_files.groupby(['Set'])['Reps'].apply(lambda x: getcomma(x) ).reset_index()
             #selected_results_files.columns=["Dataset","Samples"]
