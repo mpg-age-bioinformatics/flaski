@@ -38,18 +38,169 @@
 
         <form action="{{ url_for('aarnaseqlake') }}" method="post" enctype="multipart/form-data">
 
+
             <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
                 <div class="column" >
-                    <div class="sidebar-heading">Fix labels:</div>
+                    <div class="sidebar-heading">Dataset:</div>
                     <div style="padding-left:15px;">
-                        <select name="fixed_labels" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
-                            {% for label in available_labels %}
-                                <option value="{{label}}" {% if label in fixed_labels %} selected {% endif %}>{{label}}</option>
+                        <select name="selected_data_sets" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_data_sets %}
+                                <option value="{{label}}" {% if label in selected_data_sets %} selected {% endif %}>{{label}}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
             </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Groups:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_groups" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_groups %}
+                                <option value="{{label}}" {% if label in selected_groups %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            "data_sets","groups","reps","gene_names","gene_ids"
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Samples:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_reps" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_reps %}
+                                <option value="{{label}}" {% if label in selected_reps %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Gene names:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_gene_names" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_gene_names %}
+                                <option value="{{label}}" {% if label in selected_gene_names %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Gene IDs:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_gene_ids" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_gene_ids %}
+                                <option value="{{label}}" {% if label in selected_gene_ids %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-download"></i>
+                    <span>Output</span>
+                </a>
+                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="download_name" value='{{ download_name }}' style="width:298px;height:30px;padding-left: 4px">
+                            </div>   
+                            <div class="row arg">
+                                <label> format: <select name=download_format_value method="GET" action="/" style="width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==download_format_value %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Arguments</span>
+                </a>
+                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload arguments file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
+                    <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                    <span>Session</span>
+                </a>
+                <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload session file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_download_name" value='{{ session_download_name }}'>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+           
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -142,7 +293,7 @@
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-                <form action="{{ url_for('david', download='download') }}" method="get">
+                <form action="{{ url_for('aarnaseqlake', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Results
                     </button>
@@ -150,7 +301,7 @@
             </div>
 
             <div style="padding-left: 2px;padding-right: 2px;">
-                <form action="{{ url_for('david', download='cellplot') }}" method="get">
+                <form action="{{ url_for('aarnaseqlake', download='cellplot') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="far fa-chart-bar"></i> iCellplot
                     </button>

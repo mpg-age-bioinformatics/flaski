@@ -79,9 +79,9 @@ def aarnaseqlake(download=None):
                 pa[selection]=plot_arguments["selected_%" %(selection)]
 
         # ['File', 'Set', 'IDs', 'Reps', 'Group', 'Sample']
-        selected_results_files=results_files[ ( results_files['Set'].isin( pa["data_sets"]) ) & \
-                                            ( results_files['Reps'].isin( pa["reps"]) ) & \
-                                            ( results_files['Group'].isin( pa["groups"]) ) ]
+        selected_results_files=results_files[ ( results_files['Set'].isin( pa["data_sets"] ) ) & \
+                                            ( results_files['Reps'].isin( pa["reps"] ) ) & \
+                                            ( results_files['Group'].isin( pa["groups"] ) ) ]
 
         if "all" not in plot_arguments["selected_data_sets"]:
             selected_data_sets=list(set(selected_results_files['Set'].tolist()))
@@ -104,13 +104,11 @@ def aarnaseqlake(download=None):
         else:
             plot_arguments["selected_reps"]=["all"]
 
-
-        results_files=pd.read_json(plot_arguments["genes"])
+        genes=pd.read_json(plot_arguments["genes"])
 
         selected_genes=genes[(genes["gene_name"].isin(pa["gene_names"])) ,\
                              (genes["gene_id"].isin(pa["gene_ids"])) ]
 
-        
         if "all" not in plot_arguments["selected_gene_names"]:
             selected_gene_names=list(set(selected_genes['gene_name'].tolist()))
             selected_gene_names.sort()
@@ -124,7 +122,28 @@ def aarnaseqlake(download=None):
             plot_arguments["selected_gene_ids"]=selected_gene_id
         else:
             plot_arguments["selected_gene_ids"]=["all"]
-    
+
+
+        nsets=len(selected_data_sets)
+        if nsets > 1:
+            selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
+        else:
+            selected_results_files["Labels"]=selected_results_files["Set"]
+        ids2labels=selected_results_files[["IDs","Labels"]].drop_duplicates()
+        ids2labels.index=ids2labels["IDs"].tolist()
+        ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
+
+        gedf=pd.read_json(plot_arguments["gedf"])
+        selected_ge=gedf[list(ids2labels.keys())]
+
+        
+        selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
+        selected_ge.reset_index(inplace=True,drop=True)
+        selected_ge.rename(columns=ids2labels,inplace=True)
+        plot_arguments["selected_ge"]=selected_ge
+        plot_arguments["selected_ge_50"]=selected_ge[:50]
+
+
         selected_results_files=selected_results_files.groupby(['Set'])['Reps'].apply(lambda x: getcomma(x) ).reset_index()
         #selected_results_files.columns=["Dataset","Samples"]
         selected_results_files=list(selected_results_files.values)
@@ -145,36 +164,42 @@ def aarnaseqlake(download=None):
 
     else:
 
-        # if download == "download":
+        if download == "download":
 
-        #     plot_arguments=session["plot_arguments"]
+            plot_arguments=session["plot_arguments"]
 
-        #     # READ INPUT DATA FROM SESSION JSON
-        #     david_df=pd.read_json(session["david_df"])
-        #     report_stats=pd.read_json(session["report_stats"])
+            selected_results_files=pd.read_json(plot_arguments["selected_results_files_"])
 
 
-        #     eventlog = UserLogging(email=current_user.email,action="download david")
-        #     db.session.add(eventlog)
-        #     db.session.commit()
-
-        #     if plot_arguments["download_format_value"] == "xlsx":
-        #         outfile = io.BytesIO()
-        #         EXC=pd.ExcelWriter(outfile)
-        #         david_df.to_excel(EXC,sheet_name="david",index=None)
-        #         report_stats.to_excel(EXC,sheet_name="stats",index=None)
-        #         EXC.save()
-        #         outfile.seek(0)
-        #         return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"],as_attachment=True )
-
-        #     elif plot_arguments["download_format_value"] == "tsv":               
-        #         return Response(david_df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
-        #         #outfile.seek(0)
 
 
-        #     #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
-        #     #print(plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"])
-        #     #sys.stdout.flush()
+
+            # READ INPUT DATA FROM SESSION JSON
+            david_df=pd.read_json(session["david_df"])
+            report_stats=pd.read_json(session["report_stats"])
+
+
+            eventlog = UserLogging(email=current_user.email,action="download david")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            if plot_arguments["download_format_value"] == "xlsx":
+                outfile = io.BytesIO()
+                EXC=pd.ExcelWriter(outfile)
+                david_df.to_excel(EXC,sheet_name="david",index=None)
+                report_stats.to_excel(EXC,sheet_name="stats",index=None)
+                EXC.save()
+                outfile.seek(0)
+                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"],as_attachment=True )
+
+            elif plot_arguments["download_format_value"] == "tsv":               
+                return Response(david_df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
+                #outfile.seek(0)
+
+
+            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
+            #print(plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"])
+            #sys.stdout.flush()
 
         # if download == "cellplot":
         #     # READ INPUT DATA FROM SESSION JSON
@@ -271,13 +296,33 @@ def aarnaseqlake(download=None):
             session["plot_arguments"]["available_gene_ids"]=["all"]+available_gene_ids
             session["plot_arguments"]["selected_gene_ids"]=["all"]
 
+            selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
+            ids2labels=selected_results_files[["IDs","Labels"]].drop_duplicates()
+            ids2labels.index=ids2labels["IDs"].tolist()
+            ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
+
+            selected_ge=gedf[ list(ids2labels.keys()) ]
+            selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
+            selected_ge.reset_index(inplace=True,drop=True)
+            selected_ge.rename(columns=ids2labels,inplace=True)
+            plot_arguments["selected_ge"]=selected_ge
+            plot_arguments["selected_ge_50"]=selected_ge[:50]
+
             selected_results_files=results_files.groupby(['Set'])['Reps'].apply(lambda x: getcomma(x) ).reset_index()
             #selected_results_files.columns=["Dataset","Samples"]
             selected_results_files=list(selected_results_files.values)
             selected_results_files=[ list(s) for s in selected_results_files ]
-            plot_arguments["selected_results_files"]=selected_results_files
+            session["plot_arguments"]["selected_results_files"]=selected_results_files
 
             # data_sets groups reps gene_names gene_ids | available_ selected_
+
+            session["plot_arguments"]["download_format"]=["tsv","xlsx"]
+            session["plot_arguments"]["download_format_value"]="xlsx"
+            session["plot_arguments"]["download_name"]="DAVID"
+            session["plot_arguments"]["session_download_name"]="MySession.DAVID"
+            session["plot_arguments"]["inputsessionfile"]="Select file.."
+            session["plot_arguments"]["session_argumentsn"]="MyArguments.DAVID"
+            session["plot_arguments"]["inputargumentsfile"]="Select file.."
 
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="aarnaseqlake"
