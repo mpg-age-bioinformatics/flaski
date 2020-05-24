@@ -152,8 +152,13 @@ def get_tables(plot_arguments):
     gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
     selected_ge=gedf[list(ids2labels.keys())]
     
+    selected_ge=selected_ge.astype(float)
     cols=selected_ge.columns.tolist()
+    selected_ge["sum"]=selected_ge.sum(axis=1)
+    selected_ge=selected_ge[selected_ge["sum"]>0]
+    selected_ge=selected_ge.drop(["sum"],axis=1)
     selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
+    selected_ge=selected_ge.dropna(subset=cols,how="all")
     selected_ge=selected_ge.drop(["name_id"],axis=1)
     selected_ge=selected_ge[:50]
     for c in cols:
@@ -176,14 +181,16 @@ def get_tables(plot_arguments):
                                     (groups_to_files["Set"].isin(plot_arguments["selected_data_sets"])  )]["File"].tolist()[0]
         
         selected_dge=pd.read_csv(session["plot_arguments"]["path_to_files"]+"pairwise/"+selected_dge,sep="\t", index_col=[0])
+        cols=selected_dge.columns.tolist()
 
         selected_genes_tmp=selected_genes[["gene_name","gene_id"]]
         selected_dge=pd.merge(selected_genes_tmp,selected_dge,left_on=["gene_id"],right_index=True,how="left")
+        selected_dge=selected_dge.dropna(subset=cols,how="all")
         format_cols=selected_dge.columns.tolist()
-        format_cols=[s for s in format_cols if "ID_" in s ]+["log2FoldChange","baseMean","lfcSE"]
+        format_cols=[s for s in format_cols if "ID_" in s ]+["baseMean"]
         for c in format_cols:
             selected_dge[c]=selected_dge[c].apply(lambda x: '{:.3f}'.format(float(x)) )
-        for c in ["pvalue","padj"]:
+        for c in ["log2FoldChange","pvalue","padj","lfcSE"]:
             selected_dge[c]=selected_dge[c].apply(lambda x: '{:.3e}'.format(float(x)) )
 
         selected_dge.rename(columns=ids2labels,inplace=True)
@@ -271,39 +278,70 @@ def aarnaseqlake(download=None):
 
     else:
 
-        if download == "download":
+        if download == "metadata":
 
             plot_arguments=session["plot_arguments"]
 
-            selected_results_files=pd.read_json(plot_arguments["selected_results_files_"])
+            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
 
-
-            # READ INPUT DATA FROM SESSION JSON
-            david_df=pd.read_json(session["david_df"])
-            report_stats=pd.read_json(session["report_stats"])
-
-
-            eventlog = UserLogging(email=current_user.email,action="download david")
+            eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
             db.session.add(eventlog)
             db.session.commit()
 
             if plot_arguments["download_format_value"] == "xlsx":
                 outfile = io.BytesIO()
                 EXC=pd.ExcelWriter(outfile)
-                david_df.to_excel(EXC,sheet_name="david",index=None)
-                report_stats.to_excel(EXC,sheet_name="stats",index=None)
+                df_metadata.to_excel(EXC,sheet_name="metadata",index=None)
                 EXC.save()
                 outfile.seek(0)
-                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"],as_attachment=True )
+                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ ".metadata." + plot_arguments["download_format_value"],as_attachment=True )
 
             elif plot_arguments["download_format_value"] == "tsv":               
-                return Response(david_df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
-                #outfile.seek(0)
+                return Response(df_metadata.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".metadata")})
+
+        if download == "geneexpression":
+
+            plot_arguments=session["plot_arguments"]
+
+            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+
+            eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            if plot_arguments["download_format_value"] == "xlsx":
+                outfile = io.BytesIO()
+                EXC=pd.ExcelWriter(outfile)
+                df_de.to_excel(EXC,sheet_name="geneexp.",index=None)
+                EXC.save()
+                outfile.seek(0)
+                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ ".gene_expression." + plot_arguments["download_format_value"],as_attachment=True )
+
+            elif plot_arguments["download_format_value"] == "tsv":               
+                return Response(df_de.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".gene_expression")})
+
+        if download == "dge":
+
+            plot_arguments=session["plot_arguments"]
+
+            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+
+            eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            if plot_arguments["download_format_value"] == "xlsx":
+                outfile = io.BytesIO()
+                EXC=pd.ExcelWriter(outfile)
+                df_dge.to_excel(EXC,sheet_name="dge",index=None)
+                EXC.save()
+                outfile.seek(0)
+                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ ".dge." + plot_arguments["download_format_value"],as_attachment=True )
+
+            elif plot_arguments["download_format_value"] == "tsv":               
+                return Response(df_dge.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".dge")})
 
 
-            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
-            #print(plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"])
-            #sys.stdout.flush()
 
         # if download == "cellplot":
         #     # READ INPUT DATA FROM SESSION JSON
@@ -376,40 +414,6 @@ def aarnaseqlake(download=None):
             available_gene_ids.sort()
             session["plot_arguments"]["available_gene_ids"]=available_gene_ids
             session["plot_arguments"]["selected_gene_ids"]=""
-
-            # selected_results_files=results_files.copy()
-            # selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
-            # ids2labels=selected_results_files[["IDs","Labels"]].drop_duplicates()
-            # ids2labels.index=ids2labels["IDs"].tolist()
-            # ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
-
-            # selected_ge=gedf[ list(ids2labels.keys()) ]
-            # selected_genes=genes.copy()
-            # #print(selected_genes.head(), selected_ge.head() )
-            # cols=selected_ge.columns.tolist()
-            # selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
-            # selected_ge=selected_ge.drop(["name_id"],axis=1)
-            # selected_ge=selected_ge[:50]
-            # for c in cols:
-            #     selected_ge[c]=selected_ge[c].apply(lambda x: '{:.2f}'.format(x))
-
-            # selected_ge.reset_index(inplace=True,drop=True)
-            # selected_ge.rename(columns=ids2labels,inplace=True)
-            # #session["plot_arguments"]["selected_ge"]=selected_ge
-            # session["plot_arguments"]["selected_ge_50_cols"]=selected_ge.columns.tolist()
-
-            # selected_ge=list(selected_ge.values)
-            # selected_ge=[ list(s) for s in selected_ge ]
-            # session["plot_arguments"]["selected_ge_50"]=selected_ge
-
-
-            # selected_results_files=results_files.groupby(['Set'])['Reps'].apply(lambda x: getcomma(x) ).reset_index()
-            # #selected_results_files.columns=["Dataset","Samples"]
-            # selected_results_files=list(selected_results_files.values)
-            # selected_results_files=[ list(s) for s in selected_results_files ]
-            # session["plot_arguments"]["selected_results_files"]=selected_results_files
-
-            # data_sets groups reps gene_names gene_ids | available_ selected_
 
             session["plot_arguments"]["download_format"]=["tsv","xlsx"]
             session["plot_arguments"]["download_format_value"]="xlsx"
