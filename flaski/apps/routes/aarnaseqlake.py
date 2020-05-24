@@ -12,6 +12,8 @@ from flaski.routes import FREEAPPS
 from flaski.email import send_exception_email
 from flaski.routines import check_session_app
 
+from fuzzywuzzy import process
+
 import os
 import io
 import sys
@@ -69,14 +71,14 @@ def aarnaseqlake(download=None):
 
         plot_arguments=session["plot_arguments"]
 
-        results_files=pd.read_json(plot_arguments["results_files"])
+        results_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
 
         pa={}
         for selection in ["data_sets","groups","reps","gene_names","gene_ids"]:
-            if "all" in plot_arguments["selected_%" %(selection)]:
-                pa[selection]=plot_arguments["available_%" %(selection)]
+            if "all" in plot_arguments["selected_%s" %(selection)]:
+                pa[selection]=plot_arguments["available_%s" %(selection)]
             else:
-                pa[selection]=plot_arguments["selected_%" %(selection)]
+                pa[selection]=plot_arguments["selected_%s" %(selection)]
 
         # ['File', 'Set', 'IDs', 'Reps', 'Group', 'Sample']
         selected_results_files=results_files[ ( results_files['Set'].isin( pa["data_sets"] ) ) & \
@@ -104,27 +106,80 @@ def aarnaseqlake(download=None):
         else:
             plot_arguments["selected_reps"]=["all"]
 
-        genes=pd.read_json(plot_arguments["genes"])
 
-        selected_genes=genes[(genes["gene_name"].isin(pa["gene_names"])) ,\
-                             (genes["gene_id"].isin(pa["gene_ids"])) ]
+        genes=pd.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
 
-        if "all" not in plot_arguments["selected_gene_names"]:
-            selected_gene_names=list(set(selected_genes['gene_name'].tolist()))
+        if plot_arguments["selected_gene_names"] != "":
+            available_gene_names=plot_arguments["available_gene_names"]
+            selected_gene_names=plot_arguments["selected_gene_names"].split(",")
+            selected_gene_names=[ s.strip(" ") for s in selected_gene_names ]
             selected_gene_names.sort()
-            plot_arguments["selected_gene_names"]=selected_gene_names
+            found_gene_names=[ s  for s in selected_gene_names if s in available_gene_names ]
+            not_found_gene_names=[ s for s in selected_gene_names if s not in found_gene_names ]
+            best_matches={}
+            for gene_name in not_found_gene_names:
+                #best_match=process.extractOne(gene_name,available_gene_names)[0]
+                best_match=process.extract(gene_name,available_gene_names)
+                if gene_name.lower() == best_match[0][0].lower():
+                    found_gene_names.append(best_match[0][0])
+                else:
+                    best_match=best_match[:3]
+                    best_match=[ s[0] for s in best_match ]
+                    best_matches[gene_name]=", ".join(best_match)
+            if len(list(best_matches.keys())) > 0:
+                emsg="The folowing gene names could not be found. Please consider the respective options: "
+                for gene in list(best_matches.keys()):
+                    emsg=emsg+gene+": "+best_matches[gene]+"; "
+                emsg=emsg[:-2]+"."
+                flash(emsg,'error')
+            selected_gene_names=found_gene_names
         else:
-            plot_arguments["selected_gene_names"]=["all"]
+            selected_gene_names=genes["gene_name"].tolist()
 
-        if "all" not in plot_arguments["selected_gene_ids"]:
+        if plot_arguments["selected_gene_ids"] != "":
+            available_gene_ids=plot_arguments["available_gene_ids"]
+            selected_gene_ids=plot_arguments["selected_gene_ids"].split(",")
+            selected_gene_ids=[ s.strip(" ") for s in selected_gene_ids ]
+            selected_gene_ids.sort()
+            found_gene_ids=[ s  for s in selected_gene_ids if s in available_gene_ids ]
+            not_found_gene_ids=[ s for s in selected_gene_ids if s not in fount_gene_ids ]
+            best_matches={}
+            for gene_id in not_found_gene_ids:
+                #best_match=process.extractOne(gene_name,available_gene_names)[0]
+                best_match=process.extract(gene_id,available_gene_ids)
+                if gene_id.lower() == best_match[0][0].lower():
+                    found_gene_ids.append(best_match[0][0])
+                else:
+                    best_match=best_match[:3]
+                    best_match=[ s[0] for s in best_match ]
+                    best_matches[gene_name]=", ".join(best_match)
+            if len(list(best_matches.keys())) > 0:
+                emsg="The folowing gene ids could not be found. Please consider the respective options: "
+                for gene in list(best_matches.keys()):
+                    emsg=emsg+gene+": "+best_matches[gene]+"; "
+                emsg=emsg[:-2]+"."
+                flash(emsg,'error')
+            selected_gene_ids=found_gene_ids
+        else:
+            selected_gene_ids=genes["gene_id"].tolist()
+
+        selected_genes=genes[(genes["gene_name"].isin(selected_gene_names)) & \
+                             (genes["gene_id"].isin(selected_gene_ids)) ]
+        print(selected_genes.head())
+
+        if plot_arguments["selected_gene_ids"] != "":
             selected_gene_ids=list(set(selected_genes['gene_id'].tolist()))
             selected_gene_ids.sort()
-            plot_arguments["selected_gene_ids"]=selected_gene_id
-        else:
-            plot_arguments["selected_gene_ids"]=["all"]
+            selected_gene_ids=", ".join(selected_gene_ids)
+            plot_arguments["selected_gene_ids"]=selected_gene_ids
 
+        if plot_arguments["selected_gene_names"] != "":
+            selected_gene_names=list(set(selected_genes['gene_name'].tolist()))
+            selected_gene_names.sort()
+            selected_gene_names=", ".join(selected_gene_names)
+            plot_arguments["selected_gene_names"]=selected_gene_names
 
-        nsets=len(selected_data_sets)
+        nsets=len(plot_arguments["selected_data_sets"])
         if nsets > 1:
             selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
         else:
@@ -133,14 +188,13 @@ def aarnaseqlake(download=None):
         ids2labels.index=ids2labels["IDs"].tolist()
         ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
 
-        gedf=pd.read_json(plot_arguments["gedf"])
+        gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
         selected_ge=gedf[list(ids2labels.keys())]
-
         
         selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
+        selected_ge=selected_ge.drop(["name_id"],axis=1)
         selected_ge.reset_index(inplace=True,drop=True)
         selected_ge.rename(columns=ids2labels,inplace=True)
-        plot_arguments["selected_ge"]=selected_ge
         plot_arguments["selected_ge_50"]=selected_ge[:50]
 
 
@@ -153,6 +207,8 @@ def aarnaseqlake(download=None):
         # data_sets groups reps gene_names gene_ids | available_ selected_
 
         #return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
+
+        session["plot_arguments"]=plot_arguments
 
         return render_template('/apps/aarnaseqlake.html', apps=apps, **plot_arguments)
 
@@ -241,23 +297,24 @@ def aarnaseqlake(download=None):
             # INITIATE SESSION
             session["filename"]="Select file.."
 
+            session["plot_arguments"]={}
+
             session["plot_arguments"]["path_to_files"]="/flaski_private/aarnaseqlake/"
 
-            gedf.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t")
-            gedf=gedf.astype(str)
-            session["plot_arguments"]["gedf"]=gedf.to_json()
+            gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
+            #session["plot_arguments"]["gedf"]=gedf.to_json()
 
-            GO.read_csv(session["plot_arguments"]["path_to_files"]+"GO.tsv",sep="\t")
-            GO=GO.astype(str)
-            session["plot_arguments"]["GO"]=GO.to_json()
+            #GO=pd.read_csv(session["plot_arguments"]["path_to_files"]+"GO.tsv",sep="\t")
+            #GO=GO.astype(str)
+            #session["plot_arguments"]["GO"]=GO.to_json()
 
-            results_files.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
-            results_files=results_files.astype(str)
-            session["plot_arguments"]["results_files"]=results_files.to_json()
+            results_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
+            #results_files=results_files.astype(str)
+            #session["plot_arguments"]["results_files"]=results_files.to_json()
 
-            genes.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
-            genes=results_files.astype(str)
-            session["plot_arguments"]["results_files"]=genes.to_json()
+            genes=pd.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
+            #genes=genes.astype(str)
+            #session["plot_arguments"]["results_files"]=genes.to_json()
 
             # with open(session["plot_arguments"]["path_to_files"]+"id_name.json","r") as f:
             #     id_name=json.load(f)
@@ -278,7 +335,7 @@ def aarnaseqlake(download=None):
 
             groups=list(set(results_files["Group"].tolist()))
             groups.sort()
-            session["plot_arguments"]["available_groups"]=groups
+            session["plot_arguments"]["available_groups"]=["all"]+groups
             session["plot_arguments"]["selected_groups"]=["all"]
 
             available_reps=list(set(results_files["Reps"].tolist()))
@@ -288,25 +345,29 @@ def aarnaseqlake(download=None):
 
             available_gene_names=list(set(genes["gene_name"].tolist()))
             available_gene_names.sort()
-            session["plot_arguments"]["available_gene_names"]=["all"]+available_gene_names
-            session["plot_arguments"]["selected_gene_names"]=["all"]
+            session["plot_arguments"]["available_gene_names"]=available_gene_names
+            session["plot_arguments"]["selected_gene_names"]=""
 
             available_gene_ids=list(set(genes["gene_id"].tolist()))
             available_gene_ids.sort()
-            session["plot_arguments"]["available_gene_ids"]=["all"]+available_gene_ids
-            session["plot_arguments"]["selected_gene_ids"]=["all"]
+            session["plot_arguments"]["available_gene_ids"]=available_gene_ids
+            session["plot_arguments"]["selected_gene_ids"]=""
 
+            selected_results_files=results_files.copy()
             selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
             ids2labels=selected_results_files[["IDs","Labels"]].drop_duplicates()
             ids2labels.index=ids2labels["IDs"].tolist()
             ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
 
             selected_ge=gedf[ list(ids2labels.keys()) ]
+            selected_genes=genes.copy()
+            #print(selected_genes.head(), selected_ge.head() )
             selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
+            selected_ge=selected_ge.drop(["name_id"],axis=1)
             selected_ge.reset_index(inplace=True,drop=True)
             selected_ge.rename(columns=ids2labels,inplace=True)
-            plot_arguments["selected_ge"]=selected_ge
-            plot_arguments["selected_ge_50"]=selected_ge[:50]
+            #session["plot_arguments"]["selected_ge"]=selected_ge
+            session["plot_arguments"]["selected_ge_50"]=selected_ge[:50]
 
             selected_results_files=results_files.groupby(['Set'])['Reps'].apply(lambda x: getcomma(x) ).reset_index()
             #selected_results_files.columns=["Dataset","Samples"]

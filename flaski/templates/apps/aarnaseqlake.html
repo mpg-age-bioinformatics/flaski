@@ -65,8 +65,6 @@
                 </div>
             </div>
 
-            "data_sets","groups","reps","gene_names","gene_ids"
-
             <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
                 <div class="column" >
                     <div class="sidebar-heading">Samples:</div>
@@ -84,11 +82,13 @@
                 <div class="column" >
                     <div class="sidebar-heading">Gene names:</div>
                     <div style="padding-left:15px;">
-                        <select name="selected_gene_names" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                        <!--select name="selected_gene_names" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
                             {% for label in available_gene_names %}
                                 <option value="{{label}}" {% if label in selected_gene_names %} selected {% endif %}>{{label}}</option>
                             {% endfor %}
-                        </select>
+                        </select-->
+                        <input type="text" style="width:364px;height:34px;padding-left:4px" name="selected_gene_names" value='{{ selected_gene_names }}'>
+
                     </div>
                 </div>
             </div>
@@ -97,11 +97,13 @@
                 <div class="column" >
                     <div class="sidebar-heading">Gene IDs:</div>
                     <div style="padding-left:15px;">
-                        <select name="selected_gene_ids" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                        <!--select name="selected_gene_ids" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
                             {% for label in available_gene_ids %}
                                 <option value="{{label}}" {% if label in selected_gene_ids %} selected {% endif %}>{{label}}</option>
                             {% endfor %}
-                        </select>
+                        </select-->
+                        <input type="text" style="width:364px;height:35px;padding-left:4px" name="selected_gene_ids" value='{{ selected_gene_ids }}'>
+
                     </div>
                 </div>
             </div>

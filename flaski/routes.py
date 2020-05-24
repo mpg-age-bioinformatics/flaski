@@ -42,7 +42,6 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"DAVID", "id":'david_more',"link":'david' ,"java":"javascript:ReverseDisplay('david_more')", "description":"A DAVID querying plot."},\
         { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."},\
         { "name":"RNAseq lake", "id":'aarnaseqlake_more',"link":'aarnaseqlake' ,"java":"javascript:ReverseDisplay('aarnaseqlake_more')", "description":"RNAseq data lake to the Antebi group."} ]
- ]
 
 
 @app.route('/', methods=['GET', 'POST'])
