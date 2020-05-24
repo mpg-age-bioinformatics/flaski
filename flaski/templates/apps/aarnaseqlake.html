@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block app_title %}
+
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">RNAseq lake</h1>
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block side_bar_content %}
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+        <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+        <!-- /div -->
+        <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+            </div>
+        <!--/div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
+
+        <form action="{{ url_for('aarnaseqlake') }}" method="post" enctype="multipart/form-data">
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Fix labels:</div>
+                    <div style="padding-left:15px;">
+                        <select name="fixed_labels" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_labels %}
+                                <option value="{{label}}" {% if label in fixed_labels %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+            <!-- -------------------- SUBMIT ---------------------- -->
+
+            <div style="padding-right: 15px; padding-left: 15px;" >
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" onclick="loading();" />
+            </div>
+        </form>
+
+    </div>
+
+</ul>
+
+{% endblock %}
+
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
+{% block content %}
+<div style="margin-left:150px;" id="loading"></div>
+<div id="contentready" class="container-fluid">
+
+    {% if selected_results_files %}
+
+    <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
+        <table id="listr-table" class="table table-hover">
+            <thead>
+                <tr>
+                    <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Set</th>
+                    <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Samples</th>
+                </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <td colspan="5">
+                    <small class="pull-xs-left text-muted" dir="ltr">Selected data.</small>
+                </td>
+            </tr>
+            </tfoot>
+            <tbody>
+
+                {% for entry in selected_results_files %}
+                <tr>
+                    {% for col in entry %}
+                    <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        {% else %}
+        <!-- INFORMATION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if david_in_store %}
+        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+
+        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('david', download='download') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Results
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('david', download='cellplot') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> iCellplot
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+                <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-th fa-sm text-white-50"></i> Session
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        </div>
+
+    {% endif %}
+    
+
+</div>
+
+{% endblock %}
+
+
+
+{% block in_app_footer %}
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+        <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}

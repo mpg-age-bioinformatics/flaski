@@ -42,6 +42,7 @@ services:
   volumes:
    - data:/flaski_data/users
    - ./:/flaski
+   - ~/flaski_private:/flaski_private:ro
   environment:
    - LOGS=/var/log/flaski/
    - SECRET_KEY=${SECRET_KEY}
