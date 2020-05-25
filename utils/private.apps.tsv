@@ -1,2 +1,2 @@
 app	name	id	link	java	description	allowed
-scatterplot	Scatter plot	scatterplot_more	scatterplot	javascript:ReverseDisplay('scatterplot_more')	A static scatterplot App.	all,#mpg.de,john.doe@mpipz.mpg.de
+aarnaseqlake	RNAseq lake	aarnaseqlake_more	aarnaseqlake	javascript:ReverseDisplay('aarnaseqlake_more')	RNAseq data lake of the Antebi group.	jboucas@gmail.com
