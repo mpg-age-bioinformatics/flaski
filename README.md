@@ -94,6 +94,11 @@ For handling database entries you can start the `flask shell` by:
 ```bash
 docker-compose exec server flask shell 
 ```
+make the required imports:
+```python
+from flaski import app, db
+from flaski.models import User, UserLogging
+```
 and then for removing a user from the db:
 ```python
 u=User.query.filter_by(email=<user_email>).first()
