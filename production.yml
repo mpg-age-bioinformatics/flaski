@@ -39,6 +39,7 @@ services:
   restart: always
   volumes:
    - data:/flaski_data/users
+   - /srv/private/:/flaski_private:ro
   environment:
    LOGS: /var/log/flaski/
    SECRET_KEY: ${SECRET_KEY}
