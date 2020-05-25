@@ -13,7 +13,7 @@ STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 def make_figure(df,pa):
     tmp=df.copy()
-    tmp.index=tmp[tmp.columns.tolist()[0]].tolist()
+    tmp.index=tmp[pa["xvals"]].tolist()
     tmp=tmp[pa["yvals"]]
     if pa["zscore_value"] == "row":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=1, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
