@@ -30,13 +30,13 @@ import base64
 @login_required
 def david(download=None):
 
-    reset_info=check_session_app(session,"david")
+    apps=FREEAPPS+session["PRIVATE_APPS"]
+
+    reset_info=check_session_app(session,"david",apps)
     if reset_info:
         flash(reset_info,'error')
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
-
-    if request.method == 'POST':
+    if (request.method == 'POST') & (not reset_info):
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -246,14 +246,14 @@ def david(download=None):
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
 
 
-        if "app" not in list(session.keys()):
-            return_to_plot=False
-        elif session["app"] != "david" :
-            return_to_plot=False
-        else:
-            return_to_plot=True
+        # if "app" not in list(session.keys()):
+        #     return_to_plot=False
+        # elif session["app"] != "david" :
+        #     return_to_plot=False
+        # else:
+        #     return_to_plot=True
 
-        if not return_to_plot:
+        if reset_info:
             # INITIATE SESSION
             session["filename"]="Select file.."
 

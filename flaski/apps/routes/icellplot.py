@@ -41,14 +41,13 @@ def icellplot(download=None):
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
+    apps=FREEAPPS+session["PRIVATE_APPS"]
 
-    reset_info=check_session_app(session,"icellplot")
+    reset_info=check_session_app(session,"icellplot",apps)
     if reset_info:
         flash(reset_info,'error')
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
-
-    if request.method == 'POST':
+    if (request.method == 'POST') & (not reset_info):
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -334,14 +333,14 @@ def icellplot(download=None):
             return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
 
 
-        if "app" not in list(session.keys()):
-            return_to_plot=False
-        elif session["app"] != "icellplot" :
-            return_to_plot=False
-        else:
-            return_to_plot=True
+        # if "app" not in list(session.keys()):
+        #     return_to_plot=False
+        # elif session["app"] != "icellplot" :
+        #     return_to_plot=False
+        # else:
+        #     return_to_plot=True
 
-        if not return_to_plot:
+        if reset_info:
             # INITIATE SESSION
             session["filename"]="Select file.."
             session["ge_filename"]="Select file.."

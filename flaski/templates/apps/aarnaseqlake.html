@@ -263,6 +263,9 @@
 {% block content %}
 <div style="margin-left:150px;" id="loading"></div>
 
+<div id="contentready" class="container-fluid">
+
+
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
     {% for category, message in messages %}
@@ -292,8 +295,6 @@
     {% endfor %}
 {% endif %}
 {% endwith %}
-
-<div id="contentready" class="container-fluid">
 
     <div class="tab">
     <button class="tablinks" onclick="openCity(event, 'Metadata')" id="defaultOpen">Metadata</button>

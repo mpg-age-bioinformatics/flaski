@@ -50,13 +50,14 @@ def iheatmap(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
 
-    reset_info=check_session_app(session,"iheatmap")
+    apps=FREEAPPS+session["PRIVATE_APPS"]
+
+    reset_info=check_session_app(session,"iheatmap",apps)
     if reset_info:
         flash(reset_info,'error')
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
 
-    if request.method == 'POST':
+    if (request.method == 'POST') & (not reset_info):
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -284,14 +285,14 @@ def iheatmap(download=None):
 
             return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
 
-        if "app" not in list(session.keys()):
-            return_to_plot=False
-        elif session["app"] != "iheatmap" :
-            return_to_plot=False
-        else:
-            return_to_plot=True
+        # if "app" not in list(session.keys()):
+        #     return_to_plot=False
+        # elif session["app"] != "iheatmap" :
+        #     return_to_plot=False
+        # else:
+        #     return_to_plot=True
 
-        if not return_to_plot:
+        if reset_info:
             # INITIATE SESSION
             session["filename"]="Select file.."
 

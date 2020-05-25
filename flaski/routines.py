@@ -7,13 +7,15 @@ def reset_all(session):
         if k not in MINIMAL:
             del(session[k])
 
-def check_session_app(session,app):
+def check_session_app(session,app,apps):
     if "app" not in list(session.keys()):
-        return None
+        message="Could not find data for this App in your current session. Session has been reset."
+        return message
     elif session["app"] == app :
         return None
     else:
-        message="Your '%s' session has been reset."  %(session["app"])
+        appName=[ s for s in apps if s["link"] == session["app"] ][0]["name"]
+        message="Returning from '%s'. Your '%s' session has been reset."  %(appName,appName)
             #Flaski is not yet made for working with multiple Apps nor data simultaneously on one single browser. \
             #If you wish to use multiple Apps or data simultaneously please use one App/data per web browser eg. Safari + Chrome. \
             #Your %s session has been reset."

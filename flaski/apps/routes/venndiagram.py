@@ -40,13 +40,13 @@ def venndiagram(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
 
-    reset_info=check_session_app(session,"venndiagram")
+    apps=FREEAPPS+session["PRIVATE_APPS"]
+
+    reset_info=check_session_app(session,"venndiagram",apps)
     if reset_info:
         flash(reset_info,'error')
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
-
-    if request.method == 'POST':
+    if (request.method == 'POST') & (not reset_info):
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -241,14 +241,14 @@ def venndiagram(download=None):
 
 
 
-        if "app" not in list(session.keys()):
-            return_to_plot=False
-        elif session["app"] != "venndiagram" :
-            return_to_plot=False
-        else:
-            return_to_plot=True
+        # if "app" not in list(session.keys()):
+        #     return_to_plot=False
+        # elif session["app"] != "venndiagram" :
+        #     return_to_plot=False
+        # else:
+        #     return_to_plot=True
 
-        if not return_to_plot:
+        if reset_info:
             # INITIATE SESSION
 
             plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()

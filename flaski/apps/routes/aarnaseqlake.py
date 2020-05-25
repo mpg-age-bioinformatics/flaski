@@ -244,11 +244,61 @@ def get_tables(plot_arguments):
 @login_required
 def aarnaseqlake(download=None):
 
-    reset_info=check_session_app(session,"aarnaseqlake")
+    apps=FREEAPPS+session["PRIVATE_APPS"]
+
+    reset_info=check_session_app(session,"aarnaseqlake",apps)
     if reset_info:
         flash(reset_info,'error')
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
+        # INITIATE SESSION
+        session["filename"]="Select file.."
+        session["plot_arguments"]={}
+        session["plot_arguments"]["path_to_files"]="/flaski_private/aarnaseqlake/"
+        gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
+        #session["plot_arguments"]["gedf"]=gedf.to_json()
+        #GO=pd.read_csv(session["plot_arguments"]["path_to_files"]+"GO.tsv",sep="\t")
+        results_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
+        genes=pd.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
+
+        available_data_sets=list(set(results_files["Set"].tolist()))
+        available_data_sets.sort()
+        session["plot_arguments"]["available_data_sets"]=["all"]+available_data_sets
+        session["plot_arguments"]["selected_data_sets"]=["all"]
+
+        groups=list(set(results_files["Group"].tolist()))
+        groups.sort()
+        session["plot_arguments"]["available_groups"]=["all"]+groups
+        session["plot_arguments"]["selected_groups"]=["all"]
+
+        available_reps=list(set(results_files["Reps"].tolist()))
+        available_reps.sort()
+        session["plot_arguments"]["available_reps"]=["all"]+available_reps
+        session["plot_arguments"]["selected_reps"]=["all"]
+
+        available_gene_names=list(set(genes["gene_name"].tolist()))
+        available_gene_names.sort()
+        session["plot_arguments"]["available_gene_names"]=available_gene_names
+        session["plot_arguments"]["selected_gene_names"]=""
+
+        available_gene_ids=list(set(genes["gene_id"].tolist()))
+        available_gene_ids.sort()
+        session["plot_arguments"]["available_gene_ids"]=available_gene_ids
+        session["plot_arguments"]["selected_gene_ids"]=""
+
+        session["plot_arguments"]["download_format"]=["tsv","xlsx"]
+        session["plot_arguments"]["download_format_value"]="xlsx"
+        session["plot_arguments"]["download_name"]="RNAseqLake"
+        session["plot_arguments"]["session_download_name"]="MySession.RNAseqLake"
+        session["plot_arguments"]["inputsessionfile"]="Select file.."
+        session["plot_arguments"]["session_argumentsn"]="MyArguments.RNAseqLake"
+        session["plot_arguments"]["inputargumentsfile"]="Select file.."
+
+        plot_arguments=session["plot_arguments"]
+        plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+        session["plot_arguments"]=plot_arguments
+
+        session["COMMIT"]=app.config['COMMIT']
+        session["app"]="aarnaseqlake"
 
     if request.method == 'POST':
 
@@ -577,91 +627,6 @@ def aarnaseqlake(download=None):
             session["plot_arguments"]=plot_arguments
 
             return render_template('/apps/iheatmap.html', filename=session["filename"], apps=apps, **plot_arguments)
-
-
-
-        #     # INITIATE SESSION
-        #     session["filename"]="<from DAVID>"
-        #     session["ge_filename"]="Select file.."
-
-        #     plot_arguments, lists, notUpdateList, checkboxes=icellplot.figure_defaults()
-
-        #     session["plot_arguments"]=plot_arguments
-        #     session["lists"]=lists
-        #     session["notUpdateList"]=notUpdateList
-        #     session["COMMIT"]=app.config['COMMIT']
-        #     session["app"]="icellplot"
-        #     session["checkboxes"]=checkboxes
-
-        #     session["df"]=david_df.to_json()
-
-        #     cols=david_df.columns.tolist()
-        #     session["plot_arguments"]["david_cols"]=["select a column.."]+cols
-        #     session["plot_arguments"]["annotation_column"]=["none"]+cols
-        #     session["plot_arguments"]["categories_to_plot"]=list(set(david_df["Category"].tolist()))
-        #     session["plot_arguments"]["categories_to_plot_value"]=list(set(david_df["Category"].tolist()))
-            
-        #     return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
-
-
-        if "app" not in list(session.keys()):
-            return_to_plot=False
-        elif session["app"] != "aarnaseqlake" :
-            return_to_plot=False
-        else:
-            return_to_plot=True
-
-        if not return_to_plot:
-            # INITIATE SESSION
-            session["filename"]="Select file.."
-            session["plot_arguments"]={}
-            session["plot_arguments"]["path_to_files"]="/flaski_private/aarnaseqlake/"
-            gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
-            #session["plot_arguments"]["gedf"]=gedf.to_json()
-            #GO=pd.read_csv(session["plot_arguments"]["path_to_files"]+"GO.tsv",sep="\t")
-            results_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
-            genes=pd.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
-
-            available_data_sets=list(set(results_files["Set"].tolist()))
-            available_data_sets.sort()
-            session["plot_arguments"]["available_data_sets"]=["all"]+available_data_sets
-            session["plot_arguments"]["selected_data_sets"]=["all"]
-
-            groups=list(set(results_files["Group"].tolist()))
-            groups.sort()
-            session["plot_arguments"]["available_groups"]=["all"]+groups
-            session["plot_arguments"]["selected_groups"]=["all"]
-
-            available_reps=list(set(results_files["Reps"].tolist()))
-            available_reps.sort()
-            session["plot_arguments"]["available_reps"]=["all"]+available_reps
-            session["plot_arguments"]["selected_reps"]=["all"]
-
-            available_gene_names=list(set(genes["gene_name"].tolist()))
-            available_gene_names.sort()
-            session["plot_arguments"]["available_gene_names"]=available_gene_names
-            session["plot_arguments"]["selected_gene_names"]=""
-
-            available_gene_ids=list(set(genes["gene_id"].tolist()))
-            available_gene_ids.sort()
-            session["plot_arguments"]["available_gene_ids"]=available_gene_ids
-            session["plot_arguments"]["selected_gene_ids"]=""
-
-            session["plot_arguments"]["download_format"]=["tsv","xlsx"]
-            session["plot_arguments"]["download_format_value"]="xlsx"
-            session["plot_arguments"]["download_name"]="RNAseqLake"
-            session["plot_arguments"]["session_download_name"]="MySession.RNAseqLake"
-            session["plot_arguments"]["inputsessionfile"]="Select file.."
-            session["plot_arguments"]["session_argumentsn"]="MyArguments.RNAseqLake"
-            session["plot_arguments"]["inputargumentsfile"]="Select file.."
-
-            plot_arguments=session["plot_arguments"]
-            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
-            session["plot_arguments"]=plot_arguments
-
-
-            session["COMMIT"]=app.config['COMMIT']
-            session["app"]="aarnaseqlake"
 
         eventlog = UserLogging(email=current_user.email, action="visit aarnaseqlake")
         db.session.add(eventlog)
