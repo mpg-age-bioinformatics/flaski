@@ -51,7 +51,7 @@ services:
    MAIL_PORT: 587
    MAIL_USE_TLS: '1'
    MAIL_PASSWORD: ${MAIL_PASSWORD}
-   #PRIVATE_APPS: /private.apps.xlsx
+   PRIVATE_APPS: /flaski_private/private.apps.tsv
    FLASK_ENV: production
    ADMINS: flaski@age.mpg.de
    MAIL_SERVER: mail.age.mpg.de

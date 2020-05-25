@@ -53,6 +53,7 @@ services:
    - MYSQL_HOST=mariadb
    - MYSQL_PORT=3306
    - FLASK_ENV=development
+   - PRIVATE_APPS=/flaski_private/private.apps.tsv
    - INSTANCE=(DEV)
    - ADMINS=flaski@age.mpg.de
   links:
