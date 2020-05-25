@@ -234,6 +234,7 @@ def david(download=None):
             session["app"]="icellplot"
             session["checkboxes"]=checkboxes
 
+            david_df=david_df.astype(str)
             session["df"]=david_df.to_json()
 
             cols=david_df.columns.tolist()
