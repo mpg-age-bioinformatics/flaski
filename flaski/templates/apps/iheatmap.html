@@ -63,7 +63,7 @@
                 <div class="column">
                     <div class="sidebar-heading">Row names:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xvals method="GET" action="/" style="width:365px">
+                        <select title=xcols name=xvals method="GET" action="/" style="height:50px;width:365px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <div class="column">
+                <!--div class="column">
                     <div class="sidebar-heading">Data columns:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;padding-bottom:15px;" >
                         <select multiple name=yvals method="GET" action="/" style="width:365px">
@@ -80,7 +80,36 @@
                             {% endfor %}
                         </select>
                     </div>
+                </div-->
+
+                <div class="row" style="padding-right:15px;padding-left:13px;padding-top:0px;padding-bottom:10px;">
+                    <div class="column" >
+                        <div class="sidebar-heading">Groups:</div>
+                        <div style="padding-left:13px;">
+                            <select name="yvals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                                {% for ycol in ycols %}
+                                    <option value="{{ycol}}" {% if ycol in yvals %} selected {% endif %}>{{ycol}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="row" style="padding-right:15px;padding-left:13px;padding-top:0px;padding-bottom:10px;">
+                    <div class="column" >
+                        <div class="sidebar-heading">Rows:</div>
+                        <div style="padding-left:13px;">
+                            <select name="findrow" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                                {% for available_rows_ in available_rows %}
+                                    <option value="{{available_rows_}}" {% if available_rows_ in findrow %} selected {% endif %}>{{available_rows_}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!--label style="padding-left:0px;padding-right:8px;"> Row name(s): </label><textarea type="text" name="findrow" value='{{ findrow }}' rows="3" cols="30" style="width:200px;height:22px;padding-left:4px;">{{ findrow }}</textarea-->
+
 
                 <!--div class="column">
                     <div class="sidebar-heading" style="padding-left: 6px;">Groups:</div>
@@ -275,7 +304,7 @@
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
-                            <label style="padding-left:0px;padding-right:8px;"> Row name(s): </label><textarea type="text" name="findrow" value='{{ findrow }}' rows="3" cols="30" style="width:200px;height:22px;padding-left:4px;">{{ findrow }}</textarea>
+                            <!--label style="padding-left:0px;padding-right:8px;"> Row name(s): </label><textarea type="text" name="findrow" value='{{ findrow }}' rows="3" cols="30" style="width:200px;height:22px;padding-left:4px;">{{ findrow }}</textarea-->
                             <label style="width:263px;">Find related rows: </label>
                             <label style="padding-left:22px;"> bound type: <select name=findrowtype_value method="GET" action="/">
                                 {% for findrowtype_ in findrowtype %}

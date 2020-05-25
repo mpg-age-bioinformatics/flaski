@@ -141,7 +141,7 @@ def iheatmap(download=None):
             plot_arguments = session["plot_arguments"]
             for a in list(plot_arguments.keys()):
                 if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                    if a == "yvals":
+                    if a == ["yvals","findrow"]:
                         plot_arguments[a]=request.form.getlist(a)
                     else:
                         plot_arguments[a]=request.form[a]
@@ -161,6 +161,14 @@ def iheatmap(download=None):
                     except:
                         if (plot_arguments[checkbox][0]!="."):
                             plot_arguments[checkbox]="off"
+
+            if "df" in list(session.keys()):
+                available_rows=pd.read_json(session["df"])
+                if plot_arguments["xvals"] in available_rows.columns.tolist():
+                    available_rows=available_rows[plot_arguments["xvals"]].tolist()
+                    available_rows=list(set(available_rows))
+                    available_rows.sort()
+                    plot_arguments["available_rows"]=available_rows
 
             # UPDATE SESSION VALUES
             session["plot_arguments"]=plot_arguments
@@ -203,6 +211,13 @@ def iheatmap(download=None):
 
                     session["plot_arguments"]["ycols"]=cols
                     session["plot_arguments"]["yvals"]=cols[1:]
+
+                    available_rows=pd.read_json(session["df"])
+                    if plot_arguments["xvals"] in available_rows.columns.tolist():
+                        available_rows=available_rows[plot_arguments["xvals"]].tolist()
+                        available_rows=list(set(available_rows))
+                        available_rows.sort()
+                        session["plot_arguments"]["available_rows"]=available_rows
                                   
                     sometext="Please select which columns should be used for plotting."
                     plot_arguments=session["plot_arguments"]

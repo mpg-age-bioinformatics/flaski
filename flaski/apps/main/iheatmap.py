@@ -387,6 +387,7 @@ def figure_defaults():
         "xvals":"",\
         "ycols":[],\
         "yvals":"",\
+        "available_rows":[],\
         "title":'',\
         "title_size":STANDARD_SIZES,\
         "title_size_value":"10",\
@@ -438,7 +439,7 @@ def figure_defaults():
         "zscore_value":"none",\
         "xaxis_font_size":"10",\
         "yaxis_font_size":"10",\
-        "findrow":"",\
+        "findrow":[],\
         "findrowtype":["percentile","n rows", "absolute",],\
         "findrowtype_value":"n rows",\
         "findrowup":"",\
@@ -458,7 +459,7 @@ def figure_defaults():
     notUpdateList=["inputsessionfile"]
 
     # lists without a default value on the arguments
-    excluded_list=[]
+    excluded_list=["available_rows","findrow"]
 
     # lists with a default value on the arguments
     allargs=list(plot_arguments.keys())
