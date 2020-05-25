@@ -631,6 +631,7 @@ def aarnaseqlake(download=None):
             plot_arguments["upper_color"]="red"
             plot_arguments["col_cluster"]="off"
             plot_arguments["title_size_value"]="25"
+            plot_arguments["color_bar_label"]="z-score"
 
 
             session["plot_arguments"]=plot_arguments
