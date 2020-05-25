@@ -263,6 +263,36 @@
 {% block content %}
 <div style="margin-left:150px;" id="loading"></div>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    {% if category == "error" %}
+    <!-- ATTENTION CARD -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3", >
+            <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+        </div>
+        <div class="card-body">
+            {{ message }} 
+        </div>
+    </div>
+    <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+    {% else %}
+    <!-- INFORMATION CARD -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3", >
+            <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+        </div>
+        <div class="card-body">
+            {{ message }} 
+        </div>
+    </div>
+    <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+    {% endif %}
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
 <div id="contentready" class="container-fluid">
 
     <div class="tab">
@@ -372,56 +402,58 @@
 </div>
 
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        {% if category == "error" %}
-        <!-- ATTENTION CARD -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3", >
-                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
-            </div>
-            <div class="card-body">
-                {{ message }} 
-            </div>
-        </div>
-        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
-        {% else %}
-        <!-- INFORMATION CARD -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3", >
-                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
-            </div>
-            <div class="card-body">
-                {{ message }} 
-            </div>
-        </div>
-        <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
-        {% endif %}
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    {% if david_in_store %}
-        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
-
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-                <form action="{{ url_for('aarnaseqlake', download='download') }}" method="get">
+                <form action="{{ url_for('aarnaseqlake', download='metadata') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                        <i class="fas fa-download fa-sm text-white-50"></i> Results
+                        <i class="fas fa-download fa-sm text-white-50"></i> Metadata
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='geneexpression') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Expression
+                    </button>
+                </form>
+            </div>
+
+            {% if selected_dge_50 %}
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='dge') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Differential
                     </button>
                 </form>
             </div>
 
             <div style="padding-left: 2px;padding-right: 2px;">
-                <form action="{{ url_for('aarnaseqlake', download='cellplot') }}" method="get">
+                <form action="{{ url_for('aarnaseqlake', download='MAplot') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                        <i class="far fa-chart-bar"></i> iCellplot
+                        <i class="far fa-chart-bar"></i> MA plot
                     </button>
                 </form>
             </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='Volcanoplot') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> Volcano plot
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='iheatmap') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> Heatmap
+                    </button>
+                </form>
+            </div>
+
+            {% endif %}
 
             <div style="padding-left: 2px;padding-right: 2px;">
                 <form action="{{ url_for('download', json_type='arg') }}" method="get">
@@ -440,9 +472,7 @@
             </div>
 
         </div>
-        </div>
 
-    {% endif %}
     
 
 </div>

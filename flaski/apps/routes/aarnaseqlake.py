@@ -12,6 +12,8 @@ from flaski.routes import FREEAPPS
 from flaski.email import send_exception_email
 from flaski.routines import check_session_app
 
+from flaski.apps.main import iscatterplot, iheatmap
+
 from fuzzywuzzy import process
 
 import os
@@ -20,6 +22,7 @@ import sys
 import random
 import json
 
+import numpy as np
 import pandas as pd
 
 import base64
@@ -30,6 +33,20 @@ def getcomma(x):
     x.sort()
     x=', '.join( x )
     return x
+
+def fix_go(x):
+    if str(x)[0] == ",":
+        return x[2:]
+    else:
+        return x
+
+def nFormat(x):
+    if float(x) == 0:
+        return x
+    elif ( float(x) < 0.01 ) & ( float(x) > -0.01 ) :
+        return '{:.3e}'.format(float(x))
+    else:
+        return '{:.3f}'.format(float(x))
 
 def get_tables(plot_arguments):
 
@@ -74,7 +91,10 @@ def get_tables(plot_arguments):
     if plot_arguments["selected_gene_names"] != "":
         available_gene_names=plot_arguments["available_gene_names"]
         selected_gene_names=plot_arguments["selected_gene_names"].split(",")
-        selected_gene_names=[ s.strip(" ") for s in selected_gene_names ]
+        selected_gene_names=" ".join(selected_gene_names)
+        selected_gene_names=selected_gene_names.split(" ")
+        selected_gene_names=[s for s in selected_gene_names if len(s) > 0 ]
+        # selected_gene_names=[ s.strip(" ") for s in selected_gene_names ]
         selected_gene_names.sort()
         found_gene_names=[ s  for s in selected_gene_names if s in available_gene_names ]
         not_found_gene_names=[ s for s in selected_gene_names if s not in found_gene_names ]
@@ -101,7 +121,10 @@ def get_tables(plot_arguments):
     if plot_arguments["selected_gene_ids"] != "":
         available_gene_ids=plot_arguments["available_gene_ids"]
         selected_gene_ids=plot_arguments["selected_gene_ids"].split(",")
-        selected_gene_ids=[ s.strip(" ") for s in selected_gene_ids ]
+        selected_gene_ids=" ".join(selected_gene_ids)
+        selected_gene_ids=selected_gene_ids.split(" ")
+        selected_gene_ids=[s for s in selected_gene_ids if len(s) > 0 ]
+        # selected_gene_ids=[ s.strip(" ") for s in selected_gene_ids ]
         selected_gene_ids.sort()
         found_gene_ids=[ s  for s in selected_gene_ids if s in available_gene_ids ]
         not_found_gene_ids=[ s for s in selected_gene_ids if s not in fount_gene_ids ]
@@ -151,6 +174,7 @@ def get_tables(plot_arguments):
 
     gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
     selected_ge=gedf[list(ids2labels.keys())]
+    # print(selected_ge.head())
     
     selected_ge=selected_ge.astype(float)
     cols=selected_ge.columns.tolist()
@@ -160,12 +184,14 @@ def get_tables(plot_arguments):
     selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
     selected_ge=selected_ge.dropna(subset=cols,how="all")
     selected_ge=selected_ge.drop(["name_id"],axis=1)
-    selected_ge=selected_ge[:50]
-    for c in cols:
-        selected_ge[c]=selected_ge[c].apply(lambda x: '{:.2f}'.format(float(x)) )
+    # for c in cols:
+    #     selected_ge[c]=selected_ge[c].apply(lambda x: nFormat(x) )
     selected_ge.reset_index(inplace=True,drop=True)
     selected_ge.rename(columns=ids2labels,inplace=True)
+    # print(selected_ge.head())
     df_ge=selected_ge.copy()
+    selected_ge=selected_ge[:50]
+
     plot_arguments["selected_ge_50_cols"]=selected_ge.columns.tolist()
 
     selected_ge=list(selected_ge.values)
@@ -181,22 +207,14 @@ def get_tables(plot_arguments):
                                     (groups_to_files["Set"].isin(plot_arguments["selected_data_sets"])  )]["File"].tolist()[0]
         
         selected_dge=pd.read_csv(session["plot_arguments"]["path_to_files"]+"pairwise/"+selected_dge,sep="\t", index_col=[0])
-        cols=selected_dge.columns.tolist()
-
-        selected_genes_tmp=selected_genes[["gene_name","gene_id"]]
-        selected_dge=pd.merge(selected_genes_tmp,selected_dge,left_on=["gene_id"],right_index=True,how="left")
+        cols=["baseMean","log2FoldChange","lfcSE","pvalue","padj"]
+        selected_dge=selected_dge[cols]
+        selected_dge=pd.merge(df_ge,selected_dge,left_on=["gene_id"],right_index=True, how="left")
         selected_dge=selected_dge.dropna(subset=cols,how="all")
-        format_cols=selected_dge.columns.tolist()
-        format_cols=[s for s in format_cols if "ID_" in s ]+["baseMean"]
-        for c in format_cols:
-            selected_dge[c]=selected_dge[c].apply(lambda x: '{:.3f}'.format(float(x)) )
-        for c in ["log2FoldChange","pvalue","padj","lfcSE"]:
-            selected_dge[c]=selected_dge[c].apply(lambda x: '{:.3e}'.format(float(x)) )
-
-        selected_dge.rename(columns=ids2labels,inplace=True)
+        # for c in ["log2FoldChange","pvalue","padj","lfcSE","baseMean"]:
+        #     selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
         plot_arguments["selected_dge_50_cols"]=selected_dge.columns.tolist()
         
-
         df_dge=selected_dge.copy()
         selected_dge=selected_dge[:50]
         selected_dge=list(selected_dge.values)
@@ -305,6 +323,13 @@ def aarnaseqlake(download=None):
 
             plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
 
+            GO=pd.read_csv(plot_arguments["path_to_files"]+"GO.tsv",sep="\t")
+            GO.columns=["gene_id","go_id","go_name","go_definition"]
+            # for c in GO.columns.tolist():
+            #     GO[c]=GO[c].apply(lambda x: fix_go(x) )
+
+            df_ge=pd.merge(df_ge, GO, on=["gene_id"], how="left")
+
             eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
             db.session.add(eventlog)
             db.session.commit()
@@ -312,19 +337,25 @@ def aarnaseqlake(download=None):
             if plot_arguments["download_format_value"] == "xlsx":
                 outfile = io.BytesIO()
                 EXC=pd.ExcelWriter(outfile)
-                df_de.to_excel(EXC,sheet_name="geneexp.",index=None)
+                df_ge.to_excel(EXC,sheet_name="geneexp.",index=None)
                 EXC.save()
                 outfile.seek(0)
                 return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ ".gene_expression." + plot_arguments["download_format_value"],as_attachment=True )
 
             elif plot_arguments["download_format_value"] == "tsv":               
-                return Response(df_de.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".gene_expression")})
+                return Response(df_ge.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".gene_expression")})
 
         if download == "dge":
 
             plot_arguments=session["plot_arguments"]
 
-            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+
+            GO=pd.read_csv(plot_arguments["path_to_files"]+"GO.tsv",sep="\t")
+            GO.columns=["gene_id","go_id","go_name","go_definition"]
+            df_dge=pd.merge(df_dge, GO, on=["gene_id"], how="left")
+            for c in GO.columns.tolist():
+                GO[c]=GO[c].apply(lambda x: fix_go(x) )
 
             eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
             db.session.add(eventlog)
@@ -343,10 +374,211 @@ def aarnaseqlake(download=None):
 
 
 
-        # if download == "cellplot":
-        #     # READ INPUT DATA FROM SESSION JSON
-        #     david_df=pd.read_json(session["david_df"])
-        #     david_df=david_df.astype(str)
+        if download == "MAplot":
+            plot_arguments=session["plot_arguments"]
+            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+
+            if type(df_ge) != type(pd.DataFrame()):
+                flash("No differential available to perform gene expression for an MA plot.",'error')
+                return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
+
+            reset_info=check_session_app(session,"iscatterplot")
+            if reset_info:
+                flash(reset_info,'error')
+
+            session["filename"]="<from RNAseq lake>"
+            plot_arguments, lists, notUpdateList, checkboxes=iscatterplot.figure_defaults()
+            #session["plot_arguments"]=plot_arguments
+            session["lists"]=lists
+            session["notUpdateList"]=notUpdateList
+            session["COMMIT"]=app.config['COMMIT']
+            session["app"]="iscatterplot"
+            session["checkboxes"]=checkboxes
+
+            df_dge["log10(baseMean)"]=df_dge["baseMean"].apply(lambda x: np.log10(x) )
+            df_dge.loc[ df_dge["padj"]<=0.05,"Significant"]="yes"
+            df_dge.loc[ df_dge["padj"]>0.05,"Significant"]="no"
+
+            df_dge=df_dge.astype(str)
+            session["df"]=df_dge.to_json()
+
+            plot_arguments["xcols"]=df_dge.columns.tolist()
+            plot_arguments["ycols"]=df_dge.columns.tolist()
+            plot_arguments["groups"]=df_dge.columns.tolist()
+            plot_arguments["labels_col"]=df_dge.columns.tolist()
+            plot_arguments["xvals"]="log10(baseMean)"
+            plot_arguments["yvals"]="log2FoldChange"
+            plot_arguments["labels_col_value"]="gene_name"
+            plot_arguments["groups_value"]="Significant"
+            plot_arguments["list_of_groups"]=["yes","no"]
+
+            plot_arguments["title"]="MA plot"
+            plot_arguments["xlabel"]="log10(base Mean)"
+            plot_arguments["ylabel"]="log2(FC)"
+
+            groups_settings=[]
+            group_dic={"name":"yes",\
+                "markers":"4",\
+                "markersizes_col":"select a column..",\
+                "markerc":"red",\
+                "markerc_col":"select a column..",\
+                "markerc_write":plot_arguments["markerc_write"],\
+                "edge_linewidth":plot_arguments["edge_linewidth"],\
+                "edge_linewidth_col":"select a column..",\
+                "edgecolor":plot_arguments["edgecolor"],\
+                "edgecolor_col":"select a column..",\
+                "edgecolor_write":"",\
+                "marker":"circle",\
+                "markerstyles_col":"select a column..",\
+                "marker_alpha":"0.25",\
+                "markeralpha_col_value":"select a column.."}
+            groups_settings.append(group_dic)
+            group_dic={"name":"no",\
+                "markers":"4",\
+                "markersizes_col":"select a column..",\
+                "markerc":"black",\
+                "markerc_col":"select a column..",\
+                "markerc_write":plot_arguments["markerc_write"],\
+                "edge_linewidth":plot_arguments["edge_linewidth"],\
+                "edge_linewidth_col":"select a column..",\
+                "edgecolor":plot_arguments["edgecolor"],\
+                "edgecolor_col":"select a column..",\
+                "edgecolor_write":"",\
+                "marker":"circle",\
+                "markerstyles_col":"select a column..",\
+                "marker_alpha":"0.25",\
+                "markeralpha_col_value":"select a column.."}
+            groups_settings.append(group_dic)
+            plot_arguments["groups_settings"]=groups_settings
+
+            session["plot_arguments"]=plot_arguments
+
+            return render_template('/apps/iscatterplot.html', filename=session["filename"], apps=apps, **plot_arguments)
+
+        if download == "Volcanoplot":
+            plot_arguments=session["plot_arguments"]
+            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+
+            if type(df_ge) != type(pd.DataFrame()):
+                flash("No differential available to perform gene expression for an MA plot.",'error')
+                return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
+
+            reset_info=check_session_app(session,"iscatterplot")
+            if reset_info:
+                flash(reset_info,'error')
+
+            session["filename"]="<from RNAseq lake>"
+            plot_arguments, lists, notUpdateList, checkboxes=iscatterplot.figure_defaults()
+            #session["plot_arguments"]=plot_arguments
+            session["lists"]=lists
+            session["notUpdateList"]=notUpdateList
+            session["COMMIT"]=app.config['COMMIT']
+            session["app"]="iscatterplot"
+            session["checkboxes"]=checkboxes
+
+            df_dge["-log10(padj)"]=df_dge["padj"].apply(lambda x: np.log10(x)*-1 )
+            df_dge.loc[ df_dge["padj"]<=0.05,"Significant"]="yes"
+            df_dge.loc[ df_dge["padj"]>0.05,"Significant"]="no"
+
+            df_dge=df_dge.astype(str)
+            session["df"]=df_dge.to_json()
+
+            plot_arguments["xcols"]=df_dge.columns.tolist()
+            plot_arguments["ycols"]=df_dge.columns.tolist()
+            plot_arguments["groups"]=df_dge.columns.tolist()
+            plot_arguments["labels_col"]=df_dge.columns.tolist()
+            plot_arguments["xvals"]="log2FoldChange"
+            plot_arguments["yvals"]="-log10(padj)"
+            plot_arguments["labels_col_value"]="gene_name"
+            plot_arguments["groups_value"]="Significant"
+            plot_arguments["list_of_groups"]=["yes","no"]
+
+            plot_arguments["title"]="Volcano plot"
+            plot_arguments["xlabel"]="log2(FC)"
+            plot_arguments["ylabel"]="-log10(padj)"
+
+            groups_settings=[]
+            group_dic={"name":"yes",\
+                "markers":"4",\
+                "markersizes_col":"select a column..",\
+                "markerc":"red",\
+                "markerc_col":"select a column..",\
+                "markerc_write":plot_arguments["markerc_write"],\
+                "edge_linewidth":plot_arguments["edge_linewidth"],\
+                "edge_linewidth_col":"select a column..",\
+                "edgecolor":plot_arguments["edgecolor"],\
+                "edgecolor_col":"select a column..",\
+                "edgecolor_write":"",\
+                "marker":"circle",\
+                "markerstyles_col":"select a column..",\
+                "marker_alpha":"0.25",\
+                "markeralpha_col_value":"select a column.."}
+            groups_settings.append(group_dic)
+            group_dic={"name":"no",\
+                "markers":"4",\
+                "markersizes_col":"select a column..",\
+                "markerc":"black",\
+                "markerc_col":"select a column..",\
+                "markerc_write":plot_arguments["markerc_write"],\
+                "edge_linewidth":plot_arguments["edge_linewidth"],\
+                "edge_linewidth_col":"select a column..",\
+                "edgecolor":plot_arguments["edgecolor"],\
+                "edgecolor_col":"select a column..",\
+                "edgecolor_write":"",\
+                "marker":"circle",\
+                "markerstyles_col":"select a column..",\
+                "marker_alpha":"0.25",\
+                "markeralpha_col_value":"select a column.."}
+            groups_settings.append(group_dic)
+            plot_arguments["groups_settings"]=groups_settings
+
+            session["plot_arguments"]=plot_arguments
+
+            return render_template('/apps/iscatterplot.html', filename=session["filename"], apps=apps, **plot_arguments)
+
+        if download == "iheatmap":
+
+
+            plot_arguments=session["plot_arguments"]
+            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+            sig_genes=df_dge[df_dge["padj"]<0.05]["gene_name"].tolist()
+            df_ge=df_ge[df_ge["gene_name"].isin(sig_genes)]
+
+            if type(df_ge) != type(pd.DataFrame()):
+                flash("No differential available to perform gene expression for an MA plot.",'error')
+                return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
+
+            reset_info=check_session_app(session,"iheatmap")
+            if reset_info:
+                flash(reset_info,'error')
+
+            plot_arguments, lists, notUpdateList, checkboxes=iheatmap.figure_defaults()
+
+            session["filename"]="<from RNAseq lake>."
+            session["plot_arguments"]=plot_arguments
+            session["lists"]=lists
+            session["notUpdateList"]=notUpdateList
+            session["COMMIT"]=app.config['COMMIT']
+            session["app"]="iheatmap"
+            session["checkboxes"]=checkboxes
+
+            cols=df_ge.columns.tolist()
+            df_de=df_ge.astype(str)
+            session["df"]=df_ge.to_json()
+
+            plot_arguments["xcols"]=cols
+            plot_arguments["ycols"]=cols
+            plot_arguments["xvals"]="gene_name"
+            plot_arguments["yvals"]=[ s for s in cols if s not in ["gene_name","gene_id"] ]
+            plot_arguments["title"]="Heatmap"
+            plot_arguments["zscore_value"]="row"
+            plot_arguments["colorscale_value"]='bluered'
+
+            session["plot_arguments"]=plot_arguments
+
+            return render_template('/apps/iheatmap.html', filename=session["filename"], apps=apps, **plot_arguments)
+
+
 
         #     # INITIATE SESSION
         #     session["filename"]="<from DAVID>"
@@ -417,10 +649,10 @@ def aarnaseqlake(download=None):
 
             session["plot_arguments"]["download_format"]=["tsv","xlsx"]
             session["plot_arguments"]["download_format_value"]="xlsx"
-            session["plot_arguments"]["download_name"]="DAVID"
-            session["plot_arguments"]["session_download_name"]="MySession.DAVID"
+            session["plot_arguments"]["download_name"]="RNAseqLake"
+            session["plot_arguments"]["session_download_name"]="MySession.RNAseqLake"
             session["plot_arguments"]["inputsessionfile"]="Select file.."
-            session["plot_arguments"]["session_argumentsn"]="MyArguments.DAVID"
+            session["plot_arguments"]["session_argumentsn"]="MyArguments.RNAseqLake"
             session["plot_arguments"]["inputargumentsfile"]="Select file.."
 
             plot_arguments=session["plot_arguments"]
