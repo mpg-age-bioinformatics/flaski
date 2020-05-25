@@ -19,7 +19,7 @@ def make_figure(df,pa):
     #fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
 
     tmp=df.copy()
-    tmp.index=tmp[tmp.columns.tolist()[0]].tolist()
+    tmp.index=tmp[pa["xvals"]].tolist()
     tmp=tmp[pa["yvals"]]
 
     if pa["add_constant"]!="":
