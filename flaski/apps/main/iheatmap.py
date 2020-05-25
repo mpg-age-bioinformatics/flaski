@@ -43,18 +43,40 @@ def make_figure(df,pa):
     # else :
     #     pa_["xvals_colors"]=None
 
-    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels","row_dendogram_dist", "col_dendogram_dist"] # "robust"
+    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels","row_dendogram_dist", "col_dendogram_dist","reverse_color_scale"] # "robust"
     for c in checkboxes:
         if (pa[c] =="on") | (pa[c] ==".on"):
             pa_[c]=True
         else:
             pa_[c]=False
 
-    for v in ["col_color_threshold","row_color_threshold"]:
+    for v in ["col_color_threshold","row_color_threshold" ,"upper_value", "center_value", "lower_value"]:
         if pa[v] == "":
             pa_[v]=None
         else:
             pa_[v]=float(pa[v])
+
+    if pa_["reverse_color_scale"]:
+        pa_["colorscale_value"]=pa["colorscale_value"]+"_r"
+    else:
+        pa_["colorscale_value"]=pa["colorscale_value"]
+
+    selfdefined_cmap=True
+    for value in ["lower_value","center_value","upper_value","lower_color","center_color","upper_color"]:
+        if pa[value]=="":
+            selfdefined_cmap=False
+            break
+    if selfdefined_cmap:
+        range_diff=float(pa["upper_value"]) - float(pa["lower_value"])
+        center=float(pa["center_value"]) - float(pa["lower_value"])
+        center=center/range_diff
+
+        color_continuous_scale=[ [0, pa["lower_color"]],\
+            [center, pa["center_color"]],\
+            [1, pa["upper_color"] ]]
+        
+        pa_["colorscale_value"]=color_continuous_scale
+
 
     # if pa["color_bar_label"] == "":
     #     pa_["color_bar_label"]={}
@@ -234,7 +256,8 @@ def make_figure(df,pa):
             x = dendro_leaves_x_labels,
             y = dendro_leaves_y_labels,
             z = heat_data,
-            colorscale = pa['colorscale_value'],
+            zmax=pa_["upper_value"], zmid=pa_["center_value"], zmin=pa_["lower_value"], 
+            colorscale = pa_['colorscale_value'],
             colorbar={"title":{"text":pa["color_bar_label"] ,"font":{"size": float(pa["color_bar_font_size"]) }},
                     "lenmode":"pixels", "len":float(pa["fig_height"])/4,
                     "xpad":float(pa["color_bar_horizontal_padding"]),"tickfont":{"size":float(pa["color_bar_ticks_font_size"])}}
@@ -396,6 +419,14 @@ def figure_defaults():
         "row_cluster":".on",\
         "col_cluster":".on",\
         "robust":"0",\
+        "color_continuous_midpoint":"",\
+        "reverse_color_scale":".off",\
+        "lower_value":"",\
+        "center_value":"",\
+        "upper_value":"",\
+        "lower_color":"",\
+        "center_color":"",\
+        "upper_color":"",\
         "col_dendogram_ratio":"0.15",\
         "row_dendogram_ratio":"0.15",\
         "row_dendogram_dist":".off", \
@@ -421,7 +452,7 @@ def figure_defaults():
         "inputargumentsfile":"Select file.."}
     
     checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels",\
-        "row_dendogram_dist","col_dendogram_dist"]
+        "row_dendogram_dist","col_dendogram_dist","reverse_color_scale"]
 
     # not update list
     notUpdateList=["inputsessionfile"]

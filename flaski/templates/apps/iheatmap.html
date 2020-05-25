@@ -228,6 +228,27 @@
                                 {% endfor %}
                             </select></label>
 
+                            <label style="padding-left:8px;padding-right:4px;">reverse: </label><label><input type="checkbox" name="reverse_color_scale" {% if reverse_color_scale=="on" %} checked {% elif reverse_color_scale==".on" %} checked {% endif %}/></label>
+
+                            <!--label style="padding-right:40px;">.. or the color scale percentile (0-100): </label>
+                            <label style="padding-right:4px;">lower:</label><label><input type="text" name="lower_expression_percentile" value='{{ lower_expression_percentile }}' style="width:100px;height:22px;padding-left:4px;"></label>
+                            <label style="padding-left:12px;padding-right:4px;">upper:</label><label><input type="text" name="upper_expression_percentile" value='{{ upper_expression_percentile }}' style="width:101px;height:22px;padding-left:4px;"></label-->
+
+                            <label style="padding-right:40px;">..or, explicitly define your color map:</label>
+                            <label style="padding-left:64px;">Lower</label><label style="padding-left:28px;">Center</label><label style="padding-left:28px;padding-right:50px;">Upper</label>
+                            
+                            <label style="padding-left:22px;padding-right:2px;">Value:</label><label style="padding-right:30px;">
+                                <input type="text" name="lower_value" value='{{ lower_value }}' style="width:65px;height:22px;padding-left:4px">
+                                <input type="text" name="center_value" value='{{ center_value }}' style="width:65px;height:22px;padding-left:4px">
+                                <input type="text" name="upper_value" value='{{ upper_value }}' style="width:65px;height:22px;padding-left:4px">
+                            </label>
+                            
+                            <label style="padding-left:23px;padding-right:2px;">Color:</label><label>
+                                <input type="text" name="lower_color" value='{{ lower_color }}' style="width:65px;height:22px;padding-left:4px">
+                                <input type="text" name="center_color" value='{{ center_color }}' style="width:65px;height:22px;padding-left:4px">
+                                <input type="text" name="upper_color" value='{{ upper_color }}' style="width:65px;height:22px;padding-left:4px">
+                            </label>
+
 
 
                             <label style="width:263px;">Color bar: </label>
