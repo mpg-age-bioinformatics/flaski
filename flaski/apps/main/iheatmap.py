@@ -88,10 +88,12 @@ def make_figure(df,pa):
     elif pa["zscore_value"] == "columns":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=0, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
 
-    if pa["findrow"]!="":
-        rows_to_find=pa["findrow"].split("\n")
-        rows_to_find=[ s.strip("\r") for s in rows_to_find ]
-        rows_to_find=[ s.strip(" ") for s in rows_to_find ]
+    if len(pa["findrow"]) > 0 :
+        print("Finding rows.")
+        rows_to_find=pa["findrow"]
+        # rows_to_find=pa["findrow"].split("\n")
+        # rows_to_find=[ s.strip("\r") for s in rows_to_find ]
+        # rows_to_find=[ s.strip(" ") for s in rows_to_find ]
 
         possible_rows=tmp.index.tolist()
         not_found=[ s for s in rows_to_find if s not in possible_rows ]

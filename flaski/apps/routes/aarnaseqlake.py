@@ -619,6 +619,9 @@ def aarnaseqlake(download=None):
             plot_arguments["xcols"]=cols
             plot_arguments["ycols"]=cols
             plot_arguments["xvals"]="gene_name"
+            available_rows=list(set(df_ge["gene_name"].tolist()))
+            available_rows.sort()
+            plot_arguments["available_rows"]=available_rows
             plot_arguments["yvals"]=[ s for s in cols if s not in ["gene_name","gene_id"] ]
             plot_arguments["title"]="Heatmap"
             plot_arguments["zscore_value"]="row"

@@ -84,12 +84,12 @@
 
                 <div class="row" style="padding-right:15px;padding-left:13px;padding-top:0px;padding-bottom:10px;">
                     <div class="column" >
-                        <div class="sidebar-heading">Groups:</div>
+                        <div class="sidebar-heading">Data columns:</div>
                         <div style="padding-left:13px;">
                             <select name="yvals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
                                 {% for ycol in ycols %}
                                     <option value="{{ycol}}" {% if ycol in yvals %} selected {% endif %}>{{ycol}}</option>
-                                {% endfor %}
+                                {% endfor %}  
                             </select>
                         </div>
                     </div>
