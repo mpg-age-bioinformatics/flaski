@@ -432,7 +432,7 @@ def aarnaseqlake(download=None):
                 flash("No differential available to perform gene expression for an MA plot.",'error')
                 return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
 
-            reset_info=check_session_app(session,"iscatterplot")
+            reset_info=check_session_app(session,"iscatterplot",apps)
             if reset_info:
                 flash(reset_info,'error')
 
@@ -513,7 +513,7 @@ def aarnaseqlake(download=None):
                 flash("No differential available to perform gene expression for an MA plot.",'error')
                 return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
 
-            reset_info=check_session_app(session,"iscatterplot")
+            reset_info=check_session_app(session,"iscatterplot",apps)
             if reset_info:
                 flash(reset_info,'error')
 
@@ -598,13 +598,13 @@ def aarnaseqlake(download=None):
                 flash("No differential available to perform gene expression for an MA plot.",'error')
                 return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
 
-            reset_info=check_session_app(session,"iheatmap")
+            reset_info=check_session_app(session,"iheatmap",apps)
             if reset_info:
                 flash(reset_info,'error')
 
             plot_arguments, lists, notUpdateList, checkboxes=iheatmap.figure_defaults()
 
-            session["filename"]="<from RNAseq lake>."
+            session["filename"]="<from RNAseq lake>"
             session["plot_arguments"]=plot_arguments
             session["lists"]=lists
             session["notUpdateList"]=notUpdateList

@@ -232,6 +232,10 @@ def david(download=None):
             david_df=pd.read_json(session["david_df"])
             david_df=david_df.astype(str)
 
+            reset_info=check_session_app(session,"icellplot",apps)
+            if reset_info:
+                flash(reset_info,'error')
+
             # INITIATE SESSION
             session["filename"]="<from DAVID>"
             session["ge_filename"]="Select file.."
