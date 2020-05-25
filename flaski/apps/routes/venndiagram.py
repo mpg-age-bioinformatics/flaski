@@ -45,8 +45,17 @@ def venndiagram(download=None):
     reset_info=check_session_app(session,"venndiagram",apps)
     if reset_info:
         flash(reset_info,'error')
+        # INITIATE SESSION
+        plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
 
-    if (request.method == 'POST') & (not reset_info):
+        session["plot_arguments"]=plot_arguments
+        session["lists"]=lists
+        session["notUpdateList"]=notUpdateList
+        session["COMMIT"]=app.config['COMMIT']
+        session["app"]="venndiagram"
+        session["checkboxes"]=checkboxes
+
+    if request.method == 'POST' :
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -238,27 +247,6 @@ def venndiagram(download=None):
             db.session.commit()
 
             return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
-
-
-
-        # if "app" not in list(session.keys()):
-        #     return_to_plot=False
-        # elif session["app"] != "venndiagram" :
-        #     return_to_plot=False
-        # else:
-        #     return_to_plot=True
-
-        if reset_info:
-            # INITIATE SESSION
-
-            plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
-
-            session["plot_arguments"]=plot_arguments
-            session["lists"]=lists
-            session["notUpdateList"]=notUpdateList
-            session["COMMIT"]=app.config['COMMIT']
-            session["app"]="venndiagram"
-            session["checkboxes"]=checkboxes
 
         eventlog = UserLogging(email=current_user.email, action="visit venndiagram")
         db.session.add(eventlog)

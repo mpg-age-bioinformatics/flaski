@@ -46,12 +46,23 @@ def scatterplot(download=None):
     reset_info=check_session_app(session,"scatterplot",apps)
     if reset_info:
         flash(reset_info,'error')
+        # INITIATE SESSION
+        session["filename"]="Select file.."
+
+        plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
+
+        session["plot_arguments"]=plot_arguments
+        session["lists"]=lists
+        session["notUpdateList"]=notUpdateList
+        session["COMMIT"]=app.config['COMMIT']
+        session["app"]="scatterplot"
+        session["checkboxes"]=checkboxes
         
     """ 
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
-    if (request.method == 'POST') & (not reset_info):
+    if request.method == 'POST' :
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -331,26 +342,6 @@ def scatterplot(download=None):
             db.session.commit()
 
             return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
-
-        # if "app" not in list(session.keys()):
-        #     return_to_plot=False
-        # elif session["app"] != "scatterplot" :
-        #     return_to_plot=False
-        # else:
-        #     return_to_plot=True
-
-        if reset_info:
-            # INITIATE SESSION
-            session["filename"]="Select file.."
-
-            plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
-
-            session["plot_arguments"]=plot_arguments
-            session["lists"]=lists
-            session["notUpdateList"]=notUpdateList
-            session["COMMIT"]=app.config['COMMIT']
-            session["app"]="scatterplot"
-            session["checkboxes"]=checkboxes
 
         eventlog = UserLogging(email=current_user.email, action="visit scatterplot")
         db.session.add(eventlog)

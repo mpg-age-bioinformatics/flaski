@@ -35,8 +35,19 @@ def david(download=None):
     reset_info=check_session_app(session,"david",apps)
     if reset_info:
         flash(reset_info,'error')
+        # INITIATE SESSION
+        session["filename"]="Select file.."
 
-    if (request.method == 'POST') & (not reset_info):
+        plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
+
+        session["plot_arguments"]=plot_arguments
+        session["lists"]=lists
+        session["notUpdateList"]=notUpdateList
+        session["COMMIT"]=app.config['COMMIT']
+        session["app"]="david"
+        session["checkboxes"]=checkboxes
+
+    if request.method == 'POST' :
 
         # READ SESSION FILE IF AVAILABLE 
         # AND OVERWRITE VARIABLES
@@ -244,27 +255,6 @@ def david(download=None):
             session["plot_arguments"]["categories_to_plot_value"]=list(set(david_df["Category"].tolist()))
             
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
-
-
-        # if "app" not in list(session.keys()):
-        #     return_to_plot=False
-        # elif session["app"] != "david" :
-        #     return_to_plot=False
-        # else:
-        #     return_to_plot=True
-
-        if reset_info:
-            # INITIATE SESSION
-            session["filename"]="Select file.."
-
-            plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
-
-            session["plot_arguments"]=plot_arguments
-            session["lists"]=lists
-            session["notUpdateList"]=notUpdateList
-            session["COMMIT"]=app.config['COMMIT']
-            session["app"]="david"
-            session["checkboxes"]=checkboxes
 
         eventlog = UserLogging(email=current_user.email, action="visit david")
         db.session.add(eventlog)
