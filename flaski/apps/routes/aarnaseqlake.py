@@ -623,6 +623,15 @@ def aarnaseqlake(download=None):
             plot_arguments["title"]="Heatmap"
             plot_arguments["zscore_value"]="row"
             plot_arguments["colorscale_value"]='bluered'
+            plot_arguments["lower_value"]="-2"
+            plot_arguments["center_value"]="0"
+            plot_arguments["upper_value"]="2"
+            plot_arguments["lower_color"]="blue"
+            plot_arguments["center_color"]="white"
+            plot_arguments["upper_color"]="red"
+            plot_arguments["col_cluster"]="off"
+            plot_arguments["title_size_value"]="25"
+
 
             session["plot_arguments"]=plot_arguments
 
