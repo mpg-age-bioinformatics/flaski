@@ -428,7 +428,7 @@ def aarnaseqlake(download=None):
             plot_arguments=session["plot_arguments"]
             plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
 
-            if type(df_ge) != type(pd.DataFrame()):
+            if type(df_dge) != type(pd.DataFrame()):
                 flash("No differential available to perform gene expression for an MA plot.",'error')
                 return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
 
@@ -635,6 +635,9 @@ def aarnaseqlake(download=None):
             plot_arguments["col_cluster"]="off"
             plot_arguments["title_size_value"]="25"
             plot_arguments["color_bar_label"]="z-score"
+            plot_arguments["findrowup"]="10"
+            plot_arguments["findrowdown"]="10"
+            plot_arguments["xticklabels"]="on"
 
 
             session["plot_arguments"]=plot_arguments
