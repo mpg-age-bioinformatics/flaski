@@ -247,18 +247,18 @@ def iheatmap(download=None):
         df=pd.read_json(session["df"])
 
         # CALL FIGURE FUNCTION
-        #try:
-        fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
+        try:
+            fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
-        figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+            figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-        return render_template('/apps/iheatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+            return render_template('/apps/iheatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-        #except Exception as e:
-        #    send_exception_email( user=current_user, eapp="iheatmap", emsg=e, etime=str(datetime.now()) )
-        #    flash(e,'error')
+        except Exception as e:
+           send_exception_email( user=current_user, eapp="iheatmap", emsg=e, etime=str(datetime.now()) )
+           flash(e,'error')
 
-        #    return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)
+           return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)
 
     else:
         if download == "download":
