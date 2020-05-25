@@ -381,7 +381,7 @@ def figure_defaults():
         "yaxis_font_size":"10",\
         "findrow":"",\
         "findrowtype":["percentile","n rows", "absolute",],\
-        "findrowtype_value":"percentile",\
+        "findrowtype_value":"n rows",\
         "findrowup":"",\
         "findrowdown":"",\
         "download_format":["png","pdf","svg"],\
