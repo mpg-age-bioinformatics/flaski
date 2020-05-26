@@ -87,6 +87,7 @@ def login(width=None, height=None):
 
 @app.route('/logout')
 def logout():
+    session.clear()
     logout_user()
     return redirect(url_for('login'))
 
