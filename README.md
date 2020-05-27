@@ -186,3 +186,12 @@ pip3 install flaski-0.1.0-py3-none-any.whl
 ```
 Static files need to be included in the `MANIFEST.in`.
 
+## Credits
+
+Flaski was build using the [Bootstrap admin theme](https://github.com/BlackrockDigital/startbootstrap-sb-admin-2) created by Start Bootstrap and the [Font-Awesome](https://github.com/FortAwesome/Font-Awesome) toolkit. Please consult the respective projects for licence information.
+
+
+
+
+
+
