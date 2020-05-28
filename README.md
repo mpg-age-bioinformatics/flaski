@@ -4,8 +4,8 @@ Flaski is a flask based collection of web apps for life-sciences.
 
 ![flaski](/pyflaski/Flaski.Readme.1.png)
 
-| | | |
-|-|-|-|
+| | |
+|-|-|
 interactive data analysis | server based
 session management | scalable
 server storage | continuous delivery
@@ -13,6 +13,7 @@ Graphic User Interface to Programmatic Interface | usage statistics
 App2App communication | on-the-fly error reporting
 databases | background jobs
 user level authentication | full stack
+| | |
 
 Flaski is freely available on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
 
