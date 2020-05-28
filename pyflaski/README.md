@@ -6,7 +6,8 @@ This the Graphical User Interface to Programmatic Interface helper package of Fl
 
 ```bash
 git clone https://github.com/mpg-age-bioinformatics/flaski
-pip3 install flaski/pyflaski --user
+cd flaski/pyflaski
+python3 setup.py install --user
 ```
 
 Check out the [example notebook](example.ipynb).
