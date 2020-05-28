@@ -25,9 +25,9 @@ Flaski is freely available on [https://flaski.age.mpg.de](https://flaski.age.mpg
 
 Check our how-to videos on [YouTube](https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA).
 
-Information on how to deploy Flaski on your own servers can be found in [DEPLOYING.md](DEPLOYING.md) and on Google Kubernetes Engine in [kubernetes](kubernetes/README.md).
+Information on how to deploy Flaski on your own servers can be found in [DEPLOYING.md](DEPLOYING.md) and on Google Kubernetes Engine in [kubernetes](kubernetes).
 
-For Graphical User Interface to Programmatic Interface exchanges please install the [pyflaski](pyflaski/README.md) companion package.
+For Graphical User Interface to Programmatic Interface exchanges please install the [pyflaski](pyflaski) companion package.
 
 If you are looking to contribute to Flaski please check [CONTRIBUTING.md](CONTRIBUTING.md).
 
