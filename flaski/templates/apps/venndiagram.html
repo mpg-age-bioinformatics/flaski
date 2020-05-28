@@ -374,7 +374,9 @@
                 <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
             </div>
             <div class="card-body">
+                {% autoescape false %}
                 {{ message }} 
+                {% endautoescape %}
             </div>
         </div>
         <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
