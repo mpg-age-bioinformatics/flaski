@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pylab as plt
 import seaborn as sns
 import sys
+from scipy import stats
 from scipy.cluster.hierarchy import fcluster
 
 matplotlib.use('agg')
