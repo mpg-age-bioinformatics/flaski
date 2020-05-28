@@ -1,5 +1,8 @@
 import pandas as pd
 
+def text2html(s):
+    h=s.replace("\n","<br>").replace("    ","&emsp;").replace(" ","&nbsp;")
+    return h
 
 def reset_all(session):
     MINIMAL=['_permanent', '_fresh', 'csrf_token', 'user_id', '_id', 'PRIVATE_APPS']
