@@ -20,22 +20,15 @@ def run_david(pa):
     # Modified from https://david.ncifcrf.gov/content.jsp?file=WS.html
     # by courtesy of HuangYi @ 20110424
 
-    """
-    Queries the DAVID database for an enrichment analysis
+    """Queries the DAVID database for an enrichment analysis
     Check https://david.ncifcrf.gov/content.jsp?file=DAVID_API.html for database == "type" tag and categories ==  "annot" tag.
 
-    :param database: A string for the database to query, e.g. 'WORMBASE_GENE_ID'
-    :param categories: A comma separated string with databases
-    :param user: A user ID registered at DAVID for querying
-    :param ids: A list with identifiers
-    :param name: A string with the name for the query set
-    :param ids_bg: A list with the background identifiers to enrich against,
-      'None' for whole set
-    :param name_bg: A string with the name for the background set
-    :param p: Maximum p value for enrichment of a term
-    :param n: Minimum number of genes within a term
+    Args:
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
 
-    :returns: None if no ids match the queried database, or a pandas data frame with results
+    Returns:
+        None if no ids match the queried database, or a  Pandas DataFrame with results.
+
     """
 
     database=pa["database_value"]
@@ -152,6 +145,23 @@ def run_david(pa):
     return df, report_stats
 
 def figure_defaults():
+    """Generates default DAVID query arguments.
+
+    :param database: A string for the database to query, e.g. 'WORMBASE_GENE_ID'
+    :param categories: A comma separated string with databases
+    :param user: A user ID registered at DAVID for querying
+    :param ids: A list with identifiers
+    :param name: A string with the name for the query set
+    :param ids_bg: A list with the background identifiers to enrich against,
+      'None' for whole set
+    :param name_bg: A string with the name for the background set
+    :param p: Maximum p value for enrichment of a term
+    :param n: Minimum number of genes within a term
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
+
     plot_arguments={
         "database":['AFFYMETRIX_3PRIME_IVT_ID', 'AFFYMETRIX_EXON_GENE_ID',
           'AFFYMETRIX_SNP_ID', 'AGILENT_CHIP_ID',

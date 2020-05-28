@@ -22,6 +22,16 @@ def GET_COLOR(x):
 
 
 def make_figure(df,pa):
+    """Generates figure.
+
+    Args:
+        df (pandas.core.frame.DataFrame): Pandas DataFrame containing the input data.
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
+
+    Returns:
+        A Matplotlib figure
+        
+    """
 
     #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
 
@@ -250,6 +260,11 @@ STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 
 def figure_defaults():
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
     
     # https://matplotlib.org/3.1.1/api/markers_api.html
     # https://matplotlib.org/2.0.2/api/colors_api.html

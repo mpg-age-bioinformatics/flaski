@@ -14,6 +14,19 @@ STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 
 def make_figure(df,pa):
+    """Generates figure.
+
+    Args:
+        df (pandas.core.frame.DataFrame): Pandas DataFrame containing the input data.
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
+
+    Returns:
+        A Plotly figure.
+        A Pandas DataFrame with columns clusters.
+        A Pandas DataFrame with rows clusters.
+        A Pandas DataFrame as displayed in the the Maptlotlib figure.
+
+    """
 
     #fig = go.Figure( )
     #fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
@@ -382,6 +395,11 @@ def make_figure(df,pa):
     return fig, clusters_cols, clusters_rows, df_
 
 def figure_defaults():
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
     plot_arguments={
         "fig_width":"800",\
         "fig_height":"800",\

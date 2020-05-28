@@ -7,6 +7,16 @@ CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyax
 
 
 def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
+    """Generates figure.
+
+    Args:
+        david_df (pandas.core.frame.DataFrame): Pandas DataFrame containing the output of a DAVID query.
+        ge_df (pandas.core.frame.DataFrame): Pandas DataFrame containing the gene expression values or other values to be mapped for each gene in `david_df`.
+
+    Returns:
+        A Plotly figure.
+
+    """
 
     pa_={}
     # checkboxes=["color_scale_value","log10transform","xaxis_line","yaxis_line","topxaxis_line","rightyaxis_line", "grid"] # "robust"
@@ -184,6 +194,12 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     return fig
 
 def figure_defaults(checkboxes=CHECKBOXES):
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
+
     plot_arguments={
         "width":"1000",\
         "height":"600",\

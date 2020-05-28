@@ -23,6 +23,8 @@ Flaski provides:
 
 Flaski is freely available on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
 
+Apps documentation can be found on the project's [wiki](https://github.com/mpg-age-bioinformatics/flaski/wiki). 
+
 Check our how-to videos on [YouTube](https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA).
 
 Information on how to deploy Flaski on your own servers can be found in [DEPLOYING.md](DEPLOYING.md) and on Google Kubernetes Engine in [kubernetes](kubernetes).

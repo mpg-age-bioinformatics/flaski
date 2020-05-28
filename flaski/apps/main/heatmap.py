@@ -13,6 +13,20 @@ STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 
 
 def make_figure(df,pa):
+    """Generates figure.
+
+    Args:
+        df (pandas.core.frame.DataFrame): Pandas DataFrame containing the input data.
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
+
+    Returns:
+        A Matplotlib figure.
+        A Pandas DataFrame with columns clusters.
+        A Pandas DataFrame with rows clusters.
+        A Pandas DataFrame as displayed in the the Maptlotlib figure.
+
+    """
+
     tmp=df.copy()
     tmp.index=tmp[pa["xvals"]].tolist()
     tmp=tmp[pa["yvals"]]
@@ -170,6 +184,11 @@ def make_figure(df,pa):
     return g, cols_cluster_numbers, index_cluster_numbers, df_
 
 def figure_defaults():
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
     plot_arguments={
         "fig_width":"6.0",\
         "fig_height":"6.0",\

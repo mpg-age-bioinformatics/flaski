@@ -17,6 +17,15 @@ def GET_COLOR(x):
 
 
 def make_figure(pa):
+    """Generates figure.
+
+    Args:
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
+
+    Returns:
+        A Matplotlib figure
+        
+    """
 
     #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
     fig, axes = plt.subplots(1, 1,figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
@@ -166,6 +175,12 @@ STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 LINE_STYLES=["solid","dashed","dashdot","dotted","None"]
 
 def figure_defaults():
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
+
     plot_arguments={
         "fig_width":"6.0",\
         "fig_height":"6.0",\
