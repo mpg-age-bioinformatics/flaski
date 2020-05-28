@@ -1,4 +1,4 @@
-# <img style="color: rgb(79, 122, 178);" src="utils/dog-solid.svg" width="30"> Flaski
+# Flaski
 
 Flaski is a flask based collection of web apps for life-sciences. 
 
