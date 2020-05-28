@@ -1,6 +1,10 @@
 # Flaski
 
-Flaski is a flask based collection of web apps for life-sciences. In short,
+Flaski is a flask based collection of web apps for life-sciences. 
+
+![flaski](/pyflaski/Flaski.Readme.1.png)
+
+In short,
 
 - interactive data analysis
 - user level authentication
