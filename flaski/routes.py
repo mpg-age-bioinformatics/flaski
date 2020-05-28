@@ -75,7 +75,11 @@ def login(width=None, height=None):
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
+        print(form.remember_me.data)
+        import sys
+        sys.stdout.flush()
         login_user(user, remember=form.remember_me.data)
+        session.permanent = form.remember_me.data
         next_page = request.args.get('next')
         # session["width"]=width
         # session["height"]=height
@@ -100,6 +104,7 @@ def register():
         user = User(firstname=form.firstname.data,\
                 lastname=form.lastname.data,\
                 email=form.email.data,\
+                privacy=form.privacy.data,\
                 organization=form.organization.data)
         user.set_password(form.password.data)
         user.registered_on=datetime.utcnow()

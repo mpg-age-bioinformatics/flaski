@@ -96,9 +96,9 @@
                     {% endwith %}
                     <div class="form-group">
                       <div class="custom-control custom-checkbox small">
-                        {{ form.remember_me() }}
-                        <!--input type="checkbox" class="custom-control-input" id="customCheck" -->
-                        <label class="custom-control-label" for="customCheck">Remember Me</label>
+                        {{ form.remember_me(checked=True) }}
+                        <input type="checkbox" class="custom-control-input" id="remember_me">
+                        <label class="custom-control-label" for="remember_me">Remember Me</label>
                       </div>
                     </div>
                     {{ form.submit() }}
