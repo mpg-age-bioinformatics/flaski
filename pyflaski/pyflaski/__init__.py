@@ -5,6 +5,9 @@ import pyflaski.scatterplot
 import pyflaski.heatmap
 import pyflaski.iheatmap
 import pyflaski.venndiagram
+import pyflaski.david
+import pyflaski.icellplot
+
 
 import json
 
