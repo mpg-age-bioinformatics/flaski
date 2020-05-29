@@ -1,5 +1,26 @@
 import pandas as pd
 from flask import session
+import json
+from werkzeug.utils import secure_filename
+import io
+
+def read_tables(inputfile,session_key="df"):
+    filename=secure_filename(inputfile.filename)
+    session["filename"]=filename
+    fileread = inputfile.read()
+    filestream=io.BytesIO(fileread)
+    extension=filename.rsplit('.', 1)[1].lower()
+    if extension == "xlsx":
+        df=pd.read_excel(filestream)
+    elif extension == "csv":
+        df=pd.read_csv(filestream)
+    elif extension == "tsv":
+        df=pd.read_csv(filestream,sep="\t")
+
+    df=df.astype(str)
+    session[session_key]=df.to_json()
+
+    return df
 
 def read_request(request):
     plot_arguments=session["plot_arguments"]
