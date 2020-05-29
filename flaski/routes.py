@@ -45,7 +45,6 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-
     if current_user.is_authenticated:
         return render_template('index.html',userlogged="yes", apps=session["APPS"], ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
     else:
@@ -158,6 +157,7 @@ def reset_password(token):
 
 @app.before_request
 def before_request():
+    session["APPS"]=FREEAPPS
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
