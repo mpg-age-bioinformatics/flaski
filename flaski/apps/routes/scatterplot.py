@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.scatterplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file, check_session_app, handle_exception, read_request
+from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables
 from flaski.email import send_exception_email
 
 import os
@@ -57,14 +57,14 @@ def scatterplot(download=None):
                 msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"scatterplot")
                 if error:
                     flash(msg,'error')
-                    return render_template('/apps/scatterplot.html' , apps=apps, **plot_arguments)
+                    return render_template('/apps/scatterplot.html' , filename=session["filename"],apps=apps, **plot_arguments)
                 flash(msg,"info")
 
             if request.files["inputargumentsfile"] :
                 msg, plot_arguments, error=read_argument_file(request.files["inputargumentsfile"],"scatterplot")
                 if error:
                     flash(msg,'error')
-                    return render_template('/apps/scatterplot.html' , apps=apps, **plot_arguments)
+                    return render_template('/apps/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
                 flash(msg,"info")
             
             # IF THE UPLOADS A NEW FILE 
@@ -74,45 +74,20 @@ def scatterplot(download=None):
             if inputfile:
                 filename = secure_filename(inputfile.filename)
                 if allowed_file(inputfile.filename):
-                    session["filename"]=filename
-                    fileread = inputfile.read()
-                    filestream=io.BytesIO(fileread)
-                    extension=filename.rsplit('.', 1)[1].lower()
-                    if extension == "xlsx":
-                        df=pd.read_excel(filestream)
-                    elif extension == "csv":
-                        df=pd.read_csv(filestream)
-                    elif extension == "tsv":
-                        df=pd.read_csv(filestream,sep="\t")
-                    
-                    df=df.astype(str)
-                    session["df"]=df.to_json()
+
+                    df=read_tables(inputfile)
                     
                     cols=df.columns.tolist()
 
                     if session["plot_arguments"]["groups"] not in cols:
                         session["plot_arguments"]["groups"]=["None"]+cols
 
-                    if session["plot_arguments"]["markerstyles_cols"] not in cols:
-                        session["plot_arguments"]["markerstyles_cols"]=["select a column.."]+cols
-                    
-                    if session["plot_arguments"]["markerc_cols"] not in cols:
-                        session["plot_arguments"]["markerc_cols"]=["select a column.."]+cols
+                    columns_select=["markerstyles_cols", "markerc_cols", "markersizes_cols","markeralpha_col",\
+                        "labels_col","edgecolor_cols","edge_linewidth_cols",]
+                    for parg in columns_select:
+                        if session["plot_arguments"]["markerstyles_cols"] not in cols:
+                            session["plot_arguments"][parg]=["select a column.."]+cols
 
-                    if session["plot_arguments"]["markersizes_cols"] not in cols:
-                        session["plot_arguments"]["markersizes_cols"]=["select a column.."]+cols
-
-                    if session["plot_arguments"]["markeralpha_col"] not in cols:
-                        session["plot_arguments"]["markeralpha_col"]=["select a column.."]+cols
-
-                    if session["plot_arguments"]["labels_col"] not in cols:
-                        session["plot_arguments"]["labels_col"]=["select a column.."]+cols
-
-                    if session["plot_arguments"]["edgecolor_cols"] not in cols:
-                        session["plot_arguments"]["edgecolor_cols"]=["select a column.."]+cols
-            
-                    if session["plot_arguments"]["edge_linewidth_cols"] not in cols:
-                        session["plot_arguments"]["edge_linewidth_cols"]=["select a column.."]+cols
 
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                     if (session["plot_arguments"]["xvals"] not in cols) & (session["plot_arguments"]["yvals"] not in cols):
@@ -133,9 +108,9 @@ def scatterplot(download=None):
                     error_msg="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
-                    return render_template('/apps/scatterplot.html' , filename="Select file..", apps=apps, **plot_arguments)
+                    return render_template('/apps/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
             
-            if not inputsessionfile and not inputargumentsfile:
+            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
                 # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
                 # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments = session["plot_arguments"]
@@ -199,9 +174,9 @@ def scatterplot(download=None):
                 plot_arguments=read_request(request)
 
             if "df" not in list(session.keys()):
-                    error_msg="No data to plot, please upload a data or session  file."
-                    flash(error_msg,'error')
-                    return render_template('/apps/scatterplot.html' , filename="Select file..", apps=apps,  **plot_arguments)
+                error_msg="No data to plot, please upload a data or session  file."
+                flash(error_msg,'error')
+                return render_template('/apps/scatterplot.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
@@ -224,7 +199,7 @@ def scatterplot(download=None):
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="scatterplot",session=session)
             flash(tb_str,'traceback')
-            return render_template('/apps/scatterplot.html', filename=filename, apps=apps, **session["plot_arguments"])
+            return render_template('/apps/scatterplot.html', filename=session["filename"], apps=apps, **session["plot_arguments"])
 
     else:
         if download == "download":
