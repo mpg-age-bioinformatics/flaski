@@ -9,8 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.venndiagram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file, check_session_app, handle_exception 
-from flaski.routes import APPS
+from flaski.routines import session_to_file, check_session_app, handle_exception, read_request
 
 import os
 import io
@@ -34,7 +33,9 @@ import base64
 @login_required
 def venndiagram(download=None):
 
-    reset_info=check_session_app(session,"venndiagram",APPS)
+    apps=session["APPS"]
+
+    reset_info=check_session_app(session,"venndiagram",apps)
 
     if reset_info:
         flash(reset_info,'error')
@@ -50,17 +51,17 @@ def venndiagram(download=None):
                 msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"venndiagram")
                 if error:
                     flash(msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=APPS, **plot_arguments)
+                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
                 flash(msg,"info")
 
             if request.files["inputargumentsfile"] :
                 msg, plot_arguments, error=read_argument_file(request.files["inputargumentsfile"],"venndiagram")
                 if error:
                     flash(msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=APPS, **plot_arguments)
+                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
                 flash(msg,"info")
 
-            if not inputsessionfile and not inputargumentsfile:
+            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"]:
                 plot_arguments=read_request(request)
             
                 i=0
@@ -71,7 +72,7 @@ def venndiagram(download=None):
                 if i < 2:
                         error_msg="No data to plot, please upload data."
                         flash(error_msg,'error')
-                        return render_template('/apps/venndiagram.html', apps=APPS,  **plot_arguments)
+                        return render_template('/apps/venndiagram.html', apps=apps,  **plot_arguments)
     
             # make sure we have the latest given arguments
             plot_arguments=session["plot_arguments"]
@@ -99,12 +100,12 @@ def venndiagram(download=None):
 
                 flash(message)
 
-            return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=APPS, **plot_arguments)
+            return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="venndiagram",session=session)
             flash(tb_str,'traceback')
-            return render_template('/apps/venndiagram.html', apps=APPS, **session["plot_arguments"])
+            return render_template('/apps/venndiagram.html', apps=apps, **session["plot_arguments"])
 
     else:
         if download == "download":
@@ -157,4 +158,4 @@ def venndiagram(download=None):
         db.session.add(eventlog)
         db.session.commit()
         
-        return render_template('apps/venndiagram.html', apps=APPS, **session["plot_arguments"])
+        return render_template('apps/venndiagram.html', apps=apps, **session["plot_arguments"])

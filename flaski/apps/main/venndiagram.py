@@ -137,6 +137,7 @@ def make_figure(pa):
                     return "no"
             else:
                 return "no"
+                
     df["%s & %s" %(cols[0],cols[1])]=df.apply(check_common,args=(cols[0],cols[1]), axis=1 )
     if len(cols) == 3:
         df["%s & %s" %(cols[1],cols[2])]=df.apply(check_common,args=(cols[1],cols[2]), axis=1 )

@@ -17,7 +17,7 @@ def read_request(request):
     session["plot_arguments"]=plot_arguments
     return plot_arguments
 
-def handle_exception(e, user, eapp,session):
+def handle_exception(e, user, eapp, session):
     import traceback
     from flaski.email import send_exception_email
     from datetime import datetime
@@ -108,7 +108,7 @@ def read_argument_file(inputargumentsfile,appName):
 
     del(session_["ftype"])
     del(session_["COMMIT"])
-    del(session_["PRIVATE_APPS"])
+    del(session_["APPS"])
     for k in list(session_.keys()):
         session[k]=session_[k]
     plot_arguments=session["plot_arguments"]
@@ -132,7 +132,7 @@ def read_session_file(inputsessionfile,appName):
 
     del(session_["ftype"])
     del(session_["COMMIT"])
-    del(session_["PRIVATE_APPS"])
+    del(session_["APPS"])
     for k in list(session_.keys()):
         session[k]=session_[k]
     plot_arguments=session["plot_arguments"]
