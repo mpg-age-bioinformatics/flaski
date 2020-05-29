@@ -61,235 +61,236 @@ def icellplot(download=None):
 
     if request.method == 'POST' :
 
-        # READ SESSION FILE IF AVAILABLE 
-        # AND OVERWRITE VARIABLES
-        inputsessionfile = request.files["inputsessionfile"]
-        if inputsessionfile:
-            if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
+        try:
+            # READ SESSION FILE IF AVAILABLE 
+            # AND OVERWRITE VARIABLES
+            inputsessionfile = request.files["inputsessionfile"]
+            if inputsessionfile:
+                if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-            session_=json.load(inputsessionfile)
-            if session_["ftype"]!="session":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
+                session_=json.load(inputsessionfile)
+                if session_["ftype"]!="session":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-            if session_["app"]!="icellplot":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
-    
-            del(session_["ftype"])
-            del(session_["COMMIT"])
-            del(session_["PRIVATE_APPS"])
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
-            flash('Session file sucessufuly read.')
-
-
-        # READ ARGUMENTS FILE IF AVAILABLE 
-        # AND OVERWRITE VARIABLES
-        inputargumentsfile = request.files["inputargumentsfile"]
-        if inputargumentsfile :
-            if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            session_=json.load(inputargumentsfile)
-            if session_["ftype"]!="arguments":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            if session_["app"]!="icellplot":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            del(session_["ftype"])
-            del(session_["COMMIT"])
-            del(session_["PRIVATE_APPS"])
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
-            flash('Arguments file sucessufuly read.',"info")
-
-        if not inputsessionfile and not inputargumentsfile:
-            # SELECTION LISTS DO NOT GET UPDATED 
-            lists=session["lists"]
-
-            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-            # WITH THE EXCEPTION OF SELECTION LISTS
-            plot_arguments = session["plot_arguments"]
-            values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
-            values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
-            for a in list(plot_arguments.keys()):
-                if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                    if a in values_list:
-                        plot_arguments[a]=request.form.getlist(a)
-                    else:
-                        plot_arguments[a]=request.form[a]
-
-            # # VALUES SELECTED FROM SELECTION LISTS 
-            # # GET UPDATED TO THE LATEST CHOICE
-            # for k in list(lists.keys()):
-            #     if k in list(request.form.keys()):
-            #         plot_arguments[lists[k]]=request.form[k]
-            # checkboxes
-            for checkbox in session["checkboxes"]:
-                if checkbox in list(request.form.keys()) :
-                    plot_arguments[checkbox]="on"
-                else:
-                    try:
-                        plot_arguments[checkbox]=request.form[checkbox]
-                    except:
-                        if (plot_arguments[checkbox][0]!="."):
-                            plot_arguments[checkbox]="off"
-
-            # UPDATE SESSION VALUES
-            session["plot_arguments"]=plot_arguments
-
+                if session_["app"]!="icellplot":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
         
-        missing_args=False
-        # IF THE UPLOADS A NEW FILE 
-        # THAN UPDATE THE SESSION FILE
-        # READ INPUT FILE
-        inputfile = request.files["inputfile"]
-        if inputfile:
-            filename = secure_filename(inputfile.filename)
-            if allowed_file(inputfile.filename):
-                session["filename"]=filename
-                fileread = inputfile.read()
-                filestream=io.BytesIO(fileread)
-                extension=filename.rsplit('.', 1)[1].lower()
-                if extension == "xlsx":
-                    df=pd.read_excel(filestream, index_col=False, dtype=str)
-                elif extension == "csv":
-                    df=pd.read_csv(filestream, index_col=False, dtype=str)
-                elif extension == "tsv":
-                    df=pd.read_csv(filestream,sep="\t", index_col=False, dtype=str)
-                
-                session["df"]=df.to_json()
-                                
-                cols=df.columns.tolist()
-                session["plot_arguments"]["david_cols"]=["select a column.."]+cols
-                session["plot_arguments"]["annotation_column"]=["none"]+cols
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                del(session_["PRIVATE_APPS"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Session file sucessufuly read.')
 
 
-                # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
-                if (session["plot_arguments"]["terms_column"] not in cols) | (session["plot_arguments"]["terms_column"] == "select a column.."):
-                    session["plot_arguments"]["terms_column"]="select a column.."
-                    missing_args=True
+            # READ ARGUMENTS FILE IF AVAILABLE 
+            # AND OVERWRITE VARIABLES
+            inputargumentsfile = request.files["inputargumentsfile"]
+            if inputargumentsfile :
+                if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-                if (session["plot_arguments"]["categories_column"] not in cols) | (session["plot_arguments"]["categories_column"] == "select a column.."):
-                    session["plot_arguments"]["categories_column"]="select a column.."
-                    missing_args=True
-                else:
-                    session["plot_arguments"]["categories_to_plot"]=list(set( df[session["plot_arguments"]["categories_column"]].tolist() ))
-                    session["plot_arguments"]["categories_to_plot_value"]=list(set( df[session["plot_arguments"]["categories_column"]].tolist() ))
+                session_=json.load(inputargumentsfile)
+                if session_["ftype"]!="arguments":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-                if (session["plot_arguments"]["david_gene_ids"] not in cols)  | (session["plot_arguments"]["david_gene_ids"] == "select a column..") :
-                    session["plot_arguments"]["david_gene_ids"]="select a column.."
-                    missing_args=True
+                if session_["app"]!="icellplot":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-                if (session["plot_arguments"]["plotvalue"] not in cols) | (session["plot_arguments"]["plotvalue"] == "select a column..") :
-                    session["plot_arguments"]["plotvalue"]="select a column.."
-                    missing_args=True
- 
-                if missing_args:                
-                    sometext="Please select matching columns from DAVID file."
-                    flash(sometext,'info')
-                
-            else:
-                # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
-                error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
-                has the correct format and respective extension and try uploadling DAVID's output again." %filename
-                flash(error_msg,'error')
-                session["filename"]="Select file.."
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                del(session_["PRIVATE_APPS"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Arguments file sucessufuly read.',"info")
 
-        annotation_columns=( session["plot_arguments"]["annotation_column_value"]!="none") & (session["plot_arguments"]["annotation2_column_value"]!="none")
+            if not inputsessionfile and not inputargumentsfile:
+                # SELECTION LISTS DO NOT GET UPDATED 
+                lists=session["lists"]
 
-        if (not annotation_columns ):
-            ge_inputfile = request.files["ge_inputfile"]
-            if ge_inputfile:
-                filename = secure_filename(ge_inputfile.filename)
-                if allowed_file(ge_inputfile.filename):
-                    session["ge_filename"]=filename
-                    fileread = ge_inputfile.read()
+                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+                # WITH THE EXCEPTION OF SELECTION LISTS
+                plot_arguments = session["plot_arguments"]
+                values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
+                values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
+                for a in list(plot_arguments.keys()):
+                    if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
+                        if a in values_list:
+                            plot_arguments[a]=request.form.getlist(a)
+                        else:
+                            plot_arguments[a]=request.form[a]
+
+                # # VALUES SELECTED FROM SELECTION LISTS 
+                # # GET UPDATED TO THE LATEST CHOICE
+                # for k in list(lists.keys()):
+                #     if k in list(request.form.keys()):
+                #         plot_arguments[lists[k]]=request.form[k]
+                # checkboxes
+                for checkbox in session["checkboxes"]:
+                    if checkbox in list(request.form.keys()) :
+                        plot_arguments[checkbox]="on"
+                    else:
+                        try:
+                            plot_arguments[checkbox]=request.form[checkbox]
+                        except:
+                            if (plot_arguments[checkbox][0]!="."):
+                                plot_arguments[checkbox]="off"
+
+                # UPDATE SESSION VALUES
+                session["plot_arguments"]=plot_arguments
+
+            
+            missing_args=False
+            # IF THE UPLOADS A NEW FILE 
+            # THAN UPDATE THE SESSION FILE
+            # READ INPUT FILE
+            inputfile = request.files["inputfile"]
+            if inputfile:
+                filename = secure_filename(inputfile.filename)
+                if allowed_file(inputfile.filename):
+                    session["filename"]=filename
+                    fileread = inputfile.read()
                     filestream=io.BytesIO(fileread)
                     extension=filename.rsplit('.', 1)[1].lower()
                     if extension == "xlsx":
-                        df=pd.read_excel(filestream, index_col=False)
+                        df=pd.read_excel(filestream, index_col=False, dtype=str)
                     elif extension == "csv":
-                        df=pd.read_csv(filestream, index_col=False)
+                        df=pd.read_csv(filestream, index_col=False, dtype=str)
                     elif extension == "tsv":
-                        df=pd.read_csv(filestream,sep="\t", index_col=False)
+                        df=pd.read_csv(filestream,sep="\t", index_col=False, dtype=str)
                     
-                    df=df.astype(str)
-                    session["ge_df"]=df.to_json()
-                    
+                    session["df"]=df.to_json()
+                                    
                     cols=df.columns.tolist()
-                    session["plot_arguments"]["ge_cols"]=["select a column.."]+cols
+                    session["plot_arguments"]["david_cols"]=["select a column.."]+cols
+                    session["plot_arguments"]["annotation_column"]=["none"]+cols
+
 
                     # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
-                    if (session["plot_arguments"]["gene_identifier"] not in cols) | (session["plot_arguments"]["gene_identifier"] == "select a column..") :
-                        session["plot_arguments"]["gene_identifier"]="select a column.."
+                    if (session["plot_arguments"]["terms_column"] not in cols) | (session["plot_arguments"]["terms_column"] == "select a column.."):
+                        session["plot_arguments"]["terms_column"]="select a column.."
                         missing_args=True
-                    if (session["plot_arguments"]["expression_values"] not in cols) | (session["plot_arguments"]["expression_values"] == "select a column..") :
-                        session["plot_arguments"]["expression_values"]="select a column.."
+
+                    if (session["plot_arguments"]["categories_column"] not in cols) | (session["plot_arguments"]["categories_column"] == "select a column.."):
+                        session["plot_arguments"]["categories_column"]="select a column.."
                         missing_args=True
-                    if (session["plot_arguments"]["gene_name"] not in cols) | (session["plot_arguments"]["gene_name"] == "select a column..") :
-                        session["plot_arguments"]["gene_name"]="select a column.."
+                    else:
+                        session["plot_arguments"]["categories_to_plot"]=list(set( df[session["plot_arguments"]["categories_column"]].tolist() ))
+                        session["plot_arguments"]["categories_to_plot_value"]=list(set( df[session["plot_arguments"]["categories_column"]].tolist() ))
+
+                    if (session["plot_arguments"]["david_gene_ids"] not in cols)  | (session["plot_arguments"]["david_gene_ids"] == "select a column..") :
+                        session["plot_arguments"]["david_gene_ids"]="select a column.."
+                        missing_args=True
+
+                    if (session["plot_arguments"]["plotvalue"] not in cols) | (session["plot_arguments"]["plotvalue"] == "select a column..") :
+                        session["plot_arguments"]["plotvalue"]="select a column.."
                         missing_args=True
     
                     if missing_args:                
-                        sometext="Please select matching columns in gene expression file for mapping."
+                        sometext="Please select matching columns from DAVID file."
                         flash(sometext,'info')
-                            
+                    
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                     error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
-                    has the correct format and respective extension and try uploadling the gene expression file again." %filename
+                    has the correct format and respective extension and try uploadling DAVID's output again." %filename
                     flash(error_msg,'error')
-                    session["ge_filename"]="Select file.."
+                    session["filename"]="Select file.."
 
-        if ( (session["ge_filename"]=="Select file..") & (not annotation_columns ) ) | (session["filename"]=="Select file..")  :
-            plot_arguments=session["plot_arguments"]
-            return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments) 
+            annotation_columns=( session["plot_arguments"]["annotation_column_value"]!="none") & (session["plot_arguments"]["annotation2_column_value"]!="none")
 
-        if missing_args:
-            plot_arguments=session["plot_arguments"]
-            return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
+            if (not annotation_columns ):
+                ge_inputfile = request.files["ge_inputfile"]
+                if ge_inputfile:
+                    filename = secure_filename(ge_inputfile.filename)
+                    if allowed_file(ge_inputfile.filename):
+                        session["ge_filename"]=filename
+                        fileread = ge_inputfile.read()
+                        filestream=io.BytesIO(fileread)
+                        extension=filename.rsplit('.', 1)[1].lower()
+                        if extension == "xlsx":
+                            df=pd.read_excel(filestream, index_col=False)
+                        elif extension == "csv":
+                            df=pd.read_csv(filestream, index_col=False)
+                        elif extension == "tsv":
+                            df=pd.read_csv(filestream,sep="\t", index_col=False)
+                        
+                        df=df.astype(str)
+                        session["ge_df"]=df.to_json()
+                        
+                        cols=df.columns.tolist()
+                        session["plot_arguments"]["ge_cols"]=["select a column.."]+cols
+
+                        # IF THE USER HAS NOT YET CHOSEN X AND Y VALUES THAN PLEASE SELECT
+                        if (session["plot_arguments"]["gene_identifier"] not in cols) | (session["plot_arguments"]["gene_identifier"] == "select a column..") :
+                            session["plot_arguments"]["gene_identifier"]="select a column.."
+                            missing_args=True
+                        if (session["plot_arguments"]["expression_values"] not in cols) | (session["plot_arguments"]["expression_values"] == "select a column..") :
+                            session["plot_arguments"]["expression_values"]="select a column.."
+                            missing_args=True
+                        if (session["plot_arguments"]["gene_name"] not in cols) | (session["plot_arguments"]["gene_name"] == "select a column..") :
+                            session["plot_arguments"]["gene_name"]="select a column.."
+                            missing_args=True
         
-        annotation_columns=( session["plot_arguments"]["annotation_column_value"]!="none") & (session["plot_arguments"]["annotation2_column_value"]!="none")
+                        if missing_args:                
+                            sometext="Please select matching columns in gene expression file for mapping."
+                            flash(sometext,'info')
+                                
+                    else:
+                        # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
+                        error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
+                        has the correct format and respective extension and try uploadling the gene expression file again." %filename
+                        flash(error_msg,'error')
+                        session["ge_filename"]="Select file.."
 
-        if ( "df" not in list(session.keys()) ) | ( ( "ge_df" not in list(session.keys())) & (not annotation_columns)  ):
-                error_message="No data to plot, please upload a data or session  file."
-                flash(error_msg,'error')
-                return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps,  **plot_arguments)
- 
-        # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-        plot_arguments=session["plot_arguments"]
+            if ( (session["ge_filename"]=="Select file..") & (not annotation_columns ) ) | (session["filename"]=="Select file..")  :
+                plot_arguments=session["plot_arguments"]
+                return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments) 
 
-        # READ INPUT DATA FROM SESSION JSON
-        df=pd.read_json(session["df"])  
-        if (annotation_columns) & ( "ge_df" not in list(session.keys())):
-            ge_df=pd.DataFrame()
-            session["ge_df"]=ge_df.to_json()
-        ge_df=pd.read_json(session["ge_df"])
+            if missing_args:
+                plot_arguments=session["plot_arguments"]
+                return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
+            
+            annotation_columns=( session["plot_arguments"]["annotation_column_value"]!="none") & (session["plot_arguments"]["annotation2_column_value"]!="none")
+
+            if ( "df" not in list(session.keys()) ) | ( ( "ge_df" not in list(session.keys())) & (not annotation_columns)  ):
+                    error_message="No data to plot, please upload a data or session  file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/icellplot.html' , filename=session["filename"], ge_filename=session["ge_filename"], apps=apps,  **plot_arguments)
     
-        # CALL FIGURE FUNCTION
-        try:
+            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
+            plot_arguments=session["plot_arguments"]
+
+            # READ INPUT DATA FROM SESSION JSON
+            df=pd.read_json(session["df"])  
+            if (annotation_columns) & ( "ge_df" not in list(session.keys())):
+                ge_df=pd.DataFrame()
+                session["ge_df"]=ge_df.to_json()
+            ge_df=pd.read_json(session["ge_df"])
+        
+            # CALL FIGURE FUNCTION
+            # try:
             fig=make_figure(df,ge_df, plot_arguments)
 
             figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
@@ -297,8 +298,8 @@ def icellplot(download=None):
             return render_template('/apps/icellplot.html', figure_url=figure_url, filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
 
         except Exception as e:
-            send_exception_email( user=current_user, eapp="icellplot", emsg=e, etime=str(datetime.now()) )
-            flash(e,'error')
+            tb_str=handle_exception(e,user=current_user,eapp="icellplot",session=session)
+            flash(tb_str,'traceback')
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
 
     else:

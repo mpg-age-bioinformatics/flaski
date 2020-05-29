@@ -1,8 +1,18 @@
 import pandas as pd
 
+def handle_exception(e, user, eapp,session):
+    import traceback
+    from flaski.email import send_exception_email
+    from datetime import datetime
+    tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+    send_exception_email( user=user, eapp=eapp, emsg=tb_str, etime=str(datetime.now()) )
+    session["traceback"]=tb_str
+    tb_str=text2html(tb_str)
+    return tb_str
+
 def text2html(s):
     h=s.replace("\n","<br>").replace("    ","&emsp;").replace(" ","&nbsp;")
-    return h
+    return h  
 
 def reset_all(session):
     MINIMAL=['_permanent', '_fresh', 'csrf_token', 'user_id', '_id', 'PRIVATE_APPS']

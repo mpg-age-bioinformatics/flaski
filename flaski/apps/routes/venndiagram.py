@@ -9,9 +9,9 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.venndiagram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file, check_session_app, text2html
+from flaski.routines import session_to_file, check_session_app, handle_exception 
 from flaski.routes import FREEAPPS
-from flaski.email import send_exception_email
+#from flaski.email import send_exception_email
 
 
 import os
@@ -196,13 +196,8 @@ def venndiagram(download=None):
             return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
 
         except Exception as e:
-            import traceback
-            tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-            tb_str="Whoops! Something went wrong!\n\n"+tb_str
-            tb_str=text2html(tb_str)
-            
-            send_exception_email( user=current_user, eapp="venndiagram", emsg=tb_str, etime=str(datetime.now()) )
-            flash(tb_str,'error')
+            tb_str=handle_exception(e,user=current_user,eapp="venndiagram",session=session)
+            flash(tb_str,'traceback')
             return render_template('/apps/venndiagram.html', apps=apps, **plot_arguments)
 
     else:

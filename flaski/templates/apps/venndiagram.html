@@ -380,8 +380,37 @@
             </div>
         </div>
         <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        
+        
+        {% elif category == "traceback" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+            </div>
+            <div class="card-body">
+                {% autoescape false %}
+                {{ message }}
+                <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified something is wrong and will investigate the source of this issue. 
+                If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                <br>
+                {% endautoescape %}
+
+                <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                    <div class="pull-xs-right" style="float:right;">
+                        <div class="btn-group" style="float:right;">
+                            <button type="submit" class="btn btn-primary" style="float:right;">
+                                <i></i> Ice cream
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% else %}
-        <!-- INFORMATION CARD -->
+
         <div class="card shadow mb-4">
             <div class="card-header py-3", >
                 <h6 class="m-0 font-weight-bold text-primary">Info</h6>
@@ -392,6 +421,7 @@
                 {% endautoescape %}
             </div>
         </div>
+
         <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
         {% endif %}
         {% endfor %}
@@ -442,6 +472,34 @@
 
     {% endif %}
 </div>
+
+
+<!-- Bootstrap core JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+
+<!-- Page level plugins -->
+<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
+<script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
+
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
+
+  
 
 {% endblock %}
 

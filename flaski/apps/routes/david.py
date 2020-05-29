@@ -49,120 +49,120 @@ def david(download=None):
 
     if request.method == 'POST' :
 
-        # READ SESSION FILE IF AVAILABLE 
-        # AND OVERWRITE VARIABLES
-        inputsessionfile = request.files["inputsessionfile"]
-        if inputsessionfile:
-            if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
-                flash(error_msg,'error')
-                return render_template('/apps/david.html' , apps=apps, **plot_arguments)
-
-            session_=json.load(inputsessionfile)
-            if session_["ftype"]!="session":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
-                flash(error_msg,'error')
-                return render_template('/apps/david.html' , apps=apps, **plot_arguments)
-
-            if session_["app"]!="david":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
-                flash(error_msg,'error')
-                return render_template('/apps/david.html' , apps=apps, **plot_arguments)
-    
-            del(session_["ftype"])
-            del(session_["COMMIT"])
-            del(session_["PRIVATE_APPS"])
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
-            flash('Session file sucessufuly read.')
-
-
-        # READ ARGUMENTS FILE IF AVAILABLE 
-        # AND OVERWRITE VARIABLES
-        inputargumentsfile = request.files["inputargumentsfile"]
-        if inputargumentsfile :
-            if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
-                flash(error_msg,'error')
-                return render_template('/apps/david.html' , apps=apps, **plot_arguments)
-
-            session_=json.load(inputargumentsfile)
-            if session_["ftype"]!="arguments":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
-                flash(error_msg,'error')
-                return render_template('/apps/david.html' , apps=apps, **plot_arguments)
-
-            if session_["app"]!="heatmap":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
-                flash(error_msg,'error')
-                return render_template('/apps/david.html' , apps=apps, **plot_arguments)
-
-            del(session_["ftype"])
-            del(session_["COMMIT"])
-            del(session_["PRIVATE_APPS"])
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
-            flash('Arguments file sucessufuly read.',"info")
-
-        if not inputsessionfile and not inputargumentsfile:
-            # SELECTION LISTS DO NOT GET UPDATED 
-            lists=session["lists"]
-
-            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-            # WITH THE EXCEPTION OF SELECTION LISTS
-            plot_arguments = session["plot_arguments"]
-            ### WORKING HERE
-            values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
-            values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
-            for a in list(plot_arguments.keys()):
-                if ( a in list(request.form.keys()) ) & ( a not in session["notUpdateList"] ):
-                    if a in values_list:
-                        plot_arguments[a]=request.form.getlist(a)
-                    else:
-                        plot_arguments[a]=request.form[a]
-
-            # # VALUES SELECTED FROM SELECTION LISTS 
-            # # GET UPDATED TO THE LATEST CHOICE
-            # for k in list(lists.keys()):
-            #     if k in list(request.form.keys()):
-            #         plot_arguments[lists[k]]=request.form[k]
-            # checkboxes
-            for checkbox in session["checkboxes"]:
-                if checkbox in list(request.form.keys()) :
-                    plot_arguments[checkbox]="on"
-                else:
-                    try:
-                        plot_arguments[checkbox]=request.form[checkbox]
-                    except:
-                        if (plot_arguments[checkbox][0]!="."):
-                            plot_arguments[checkbox]="off"
-
-            # UPDATE SESSION VALUES
-            session["plot_arguments"]=plot_arguments
-
-        plot_arguments=session["plot_arguments"]
-
-        if plot_arguments["user"] == "":
-            flash('Please give in a register DAVID email in "Input" > "DAVID registered email". If you do not yet have a registered address you need to register with DAVID - https://david.ncifcrf.gov/webservice/register.htm. Please be aware that you will not receive any confirmation email. ','error')
-            return render_template('/apps/david.html', apps=apps, **plot_arguments)
-        
-        # debug bad gateway
-        # import time
-        # time.sleep(30)
-
-        # flash('30 seconds debug')
-        # return render_template('/apps/david.html', apps=apps, **plot_arguments)
-
-        # CALL FIGURE FUNCTION
         try:
+            # READ SESSION FILE IF AVAILABLE 
+            # AND OVERWRITE VARIABLES
+            inputsessionfile = request.files["inputsessionfile"]
+            if inputsessionfile:
+                if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
+                    flash(error_msg,'error')
+                    return render_template('/apps/david.html' , apps=apps, **plot_arguments)
+
+                session_=json.load(inputsessionfile)
+                if session_["ftype"]!="session":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/david.html' , apps=apps, **plot_arguments)
+
+                if session_["app"]!="david":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
+                    flash(error_msg,'error')
+                    return render_template('/apps/david.html' , apps=apps, **plot_arguments)
+        
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                del(session_["PRIVATE_APPS"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Session file sucessufuly read.')
+
+
+            # READ ARGUMENTS FILE IF AVAILABLE 
+            # AND OVERWRITE VARIABLES
+            inputargumentsfile = request.files["inputargumentsfile"]
+            if inputargumentsfile :
+                if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
+                    flash(error_msg,'error')
+                    return render_template('/apps/david.html' , apps=apps, **plot_arguments)
+
+                session_=json.load(inputargumentsfile)
+                if session_["ftype"]!="arguments":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/david.html' , apps=apps, **plot_arguments)
+
+                if session_["app"]!="heatmap":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
+                    flash(error_msg,'error')
+                    return render_template('/apps/david.html' , apps=apps, **plot_arguments)
+
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                del(session_["PRIVATE_APPS"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Arguments file sucessufuly read.',"info")
+
+            if not inputsessionfile and not inputargumentsfile:
+                # SELECTION LISTS DO NOT GET UPDATED 
+                lists=session["lists"]
+
+                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+                # WITH THE EXCEPTION OF SELECTION LISTS
+                plot_arguments = session["plot_arguments"]
+                ### WORKING HERE
+                values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
+                values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
+                for a in list(plot_arguments.keys()):
+                    if ( a in list(request.form.keys()) ) & ( a not in session["notUpdateList"] ):
+                        if a in values_list:
+                            plot_arguments[a]=request.form.getlist(a)
+                        else:
+                            plot_arguments[a]=request.form[a]
+
+                # # VALUES SELECTED FROM SELECTION LISTS 
+                # # GET UPDATED TO THE LATEST CHOICE
+                # for k in list(lists.keys()):
+                #     if k in list(request.form.keys()):
+                #         plot_arguments[lists[k]]=request.form[k]
+                # checkboxes
+                for checkbox in session["checkboxes"]:
+                    if checkbox in list(request.form.keys()) :
+                        plot_arguments[checkbox]="on"
+                    else:
+                        try:
+                            plot_arguments[checkbox]=request.form[checkbox]
+                        except:
+                            if (plot_arguments[checkbox][0]!="."):
+                                plot_arguments[checkbox]="off"
+
+                # UPDATE SESSION VALUES
+                session["plot_arguments"]=plot_arguments
+
+            plot_arguments=session["plot_arguments"]
+
+            if plot_arguments["user"] == "":
+                flash('Please give in a register DAVID email in "Input" > "DAVID registered email". If you do not yet have a registered address you need to register with DAVID - https://david.ncifcrf.gov/webservice/register.htm. Please be aware that you will not receive any confirmation email. ','error')
+                return render_template('/apps/david.html', apps=apps, **plot_arguments)
+            
+            # debug bad gateway
+            # import time
+            # time.sleep(30)
+
+            # flash('30 seconds debug')
+            # return render_template('/apps/david.html', apps=apps, **plot_arguments)
+
+            # CALL FIGURE FUNCTION
             david_df, report_stats=run_david(plot_arguments)
         
             ## get this into json like in former apps
@@ -189,8 +189,8 @@ def david(download=None):
             return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
 
         except Exception as e:
-            send_exception_email(user=current_user, eapp="david", emsg=e, etime=str(datetime.now())  )
-            flash(e,'error')
+            tb_str=handle_exception(e,user=current_user,eapp="david",session=session)
+            flash(tb_str,'traceback')
             session["david_in_store"]=False
             return render_template('/apps/david.html', david_in_store=True, apps=apps, **plot_arguments)
 

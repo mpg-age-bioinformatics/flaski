@@ -199,3 +199,11 @@ def download(json_type="arg"):
     db.session.commit()
 
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+"."+json_type )
+
+@app.route('/help', methods=['GET','POST'])
+@login_required
+def askforhelp():
+    page=session["app"]
+    return redirect(url_for(page))
+
+

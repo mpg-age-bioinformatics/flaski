@@ -65,173 +65,174 @@ def heatmap(download=None):
 
     if request.method == 'POST':
 
-        # READ SESSION FILE IF AVAILABLE 
-        # AND OVERWRITE VARIABLES
-        inputsessionfile = request.files["inputsessionfile"]
-        if inputsessionfile:
-            if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            session_=json.load(inputsessionfile)
-            if session_["ftype"]!="session":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            if session_["app"]!="heatmap":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
-    
-            del(session_["ftype"])
-            del(session_["COMMIT"])
-            del(session_["PRIVATE_APPS"])
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
-            flash('Session file sucessufuly read.')
-
-
-        # READ ARGUMENTS FILE IF AVAILABLE 
-        # AND OVERWRITE VARIABLES
-        inputargumentsfile = request.files["inputargumentsfile"]
-        if inputargumentsfile :
-            if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            session_=json.load(inputargumentsfile)
-            if session_["ftype"]!="arguments":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            if session_["app"]!="heatmap":
-                plot_arguments=session["plot_arguments"]
-                error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
-
-            del(session_["ftype"])
-            del(session_["COMMIT"])
-            del(session_["PRIVATE_APPS"])
-            for k in list(session_.keys()):
-                session[k]=session_[k]
-            plot_arguments=session["plot_arguments"]
-            flash('Arguments file sucessufuly read.',"info")
-
-        if not inputsessionfile and not inputargumentsfile:
-            # SELECTION LISTS DO NOT GET UPDATED 
-            lists=session["lists"]
-
-            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-            # WITH THE EXCEPTION OF SELECTION LISTS
-            plot_arguments = session["plot_arguments"]
-            for a in list(plot_arguments.keys()):
-                if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                    if a == "yvals":
-                        plot_arguments[a]=request.form.getlist(a)
-                    else:
-                        plot_arguments[a]=request.form[a]
-
-            # # VALUES SELECTED FROM SELECTION LISTS 
-            # # GET UPDATED TO THE LATEST CHOICE
-            # for k in list(lists.keys()):
-            #     if k in list(request.form.keys()):
-            #         plot_arguments[lists[k]]=request.form[k]
-            # checkboxes
-            for checkbox in session["checkboxes"]:
-                if checkbox in list(request.form.keys()) :
-                    plot_arguments[checkbox]="on"
-                else:
-                    try:
-                        plot_arguments[checkbox]=request.form[checkbox]
-                    except:
-                        if (plot_arguments[checkbox][0]!="."):
-                            plot_arguments[checkbox]="off"
-
-            # UPDATE SESSION VALUES
-            session["plot_arguments"]=plot_arguments
-        
-        # IF THE UPLOADS A NEW FILE 
-        # THAN UPDATE THE SESSION FILE
-        # READ INPUT FILE
-        inputfile = request.files["inputfile"]
-        if inputfile:
-            filename = secure_filename(inputfile.filename)
-            if allowed_file(inputfile.filename):
-                session["filename"]=filename
-                fileread = inputfile.read()
-                filestream=io.BytesIO(fileread)
-                extension=filename.rsplit('.', 1)[1].lower()
-                if extension == "xlsx":
-                    df=pd.read_excel(filestream, index_col=False)
-                elif extension == "csv":
-                    df=pd.read_csv(filestream, index_col=False)
-                elif extension == "tsv":
-                    df=pd.read_csv(filestream,sep="\t", index_col=False)
-                
-                df=df.astype(str)
-                session["df"]=df.to_json()
-                
-                cols=df.columns.tolist()
-
-                # if session["plot_arguments"]["yvals_colors"] not in cols:
-                #     session["plot_arguments"]["yvals_colors"]=["None"]+cols
-
-                # if session["plot_arguments"]["xvals_colors"] not in df[cols[0]].tolist():
-                #     session["plot_arguments"]["xvals_colors"]=["select a row.."]+df[cols[0]].tolist()
-
-
-                # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
-                if (session["plot_arguments"]["yvals"] not in cols) | (session["plot_arguments"]["xvals"] not in cols):
-
-                    session["plot_arguments"]["xcols"]=cols
-                    session["plot_arguments"]["xvals"]=cols[0]
-
-                    session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[session["plot_arguments"]["xvals"]].tolist()
-
-                    session["plot_arguments"]["ycols"]=cols
-                    session["plot_arguments"]["yvals"]=cols[1:]
-                                  
-                    sometext="Please select which columns should be used for plotting."
-                    plot_arguments=session["plot_arguments"]
-                    flash(sometext,'info')
-                    return render_template('/apps/heatmap.html' , filename=filename, apps=apps,**plot_arguments)
-                
-            else:
-                # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
-                error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
-                has the correct format and respective extension and try uploadling it again." %filename
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps, **plot_arguments)
-        
-        if "df" not in list(session.keys()):
-                error_message="No data to plot, please upload a data or session  file."
-                flash(error_msg,'error')
-                return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps,  **plot_arguments)
- 
-        #if session["plot_arguments"]["groups_value"]=="None":
-        #    session["plot_arguments"]["groups_auto_generate"]=".on"
-
-        # READ INPUT DATA FROM SESSION JSON
-        df=pd.read_json(session["df"])
-
-        session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[request.form["xvals"]].tolist()
-        # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-        filename=session["filename"]
-        plot_arguments=session["plot_arguments"]
-
-        # CALL FIGURE FUNCTION
         try:
+            # READ SESSION FILE IF AVAILABLE 
+            # AND OVERWRITE VARIABLES
+            inputsessionfile = request.files["inputsessionfile"]
+            if inputsessionfile:
+                if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
+
+                session_=json.load(inputsessionfile)
+                if session_["ftype"]!="session":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
+
+                if session_["app"]!="heatmap":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
+        
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                del(session_["PRIVATE_APPS"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Session file sucessufuly read.')
+
+
+            # READ ARGUMENTS FILE IF AVAILABLE 
+            # AND OVERWRITE VARIABLES
+            inputargumentsfile = request.files["inputargumentsfile"]
+            if inputargumentsfile :
+                if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
+
+                session_=json.load(inputargumentsfile)
+                if session_["ftype"]!="arguments":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
+
+                if session_["app"]!="heatmap":
+                    plot_arguments=session["plot_arguments"]
+                    error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename=session["filename"], apps=apps, **plot_arguments)
+
+                del(session_["ftype"])
+                del(session_["COMMIT"])
+                del(session_["PRIVATE_APPS"])
+                for k in list(session_.keys()):
+                    session[k]=session_[k]
+                plot_arguments=session["plot_arguments"]
+                flash('Arguments file sucessufuly read.',"info")
+
+            if not inputsessionfile and not inputargumentsfile:
+                # SELECTION LISTS DO NOT GET UPDATED 
+                lists=session["lists"]
+
+                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+                # WITH THE EXCEPTION OF SELECTION LISTS
+                plot_arguments = session["plot_arguments"]
+                for a in list(plot_arguments.keys()):
+                    if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
+                        if a == "yvals":
+                            plot_arguments[a]=request.form.getlist(a)
+                        else:
+                            plot_arguments[a]=request.form[a]
+
+                # # VALUES SELECTED FROM SELECTION LISTS 
+                # # GET UPDATED TO THE LATEST CHOICE
+                # for k in list(lists.keys()):
+                #     if k in list(request.form.keys()):
+                #         plot_arguments[lists[k]]=request.form[k]
+                # checkboxes
+                for checkbox in session["checkboxes"]:
+                    if checkbox in list(request.form.keys()) :
+                        plot_arguments[checkbox]="on"
+                    else:
+                        try:
+                            plot_arguments[checkbox]=request.form[checkbox]
+                        except:
+                            if (plot_arguments[checkbox][0]!="."):
+                                plot_arguments[checkbox]="off"
+
+                # UPDATE SESSION VALUES
+                session["plot_arguments"]=plot_arguments
+            
+            # IF THE UPLOADS A NEW FILE 
+            # THAN UPDATE THE SESSION FILE
+            # READ INPUT FILE
+            inputfile = request.files["inputfile"]
+            if inputfile:
+                filename = secure_filename(inputfile.filename)
+                if allowed_file(inputfile.filename):
+                    session["filename"]=filename
+                    fileread = inputfile.read()
+                    filestream=io.BytesIO(fileread)
+                    extension=filename.rsplit('.', 1)[1].lower()
+                    if extension == "xlsx":
+                        df=pd.read_excel(filestream, index_col=False)
+                    elif extension == "csv":
+                        df=pd.read_csv(filestream, index_col=False)
+                    elif extension == "tsv":
+                        df=pd.read_csv(filestream,sep="\t", index_col=False)
+                    
+                    df=df.astype(str)
+                    session["df"]=df.to_json()
+                    
+                    cols=df.columns.tolist()
+
+                    # if session["plot_arguments"]["yvals_colors"] not in cols:
+                    #     session["plot_arguments"]["yvals_colors"]=["None"]+cols
+
+                    # if session["plot_arguments"]["xvals_colors"] not in df[cols[0]].tolist():
+                    #     session["plot_arguments"]["xvals_colors"]=["select a row.."]+df[cols[0]].tolist()
+
+
+                    # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
+                    if (session["plot_arguments"]["yvals"] not in cols) | (session["plot_arguments"]["xvals"] not in cols):
+
+                        session["plot_arguments"]["xcols"]=cols
+                        session["plot_arguments"]["xvals"]=cols[0]
+
+                        session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[session["plot_arguments"]["xvals"]].tolist()
+
+                        session["plot_arguments"]["ycols"]=cols
+                        session["plot_arguments"]["yvals"]=cols[1:]
+                                    
+                        sometext="Please select which columns should be used for plotting."
+                        plot_arguments=session["plot_arguments"]
+                        flash(sometext,'info')
+                        return render_template('/apps/heatmap.html' , filename=filename, apps=apps,**plot_arguments)
+                    
+                else:
+                    # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
+                    error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
+                    has the correct format and respective extension and try uploadling it again." %filename
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps, **plot_arguments)
+            
+            if "df" not in list(session.keys()):
+                    error_message="No data to plot, please upload a data or session  file."
+                    flash(error_msg,'error')
+                    return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps,  **plot_arguments)
+    
+            #if session["plot_arguments"]["groups_value"]=="None":
+            #    session["plot_arguments"]["groups_auto_generate"]=".on"
+
+            # READ INPUT DATA FROM SESSION JSON
+            df=pd.read_json(session["df"])
+
+            session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[request.form["xvals"]].tolist()
+            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
+            filename=session["filename"]
+            plot_arguments=session["plot_arguments"]
+
+            # CALL FIGURE FUNCTION
+            # try:
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
             # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
@@ -244,8 +245,8 @@ def heatmap(download=None):
             return render_template('/apps/heatmap.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
-            send_exception_email( user=current_user, eapp="heatmap", emsg=e, etime=str(datetime.now()) )
-            flash(e,'error')
+            tb_str=handle_exception(e,user=current_user,eapp="heatmap",session=session)
+            flash(tb_str,'traceback')
             return render_template('/apps/heatmap.html', filename=filename, apps=apps, **plot_arguments)
 
     else:

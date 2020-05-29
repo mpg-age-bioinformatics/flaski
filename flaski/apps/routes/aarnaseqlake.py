@@ -302,47 +302,34 @@ def aarnaseqlake(download=None):
 
     if request.method == 'POST':
 
-        # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-        # WITH THE EXCEPTION OF SELECTION LISTS
-        plot_arguments = session["plot_arguments"]
-        values_list=[ s for s in list(plot_arguments.keys()) if type(plot_arguments[s]) == list ]
-        for a in list(plot_arguments.keys()):
-            if a in list(request.form.keys()):
-                if a in values_list:
-                    plot_arguments[a]=request.form.getlist(a)
-                else:
-                    plot_arguments[a]=request.form[a]
+        try:
 
-        # checkboxes
-        # for checkbox in session["checkboxes"]:
-        #     if checkbox in list(request.form.keys()) :
-        #         plot_arguments[checkbox]="on"
-        #     else:
-        #         try:
-        #             plot_arguments[checkbox]=request.form[checkbox]
-        #         except:
-        #             if (plot_arguments[checkbox][0]!="."):
-        #                 plot_arguments[checkbox]="off"
-
-        # UPDATE SESSION VALUES
-        session["plot_arguments"]=plot_arguments
+            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+            # WITH THE EXCEPTION OF SELECTION LISTS
+            plot_arguments = session["plot_arguments"]
+            values_list=[ s for s in list(plot_arguments.keys()) if type(plot_arguments[s]) == list ]
+            for a in list(plot_arguments.keys()):
+                if a in list(request.form.keys()):
+                    if a in values_list:
+                        plot_arguments[a]=request.form.getlist(a)
+                    else:
+                        plot_arguments[a]=request.form[a]
 
 
-        plot_arguments=session["plot_arguments"]
-        plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
-        session["plot_arguments"]=plot_arguments
+            # UPDATE SESSION VALUES
+            session["plot_arguments"]=plot_arguments
 
-        # data_sets groups reps gene_names gene_ids | available_ selected_
 
-        #return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
+            plot_arguments=session["plot_arguments"]
+            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+            session["plot_arguments"]=plot_arguments
 
-        return render_template('/apps/aarnaseqlake.html', apps=apps, **plot_arguments)
+            return render_template('/apps/aarnaseqlake.html', apps=apps, **plot_arguments)
 
-        # except Exception as e:
-        #     send_exception_email(user=current_user, eapp="david", emsg=e, etime=str(datetime.now())  )
-        #     flash(e,'error')
-        #     session["david_in_store"]=False
-        #     return render_template('/apps/david.html', david_in_store=True, apps=apps, **plot_arguments)
+        except Exception as e:
+            tb_str=handle_exception(e,user=current_user,eapp="aarnaseqlake",session=session)
+            flash(tb_str,'traceback')
+            return render_template('/apps/aarnaseqlake.html', apps=apps, **plot_arguments)
 
     else:
 
