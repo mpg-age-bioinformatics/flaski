@@ -1,4 +1,21 @@
 import pandas as pd
+from flask import session
+
+def read_request(request):
+    plot_arguments=session["plot_arguments"]
+    checkboxes=[ s for s in list(plot_arguments.keys()) if plot_arguments[s] in [".on",".off","on","off" ] ]
+    for a in list(plot_arguments.keys()):
+        if a in list(request.form.keys()):
+            if type(plot_arguments[a]) == list :
+                plot_arguments[a]=request.form.getlist(a)
+            elif a in checkboxes:
+                plot_arguments[a]="on"
+            else:
+                plot_arguments[a]=request.form[a]
+        elif a in checkboxes:
+            plot_arguments[a]="off"
+    session["plot_arguments"]=plot_arguments
+    return plot_arguments
 
 def handle_exception(e, user, eapp,session):
     import traceback
@@ -74,3 +91,50 @@ def read_private_apps(useremail,app):
                         PRIVATE_APPS.append(private_app)
                         break
     return PRIVATE_APPS
+
+def read_argument_file(inputargumentsfile,appName):
+    if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
+        error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
+        return error_msg, session["plot_arguments"], True
+
+    session_=json.load(inputargumentsfile)
+    if session_["ftype"]!="arguments":
+        error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
+        return error_msg, session["plot_arguments"], True
+
+    if session_["app"]!=appName:
+        error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
+        return error_msg, session["plot_arguments"], True
+
+    del(session_["ftype"])
+    del(session_["COMMIT"])
+    del(session_["PRIVATE_APPS"])
+    for k in list(session_.keys()):
+        session[k]=session_[k]
+    plot_arguments=session["plot_arguments"]
+    msg='Arguments file successfully read.'
+    return msg, plot_arguments, False
+
+
+def read_session_file(inputsessionfile,appName):
+    if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
+        error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
+        return error_msg, session["plot_arguments"], True
+
+    session_=json.load(inputsessionfile)
+    if session_["ftype"]!="session":
+        error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
+        return error_msg, session["plot_arguments"], True
+
+    if session_["app"]!=appName:
+        error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
+        return error_msg, session["plot_arguments"], True
+
+    del(session_["ftype"])
+    del(session_["COMMIT"])
+    del(session_["PRIVATE_APPS"])
+    for k in list(session_.keys()):
+        session[k]=session_[k]
+    plot_arguments=session["plot_arguments"]
+    msg="Session file successfully read."
+    return msg, plot_arguments, False

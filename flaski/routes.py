@@ -42,16 +42,15 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"DAVID", "id":'david_more',"link":'david' ,"java":"javascript:ReverseDisplay('david_more')", "description":"A DAVID querying plot."},\
         { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."}  ]
 
+APPS=FREEAPPS+session["PRIVATE_APPS"]
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    apps=FREEAPPS
     if current_user.is_authenticated:
-        apps=apps+session["PRIVATE_APPS"]
-        return render_template('index.html',userlogged="yes", apps=apps, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
+        return render_template('index.html',userlogged="yes", apps=APPS, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
     else:
-        return render_template('index.html',userlogged="no",apps=apps,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
+        return render_template('index.html',userlogged="no",apps=APPS,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])

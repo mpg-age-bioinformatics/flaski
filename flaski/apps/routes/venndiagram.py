@@ -10,9 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.apps.main.venndiagram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file, check_session_app, handle_exception 
-from flaski.routes import FREEAPPS
-#from flaski.email import send_exception_email
-
+from flaski.routes import APPS
 
 import os
 import io
@@ -36,118 +34,34 @@ import base64
 @login_required
 def venndiagram(download=None):
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
-
-    reset_info=check_session_app(session,"venndiagram",apps)
-
+    reset_info=check_session_app(session,"venndiagram",APPS)
 
     if reset_info:
         flash(reset_info,'error')
-        # INITIATE SESSION
-        plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
-
+        plot_arguments=figure_defaults()
         session["plot_arguments"]=plot_arguments
-        session["lists"]=lists
-        session["notUpdateList"]=notUpdateList
         session["COMMIT"]=app.config['COMMIT']
         session["app"]="venndiagram"
-        session["checkboxes"]=checkboxes
 
     if request.method == 'POST' :
 
         try:
-            # READ SESSION FILE IF AVAILABLE 
-            # AND OVERWRITE VARIABLES
-            inputsessionfile = request.files["inputsessionfile"]
-            if inputsessionfile:
-                if inputsessionfile.filename.rsplit('.', 1)[1].lower() != "ses"  :
-                    plot_arguments=session["plot_arguments"]
-                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file with the correct `ses` extension."
-                    flash(error_msg,'error')
-                    return render_template('/apps/venndiagram.html', apps=apps, **plot_arguments)
+            if request.files["inputsessionfile"] :
+                msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"venndiagram")
+                if error:
+                    flash(msg,'error')
+                    return render_template('/apps/venndiagram.html' , apps=APPS, **plot_arguments)
+                flash(msg,"info")
 
-                session_=json.load(inputsessionfile)
-                if session_["ftype"]!="session":
-                    plot_arguments=session["plot_arguments"]
-                    error_msg="The file you have uploaded is not a session file. Please make sure you upload a session file."
-                    flash(error_msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
-
-                if session_["app"]!="venndiagram":
-                    plot_arguments=session["plot_arguments"]
-                    error_msg="The file was not load as it is associated with the '%s' and not with this app." %session_["app"]
-                    flash(error_msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
-        
-                del(session_["ftype"])
-                del(session_["COMMIT"])
-                del(session_["PRIVATE_APPS"])
-                for k in list(session_.keys()):
-                    session[k]=session_[k]
-                plot_arguments=session["plot_arguments"]
-                flash('Session file sucessufuly read.')
-
-
-            # READ ARGUMENTS FILE IF AVAILABLE 
-            # AND OVERWRITE VARIABLES
-            inputargumentsfile = request.files["inputargumentsfile"]
-            if inputargumentsfile :
-                if inputargumentsfile.filename.rsplit('.', 1)[1].lower() != "arg"  :
-                    plot_arguments=session["plot_arguments"]
-                    error_msg="The file you have uploaded is not a arguments file. Please make sure you upload a session file with the correct `arg` extension."
-                    flash(error_msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
-
-                session_=json.load(inputargumentsfile)
-                if session_["ftype"]!="arguments":
-                    plot_arguments=session["plot_arguments"]
-                    error_msg="The file you have uploaded is not an arguments file. Please make sure you upload an arguments file."
-                    flash(error_msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
-
-                if session_["app"]!="venndiagram":
-                    plot_arguments=session["plot_arguments"]
-                    error_msg="The file was not loaded as it is associated with the '%s' and not with this app." %session_["app"]
-                    flash(error_msg,'error')
-                    return render_template('/apps/venndiagram.html' , apps=apps, **plot_arguments)
-
-                del(session_["ftype"])
-                del(session_["COMMIT"])
-                del(session_["PRIVATE_APPS"])
-                for k in list(session_.keys()):
-                    session[k]=session_[k]
-                plot_arguments=session["plot_arguments"]
-                flash('Arguments file sucessufuly read.',"info")
+            if request.files["inputargumentsfile"] :
+                msg, plot_arguments, error=read_argument_file(request.files["inputargumentsfile"],"venndiagram")
+                if error:
+                    flash(msg,'error')
+                    return render_template('/apps/venndiagram.html' , apps=APPS, **plot_arguments)
+                flash(msg,"info")
 
             if not inputsessionfile and not inputargumentsfile:
-                # SELECTION LISTS DO NOT GET UPDATED 
-                lists=session["lists"]
-
-                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                # WITH THE EXCEPTION OF SELECTION LISTS
-                plot_arguments = session["plot_arguments"]
-                for a in list(plot_arguments.keys()):
-                    if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                        plot_arguments[a]=request.form[a]
-
-                # # VALUES SELECTED FROM SELECTION LISTS 
-                # # GET UPDATED TO THE LATEST CHOICE
-                # for k in list(lists.keys()):
-                #     if k in list(request.form.keys()):
-                #         plot_arguments[lists[k]]=request.form[k]
-                # checkboxes
-                for checkbox in session["checkboxes"]:
-                    if checkbox in list(request.form.keys()) :
-                        plot_arguments[checkbox]="on"
-                    else:
-                        try:
-                            plot_arguments[checkbox]=request.form[checkbox]
-                        except:
-                            if plot_arguments[checkbox][0]!=".":
-                                plot_arguments[checkbox]="off"
-
-                # UPDATE SESSION VALUES
-                session["plot_arguments"]=plot_arguments
+                plot_arguments=read_request(request)
             
                 i=0
                 for set_index in ["set1","set2","set3"]:
@@ -157,12 +71,9 @@ def venndiagram(download=None):
                 if i < 2:
                         error_msg="No data to plot, please upload data."
                         flash(error_msg,'error')
-                        return render_template('/apps/venndiagram.html', apps=apps,  **plot_arguments)
+                        return render_template('/apps/venndiagram.html', apps=APPS,  **plot_arguments)
     
-            #if session["plot_arguments"]["groups_value"]=="None":
-            #    session["plot_arguments"]["groups_auto_generate"]=".on"
-
-            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
+            # make sure we have the latest given arguments
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION
@@ -188,17 +99,12 @@ def venndiagram(download=None):
 
                 flash(message)
 
-            # def bad_function():
-            #     rpto
-            #     return None
-            # bad_function()
-
-            return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
+            return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=APPS, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="venndiagram",session=session)
             flash(tb_str,'traceback')
-            return render_template('/apps/venndiagram.html', apps=apps, **plot_arguments)
+            return render_template('/apps/venndiagram.html', apps=APPS, **session["plot_arguments"])
 
     else:
         if download == "download":
@@ -224,10 +130,6 @@ def venndiagram(download=None):
         if download == "data":
 
             plot_arguments=session["plot_arguments"]
-
-            # READ INPUT DATA FROM SESSION JSON
-            # CALL FIGURE FUNCTION
-
             fig, df, pvalues=make_figure(plot_arguments)
 
             if pvalues: 
@@ -255,4 +157,4 @@ def venndiagram(download=None):
         db.session.add(eventlog)
         db.session.commit()
         
-        return render_template('apps/venndiagram.html', apps=apps, **session["plot_arguments"])
+        return render_template('apps/venndiagram.html', apps=APPS, **session["plot_arguments"])
