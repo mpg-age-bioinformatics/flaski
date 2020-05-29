@@ -21,7 +21,7 @@ def GET_COLOR(x):
         return str(x)
 
 
-def make_figure(df,pa):
+def make_figure(df,pa,fig=None,ax=None):
     """Generates figure.
 
     Args:
@@ -36,9 +36,11 @@ def make_figure(df,pa):
     #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
 
     # MAIN FIGURE
+    if (not fig) or (not ax): 
+        fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
+
     #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
-    fig, ax = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
     # if we have groups
     # the user can decide how the diferent groups should look like 

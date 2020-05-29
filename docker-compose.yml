@@ -34,7 +34,7 @@ services:
  server:
   container_name: server
   ports:
-    - 8888:8888 #jupyterhub
+    - 8887:8888 #jupyterhub
   build:
     context: ./
     dockerfile: Dockerfile

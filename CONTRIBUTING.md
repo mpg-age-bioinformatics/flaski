@@ -79,9 +79,9 @@ docker-compose exec server /bin/bash
 ```
 Once inside the container start `jupyter` with:
 ```bash
-jupyter notebook --allow-root --ip=0.0.0.0
+jupyter notebook --ip=0.0.0.0
 ```
-You can now use the displayed link to access `jupyter` in Flaski build environment.
+You can now use the displayed link to access `jupyter` in Flaski build environment. It will be accessbile over [http://0.0.0.0:8887/?token=`<token>`]()
 
 ### pyflaski
 
