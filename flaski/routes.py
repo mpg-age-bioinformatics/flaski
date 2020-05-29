@@ -42,15 +42,14 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"DAVID", "id":'david_more',"link":'david' ,"java":"javascript:ReverseDisplay('david_more')", "description":"A DAVID querying plot."},\
         { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."}  ]
 
-APPS=FREEAPPS+session["PRIVATE_APPS"]
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+
     if current_user.is_authenticated:
-        return render_template('index.html',userlogged="yes", apps=APPS, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
+        return render_template('index.html',userlogged="yes", apps=session["APPS"], ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
     else:
-        return render_template('index.html',userlogged="no",apps=APPS,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
+        return render_template('index.html',userlogged="no",apps=session["APPS"],ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
@@ -65,7 +64,7 @@ def login(width=None, height=None):
     #     </script>
     #     """
     if current_user.is_authenticated:
-        session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
+        # session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
         return redirect(url_for('index'))
         
     form = LoginForm()
@@ -74,9 +73,6 @@ def login(width=None, height=None):
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
-        print(form.remember_me.data)
-        import sys
-        sys.stdout.flush()
         login_user(user, remember=form.remember_me.data)
         session.permanent = form.remember_me.data
         next_page = request.args.get('next')
@@ -84,7 +80,7 @@ def login(width=None, height=None):
         # session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
-        session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
+        # session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -165,6 +161,8 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
+        if "APPS" not in list(session.keys()):
+            session["APPS"]=FREEAPPS+read_private_apps(current_user.email,app)
         if not current_user.active:
             flash('This account is not active. Please contact support.')
             logout_user()
