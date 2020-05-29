@@ -9,7 +9,7 @@ from datetime import datetime
 from flaski import db
 from werkzeug.urls import url_parse
 from flaski.forms import ResetPasswordRequestForm
-from flaski.email import send_password_reset_email, send_validate_email
+from flaski.email import send_password_reset_email, send_validate_email, send_help_email
 from flaski.forms import ResetPasswordForm
 from flaski.routines import session_to_file
 #from app.token import generate_confirmation_token, confirm_token
@@ -203,7 +203,20 @@ def download(json_type="arg"):
 @app.route('/help', methods=['GET','POST'])
 @login_required
 def askforhelp():
+    import tempfile
     page=session["app"]
+    tb_str=session["traceback"]
+
+    session_=session_to_file(session,"ses")
+    if not os.path.isdir(app.config['USERS_DATA']+"/tmp/"):
+        os.makedirs(app.config['USERS_DATA']+"/tmp/")
+    
+    session_file_name=tempfile.mkstemp(dir=app.config['USERS_DATA']+"/tmp/",suffix='.ses')[1]
+    with open(session_file_name, "w") as session_file:
+        json.dump(session_, session_file)
+
+    send_help_email( user=current_user, eapp=page, emsg=tb_str, etime=str(datetime.now()), session_file=session_file_name)
+    flash("Your scream for Ice cream has been sent. We will get in contact with you as soon as possible.")
     return redirect(url_for(page))
 
 

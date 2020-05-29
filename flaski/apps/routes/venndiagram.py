@@ -188,10 +188,10 @@ def venndiagram(download=None):
 
                 flash(message)
 
-            # def bad_function():
-            #     rpto
-            #     return None
-            # bad_function()
+            def bad_function():
+                rpto
+                return None
+            bad_function()
 
             return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
 
