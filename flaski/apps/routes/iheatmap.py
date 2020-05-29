@@ -10,7 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.apps.main.iheatmap import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
-from flaski.routines import check_session_app, handle_exception 
+from flaski.routines import check_session_app, handle_exception, read_request
 import plotly
 import plotly.io as pio
 from flaski.email import send_exception_email
@@ -134,34 +134,7 @@ def iheatmap(download=None):
                 flash('Arguments file sucessufuly read.',"info")
 
             if not inputsessionfile and not inputargumentsfile:
-                # SELECTION LISTS DO NOT GET UPDATED 
-                lists=session["lists"]
-
-                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                # WITH THE EXCEPTION OF SELECTION LISTS
-                plot_arguments = session["plot_arguments"]
-                for a in list(plot_arguments.keys()):
-                    if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                        if a in ["yvals","findrow"]:
-                            plot_arguments[a]=request.form.getlist(a)
-                        else:
-                            plot_arguments[a]=request.form[a]
-
-                # # VALUES SELECTED FROM SELECTION LISTS 
-                # # GET UPDATED TO THE LATEST CHOICE
-                # for k in list(lists.keys()):
-                #     if k in list(request.form.keys()):
-                #         plot_arguments[lists[k]]=request.form[k]
-                # checkboxes
-                for checkbox in session["checkboxes"]:
-                    if checkbox in list(request.form.keys()) :
-                        plot_arguments[checkbox]="on"
-                    else:
-                        try:
-                            plot_arguments[checkbox]=request.form[checkbox]
-                        except:
-                            if (plot_arguments[checkbox][0]!="."):
-                                plot_arguments[checkbox]="off"
+                plot_arguments=read_request(request)
 
                 if "df" in list(session.keys()):
                     available_rows=pd.read_json(session["df"])
@@ -257,6 +230,7 @@ def iheatmap(download=None):
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="iheatmap",session=session)
+            filename=session["filename"]
             flash(tb_str,'traceback')
             return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)
 
