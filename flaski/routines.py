@@ -6,8 +6,8 @@ def handle_exception(e, user, eapp,session):
     from datetime import datetime
     tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
     send_exception_email( user=user, eapp=eapp, emsg=tb_str, etime=str(datetime.now()) )
-    session["traceback"]=tb_str
     tb_str=text2html(tb_str)
+    session["traceback"]=tb_str
     return tb_str
 
 def text2html(s):
