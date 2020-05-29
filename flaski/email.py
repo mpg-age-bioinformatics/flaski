@@ -64,10 +64,11 @@ def send_exception_email(user,eapp,emsg,etime):
 
 def send_help_email(user,eapp,emsg,etime,session_file):
     with app.app_context():
+        emsg_html=emsg.split("\n")
         send_email('[Flaski] %s help needed' %eapp,
                 sender=app.config['ADMINS'][0],
                 recipients=app.config['ADMINS'],
                 text_body=render_template('email/app_help.txt',
                                             user=user, eapp=eapp, emsg=emsg, etime=etime, session_file=session_file),
                 html_body=render_template('email/app_help.html',
-                                            user=user, eapp=eapp, emsg=emsg, etime=etime, session_file=session_file))                                   
+                                            user=user, eapp=eapp, emsg=emsg_html, etime=etime, session_file=session_file))                                   
