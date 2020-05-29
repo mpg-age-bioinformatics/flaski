@@ -155,7 +155,8 @@ do
             docker-compose -f production.yml exec backup /backup.sh && \
             docker-compose -f production.yml exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ && \
             echo "$(date) :: docker-compose up -d" && \
-            docker-compose -f production.yml up -d server
+            docker-compose -f production.yml up -d server && \
+            docker-compose -f production.yml restart nginx
 
         fi
     fi
