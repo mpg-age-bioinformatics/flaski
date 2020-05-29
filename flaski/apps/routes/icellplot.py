@@ -10,7 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.apps.main.icellplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
-from flaski.routines import check_session_app
+from flaski.routines import check_session_app, handle_exception 
 import plotly
 import plotly.io as pio
 from flaski.email import send_exception_email

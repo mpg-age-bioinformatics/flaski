@@ -10,7 +10,7 @@ from werkzeug.urls import url_parse
 from flaski.models import User, UserLogging
 from flaski.routes import FREEAPPS
 from flaski.email import send_exception_email
-from flaski.routines import check_session_app
+from flaski.routines import check_session_app, handle_exception 
 
 from flaski.apps.main import iscatterplot, iheatmap
 
