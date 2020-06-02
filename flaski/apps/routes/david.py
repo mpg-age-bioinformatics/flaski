@@ -29,7 +29,7 @@ import base64
 @login_required
 def david(download=None):
 
-    apps=session["APPS"]
+    apps=current_user.user_apps
 
     reset_info=check_session_app(session,"david",apps)
     if reset_info:

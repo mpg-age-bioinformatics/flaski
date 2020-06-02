@@ -34,7 +34,7 @@ import base64
 @login_required
 def scatterplot(download=None):
     
-    apps=session["APPS"]
+    apps=current_user.user_apps
     reset_info=check_session_app(session,"scatterplot",apps)
 
     if reset_info:

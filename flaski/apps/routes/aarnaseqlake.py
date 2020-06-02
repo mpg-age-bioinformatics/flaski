@@ -243,7 +243,7 @@ def get_tables(plot_arguments):
 @login_required
 def aarnaseqlake(download=None):
 
-    apps=session["APPS"]
+    apps=current_user.user_apps
 
     reset_info=check_session_app(session,"aarnaseqlake",apps)
     if reset_info:

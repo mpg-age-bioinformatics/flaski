@@ -46,9 +46,10 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
-        return render_template('index.html',userlogged="yes", apps=session["APPS"], ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
+        apps=current_user.user_apps
+        return render_template('index.html',userlogged="yes", apps=apps, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
     else:
-        return render_template('index.html',userlogged="no",apps=session["APPS"],ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
+        return render_template('index.html',userlogged="no",apps=FREEAPPS,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
@@ -75,6 +76,10 @@ def login(width=None, height=None):
         login_user(user, remember=form.remember_me.data)
         session.permanent = form.remember_me.data
         next_page = request.args.get('next')
+        #session["APPS"]=FREEAPPS
+        user.user_apps=FREEAPPS+read_private_apps(current_user.email,app)
+        db.session.add(user)
+        db.session.commit()
         # session["width"]=width
         # session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
@@ -157,12 +162,9 @@ def reset_password(token):
 
 @app.before_request
 def before_request():
-    session["APPS"]=FREEAPPS
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
-        if "APPS" not in list(session.keys()):
-            session["APPS"]=FREEAPPS+read_private_apps(current_user.email,app)
         if not current_user.active:
             flash('This account is not active. Please contact support.')
             logout_user()

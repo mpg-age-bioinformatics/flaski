@@ -33,7 +33,7 @@ def iscatterplot(download=None):
     renders the plot on the fly.
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
-    apps=session["APPS"]
+    apps=current_user.user_apps
 
     reset_info=check_session_app(session,"iscatterplot",apps)
     if reset_info:
