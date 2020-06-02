@@ -12,4 +12,4 @@ cd pyflaski
 python3 setup.py install --user
 ```
 
-Check out the [example notebook](example.ipynb).
+Check out the example notebook [ipynb](example.ipynb)/[html](example.html).
