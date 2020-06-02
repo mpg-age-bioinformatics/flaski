@@ -8,9 +8,8 @@ from datetime import datetime
 from flaski import db
 from werkzeug.urls import url_parse
 from flaski.models import User, UserLogging
-from flaski.routes import FREEAPPS
 from flaski.email import send_exception_email
-from flaski.routines import check_session_app, handle_exception 
+from flaski.routines import check_session_app, handle_exception, read_request
 
 from flaski.apps.main import iscatterplot, iheatmap
 
@@ -244,7 +243,7 @@ def get_tables(plot_arguments):
 @login_required
 def aarnaseqlake(download=None):
 
-    apps=FREEAPPS+session["PRIVATE_APPS"]
+    apps=session["APPS"]
 
     reset_info=check_session_app(session,"aarnaseqlake",apps)
     if reset_info:
@@ -306,21 +305,22 @@ def aarnaseqlake(download=None):
 
             # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             # WITH THE EXCEPTION OF SELECTION LISTS
-            plot_arguments = session["plot_arguments"]
-            values_list=[ s for s in list(plot_arguments.keys()) if type(plot_arguments[s]) == list ]
-            for a in list(plot_arguments.keys()):
-                if a in list(request.form.keys()):
-                    if a in values_list:
-                        plot_arguments[a]=request.form.getlist(a)
-                    else:
-                        plot_arguments[a]=request.form[a]
+            # plot_arguments = session["plot_arguments"]
+            # values_list=[ s for s in list(plot_arguments.keys()) if type(plot_arguments[s]) == list ]
+            # for a in list(plot_arguments.keys()):
+            #     if a in list(request.form.keys()):
+            #         if a in values_list:
+            #             plot_arguments[a]=request.form.getlist(a)
+            #         else:
+            #             plot_arguments[a]=request.form[a]
 
 
-            # UPDATE SESSION VALUES
-            session["plot_arguments"]=plot_arguments
+            # # UPDATE SESSION VALUES
+            # session["plot_arguments"]=plot_arguments
 
 
-            plot_arguments=session["plot_arguments"]
+            # plot_arguments=session["plot_arguments"]
+            plot_arguments=read_request(request)
             plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
             session["plot_arguments"]=plot_arguments
 
@@ -424,13 +424,13 @@ def aarnaseqlake(download=None):
                 flash(reset_info,'error')
 
             session["filename"]="<from RNAseq lake>"
-            plot_arguments, lists, notUpdateList, checkboxes=iscatterplot.figure_defaults()
-            #session["plot_arguments"]=plot_arguments
-            session["lists"]=lists
-            session["notUpdateList"]=notUpdateList
+            plot_arguments=iscatterplot.figure_defaults()
+            session["plot_arguments"]=plot_arguments
+            # session["lists"]=lists
+            # session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="iscatterplot"
-            session["checkboxes"]=checkboxes
+            # session["checkboxes"]=checkboxes
 
             df_dge["log10(baseMean)"]=df_dge["baseMean"].apply(lambda x: np.log10(x) )
             df_dge.loc[ df_dge["padj"]<=0.05,"Significant"]="yes"
@@ -505,13 +505,13 @@ def aarnaseqlake(download=None):
                 flash(reset_info,'error')
 
             session["filename"]="<from RNAseq lake>"
-            plot_arguments, lists, notUpdateList, checkboxes=iscatterplot.figure_defaults()
+            plot_arguments=iscatterplot.figure_defaults()
             #session["plot_arguments"]=plot_arguments
-            session["lists"]=lists
-            session["notUpdateList"]=notUpdateList
+            # session["lists"]=lists
+            # session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="iscatterplot"
-            session["checkboxes"]=checkboxes
+            # session["checkboxes"]=checkboxes
 
             df_dge["-log10(padj)"]=df_dge["padj"].apply(lambda x: np.log10(x)*-1 )
             df_dge.loc[ df_dge["padj"]<=0.05,"Significant"]="yes"
@@ -589,15 +589,15 @@ def aarnaseqlake(download=None):
             if reset_info:
                 flash(reset_info,'error')
 
-            plot_arguments, lists, notUpdateList, checkboxes=iheatmap.figure_defaults()
+            plot_arguments=iheatmap.figure_defaults()
 
             session["filename"]="<from RNAseq lake>"
             session["plot_arguments"]=plot_arguments
-            session["lists"]=lists
-            session["notUpdateList"]=notUpdateList
+            # session["lists"]=lists
+            # session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="iheatmap"
-            session["checkboxes"]=checkboxes
+            # session["checkboxes"]=checkboxes
 
             cols=df_ge.columns.tolist()
             df_de=df_ge.astype(str)

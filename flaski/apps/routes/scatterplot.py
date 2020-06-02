@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.scatterplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables
+from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file
 from flaski.email import send_exception_email
 
 import os
@@ -28,11 +28,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import base64
-
-ALLOWED_EXTENSIONS=["xlsx","tsv","csv"]
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/scatterplot/<download>', methods=['GET', 'POST'])
 @app.route('/scatterplot', methods=['GET', 'POST'])

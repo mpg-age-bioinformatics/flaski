@@ -472,25 +472,26 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.iheatmap",\
         "inputargumentsfile":"Select file.."}
     
-    checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels",\
-        "row_dendogram_dist","col_dendogram_dist","reverse_color_scale"]
+    # checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels",\
+    #     "row_dendogram_dist","col_dendogram_dist","reverse_color_scale"]
 
-    # not update list
-    notUpdateList=["inputsessionfile"]
+    # # not update list
+    # notUpdateList=["inputsessionfile"]
 
-    # lists without a default value on the arguments
-    excluded_list=["available_rows","findrow"]
+    # # lists without a default value on the arguments
+    # excluded_list=["available_rows","findrow"]
 
-    # lists with a default value on the arguments
-    allargs=list(plot_arguments.keys())
+    # # lists with a default value on the arguments
+    # allargs=list(plot_arguments.keys())
 
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    lists={} 
-    for i in range(len(allargs)):
-        if type(plot_arguments[allargs[i]]) == type([]):
-            if allargs[i] not in excluded_list:
-                lists[allargs[i]]=allargs[i+1]
+    # # dictionary of the type 
+    # # {"key_list_name":"key_default_value"} 
+    # # eg. {"marker_size":"markers"}
+    # lists={} 
+    # for i in range(len(allargs)):
+    #     if type(plot_arguments[allargs[i]]) == type([]):
+    #         if allargs[i] not in excluded_list:
+    #             lists[allargs[i]]=allargs[i+1]
 
-    return plot_arguments, lists, notUpdateList, checkboxes
+    # , lists, notUpdateList, checkboxes
+    return plot_arguments

@@ -415,27 +415,29 @@ def figure_defaults():
         "inputargumentsfile":"Select file.."
     }
 
-    # grid colors not implemented in UI
-    checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
-            "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
-            "show_legend"]
+    # # grid colors not implemented in UI
+    # checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
+    #         "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
+    #         "show_legend"]
 
-    # not update list
-    notUpdateList=["inputsessionfile"]
+    # # not update list
+    # notUpdateList=["inputsessionfile"]
 
-    # lists without a default value on the arguments
-    excluded_list=["groups_settings","list_of_groups","available_labels","fixed_labels"]
+    # # lists without a default value on the arguments
+    # excluded_list=["groups_settings","list_of_groups","available_labels","fixed_labels"]
 
-    # lists with a default value on the arguments
-    allargs=list(plot_arguments.keys())
+    # # lists with a default value on the arguments
+    # allargs=list(plot_arguments.keys())
 
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    lists={} 
-    for i in range(len(allargs)):
-        if type(plot_arguments[allargs[i]]) == type([]):
-            if allargs[i] not in excluded_list:
-                lists[allargs[i]]=allargs[i+1]
+    # # dictionary of the type 
+    # # {"key_list_name":"key_default_value"} 
+    # # eg. {"marker_size":"markers"}
+    # lists={} 
+    # for i in range(len(allargs)):
+    #     if type(plot_arguments[allargs[i]]) == type([]):
+    #         if allargs[i] not in excluded_list:
+    #             lists[allargs[i]]=allargs[i+1]
+    
+    # , lists, notUpdateList, checkboxes
 
-    return plot_arguments, lists, notUpdateList, checkboxes
+    return plot_arguments

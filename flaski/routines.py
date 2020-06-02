@@ -4,9 +4,14 @@ import json
 from werkzeug.utils import secure_filename
 import io
 
-def read_tables(inputfile,session_key="df"):
+ALLOWED_EXTENSIONS=["xlsx","tsv","csv"]
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def read_tables(inputfile,session_key="df", file_field="filename"):
     filename=secure_filename(inputfile.filename)
-    session["filename"]=filename
+    session[file_field]=filename
     fileread = inputfile.read()
     filestream=io.BytesIO(fileread)
     extension=filename.rsplit('.', 1)[1].lower()

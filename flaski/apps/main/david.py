@@ -221,11 +221,13 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.DAVID",\
         "inputargumentsfile":"Select file.."}
 
-    lists=[]
-    for i in list(plot_arguments.keys()):
-        if type(plot_arguments[i]) == type([]):
-            lists.append(i)
-    notUpdateList=[]
-    checkboxes=[]
+    # lists=[]
+    # for i in list(plot_arguments.keys()):
+    #     if type(plot_arguments[i]) == type([]):
+    #         lists.append(i)
+    # notUpdateList=[]
+    # checkboxes=[]
 
-    return plot_arguments, lists, notUpdateList, checkboxes
+    # , lists, notUpdateList, checkboxes
+
+    return plot_arguments
