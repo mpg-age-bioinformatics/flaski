@@ -215,7 +215,7 @@ def askforhelp():
         json.dump(session_, session_file)
 
     send_help_email( user=current_user, eapp=page, emsg=tb_str, etime=str(datetime.now()), session_file=session_file_name)
-    flash("Your scream for Ice cream has been sent. We will get in contact with you as soon as possible.")
+    flash("Your scream for help has been sent. We will get in contact with you as soon as possible.")
     return redirect(url_for(page))
 
 

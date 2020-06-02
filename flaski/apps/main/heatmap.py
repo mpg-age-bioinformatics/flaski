@@ -68,14 +68,6 @@ def make_figure(df,pa):
         pa_["color_bar_label"]={'label': pa["color_bar_label"]}
 
 
-    # if pa["zscore_value"] == "none":
-    #     pa_["zscore_value"]=None
-    # elif pa["zscore_value"] == "row":
-    #     pa_["zscore_value"]=0
-    # elif pa["zscore_value"] == "columns":
-    #     pa_["zscore_value"]=1
-
-
     if ( (int(pa["n_cols_cluster"]) > 0) | (int(pa["n_rows_cluster"]) > 0) ) and ( (pa_["row_cluster"]) and (pa_["col_cluster"])  ):
         g = sns.clustermap(tmp,\
                             method=pa["method_value"],\
@@ -248,26 +240,5 @@ def figure_defaults():
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.heatmap",\
         "inputargumentsfile":"Select file.."}
-    
-    # checkboxes=["row_cluster","col_cluster","robust","xticklabels","yticklabels"]
-
-    # # not update list
-    # notUpdateList=["inputsessionfile"]
-
-    # # lists without a default value on the arguments
-    # excluded_list=[]
-
-    # # lists with a default value on the arguments
-    # allargs=list(plot_arguments.keys())
-
-    # # dictionary of the type 
-    # # {"key_list_name":"key_default_value"} 
-    # # eg. {"marker_size":"markers"}
-    # lists={} 
-    # for i in range(len(allargs)):
-    #     if type(plot_arguments[allargs[i]]) == type([]):
-    #         if allargs[i] not in excluded_list:
-    #             lists[allargs[i]]=allargs[i+1]
-    # , lists, notUpdateList, checkboxes
 
     return plot_arguments
