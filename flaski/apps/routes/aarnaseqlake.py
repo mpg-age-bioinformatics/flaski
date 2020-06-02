@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.models import User, UserLogging
 from flaski.email import send_exception_email
-from flaski.routines import check_session_app, handle_exception, read_request
+from flaski.routines import check_session_app, handle_exception, read_request, fuzzy_search
 
 from flaski.apps.main import iscatterplot, iheatmap
 
@@ -88,62 +88,69 @@ def get_tables(plot_arguments):
     genes=pd.read_csv(plot_arguments["path_to_files"]+"genes.tsv",sep="\t")
 
     if plot_arguments["selected_gene_names"] != "":
-        available_gene_names=plot_arguments["available_gene_names"]
-        selected_gene_names=plot_arguments["selected_gene_names"].split(",")
-        selected_gene_names=" ".join(selected_gene_names)
-        selected_gene_names=selected_gene_names.split(" ")
-        selected_gene_names=[s for s in selected_gene_names if len(s) > 0 ]
-        # selected_gene_names=[ s.strip(" ") for s in selected_gene_names ]
-        selected_gene_names.sort()
-        found_gene_names=[ s  for s in selected_gene_names if s in available_gene_names ]
-        not_found_gene_names=[ s for s in selected_gene_names if s not in found_gene_names ]
-        best_matches={}
-        for gene_name in not_found_gene_names:
-            #best_match=process.extractOne(gene_name,available_gene_names)[0]
-            best_match=process.extract(gene_name,available_gene_names)
-            if gene_name.lower() == best_match[0][0].lower():
-                found_gene_names.append(best_match[0][0])
-            else:
-                best_match=best_match[:3]
-                best_match=[ s[0] for s in best_match ]
-                best_matches[gene_name]=", ".join(best_match)
-        if len(list(best_matches.keys())) > 0:
-            emsg="The folowing gene names could not be found. Please consider the respective options: "
-            for gene in list(best_matches.keys()):
-                emsg=emsg+gene+": "+best_matches[gene]+"; "
-            emsg=emsg[:-2]+"."
+        selected_gene_names, emsg=fuzzy_search(plot_arguments["selected_gene_names"],plot_arguments["available_gene_names"])
+        if emsg:
             flash(emsg,'error')
-        selected_gene_names=found_gene_names
+        # available_gene_names=plot_arguments["available_gene_names"]
+        # selected_gene_names=plot_arguments["selected_gene_names"].split(",")
+        # selected_gene_names=" ".join(selected_gene_names)
+        # selected_gene_names=selected_gene_names.split(" ")
+        # selected_gene_names=[s for s in selected_gene_names if len(s) > 0 ]
+        # # selected_gene_names=[ s.strip(" ") for s in selected_gene_names ]
+        # selected_gene_names.sort()
+        # found_gene_names=[ s  for s in selected_gene_names if s in available_gene_names ]
+        # not_found_gene_names=[ s for s in selected_gene_names if s not in found_gene_names ]
+        # best_matches={}
+        # for gene_name in not_found_gene_names:
+        #     #best_match=process.extractOne(gene_name,available_gene_names)[0]
+        #     best_match=process.extract(gene_name,available_gene_names)
+        #     if gene_name.lower() == best_match[0][0].lower():
+        #         found_gene_names.append(best_match[0][0])
+        #     else:
+        #         best_match=best_match[:3]
+        #         best_match=[ s[0] for s in best_match ]
+        #         best_matches[gene_name]=", ".join(best_match)
+        # if len(list(best_matches.keys())) > 0:
+        #     emsg="The folowing gene names could not be found. Please consider the respective options: "
+        #     for gene in list(best_matches.keys()):
+        #         emsg=emsg+gene+": "+best_matches[gene]+"; "
+        #     emsg=emsg[:-2]+"."
+        #     flash(emsg,'error')
+        # selected_gene_names=found_gene_names
     else:
         selected_gene_names=genes["gene_name"].tolist()
 
     if plot_arguments["selected_gene_ids"] != "":
-        available_gene_ids=plot_arguments["available_gene_ids"]
-        selected_gene_ids=plot_arguments["selected_gene_ids"].split(",")
-        selected_gene_ids=" ".join(selected_gene_ids)
-        selected_gene_ids=selected_gene_ids.split(" ")
-        selected_gene_ids=[s for s in selected_gene_ids if len(s) > 0 ]
-        # selected_gene_ids=[ s.strip(" ") for s in selected_gene_ids ]
-        selected_gene_ids.sort()
-        found_gene_ids=[ s  for s in selected_gene_ids if s in available_gene_ids ]
-        not_found_gene_ids=[ s for s in selected_gene_ids if s not in fount_gene_ids ]
-        best_matches={}
-        for gene_id in not_found_gene_ids:
-            #best_match=process.extractOne(gene_name,available_gene_names)[0]
-            best_match=process.extract(gene_id,available_gene_ids)
-            if gene_id.lower() == best_match[0][0].lower():
-                found_gene_ids.append(best_match[0][0])
-            else:
-                best_match=best_match[:3]
-                best_match=[ s[0] for s in best_match ]
-                best_matches[gene_name]=", ".join(best_match)
-        if len(list(best_matches.keys())) > 0:
-            emsg="The folowing gene ids could not be found. Please consider the respective options: "
-            for gene in list(best_matches.keys()):
-                emsg=emsg+gene+": "+best_matches[gene]+"; "
-            emsg=emsg[:-2]+"."
+        selected_gene_ids, emsg=fuzzy_search(plot_arguments["selected_gene_ids"],plot_arguments["available_gene_ids"])
+        if emsg:
             flash(emsg,'error')
-        selected_gene_ids=found_gene_ids
+
+        # available_gene_ids=plot_arguments["available_gene_ids"]
+        # selected_gene_ids=plot_arguments["selected_gene_ids"].split(",")
+        # selected_gene_ids=" ".join(selected_gene_ids)
+        # selected_gene_ids=selected_gene_ids.split(" ")
+        # selected_gene_ids=[s for s in selected_gene_ids if len(s) > 0 ]
+        # # selected_gene_ids=[ s.strip(" ") for s in selected_gene_ids ]
+        # selected_gene_ids.sort()
+        # found_gene_ids=[ s  for s in selected_gene_ids if s in available_gene_ids ]
+        # not_found_gene_ids=[ s for s in selected_gene_ids if s not in fount_gene_ids ]
+        # best_matches={}
+        # for gene_id in not_found_gene_ids:
+        #     #best_match=process.extractOne(gene_name,available_gene_names)[0]
+        #     best_match=process.extract(gene_id,available_gene_ids)
+        #     if gene_id.lower() == best_match[0][0].lower():
+        #         found_gene_ids.append(best_match[0][0])
+        #     else:
+        #         best_match=best_match[:3]
+        #         best_match=[ s[0] for s in best_match ]
+        #         best_matches[gene_name]=", ".join(best_match)
+        # if len(list(best_matches.keys())) > 0:
+        #     emsg="The folowing gene ids could not be found. Please consider the respective options: "
+        #     for gene in list(best_matches.keys()):
+        #         emsg=emsg+gene+": "+best_matches[gene]+"; "
+        #     emsg=emsg[:-2]+"."
+        #     flash(emsg,'error')
+        # selected_gene_ids=found_gene_ids
     else:
         selected_gene_ids=genes["gene_id"].tolist()
 
