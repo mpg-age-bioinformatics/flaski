@@ -6,7 +6,7 @@ Flaski is a flask based collection of web apps for life-sciences. Flaski can be 
 
 If you need to generate self-signed certificates you can do so by:
 ```
-mkdir ~/flaski_data/certificates 
+mkdir -p ~/flaski_data/certificates 
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/certificates/key.pem -out ~/flaski_data/certificates/cert.pem -subj "/C=DE/ST=NRW/L=Cologne/O=MPS/CN=flaski"
 openssl dhparam -out ~/flaski_data/certificates/dhparam.pem 2048
 ```
