@@ -79,6 +79,12 @@ docker-compose exec backup /backup.sh
 docker-compose exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/
 ```
 
+## Looking for and removing old files
+
+```bash
+docker-compose run --entrypoint="python3 /flaski/flaski.py" init
+```
+
 ## Email logging
 
 To use the SMTP debugging server from Python comment all email related `env` in `docker-compose.yml`.
