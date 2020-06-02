@@ -13,6 +13,7 @@ if __name__ == "__main__":
     def clean():
         data_folder=app.config['USERS_DATA']
         users=os.listdir(data_folder)
+        users=[ s for s in users if s != "tmp" ]
         today=datetime.datetime.now()
 
         for userid in users:
