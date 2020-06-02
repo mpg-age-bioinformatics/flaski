@@ -37,7 +37,7 @@ def david(download=None):
         # INITIATE SESSION
         session["filename"]="Select file.."
 
-        plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
+        plot_arguments=figure_defaults()
 
         session["plot_arguments"]=plot_arguments
         # session["lists"]=lists

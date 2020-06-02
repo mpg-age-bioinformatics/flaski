@@ -33,7 +33,7 @@ import base64
 @login_required
 def venndiagram(download=None):
 
-    apps=apps=current_user.user_apps
+    apps=current_user.user_apps
 
     reset_info=check_session_app(session,"venndiagram",apps)
 

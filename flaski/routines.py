@@ -39,7 +39,11 @@ def read_request(request):
             else:
                 plot_arguments[a]=request.form[a]
         elif a in checkboxes:
-            plot_arguments[a]="off"
+            if plot_arguments[a]==".on":
+                plot_arguments[a]="on"
+            else:
+                plot_arguments[a]="off"
+
     session["plot_arguments"]=plot_arguments
     return plot_arguments
 

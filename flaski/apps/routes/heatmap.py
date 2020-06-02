@@ -30,6 +30,8 @@ import pandas as pd
 
 import base64
 
+import sys
+
 @app.route('/heatmap/<download>', methods=['GET', 'POST'])
 @app.route('/heatmap', methods=['GET', 'POST'])
 @login_required
@@ -47,7 +49,7 @@ def heatmap(download=None):
         # INITIATE SESSION
         session["filename"]="Select file.."
 
-        plot_arguments, lists, notUpdateList, checkboxes=figure_defaults()
+        plot_arguments=figure_defaults()
 
         session["plot_arguments"]=plot_arguments
         session["COMMIT"]=app.config['COMMIT']

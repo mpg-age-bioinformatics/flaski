@@ -51,6 +51,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         gedic_keys=", ".join(gedic_keys).split(", ")
         gedic_value=", ".join(gedic_value).split(", ")
         gedic=pd.DataFrame({0:gedic_keys,1:gedic_value})
+        gedic[1]=gedic[1].apply(lambda x: float(str(x).replace(",",".")) )
         gedic=gedic.drop_duplicates()
         gedic.index=gedic[0].tolist()
         gedic=gedic.to_dict()[ 1 ]
@@ -81,7 +82,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         # log10p=float(tmp.iloc[0,tmp.columns.tolist().index(pa["plotvalue"])])
         genes=tmp.iloc[0,tmp.columns.tolist().index( pa["david_gene_ids"] )].split(", ")
         tmp=pd.DataFrame({"term":term,"genes":genes})
-        tmp["expression"]=tmp["genes"].apply(lambda x: float(gedic.get(x.upper()) ) )
+        tmp["expression"]=tmp["genes"].apply(lambda x: float( gedic.get(x.upper())  ) )
         tmp["gene_name"]=tmp["genes"].apply(lambda x: namesdic.get(x.upper()) )
         tmp["n_genes"]=len(genes)
         tmp=tmp.sort_values(by=["expression"], ascending=True)
