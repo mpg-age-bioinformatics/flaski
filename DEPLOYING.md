@@ -129,59 +129,14 @@ flask db migrate -m "new fields in user model"
 flask db upgrade
 ```
 
-Backup a database:
+Manually backup a database:
 ```bash
 docker-compose exec mariadb /usr/bin/mysqldump -u root --password=mypass flaski > dump.sql
 ```
 
-Restore a database from backup:
+Manually restore a database from backup:
 ```bash
 cat dump.sql | docker-compose exec mariadb mysql --user=root --password=mypass flaski
-```
-
-*Backup with `mariabackup`*
-
-1st backup:
-```bash
-mariabackup --backup \
-   --target-dir=/var/mariadb/backup/ \
-   --user=root --password=mypass
-```
-
-2nd backup:
-```bash
-mariabackup --backup \
-   --incremental-basedir=/var/mariadb/backup/
-   --target-dir=/var/mariadb/inc1/ \
-   --user=root --password=mypass
-```
-
-3rd backup:
-```bash
-mariabackup --backup \
-   --target-dir=/var/mariadb/inc2/ \
-   --incremental-basedir=/var/mariadb/inc1/ \
-   --user=root --password=mypass
-```
-
-*Restore from incremental backups with `mariabackup`*
-```bash
-mariabackup --prepare \
-   --target-dir=/var/mariadb/backup
-mariabackup --prepare \
-   --target-dir=/var/mariadb/backup \
-   --incremental-dir=/var/mariadb/inc1
-.
-.
-.
-mariabackup --prepare \
-   --target-dir=/var/mariadb/backup \
-   --incremental-dir=/var/mariadb/incN
-
-mariabackup --copy-back \
-   --target-dir=/var/mariadb/backup/
-
-chown -R mysql:mysql /var/lib/mysql/
 ```
 
 ## Build and Install
@@ -191,12 +146,6 @@ python3 setup.py bdist_wheel
 pip3 install flaski-0.1.0-py3-none-any.whl
 ```
 Static files need to be included in the `MANIFEST.in`.
-
-## Credits
-
-Flaski was build using the [Bootstrap admin theme](https://github.com/BlackrockDigital/startbootstrap-sb-admin-2) created by Start Bootstrap and the [Font-Awesome](https://github.com/FortAwesome/Font-Awesome) toolkit. Please consult the respective projects for licence information.
-
-
 
 
 
