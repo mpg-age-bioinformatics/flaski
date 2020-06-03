@@ -206,7 +206,6 @@ def scatterplot(download=None):
             # CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
 
-            #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
             plt.savefig(figfile, format=plot_arguments["downloadf"])

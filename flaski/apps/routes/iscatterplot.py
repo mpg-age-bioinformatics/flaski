@@ -143,17 +143,12 @@ def iscatterplot(download=None):
                                 "marker_alpha":plot_arguments["marker_alpha"],\
                                 "markeralpha_col_value":"select a column.."}
                             groups_settings.append(group_dic)
-                            # for k in list( group_dic[group].keys() ):
-                            #     plot_arguments[k+"_"+group]=group_dic[group][k]
                         plot_arguments["groups_settings"]=groups_settings
                     elif request.form["groups_value"] == "None" :
                         plot_arguments["groups_settings"]=[]
                         plot_arguments["list_of_groups"]=[]
 
                 elif plot_arguments["groups_value"] != "None":
-                    # print(list(request.form.keys()) )
-                    # import sys
-                    # sys.stdout.flush()
                     groups_settings=[]
                     group_dic={}
                     for group in plot_arguments["list_of_groups"]:
@@ -192,7 +187,6 @@ def iscatterplot(download=None):
             df=pd.read_json(session["df"])
 
             #CALL FIGURE FUNCTION
-            # try:
             fig=make_figure(df,plot_arguments)
             figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
             return render_template('/apps/iscatterplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
@@ -214,7 +208,6 @@ def iscatterplot(download=None):
             pio.orca.config.executable='/miniconda/bin/orca'
             pio.orca.config.use_xvfb = True
             #pio.orca.config.save()
-            #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
 

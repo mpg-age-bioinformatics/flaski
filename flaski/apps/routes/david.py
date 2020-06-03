@@ -40,11 +40,8 @@ def david(download=None):
         plot_arguments=figure_defaults()
 
         session["plot_arguments"]=plot_arguments
-        # session["lists"]=lists
-        # session["notUpdateList"]=notUpdateList
         session["COMMIT"]=app.config['COMMIT']
         session["app"]="david"
-        # session["checkboxes"]=checkboxes
 
     if request.method == 'POST' :
 
@@ -69,13 +66,6 @@ def david(download=None):
             if plot_arguments["user"] == "":
                 flash('Please give in a register DAVID email in "Input" > "DAVID registered email". If you do not yet have a registered address you need to register with DAVID - https://david.ncifcrf.gov/webservice/register.htm. Please be aware that you will not receive any confirmation email. ','error')
                 return render_template('/apps/david.html', apps=apps, **plot_arguments)
-            
-            # debug bad gateway
-            # import time
-            # time.sleep(30)
-
-            # flash('30 seconds debug')
-            # return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
             # CALL FIGURE FUNCTION
             david_df, report_stats=run_david(plot_arguments)
@@ -85,7 +75,6 @@ def david(download=None):
             report_stats=report_stats.astype(str)
             session["david_df"]=david_df.to_json()
             session["report_stats"]=report_stats.to_json()
-            #flash('Success!')
 
             table_headers=david_df.columns.tolist()
             tmp=david_df[:50]
@@ -135,11 +124,6 @@ def david(download=None):
             elif plot_arguments["download_format_value"] == "tsv":               
                 return Response(david_df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
                 #outfile.seek(0)
-
-
-            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
-            #print(plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"])
-            #sys.stdout.flush()
 
         if download == "cellplot":
             # READ INPUT DATA FROM SESSION JSON

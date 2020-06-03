@@ -43,18 +43,7 @@ def make_figure(df,pa):
     elif pa["log_transform_value"] == "log10":
         tmp=np.log10(tmp)
 
-    #print(tmp,pa["yvals"])
     pa_={}
-    # if pa["yvals_colors"] != "select a column..":
-    #     pa_["yvals_colors"]=list( tmp[ tmp.index == pa["yvals_colors"] ].values[0] )
-    #     tmp=tmp[tmp.index != pa_["yvals_colors"]]
-    # else :
-    #     pa_["yvals_colors"]=None
-
-    # if pa["xvals_colors"] != 'select a row..':
-    #     pa_["xvals_colors"]=df[ pa["xvals_colors"] ].tolist()
-    # else :
-    #     pa_["xvals_colors"]=None
 
     checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels","row_dendogram_dist", "col_dendogram_dist","reverse_color_scale"] # "robust"
     for c in checkboxes:
@@ -91,22 +80,13 @@ def make_figure(df,pa):
         pa_["colorscale_value"]=color_continuous_scale
 
 
-    # if pa["color_bar_label"] == "":
-    #     pa_["color_bar_label"]={}
-    # else:
-    #     pa_["color_bar_label"]={'label': pa["color_bar_label"]}
-
     if pa["zscore_value"] == "row":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=1, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
     elif pa["zscore_value"] == "columns":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=0, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
 
     if len(pa["findrow"]) > 0 :
-        print("Finding rows.")
         rows_to_find=pa["findrow"]
-        # rows_to_find=pa["findrow"].split("\n")
-        # rows_to_find=[ s.strip("\r") for s in rows_to_find ]
-        # rows_to_find=[ s.strip(" ") for s in rows_to_find ]
 
         possible_rows=tmp.index.tolist()
         not_found=[ s for s in rows_to_find if s not in possible_rows ]
@@ -171,29 +151,7 @@ def make_figure(df,pa):
     data_array_=tmp.transpose().values
     labels=tmp.columns.tolist()
     rows=tmp.index.tolist()
-
-    # if ( not pa_["col_color_threshold"] ) & ( pa_["col_cluster"] ):
-    #     fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels,\
-    #                         distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]) ,\
-    #                         linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
-    #     dists=[]
-    #     for d in fig["data"]:
-    #         dists.append(d["y"][2])
-    #     color_threshold=abs(np.percentile(dists,50))
-    #     pa_["col_color_threshold"]=color_threshold
-
-    # if ( not pa_["row_color_threshold"] ) & ( pa_["row_cluster"] ): 
-    #     dendro_side = ff.create_dendrogram(data_array, orientation='bottom', labels=rows,\
-    #                         distfun = lambda x: scs.distance.pdist(x, metric=pa["distance_value"]),\
-    #                         linkagefun= lambda x: sch.linkage(x, pa["method_value"]))
-    #     dists=[]
-    #     for d in dendro_side["data"]:
-    #         dists.append(d["x"][2])
-    #     color_threshold=abs(np.percentile(dists,50))
-    #     pa_["row_color_threshold"]=color_threshold
-
     
-        
     # # Initialize figure by creating upper dendrogram
     if pa_["col_cluster"]:
         fig = ff.create_dendrogram(data_array_, orientation='bottom', labels=labels, color_threshold=pa_["col_color_threshold"],\
@@ -295,10 +253,6 @@ def make_figure(df,pa):
         #dendro_leaves_x_labels=tuple(fake_vals)
         heatmap[0]['y']=tuple(fake_vals) #dendro_leaves_x_labels
 
-    #print("x", heatmap[0]['x'][:10])
-    #print("y", heatmap[0]['y'][:10])
-
-
     # Add Heatmap Data to Figure
     # if (pa_["col_cluster"]) | (pa_["row_cluster"]):
     for data in heatmap:
@@ -328,9 +282,7 @@ def make_figure(df,pa):
                                     "tickfont":{"size":float(pa["yaxis_font_size"])},
                                     'ticks':"",\
                                     'ticktext':dendro_leaves_y_labels})
-    # print(dendro_leaves_y_labels, dendro_leaves_y)
-    # import sys
-    # sys.stdout.flush()
+
     # Edit xaxis2
     if pa_["row_cluster"]:
         fig.update_layout(xaxis2={'domain': [0, float(pa["row_dendogram_ratio"])],
@@ -472,26 +424,4 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.iheatmap",\
         "inputargumentsfile":"Select file.."}
     
-    # checkboxes=["row_cluster","col_cluster","xticklabels","yticklabels",\
-    #     "row_dendogram_dist","col_dendogram_dist","reverse_color_scale"]
-
-    # # not update list
-    # notUpdateList=["inputsessionfile"]
-
-    # # lists without a default value on the arguments
-    # excluded_list=["available_rows","findrow"]
-
-    # # lists with a default value on the arguments
-    # allargs=list(plot_arguments.keys())
-
-    # # dictionary of the type 
-    # # {"key_list_name":"key_default_value"} 
-    # # eg. {"marker_size":"markers"}
-    # lists={} 
-    # for i in range(len(allargs)):
-    #     if type(plot_arguments[allargs[i]]) == type([]):
-    #         if allargs[i] not in excluded_list:
-    #             lists[allargs[i]]=allargs[i+1]
-
-    # , lists, notUpdateList, checkboxes
     return plot_arguments

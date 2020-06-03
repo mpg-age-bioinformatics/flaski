@@ -115,7 +115,6 @@ def venndiagram(download=None):
             # CALL FIGURE FUNCTION
             fig, df, pvalues=make_figure(plot_arguments)
 
-            #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
             plt.savefig(figfile, format=plot_arguments["downloadf"])

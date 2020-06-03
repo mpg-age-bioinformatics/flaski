@@ -229,26 +229,4 @@ def figure_defaults():
     }
     # grid colors not implemented in UI
 
-
-    # checkboxes=[]
-
-    # # not update list
-    # notUpdateList=["inputsessionfile"]
-
-    # # lists without a default value on the arguments
-    # excluded_list=[]
-
-    # # lists with a default value on the arguments
-    # allargs=list(plot_arguments.keys())
-
-    # # dictionary of the type 
-    # # {"key_list_name":"key_default_value"} 
-    # # eg. {"marker_size":"markers"}
-    # lists={} 
-    # for i in range(len(allargs)):
-    #     if type(plot_arguments[allargs[i]]) == type([]):
-    #         if allargs[i] not in excluded_list:
-    #             lists[allargs[i]]=allargs[i+1]
-
-     #, lists, notUpdateList, checkboxes
     return plot_arguments

@@ -20,13 +20,6 @@ import sys
 import random
 import json
 
-# import matplotlib
-# matplotlib.use('agg')
-# from matplotlib.backends.backend_agg import FigureCanvasAgg
-# from matplotlib.backends.backend_svg import FigureCanvasSVG
-# from matplotlib.figure import Figure
-# import matplotlib.pyplot as plt
-
 import pandas as pd
 
 import base64
@@ -160,7 +153,6 @@ def iheatmap(download=None):
             pio.orca.config.executable='/miniconda/bin/orca'
             pio.orca.config.use_xvfb = True
             #pio.orca.config.save()
-            #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
             fig.write_image(figfile, format=plot_arguments["downloadf"], height=float(plot_arguments["fig_height"]) , width=float(plot_arguments["fig_width"]))

@@ -19,7 +19,6 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     """
 
     pa_={}
-    # checkboxes=["color_scale_value","log10transform","xaxis_line","yaxis_line","topxaxis_line","rightyaxis_line", "grid"] # "robust"
     for c in checkboxes:
         if (pa[c] =="on") | (pa[c] ==".on"):
             pa_[c]=True
@@ -269,26 +268,6 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.icellplot",\
         "inputargumentsfile":"Select file.."}    
-
-    # # not update list
-    # notUpdateList=["inputsessionfile"]
-
-    # # lists without a default value on the arguments
-    # excluded_list=["categories_to_plot","categories_to_plot_value"]
-
-    # # lists with a default value on the arguments
-    # allargs=list(plot_arguments.keys())
-
-    # # dictionary of the type 
-    # # {"key_list_name":"key_default_value"} 
-    # # eg. {"marker_size":"markers"}
-    # lists={} 
-    # for i in range(len(allargs)):
-    #     if type(plot_arguments[allargs[i]]) == type([]):
-    #         if allargs[i] not in excluded_list:
-    #             lists[allargs[i]]=allargs[i+1]
-
-    #, lists, notUpdateList, checkboxes
-
+        
     return plot_arguments
 

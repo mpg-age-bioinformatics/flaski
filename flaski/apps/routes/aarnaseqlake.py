@@ -91,32 +91,6 @@ def get_tables(plot_arguments):
         selected_gene_names, emsg=fuzzy_search(plot_arguments["selected_gene_names"],plot_arguments["available_gene_names"])
         if emsg:
             flash(emsg,'error')
-        # available_gene_names=plot_arguments["available_gene_names"]
-        # selected_gene_names=plot_arguments["selected_gene_names"].split(",")
-        # selected_gene_names=" ".join(selected_gene_names)
-        # selected_gene_names=selected_gene_names.split(" ")
-        # selected_gene_names=[s for s in selected_gene_names if len(s) > 0 ]
-        # # selected_gene_names=[ s.strip(" ") for s in selected_gene_names ]
-        # selected_gene_names.sort()
-        # found_gene_names=[ s  for s in selected_gene_names if s in available_gene_names ]
-        # not_found_gene_names=[ s for s in selected_gene_names if s not in found_gene_names ]
-        # best_matches={}
-        # for gene_name in not_found_gene_names:
-        #     #best_match=process.extractOne(gene_name,available_gene_names)[0]
-        #     best_match=process.extract(gene_name,available_gene_names)
-        #     if gene_name.lower() == best_match[0][0].lower():
-        #         found_gene_names.append(best_match[0][0])
-        #     else:
-        #         best_match=best_match[:3]
-        #         best_match=[ s[0] for s in best_match ]
-        #         best_matches[gene_name]=", ".join(best_match)
-        # if len(list(best_matches.keys())) > 0:
-        #     emsg="The folowing gene names could not be found. Please consider the respective options: "
-        #     for gene in list(best_matches.keys()):
-        #         emsg=emsg+gene+": "+best_matches[gene]+"; "
-        #     emsg=emsg[:-2]+"."
-        #     flash(emsg,'error')
-        # selected_gene_names=found_gene_names
     else:
         selected_gene_names=genes["gene_name"].tolist()
 
@@ -124,33 +98,6 @@ def get_tables(plot_arguments):
         selected_gene_ids, emsg=fuzzy_search(plot_arguments["selected_gene_ids"],plot_arguments["available_gene_ids"])
         if emsg:
             flash(emsg,'error')
-
-        # available_gene_ids=plot_arguments["available_gene_ids"]
-        # selected_gene_ids=plot_arguments["selected_gene_ids"].split(",")
-        # selected_gene_ids=" ".join(selected_gene_ids)
-        # selected_gene_ids=selected_gene_ids.split(" ")
-        # selected_gene_ids=[s for s in selected_gene_ids if len(s) > 0 ]
-        # # selected_gene_ids=[ s.strip(" ") for s in selected_gene_ids ]
-        # selected_gene_ids.sort()
-        # found_gene_ids=[ s  for s in selected_gene_ids if s in available_gene_ids ]
-        # not_found_gene_ids=[ s for s in selected_gene_ids if s not in fount_gene_ids ]
-        # best_matches={}
-        # for gene_id in not_found_gene_ids:
-        #     #best_match=process.extractOne(gene_name,available_gene_names)[0]
-        #     best_match=process.extract(gene_id,available_gene_ids)
-        #     if gene_id.lower() == best_match[0][0].lower():
-        #         found_gene_ids.append(best_match[0][0])
-        #     else:
-        #         best_match=best_match[:3]
-        #         best_match=[ s[0] for s in best_match ]
-        #         best_matches[gene_name]=", ".join(best_match)
-        # if len(list(best_matches.keys())) > 0:
-        #     emsg="The folowing gene ids could not be found. Please consider the respective options: "
-        #     for gene in list(best_matches.keys()):
-        #         emsg=emsg+gene+": "+best_matches[gene]+"; "
-        #     emsg=emsg[:-2]+"."
-        #     flash(emsg,'error')
-        # selected_gene_ids=found_gene_ids
     else:
         selected_gene_ids=genes["gene_id"].tolist()
 
@@ -180,7 +127,6 @@ def get_tables(plot_arguments):
 
     gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
     selected_ge=gedf[list(ids2labels.keys())]
-    # print(selected_ge.head())
     
     selected_ge=selected_ge.astype(float)
     cols=selected_ge.columns.tolist()
@@ -194,7 +140,6 @@ def get_tables(plot_arguments):
     #     selected_ge[c]=selected_ge[c].apply(lambda x: nFormat(x) )
     selected_ge.reset_index(inplace=True,drop=True)
     selected_ge.rename(columns=ids2labels,inplace=True)
-    # print(selected_ge.head())
     df_ge=selected_ge.copy()
     selected_ge=selected_ge[:50]
 
@@ -261,8 +206,6 @@ def aarnaseqlake(download=None):
         session["plot_arguments"]={}
         session["plot_arguments"]["path_to_files"]="/flaski_private/aarnaseqlake/"
         gedf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"gene_expression.tsv",sep="\t",index_col=[0])
-        #session["plot_arguments"]["gedf"]=gedf.to_json()
-        #GO=pd.read_csv(session["plot_arguments"]["path_to_files"]+"GO.tsv",sep="\t")
         results_files=pd.read_csv(session["plot_arguments"]["path_to_files"]+"files2ids.tsv",sep="\t")
         genes=pd.read_csv(session["plot_arguments"]["path_to_files"]+"genes.tsv",sep="\t")
 
@@ -309,24 +252,6 @@ def aarnaseqlake(download=None):
     if request.method == 'POST':
 
         try:
-
-            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-            # WITH THE EXCEPTION OF SELECTION LISTS
-            # plot_arguments = session["plot_arguments"]
-            # values_list=[ s for s in list(plot_arguments.keys()) if type(plot_arguments[s]) == list ]
-            # for a in list(plot_arguments.keys()):
-            #     if a in list(request.form.keys()):
-            #         if a in values_list:
-            #             plot_arguments[a]=request.form.getlist(a)
-            #         else:
-            #             plot_arguments[a]=request.form[a]
-
-
-            # # UPDATE SESSION VALUES
-            # session["plot_arguments"]=plot_arguments
-
-
-            # plot_arguments=session["plot_arguments"]
             plot_arguments=read_request(request)
             plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
             session["plot_arguments"]=plot_arguments
@@ -433,11 +358,8 @@ def aarnaseqlake(download=None):
             session["filename"]="<from RNAseq lake>"
             plot_arguments=iscatterplot.figure_defaults()
             session["plot_arguments"]=plot_arguments
-            # session["lists"]=lists
-            # session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="iscatterplot"
-            # session["checkboxes"]=checkboxes
 
             df_dge["log10(baseMean)"]=df_dge["baseMean"].apply(lambda x: np.log10(x) )
             df_dge.loc[ df_dge["padj"]<=0.05,"Significant"]="yes"
@@ -513,12 +435,8 @@ def aarnaseqlake(download=None):
 
             session["filename"]="<from RNAseq lake>"
             plot_arguments=iscatterplot.figure_defaults()
-            #session["plot_arguments"]=plot_arguments
-            # session["lists"]=lists
-            # session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="iscatterplot"
-            # session["checkboxes"]=checkboxes
 
             df_dge["-log10(padj)"]=df_dge["padj"].apply(lambda x: np.log10(x)*-1 )
             df_dge.loc[ df_dge["padj"]<=0.05,"Significant"]="yes"
@@ -600,11 +518,8 @@ def aarnaseqlake(download=None):
 
             session["filename"]="<from RNAseq lake>"
             session["plot_arguments"]=plot_arguments
-            # session["lists"]=lists
-            # session["notUpdateList"]=notUpdateList
             session["COMMIT"]=app.config['COMMIT']
             session["app"]="iheatmap"
-            # session["checkboxes"]=checkboxes
 
             cols=df_ge.columns.tolist()
             df_de=df_ge.astype(str)
@@ -632,7 +547,6 @@ def aarnaseqlake(download=None):
             plot_arguments["findrowup"]="10"
             plot_arguments["findrowdown"]="10"
             plot_arguments["xticklabels"]="on"
-
 
             session["plot_arguments"]=plot_arguments
 

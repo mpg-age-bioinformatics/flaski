@@ -74,11 +74,9 @@ def run_david(pa):
     n=pa["n"]    
     #, categories, user, ids, ids_bg = None, name = '', name_bg = '', verbose = False, p = 0.1, n = 2
 
-    # return pd.DataFrame(), pd.DataFrame()
     verbose=True
     ids = ','.join([str(i) for i in ids])
     use_bg = 0
-    #print(ids,ids_bg)
 
     if ids_bg is not None:
       ids_bg = ','.join([str(i) for i in ids_bg])
@@ -220,14 +218,5 @@ def figure_defaults():
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.DAVID",\
         "inputargumentsfile":"Select file.."}
-
-    # lists=[]
-    # for i in list(plot_arguments.keys()):
-    #     if type(plot_arguments[i]) == type([]):
-    #         lists.append(i)
-    # notUpdateList=[]
-    # checkboxes=[]
-
-    # , lists, notUpdateList, checkboxes
 
     return plot_arguments

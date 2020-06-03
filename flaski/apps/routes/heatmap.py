@@ -73,11 +73,6 @@ def heatmap(download=None):
                 flash(msg,"info")
 
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-                # SELECTION LISTS DO NOT GET UPDATED 
-                # lists=session["lists"]
-
-                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments=read_request(request)
 
             
@@ -90,13 +85,6 @@ def heatmap(download=None):
                 if allowed_file(inputfile.filename):
                     df=read_tables(inputfile)
                     cols=df.columns.tolist()
-
-                    # if session["plot_arguments"]["yvals_colors"] not in cols:
-                    #     session["plot_arguments"]["yvals_colors"]=["None"]+cols
-
-                    # if session["plot_arguments"]["xvals_colors"] not in df[cols[0]].tolist():
-                    #     session["plot_arguments"]["xvals_colors"]=["select a row.."]+df[cols[0]].tolist()
-
 
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                     if (session["plot_arguments"]["yvals"] not in cols) | (session["plot_arguments"]["xvals"] not in cols):
@@ -125,9 +113,6 @@ def heatmap(download=None):
                     error_message="No data to plot, please upload a data or session  file."
                     flash(error_msg,'error')
                     return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps,  **plot_arguments)
-    
-            #if session["plot_arguments"]["groups_value"]=="None":
-            #    session["plot_arguments"]["groups_auto_generate"]=".on"
 
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
@@ -138,7 +123,6 @@ def heatmap(download=None):
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION
-            # try:
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
             # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
@@ -165,7 +149,6 @@ def heatmap(download=None):
             # CALL FIGURE FUNCTION
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
-            #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
             plt.savefig(figfile, format=plot_arguments["downloadf"])
@@ -220,9 +203,7 @@ def heatmap(download=None):
             eventlog = UserLogging(email=current_user.email,action="download figure heatmap clusters")
             db.session.add(eventlog)
             db.session.commit()
-
-            #mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, attachment_filename=plot_arguments["downloadn"]+".xlsx" 
-
+            
             return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
 
         eventlog = UserLogging(email=current_user.email, action="visit heatmap")

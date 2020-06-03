@@ -15,7 +15,6 @@ def GET_COLOR(x):
     if str(x)[:3].lower() == "rgb":
         vals=x.split("rgb(")[-1].split(")")[0].split(",")
         vals=[ float(s.strip(" ")) for s in vals ]
-        #vals=tuple(vals)
         return vals
     else:
         return str(x)
@@ -377,66 +376,7 @@ def figure_defaults():
         "inputargumentsfile":"Select file.."
     }
     # grid colors not implemented in UI
-
-
-    # checkboxes=["left_axis","right_axis","upper_axis","lower_axis",\
-    #         "tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis",\
-    #         "show_legend"]
-
-    # not update list
-    # notUpdateList=["inputsessionfile"]
-
-    # lists without a default value on the arguments
-    #excluded_list=["groups_settings","list_of_groups"]
-
-    # lists with a default value on the arguments
-    #allargs=list(plot_arguments.keys())
-
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    # lists={} 
-    # for i in range(len(allargs)):
-    #     if type(plot_arguments[allargs[i]]) == type([]):
-    #         if allargs[i] not in excluded_list:
-    #             lists[allargs[i]]=allargs[i+1]
-    # , lists, notUpdateList, checkboxes
     return plot_arguments
-
-# def input_check(df,pa):
-#     errors=[]
-#     try:
-#         pa["title"]=str(pa["title"])
-#     else:
-#         errors=errors+["Could not convert title to string."]
-
-#     try:
-#         pa["titles"]=int(pa["titles"])
-#     except:
-#         errors=errors+["Could not convert title size to int."]
-
-#     for x in pa["xcols"]:
-#         if x not in df.columns.tolist():
-#             errors=errors+["%s could not be found on your dataframe headers." %x]
-
-#     for y in pa["ycols"]:
-#         if y not in df.columns.tolist():
-#             errors=errors+["%s could not be found on your dataframe headers." %y]
-
-#     if type(pa["xvals"]) != list:
-#         if str(pa["xvals"]).lower() == "none":
-#             errors=errors+["No x vals selected."]
-#         else:
-#             errors=errors+["Could not find proper values for x"]
-#     else:
-#         for v in pa["xvals"]:
-#             values=[]
-#             try:
-#                 values=values+[float(v)]
-#             except:
-#                 errors=errors+["Could not find proper values for x"]
-
-    
 
     
 

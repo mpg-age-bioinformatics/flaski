@@ -68,41 +68,6 @@ def icellplot(download=None):
 
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
                 plot_arguments=read_request(request)
-
-                # SELECTION LISTS DO NOT GET UPDATED 
-                # lists=session["lists"]
-
-                # # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                # # WITH THE EXCEPTION OF SELECTION LISTS
-                # plot_arguments = session["plot_arguments"]
-                # values_list=[ s for s in list(plot_arguments.keys()) if "_value" in s ]
-                # values_list=[ s for s in values_list if type(plot_arguments[s]) == list ]
-                # for a in list(plot_arguments.keys()):
-                #     if ( a in list(request.form.keys()) ) & ( a not in list(lists.keys())+session["notUpdateList"] ):
-                #         if a in values_list:
-                #             plot_arguments[a]=request.form.getlist(a)
-                #         else:
-                #             plot_arguments[a]=request.form[a]
-
-                # # # VALUES SELECTED FROM SELECTION LISTS 
-                # # # GET UPDATED TO THE LATEST CHOICE
-                # # for k in list(lists.keys()):
-                # #     if k in list(request.form.keys()):
-                # #         plot_arguments[lists[k]]=request.form[k]
-                # # checkboxes
-                # for checkbox in session["checkboxes"]:
-                #     if checkbox in list(request.form.keys()) :
-                #         plot_arguments[checkbox]="on"
-                #     else:
-                #         try:
-                #             plot_arguments[checkbox]=request.form[checkbox]
-                #         except:
-                #             if (plot_arguments[checkbox][0]!="."):
-                #                 plot_arguments[checkbox]="off"
-
-                # # UPDATE SESSION VALUES
-                # session["plot_arguments"]=plot_arguments
-
             
             missing_args=False
             # IF THE UPLOADS A NEW FILE 
@@ -235,7 +200,6 @@ def icellplot(download=None):
             pio.orca.config.executable='/miniconda/bin/orca'
             pio.orca.config.use_xvfb = True
             #pio.orca.config.save()
-            #flash('Figure is being sent to download but will not be updated on your screen.')
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
 

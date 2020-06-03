@@ -35,7 +35,6 @@ def make_figure(df,pa):
     elif pa["zscore_value"] == "columns":
         tmp=pd.DataFrame(stats.zscore(tmp, axis=0, ddof=1),columns=tmp.columns.tolist(), index=tmp.index.tolist())
 
-    #print(tmp,pa["yvals"])
     pa_={}
     if pa["yvals_colors"] != "select a column..":
         pa_["yvals_colors"]=list( tmp[ tmp.index == pa["yvals_colors"] ].values[0] )
