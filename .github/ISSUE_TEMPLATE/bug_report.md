@@ -8,6 +8,7 @@ assignees: jorgeboucas
 ---
 
 **App**
+In which App did you find a bug.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
