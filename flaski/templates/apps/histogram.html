@@ -38,105 +38,194 @@
 
         <form action="{{ url_for('histogram') }}" method="post" enctype="multipart/form-data">
 
-            <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
+            <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
+            <!-- Heading -->
+            <div class="sidebar-heading">Input</div>
 
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item" style="padding-bottom: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Figure</span>
-                </a>
-                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
+                    <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
+                </div>
 
-                            <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left: 7px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px"></label>
+            </div>
 
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
 
-                            <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left: 4px"> size: <select name=title_size_value method="GET" action="/" style="width:50px">
-                                {% for title_size_ in title_size %}
-                                    <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
-                                {% endfor %}
-                            </select></label>
+            {% if filename != "Select file.." %}
 
-                            <label style="padding-left:0px;padding-right:0px;">Fill alpha: <input type="text" name="fill_alpha" value='{{ fill_alpha }}' style="width:83px;height:22px;padding-left:4px;"></label>
-
+            <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
+            
+                <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 25px;">
+                    
+                    <div class="row" style="padding-right:15px;padding-left:13px;padding-top:0px;padding-bottom:10px;">
+                        <div class="column" >
+                            <div class="sidebar-heading">Data columns:</div>
+                            <div style="padding-left:13px;">
+                                <select name="vals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                                    {% for col in cols %}
+                                        <option value="{{col}}" {% if col in vals %} selected {% endif %}>{{col}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
 
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+                
+                {% if vals != [] %}
 
-            <!-- -------------------- Histogram ARGUMENTS ---------------------- -->
+                <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
 
-            <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseParameters" aria-expanded="true" aria-controls="collapseParameters" style="padding-top: 0px;">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Parameters</span>
-                </a>
-                <div id="collapseParameters" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-                            <label style="width:300px">Values:</label>
-                            <textarea type="text" name=values value='{{ values }}' rows="3" cols="30" style="width:320px;height:66px;padding-left:4px;">{{ values }}</textarea>
-
-                            <label style="padding-top:8px;">Fill color: <select name=color_value method="GET" action="/" style="width:78px;padding-top:8px;">
-                                {% for colors_ in colors %}
-                                    <option value="{{colors_}}" {% if colors_==color_value %} selected {% endif %}>{{colors_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label> ..or, write a fill color name <input type="text" name="color_rgb" value='{{ color_rgb }}' style="width:160px;height:22px;padding-left: 4px"></label>
-                            
-                            <label style="padding-top:8px;">Binning type: <select name=bins_value method="GET" action="/" style="width:78px;padding-top:8px;">
-                                {% for bins_ in bins %}
-                                    <option value="{{bins_}}" {% if bins_==bins_value %} selected {% endif %}>{{bins_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label> ..or, write the number of bins <input type="text" name="bins_number" value='{{ bins_number }}' style="width:140px;height:22px;padding-left: 4px"></label>
-
-                            <label style="padding-right:10px;">Orientation: <select name=orientation_value method="GET" action="/" style="width:95px">
-                                {% for orientations_ in orientations %}
-                                    <option value="{{orientations_}}" {% if orientations_==orientation_value %} selected {% endif %}>{{orientations_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-right:10px;">Type: <select name=histtype_value method="GET" action="/" style="width:100px">
-                                {% for histtype_ in hist_types %}
-                                    <option value="{{histtype_}}" {% if histtype_==histtype_value %} selected {% endif %}>{{histtype_}}</option>
-                                {% endfor %}
-                            </select></label>
-                            
-                            <label> Line width: <input type="text" name="linewidth" value='{{ linewidth }}' style="width:75px;height:22px;padding-left: 4px"></label>
-
-                            <label style="padding-left:28px;">Line style: <select name=linestyle_value method="GET" action="/" style="width:78px">
-                                {% for linestyles_ in linestyles %}
-                                    <option value="{{linestyles_}}" {% if linestyles_==linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-right:28px;">Line color: <select name=line_color method="GET" action="/" style="width:75px">
-                                {% for colors_ in colors %}
-                                    <option value="{{colors_}}" {% if colors_==line_color %} selected {% endif %}>{{colors_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label> ..or, write a line color name <input type="text" name="line_rgb" value='{{ line_rgb }}' style="width:155px;height:22px;padding-left:4px"></label>
-
+                <!-- Nav Item - Pages Collapse Menu -->
+                <li class="nav-item" style="padding-bottom: 0px;">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Figure</span>
+                    </a>
+                    <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded openmenu">
+                            <div class="row arguments">
+                                
+                                <div class="row arg">
+                                    <label>Title: <input type="text" name="title" value='{{ title }}' style="width:300px;height:22px;padding-right: 5px"></label>
+                                    <label style="padding-right: 4px"> Title size: <select name=title_size_value method="GET" action="/" style="width:50px">
+                                        {% for title_size_ in title_size %}
+                                            <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 6px"></label>
+                                    <label style="padding-left: 6px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 6px"></label>
+                                </div>
+                                
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
+                </li>
+
+
+                <!-- -------------------- Histogram ARGUMENTS ---------------------- -->
+
+                    {% for val in vals %}
+                    
+                        <li class="nav-item" style="padding-top: 0px;">
+                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{val.name}}" aria-expanded="true" aria-controls="collapse{{val.name}}" style="padding-top: 0px;">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Histogram {{val}} </span>
+                            </a>
+                        
+                            
+                            <div id="collapse{{val.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                <div class="bg-white py-2 collapse-inner rounded openmenu">
+                                    <div class="row arguments">
+                                        
+                                        <div class="row arg" style="padding-bottom:6px;">
+                                            <label> Label <input type="text" name={{val}}.label value={{groups_settings[val]["label"]}} style="width:300px;height:22px;padding-left 4px">
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label style="padding-right:10px;padding-bottom:6px;">Fill color: <select value={{groups_settings[val]["color_value"]}} method="GET" action="/" style="width:100px;padding-right:10px;padding-bottom:6px;">
+                                            {% for colors_ in colors %}
+                                            <option value="{{colors_}}" {% if colors_==val.color_value %} selected {% endif %}>{{colors_}}</option>
+                                            {% endfor %}
+                                            </select></label>
+                                        </div>
+
+                                        <div class="row arg" style="padding-bottom:6px;">
+                                            <label> ..or, write a fill color name <input type="text" name={{val}}.color_rgb value={{groups_settings[val]["color_rgb"]}} style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;">
+                                        </div>
+                                        
+                                        <div class="row arg">
+                                            <label style="padding-right:10px;padding-bottom:6px;">Line color: <select
+                                                name={{val}}.line_color
+                                                value=groups_settings[val]["line_color"]}}  method="GET" action="/" style="width:100px;padding-bottom:6px;">
+                                            {% for colors_ in colors %}
+                                            <option value="{{colors_}}" {% if colors_==val.line_color %} selected {% endif %}>{{colors_}}</option>
+                                            {% endfor %}
+                                            </select></label>
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label> ..or, write a line color name <input type="text" name={{val}}.line_rgb value={{groups_settings[val]["line_rgb"]}}  style="width:300px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
+                                        </div>
+                                        
+                                        <div class="row arg">
+                                            <label style="padding-bottom:6px;">Binning type: <select name={{val}}.bins_value
+                                                val={{groups_settings[val]["bins_value"]}}  method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
+                                            {% for bins_ in bins %}
+                                            <option value="{{bins_}}" {% if bins_==val.bins_value %} selected {% endif %}>{{bins_}}</option>
+                                            {% endfor %}
+                                            </select></label>
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label> ..or, write the number of bins <input type="text" name={{val}}.bins_number value={{groups_settings[val]["bins_number"]}}  style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;"></label>
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label style="padding-right:5px;padding-bottom:6px;">Orientation: <select name={{val}}.orientation_value val= {{groups_settings[val]["orientation"]}}
+                                                method="GET" action="/" style="width:80px;padding-bottom:6px;">
+                                            {% for orientations_ in orientations %}
+                                                <option value="{{orientations_}}" {% if orientations_==val.orientation_value %} selected {% endif %}>{{orientations_}}</option>
+                                            {% endfor %}
+                                            </select></label>
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label style="padding-left:10px;padding-bottom:6px;">Type: <select name={{val}}.histtype_value
+                                                val= {{groups_settings[val]["histtype_value"]}}  method="GET" action="/" style="width:90px;padding-bottom:6px;">
+                                            {% for histtype_ in hist_types %}
+                                                <option value="{{histtype_}}" {% if histtype_==val.histtype_value %} selected {% endif %}>{{histtype_}}</option>
+                                            {% endfor %}
+                                            </select></label>
+                                        </div>
+
+                                        
+                                        <div class="row arg">
+                                            <label> Line width: <input type="text" name={{val}}.linewidth value={{groups_settings[val]["linewidth"]}}  style="width:75px;height:22px;padding-left: 20px;padding-bottom:6px;"></label>
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label style="padding-left:5px;padding-bottom:6px;">Line style: <select name={{val}}.linestyle_value val = {{groups_settings[val]["linestyle_value"]}}  method="GET" action="/" style="width:79px;padding-bottom:6px;">
+                                            {% for linestyles_ in linestyles %}
+                                            <option value="{{linestyles_}}" {% if linestyles_==val.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                            {% endfor %}
+                                            </select></label>
+                                        </div>
+                                        
+                                        <div class="row arg">
+                                            <label style="padding-bottom:6px;padding-right:5px">Fill alpha: <input type="text" name={{val}}.fill_alpha value={{groups_settings[val]["fill_alpha"]}}  style="width:85px;height:22px;padding-left:20px;padding-bottom:6px;"></label>
+                                        </div>
+                                        
+                                        <div class="row arg">
+                                            <label style="width:80px;padding-left:1px;padding-bottom:6px;">Log scale:</label>
+                                            <label style="padding-right:1px;padding-bottom:6px;;"><input type="checkbox" name= {{val}}.log_scale {% if val.log_scale =="on" %} checked {% elif val.log_scale==".on" %} checked {% endif %}/></label>
+                                        </div>
+                                        
+                                        
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+
+
+            {% endif %}
+
 
 
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
+
 
             {% if figure_url %}
             
