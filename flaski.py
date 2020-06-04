@@ -18,8 +18,7 @@ if __name__ == "__main__":
         sys.stdout.flush()
         data_folder=app.config['USERS_DATA']
         users=os.listdir(data_folder)
-        users=[ s for s in users if "tmp" not in s  ]
-        users=[ s for s in users if s != "stats" ]
+        users=[ s for s in users if s not in [ "tmp" ] ]
         today=datetime.datetime.now()
 
         for userid in users:
