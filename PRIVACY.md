@@ -71,7 +71,20 @@ Personal data, ie. firstname, last name, email, and organization are kept until 
 
 *Data analysis*
 
-Flaski purpose is to support researchers on the analysis for their data. For this we constantly enhance the number and quality of our app promptly responding to user's requests. Flaski, the Max Planck Institute for Biology of Ageing, and it's personnel can not be hold responsible for any data analysis performed with Flaski nor for any misinterpretation that might come from an undesirable, misunderstood. Flaski's code is public and open source and we encourage all users to follow it's code as a trace to their analysis.   
+Flaski purpose is to support researchers on the analysis for their data. For this we constantly enhance the number and quality of our app promptly responding to user's requests. Flaski, the Max Planck Institute for Biology of Ageing, and it's personnel can not be hold responsible for any data analysis performed with Flaski nor for any misinterpretation that might come from an undesirable or misunderstood function. Flaski's code is public and open source and we encourage all users to follow it's code as a trace to their analysis.   
+
+*What are my rights as a data subject?*
+
+As an individual whose personal data is gathered as part of the aforementioned services, you have, in principle, the following rights, to the extent that no legal exceptions are applicable in individual cases:
+
+- Information (Article 15 GDPR)
+- Correction (Article 16 GDPR)
+- Deletion (Article 17 (1) GDPR)
+- Restriction of processing (Article 18 GDPR)
+- Data transmission (Article 20 GDPR)
+- Revocation of processing (Article 21 GDPR)
+- Revocation of consent (Article 7 (3) GDPR)
+- Right to complain to the regulator (Article 77 GDPR). For the MPG, this is the Bavarian Data Protection Authority (BayLDA), Postbox 606, 91511 Ansbach
 
 **Contacting Flaski**
 
@@ -85,19 +98,5 @@ Joseph-Stelzmann-Str. 9b
 
 Phone: +49 221 37970-0
 
-Email: 
- 
-
-What are my rights as a data subject?
-
-As an individual whose personal data is gathered as part of the aforementioned services, you have, in principle, the following rights, to the extent that no legal exceptions are applicable in individual cases:
-
-•	Information (Article 15 GDPR)
-•	Correction (Article 16 GDPR)
-•	Deletion (Article 17 (1) GDPR)
-•	Restriction of processing (Article 18 GDPR)
-•	Data transmission (Article 20 GDPR)
-•	Revocation of processing (Article 21 GDPR)
-•	Revocation of consent (Article 7 (3) GDPR)
-•	Right to complain to the regulator (Article 77 GDPR). For the MPG, this is the Bavarian Data Protection Authority (BayLDA), Postbox 606, 91511 Ansbach
+Email: bioinformatics@age.mpg.de
 
