@@ -35,6 +35,10 @@ For Graphical User Interface to Programmatic Interface exchanges please install 
 
 If you are looking to contribute to Flaski please check [CONTRIBUTING.md](CONTRIBUTING.md).
 
+Issues: [https://github.com/mpg-age-bioinformatics/flaski/issues](https://github.com/mpg-age-bioinformatics/flaski/issues).
+
+Source: [https://github.com/mpg-age-bioinformatics/flaski](https://github.com/mpg-age-bioinformatics/flaski).
+
 Please check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before doing any contribution or opening an issue.
 
 ## Credits
