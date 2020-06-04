@@ -17,6 +17,15 @@ def GET_COLOR(x):
 
 
 def make_figure(pa):
+    """Generates figure.
+
+    Args:
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
+
+    Returns:
+        A Matplotlib figure
+        
+    """
 
     #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
     fig, axes = plt.subplots(1, 1,figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
@@ -105,15 +114,74 @@ def make_figure(pa):
         tmp=pd.DataFrame( { pa[ "%s_name" %(set_index)]:list(sets[set_index]) } ,index=list(sets[set_index]) )
         df=pd.merge(df,tmp,how="left",left_index=True, right_index=True)
 
+    cols=df.columns.tolist()
+    def check_common(df, left,right,third=None):
+        if not third:
+            left=df[left]
+            right=df[right]
+            if ( str(left) != str(np.nan) ) &  ( str(right) != str(np.nan) ):
+                if left == right:
+                    return "yes"
+                else:
+                    return "no"
+            else:
+                return "no"
+        else:
+            left=df[left]
+            right=df[right]
+            third=df[third]
+            if ( str(left) != str(np.nan) ) &  ( str(right) != str(np.nan) ) & ( str(third) != str(np.nan) ):
+                if (left == right) & (left == third):
+                    return "yes"
+                else:
+                    return "no"
+            else:
+                return "no"
+                
+    df["%s & %s" %(cols[0],cols[1])]=df.apply(check_common,args=(cols[0],cols[1]), axis=1 )
+    if len(cols) == 3:
+        df["%s & %s" %(cols[1],cols[2])]=df.apply(check_common,args=(cols[1],cols[2]), axis=1 )
+        df["%s & %s" %(cols[0],cols[2])]=df.apply(check_common,args=(cols[0],cols[2]), axis=1 )
+        df["%s & %s & %s" %(cols[0],cols[1],cols[2])]=df.apply(check_common,args=(cols[0],cols[1],cols[2]), axis=1 )
+    
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
 
-    return fig, df
+    if pa["population_size"]!="":
+        pvalues={}
+        from scipy.stats import hypergeom
+        def hypergeomtest(set_1,set_2):
+            M=float(pa["population_size"]) # total number of geness
+            n=len(sets[set_1]) # genes in group I
+            N=len(sets[set_2]) # genes in group II
+            x=len( [ s for s in list(sets[set_1]) if s in list(sets[set_2]) ] ) # intersect
+            p=hypergeom.sf(x-1, M,n,N)
+            return p, M, n, N, x
+        p, M, n, N, x = hypergeomtest("set1","set2")
+        pvalues["%s vs. %s" %(pa["set1_name"],pa["set2_name"])]={"n %s" %pa["set1_name"]:n,"n %s" %pa["set2_name"]:N,"common":x,"total":M,"p value":str(p)}
+
+        if len( list(sets.keys()) ) == 3:
+            p, M, n, N, x=hypergeomtest("set1","set3")
+            pvalues["%s vs. %s" %(pa["set1_name"],pa["set3_name"])]={"n %s" %pa["set1_name"]:n,"n %s" %pa["set3_name"]:N,"common":x,"total":M,"p value":str(p)}
+
+            p, M, n, N, x=hypergeomtest("set2","set3")
+            pvalues["%s vs. %s" %(pa["set2_name"],pa["set3_name"])]={"n %s" %pa["set2_name"]:n,"n %s" %pa["set3_name"]:N,"common":x,"total":M,"p value":str(p)}
+
+    else:
+        pvalues=None
+
+    return fig, df, pvalues
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
 LINE_STYLES=["solid","dashed","dashdot","dotted","None"]
 
 def figure_defaults():
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
+
     plot_arguments={
         "fig_width":"6.0",\
         "fig_height":"6.0",\
@@ -150,6 +218,7 @@ def figure_defaults():
         "set1_line_rgb":"",\
         "set2_line_rgb":"",\
         "set3_line_rgb":"",\
+        "population_size":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
@@ -160,25 +229,4 @@ def figure_defaults():
     }
     # grid colors not implemented in UI
 
-
-    checkboxes=[]
-
-    # not update list
-    notUpdateList=["inputsessionfile"]
-
-    # lists without a default value on the arguments
-    excluded_list=[]
-
-    # lists with a default value on the arguments
-    allargs=list(plot_arguments.keys())
-
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    lists={} 
-    for i in range(len(allargs)):
-        if type(plot_arguments[allargs[i]]) == type([]):
-            if allargs[i] not in excluded_list:
-                lists[allargs[i]]=allargs[i+1]
-
-    return plot_arguments, lists, notUpdateList, checkboxes
+    return plot_arguments

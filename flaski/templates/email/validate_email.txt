@@ -4,6 +4,14 @@ Welcome! Thanks for signing up. Please follow this link to activate your account
 
 {{ url_for('confirm', token=token, _external=True) }}
 
+You can find several how-to videos on Flaski's YouTube channel: https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA.
+
+For documentation please visit Flaski's GitHub page: https://bioinformatics.age.mpg.de/flaski
+
+
+Continuous delivery. To ensure you get the latest updates as soon as possible we rollout changes between 04:00 and 05:00 CET. During this time you might experience glitches of a few seconds. Check our releases page - https://github.com/mpg-age-bioinformatics/flaski/releases - if you want to know more about delivered updates.
+
+
 Cheers!
 
 Sincerely,

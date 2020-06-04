@@ -34,7 +34,7 @@ services:
  server:
   container_name: server
   ports:
-    - 8888:8888 #jupyterhub
+    - 8887:8888 #jupyterhub
   build:
     context: ./
     dockerfile: Dockerfile
@@ -42,6 +42,7 @@ services:
   volumes:
    - data:/flaski_data/users
    - ./:/flaski
+   - ~/flaski_private:/flaski_private:ro
   environment:
    - LOGS=/var/log/flaski/
    - SECRET_KEY=${SECRET_KEY}
@@ -52,6 +53,7 @@ services:
    - MYSQL_HOST=mariadb
    - MYSQL_PORT=3306
    - FLASK_ENV=development
+   - PRIVATE_APPS=/flaski_private/private.apps.tsv
    - INSTANCE=(DEV)
    - ADMINS=flaski@age.mpg.de
   links:

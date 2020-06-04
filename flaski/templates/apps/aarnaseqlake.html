@@ -1,0 +1,549 @@
+{% extends "base.html" %}
+
+<style>
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+</style>
+
+{% block app_title %}
+
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">RNAseq lake</h1>
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block side_bar_content %}
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+        <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+        <!-- /div -->
+        <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+            </div>
+        <!--/div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
+
+        <form action="{{ url_for('aarnaseqlake') }}" method="post" enctype="multipart/form-data">
+
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Dataset:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_data_sets" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_data_sets %}
+                                <option value="{{label}}" {% if label in selected_data_sets %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Groups:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_groups" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_groups %}
+                                <option value="{{label}}" {% if label in selected_groups %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Samples:</div>
+                    <div style="padding-left:15px;">
+                        <select name="selected_reps" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_reps %}
+                                <option value="{{label}}" {% if label in selected_reps %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Gene names:</div>
+                    <div style="padding-left:15px;">
+                        <!--select name="selected_gene_names" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_gene_names %}
+                                <option value="{{label}}" {% if label in selected_gene_names %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select-->
+                        <input type="text" style="width:364px;height:34px;padding-left:4px" name="selected_gene_names" value='{{ selected_gene_names }}'>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Gene IDs:</div>
+                    <div style="padding-left:15px;">
+                        <!--select name="selected_gene_ids" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_gene_ids %}
+                                <option value="{{label}}" {% if label in selected_gene_ids %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select-->
+                        <input type="text" style="width:364px;height:35px;padding-left:4px" name="selected_gene_ids" value='{{ selected_gene_ids }}'>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-download"></i>
+                    <span>Output</span>
+                </a>
+                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="download_name" value='{{ download_name }}' style="width:298px;height:30px;padding-left: 4px">
+                            </div>   
+                            <div class="row arg">
+                                <label> format: <select name=download_format_value method="GET" action="/" style="width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==download_format_value %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Arguments</span>
+                </a>
+                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload arguments file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
+                    <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                    <span>Session</span>
+                </a>
+                <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload session file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_download_name" value='{{ session_download_name }}'>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+           
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+            <!-- -------------------- SUBMIT ---------------------- -->
+
+            <div style="padding-right: 15px; padding-left: 15px;" >
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" onclick="loading();" />
+            </div>
+        </form>
+
+    </div>
+
+</ul>
+
+{% endblock %}
+
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
+{% block content %}
+<div style="margin-left:150px;" id="loading"></div>
+
+<div id="contentready" class="container-fluid">
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    {% if category == "error" %}
+    <!-- ATTENTION CARD -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3", >
+            <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+        </div>
+        <div class="card-body">
+            {{ message }} 
+        </div>
+    </div>
+    <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+    {% elif category == "traceback" %}
+    <!-- ATTENTION CARD -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3", >
+            <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+        </div>
+        <div class="card-body">
+            {% autoescape false %}
+            {{ message }}
+            <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+            If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+            <br>
+            {% endautoescape %}
+
+            <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                <div class="pull-xs-right" style="float:right;">
+                    <div class="btn-group" style="float:right;">
+                        <button type="submit" class="btn btn-primary" style="float:right;">
+                            <i></i> Ice cream
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <!-- INFORMATION CARD -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3", >
+            <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+        </div>
+        <div class="card-body">
+            {{ message }} 
+        </div>
+    </div>
+    <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+    {% endif %}
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+    <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'Metadata')" id="defaultOpen">Metadata</button>
+    <button class="tablinks" onclick="openCity(event, 'GeneExpression')">Gene Expression</button>
+    {% if selected_dge_50 %}
+    <button class="tablinks" onclick="openCity(event, 'DifferentialGeneExpression')">Differential Gene Expression</button>
+    {% endif %}
+    </div>
+
+    <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
+        <div id="Metadata" class="tabcontent">
+            
+            <h2><br>Metadata</h2>
+            <table id="listr-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Set</th>
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">Samples</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">Selected data.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+                    {% for entry in selected_results_files %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    <!--/div-->
+
+    <div id="GeneExpression" class="tabcontent">
+        <h2><br>Gene Expression</h2>
+        <!--div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);"-->
+            <table id="listr2-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in selected_ge_50_cols %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">First 50 entries. Download table if you want to see all entries.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+
+                    {% for entry in selected_ge_50 %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        <!--/div-->
+    </div>
+
+    {% if selected_dge_50 %}
+    <div id="DifferentialGeneExpression" class="tabcontent">
+        <h2><br>Differential Gene Expression</h2>
+        <!--div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);"-->
+            <table id="listr3-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in selected_dge_50_cols %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">First 50 entries. Download table if you want to see all entries.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+
+                    {% for entry in selected_dge_50 %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        <!--/div-->
+    </div>
+    {% endif %}
+</div>
+
+
+        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='metadata') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Metadata
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='geneexpression') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Expression
+                    </button>
+                </form>
+            </div>
+
+            {% if selected_dge_50 %}
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='dge') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Differential
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='MAplot') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> MA plot
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='Volcanoplot') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> Volcano plot
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='iheatmap') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> Heatmap
+                    </button>
+                </form>
+            </div>
+
+            {% endif %}
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+                <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-th fa-sm text-white-50"></i> Session
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    
+
+</div>
+
+<script>
+    // Get the element with id="defaultOpen" and click on it
+    document.getElementById("defaultOpen").click();
+</script>
+
+<script>
+function openCity(evt, cityName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+  
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+  
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+  
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+</script>
+
+{% endblock %}
+
+
+
+{% block in_app_footer %}
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+        <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}

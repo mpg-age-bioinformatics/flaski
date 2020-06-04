@@ -4,7 +4,7 @@ services:
 
  init:
   container_name: init
-  image: flaski/flaski:latests
+  image: flaski/flaski:${IMAGE_TAG}
   user: root
   volumes:
    - data:/flaski_data/users
@@ -35,10 +35,11 @@ services:
 
  server:
   container_name: server
-  image: flaski/flaski:latest
+  image: flaski/flaski:${IMAGE_TAG}
   restart: always
   volumes:
    - data:/flaski_data/users
+   - /srv/private/:/flaski_private:ro
   environment:
    LOGS: /var/log/flaski/
    SECRET_KEY: ${SECRET_KEY}
@@ -51,11 +52,12 @@ services:
    MAIL_PORT: 587
    MAIL_USE_TLS: '1'
    MAIL_PASSWORD: ${MAIL_PASSWORD}
-   #PRIVATE_APPS: /private.apps.xlsx
+   PRIVATE_APPS: /flaski_private/private.apps.tsv
    FLASK_ENV: production
    ADMINS: flaski@age.mpg.de
    MAIL_SERVER: mail.age.mpg.de
    MAIL_USERNAME: flaski@age.mpg.de
+   INSTANCE: ${IMAGE_TAG}
   links:
    - mariadb
    - redis

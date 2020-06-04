@@ -20,22 +20,15 @@ def run_david(pa):
     # Modified from https://david.ncifcrf.gov/content.jsp?file=WS.html
     # by courtesy of HuangYi @ 20110424
 
-    """
-    Queries the DAVID database for an enrichment analysis
+    """Queries the DAVID database for an enrichment analysis
     Check https://david.ncifcrf.gov/content.jsp?file=DAVID_API.html for database == "type" tag and categories ==  "annot" tag.
 
-    :param database: A string for the database to query, e.g. 'WORMBASE_GENE_ID'
-    :param categories: A comma separated string with databases
-    :param user: A user ID registered at DAVID for querying
-    :param ids: A list with identifiers
-    :param name: A string with the name for the query set
-    :param ids_bg: A list with the background identifiers to enrich against,
-      'None' for whole set
-    :param name_bg: A string with the name for the background set
-    :param p: Maximum p value for enrichment of a term
-    :param n: Minimum number of genes within a term
+    Args:
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
 
-    :returns: None if no ids match the queried database, or a pandas data frame with results
+    Returns:
+        None if no ids match the queried database, or a  Pandas DataFrame with results.
+
     """
 
     database=pa["database_value"]
@@ -81,11 +74,9 @@ def run_david(pa):
     n=pa["n"]    
     #, categories, user, ids, ids_bg = None, name = '', name_bg = '', verbose = False, p = 0.1, n = 2
 
-    # return pd.DataFrame(), pd.DataFrame()
     verbose=True
     ids = ','.join([str(i) for i in ids])
     use_bg = 0
-    #print(ids,ids_bg)
 
     if ids_bg is not None:
       ids_bg = ','.join([str(i) for i in ids_bg])
@@ -94,6 +85,10 @@ def run_david(pa):
     client = sudsclient(url)
     client.wsdl.services[0].setlocation('https://david.ncifcrf.gov/webservice/services/DAVIDWebService.DAVIDWebServiceHttpSoap11Endpoint/')
     client_auth = client.service.authenticate(user)
+    
+    if str(client_auth) == "Failed. For user registration, go to http://david.abcc.ncifcrf.gov/webservice/register.htm" :
+      return None, None
+      
     if verbose:
       print('User Authentication:', client_auth)
       sys.stdout.flush()
@@ -152,6 +147,23 @@ def run_david(pa):
     return df, report_stats
 
 def figure_defaults():
+    """Generates default DAVID query arguments.
+
+    :param database: A string for the database to query, e.g. 'WORMBASE_GENE_ID'
+    :param categories: A comma separated string with databases
+    :param user: A user ID registered at DAVID for querying
+    :param ids: A list with identifiers
+    :param name: A string with the name for the query set
+    :param ids_bg: A list with the background identifiers to enrich against,
+      'None' for whole set
+    :param name_bg: A string with the name for the background set
+    :param p: Maximum p value for enrichment of a term
+    :param n: Minimum number of genes within a term
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
+
     plot_arguments={
         "database":['AFFYMETRIX_3PRIME_IVT_ID', 'AFFYMETRIX_EXON_GENE_ID',
           'AFFYMETRIX_SNP_ID', 'AGILENT_CHIP_ID',
@@ -211,11 +223,4 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.DAVID",\
         "inputargumentsfile":"Select file.."}
 
-    lists=[]
-    for i in list(plot_arguments.keys()):
-        if type(plot_arguments[i]) == type([]):
-            lists.append(i)
-    notUpdateList=[]
-    checkboxes=[]
-
-    return plot_arguments, lists, notUpdateList, checkboxes
+    return plot_arguments

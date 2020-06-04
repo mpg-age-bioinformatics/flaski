@@ -130,6 +130,21 @@
                                     {% endfor %}
                                 </select></label>
                             </div>
+
+                            {% if groups_value != "None" %}
+
+                            <div class="row arg">
+                                <label style="padding-right:4px;">Legend:
+                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
+                                <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;height:22px;padding-left:4px;"></label></label>
+                            </div>
+
+                            {% else %}
+
+                                <input type="hidden" name ="show_legend" value="{{ show_legend }}">
+                                <input type="hidden" name ="legend_font_size" value="{{ legend_font_size }}">
+
+                            {% endif %}
                         
                         </div>
                     </div>
@@ -239,13 +254,121 @@
                                 <label style="padding-left:35px;"> width: <label style="padding-left:2px;"><input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:74px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
-
                         </div>
         
                     </div>
                 </div>
             </li>
 
+            {% for group in groups_settings %}
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group.name}}" aria-expanded="true" aria-controls="collapse{{group.name}}" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Marker: {{group.name}}</span>
+                </a>
+                <div id="collapse{{group.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu"> 
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label> size: <select name={{group.name}}.markers method="GET" action="/" style="width:50px">
+                                    {% for marker_size_ in marker_size %}
+                                        <option value="{{marker_size_}}" {% if marker_size_==group.markers %} selected {% endif %}>{{marker_size_}}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <label> ..or, <select name={{group.name}}.markersizes_col method="GET" action="/" style="width:189px">
+                                    {% for markersizes_cols_ in markersizes_cols %}
+                                        <option value="{{markersizes_cols_}}" {% if markersizes_cols_==group.markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+
+                            <div class="row arg">
+                                <label> color: <select name={{group.name}}.markerc method="GET" action="/" style="width:80px">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==group.markerc %} selected {% endif %}>{{marker_color_}}</option>"
+                                    {% endfor %}
+                                </select>
+
+                                <label> ..or, <select name={{group.name}}.markerc_col method="GET" action="/" style="width:153px">
+                                    {% for markerc_cols_ in markerc_cols %}
+                                        <option value="{{markerc_cols_}}" {% if markerc_cols_==group.markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:6px;">
+                                <label> ..or, write a color name <input type="text" name={{group.name}}.markerc_write value="{{group.markerc_write}}" style="width:155px;height:22px;padding-left: 4px">
+                            </div>
+
+                            <div class="row arg">
+                                <label> line width: <select name={{group.name}}.edge_linewidth method="GET" action="/" style="width:50px">
+                                    {% for edge_linewidth_ in edge_linewidths %}
+                                        <option value="{{edge_linewidth_}}" {% if edge_linewidth_==group.edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <label> ..or, <select name={{group.name}}.edge_linewidth_col method="GET" action="/" style="width:152px">
+                                    {% for edge_linewidth_col_ in edge_linewidth_cols %}
+                                        <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==group.edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg">
+                                <div class="row arg">
+                                    <label> line color: <select name={{group.name}}.edgecolor method="GET" action="/" style="width:80px">
+                                        {% for edgecolor_ in edge_colors %}
+                                            <option value="{{edgecolor_}}" {% if edgecolor_==group.edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
+                                        {% endfor %}
+                                    </select>
+
+                                    <label> ..or, <select name={{group.name}}.edgecolor_col method="GET" action="/" style="width:128px">
+                                        {% for edgecolor_col_ in edgecolor_cols %}
+                                            <option value="{{edgecolor_col_}}" {% if edgecolor_col_==group.edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="row arg" style="padding-bottom:6px;">
+                                    <label> ..or, write a color name <input type="text" name={{group.name}}.edgecolor_write value="{{group.edgecolor_write}}" style="width:155px;height:22px;padding-left: 4px">
+                            </div>
+
+                            <div class="row arg">
+                                <label>shape: <select name={{group.name}}.marker method="GET" action="/" style="width:50px">
+                                    {% for markerstyles_ in markerstyles %}
+                                        <option value="{{markerstyles_}}" {% if markerstyles_==group.marker %} selected {% endif %}>{{markerstyles_}}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <label>&nbsp;..or, <select name={{group.name}}.markerstyles_col method="GET" action="/" style="width:172px">
+                                    {% for markerstyles_cols_ in markerstyles_cols %}
+                                        <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==group.markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+
+                            <div class="row arg">
+                                <label>alpha: <input type="text" name={{group.name}}.marker_alpha value='{{ group.marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
+
+                                <label style="padding-left:1px;">&nbsp;..or, <select name={{group.name}}.markeralpha_col_value method="GET" action="/" style="width:172px">
+                                    {% for markeralpha_col_ in markeralpha_col %}
+                                        <option value="{{markeralpha_col_}}" {% if markeralpha_col_==group.markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
+                                    {% endfor %}
+                                </select></label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </li>            
+            {% endfor %}
+
+
+            {% if groups_value == "None" %}
 
             <!-- -------------------- MARKER ARGUMENTS ---------------------- -->
 
@@ -349,6 +472,25 @@
                                 </select></label>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {% endif %}
+
+
+            <!-- -------------------- LABELS ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLabels" aria-expanded="true" aria-controls="collapseLabels" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Labels</span>
+                </a>
+                <div id="collapseLabels" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
                             <div class="row arg">
                                 <label>Labels: <select name=labels_col_value method="GET" action="/" style="width:252px">
                                     {% for labels_col_ in labels_col %}
@@ -381,30 +523,7 @@
                             <div class="row arg">
                                 <label>Arrows line width: <input type="text" name="labels_line_width" value='{{ labels_line_width }}' style="width:64px;height:22px;padding-left:4px;"></label>
                                 <label style="padding-left:12px;">alpha: <input type="text" name="labels_alpha" value='{{ labels_alpha }}' style="width:64px;height:22px;padding-left:4px;"></label>
-
                             </div>
-
-
-                            {% if groups_value != "None" %}
-
-                                <div class="row arg">
-                                    <label style="padding-right:4px;">Auto generate groups characteristics: </label>
-                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="groups_auto_generate" {% if groups_auto_generate=="on" %} checked {% elif groups_auto_generate==".on" %} checked {% endif %}/></label>
-                                </div>
-
-                                <div class="row arg">
-                                    <label style="padding-right:4px;">Legend:
-                                    <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
-                                    <label>fontsize: <input type="text" name="legend_font_size" value='{{ legend_font_size }}' style="width:66px;height:22px;padding-left:4px;"></label></label>
-                                </div>
-
-                            {% else %}
-
-                                <input type="hidden" name ="groups_auto_generate" value="{{ groups_auto_generate }}">
-                                <input type="hidden" name ="show_legend" value="{{ show_legend }}">
-                                <input type="hidden" name ="legend_font_size" value="{{ legend_font_size }}">
-
-                            {% endif %}
 
                         </div>
                     </div>
@@ -557,6 +676,34 @@
             </div>
         </div>
         <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+
+        {% elif category == "traceback" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+            </div>
+            <div class="card-body">
+                {% autoescape false %}
+                {{ message }}
+                <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+                If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                <br>
+                {% endautoescape %}
+
+                <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                    <div class="pull-xs-right" style="float:right;">
+                        <div class="btn-group" style="float:right;">
+                            <button type="submit" class="btn btn-primary" style="float:right;">
+                                <i></i> Ice cream
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% else %}
         <!-- INFORMATION CARD -->
         <div class="card shadow mb-4">

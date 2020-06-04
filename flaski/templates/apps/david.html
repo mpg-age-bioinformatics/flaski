@@ -322,6 +322,39 @@
 <div style="margin-left:150px;" id="loading"></div>
 <div id="contentready" class="container-fluid">
 
+    {% if david_contents %}
+
+    <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
+        <table id="listr-table" class="table table-hover">
+            <thead>
+                <tr>
+                    {% for entry in table_headers %}
+                    <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <td colspan="5">
+                    <small class="pull-xs-left text-muted" dir="ltr">Showing top 50 results. Download table to see the complete list of results.</small>
+                </td>
+            </tr>
+            </tfoot>
+            <tbody>
+
+                {% for entry in david_contents %}
+                <tr>
+                    {% for col in entry %}
+                    <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+
     <!--div style="margin-left:150px;" id="loader"></div-->
 
 
@@ -339,6 +372,32 @@
             </div>
         </div>
         <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        {% elif category == "traceback" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+            </div>
+            <div class="card-body">
+                {% autoescape false %}
+                {{ message }}
+                <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+                If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                <br>
+                {% endautoescape %}
+
+                <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                    <div class="pull-xs-right" style="float:right;">
+                        <div class="btn-group" style="float:right;">
+                            <button type="submit" class="btn btn-primary" style="float:right;">
+                                <i></i> Ice cream
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
         {% else %}
         <!-- INFORMATION CARD -->
         <div class="card shadow mb-4">

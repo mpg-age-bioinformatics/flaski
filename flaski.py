@@ -1,5 +1,6 @@
 from flaski import app, db
 from flaski.models import User, UserLogging
+import sys
 
 @app.shell_context_processor
 def make_shell_context():
@@ -11,8 +12,11 @@ if __name__ == "__main__":
     from flaski.email import send_files_deletion_email
 
     def clean():
+        print("Looking for old files.")
+        sys.stdout.flush()
         data_folder=app.config['USERS_DATA']
         users=os.listdir(data_folder)
+        users=[ s for s in users if "tmp" not in s  ]
         today=datetime.datetime.now()
 
         for userid in users:
@@ -54,5 +58,7 @@ if __name__ == "__main__":
             user.mailed_files = mailed
             db.session.add(user)
             db.session.commit()
+        print("Done looking for old files.")
+        sys.stdout.flush()
 
     clean()

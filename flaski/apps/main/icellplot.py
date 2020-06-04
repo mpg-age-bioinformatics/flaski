@@ -7,9 +7,18 @@ CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyax
 
 
 def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
+    """Generates figure.
+
+    Args:
+        david_df (pandas.core.frame.DataFrame): Pandas DataFrame containing the output of a DAVID query.
+        ge_df (pandas.core.frame.DataFrame): Pandas DataFrame containing the gene expression values or other values to be mapped for each gene in `david_df`.
+
+    Returns:
+        A Plotly figure.
+
+    """
 
     pa_={}
-    # checkboxes=["color_scale_value","log10transform","xaxis_line","yaxis_line","topxaxis_line","rightyaxis_line", "grid"] # "robust"
     for c in checkboxes:
         if (pa[c] =="on") | (pa[c] ==".on"):
             pa_[c]=True
@@ -41,6 +50,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         gedic_keys=", ".join(gedic_keys).split(", ")
         gedic_value=", ".join(gedic_value).split(", ")
         gedic=pd.DataFrame({0:gedic_keys,1:gedic_value})
+        gedic[1]=gedic[1].apply(lambda x: float(str(x).replace(",",".")) )
         gedic=gedic.drop_duplicates()
         gedic.index=gedic[0].tolist()
         gedic=gedic.to_dict()[ 1 ]
@@ -71,7 +81,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         # log10p=float(tmp.iloc[0,tmp.columns.tolist().index(pa["plotvalue"])])
         genes=tmp.iloc[0,tmp.columns.tolist().index( pa["david_gene_ids"] )].split(", ")
         tmp=pd.DataFrame({"term":term,"genes":genes})
-        tmp["expression"]=tmp["genes"].apply(lambda x: float(gedic.get(x.upper()) ) )
+        tmp["expression"]=tmp["genes"].apply(lambda x: float( gedic.get(x.upper())  ) )
         tmp["gene_name"]=tmp["genes"].apply(lambda x: namesdic.get(x.upper()) )
         tmp["n_genes"]=len(genes)
         tmp=tmp.sort_values(by=["expression"], ascending=True)
@@ -184,6 +194,12 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     return fig
 
 def figure_defaults(checkboxes=CHECKBOXES):
+    """Generates default figure arguments.
+
+    Returns:
+        dict: A dictionary of the style { "argument":"value"}
+    """
+
     plot_arguments={
         "width":"1000",\
         "height":"600",\
@@ -252,24 +268,6 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.icellplot",\
         "inputargumentsfile":"Select file.."}    
-
-    # not update list
-    notUpdateList=["inputsessionfile"]
-
-    # lists without a default value on the arguments
-    excluded_list=["categories_to_plot","categories_to_plot_value"]
-
-    # lists with a default value on the arguments
-    allargs=list(plot_arguments.keys())
-
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    lists={} 
-    for i in range(len(allargs)):
-        if type(plot_arguments[allargs[i]]) == type([]):
-            if allargs[i] not in excluded_list:
-                lists[allargs[i]]=allargs[i+1]
-
-    return plot_arguments, lists, notUpdateList, checkboxes
+        
+    return plot_arguments
 

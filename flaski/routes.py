@@ -9,12 +9,12 @@ from datetime import datetime
 from flaski import db
 from werkzeug.urls import url_parse
 from flaski.forms import ResetPasswordRequestForm
-from flaski.email import send_password_reset_email, send_validate_email
+from flaski.email import send_password_reset_email, send_validate_email, send_help_email
 from flaski.forms import ResetPasswordForm
 from flaski.routines import session_to_file
 #from app.token import generate_confirmation_token, confirm_token
 #from flaski.plots.figures.scatterplot import make_figure, figure_defaults
-from flaski.routines import read_private_apps
+from flaski.routines import read_private_apps, reset_all
 
 import os
 import io
@@ -39,20 +39,17 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"Heatmap", "id":'heatmap_more',"link":'heatmap' ,"java":"javascript:ReverseDisplay('heatmap_more')", "description":"An heatmap plotting app."},\
         { "name":"iHeatmap", "id":'iheatmap_more',"link":'iheatmap' ,"java":"javascript:ReverseDisplay('iheatmap_more')", "description":"An interactive heatmap plotting app."},\
         { "name":"Venn diagram", "id":'venndiagram_more',"link":'venndiagram' ,"java":"javascript:ReverseDisplay('venndiagram_more')", "description":"A venn diagram plotting app."},\
-        { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."},\
         { "name":"DAVID", "id":'david_more',"link":'david' ,"java":"javascript:ReverseDisplay('david_more')", "description":"A DAVID querying plot."},\
-        { "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A Histogram plot."}]
-
+        { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."}  ]
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    apps=FREEAPPS
     if current_user.is_authenticated:
-        apps=apps+session["PRIVATE_APPS"]
+        apps=current_user.user_apps
         return render_template('index.html',userlogged="yes", apps=apps, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
     else:
-        return render_template('index.html',userlogged="no",apps=apps,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
+        return render_template('index.html',userlogged="no",apps=FREEAPPS,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
@@ -67,7 +64,7 @@ def login(width=None, height=None):
     #     </script>
     #     """
     if current_user.is_authenticated:
-        session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
+        # session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
         return redirect(url_for('index'))
         
     form = LoginForm()
@@ -77,17 +74,23 @@ def login(width=None, height=None):
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
+        session.permanent = form.remember_me.data
         next_page = request.args.get('next')
+        #session["APPS"]=FREEAPPS
+        user.user_apps=FREEAPPS+read_private_apps(current_user.email,app)
+        db.session.add(user)
+        db.session.commit()
         # session["width"]=width
         # session["height"]=height
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
-        session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
+        # session["PRIVATE_APPS"]=read_private_apps(current_user.email,app)
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
 def logout():
+    session.clear()
     logout_user()
     return redirect(url_for('login'))
 
@@ -100,6 +103,7 @@ def register():
         user = User(firstname=form.firstname.data,\
                 lastname=form.lastname.data,\
                 email=form.email.data,\
+                privacy=form.privacy.data,\
                 organization=form.organization.data)
         user.set_password(form.password.data)
         user.registered_on=datetime.utcnow()
@@ -170,11 +174,12 @@ def before_request():
 @login_required
 def reset():
     if 'app' in list(session.keys()):
-        app=session["app"]
+        page=session["app"]
     else:
-        app="index"
-    session["app"]='reset'
-    return redirect(url_for(app))
+        page="index"
+    reset_all(session)
+    #session["app"]='reset'
+    return redirect(url_for(page))
 
 @app.route('/download/<json_type>', methods=['GET','POST'])
 @login_required
@@ -193,3 +198,24 @@ def download(json_type="arg"):
     db.session.commit()
 
     return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+"."+json_type )
+
+@app.route('/help', methods=['GET','POST'])
+@login_required
+def askforhelp():
+    import tempfile
+    page=session["app"]
+    tb_str=session["traceback"]
+
+    session_=session_to_file(session,"ses")
+    if not os.path.isdir(app.config['USERS_DATA']+"/tmp/"):
+        os.makedirs(app.config['USERS_DATA']+"/tmp/")
+    
+    session_file_name=tempfile.mkstemp(dir=app.config['USERS_DATA']+"/tmp/",suffix='.ses')[1]
+    with open(session_file_name, "w") as session_file:
+        json.dump(session_, session_file)
+
+    send_help_email( user=current_user, eapp=page, emsg=tb_str, etime=str(datetime.now()), session_file=session_file_name)
+    flash("Your scream for help has been sent. We will get in contact with you as soon as possible.")
+    return redirect(url_for(page))
+
+

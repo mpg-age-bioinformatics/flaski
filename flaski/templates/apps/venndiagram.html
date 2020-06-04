@@ -215,6 +215,25 @@
                 </div>
             </li>
 
+            <!-- -------------------- Hypergeometric test ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHypergeometric" aria-expanded="true" aria-controls="collapseHypergeometric" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Hypergeometric test</span>
+                </a>
+                <div id="collapseHypergeometric" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Population size (eg. number of genes in organism): <input type="text" name="population_size" value='{{ population_size }}' style="width:300px;height:22px;padding-left:4px"/></label>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -355,20 +374,54 @@
                 <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
             </div>
             <div class="card-body">
+                {% autoescape false %}
                 {{ message }} 
+                {% endautoescape %}
             </div>
         </div>
         <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        
+        
+        {% elif category == "traceback" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+            </div>
+            <div class="card-body">
+                {% autoescape false %}
+                {{ message }}
+                <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+                If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                <br>
+                {% endautoescape %}
+
+                <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                    <div class="pull-xs-right" style="float:right;">
+                        <div class="btn-group" style="float:right;">
+                            <button type="submit" class="btn btn-primary" style="float:right;">
+                                <i></i> Ice cream
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% else %}
-        <!-- INFORMATION CARD -->
+
         <div class="card shadow mb-4">
             <div class="card-header py-3", >
                 <h6 class="m-0 font-weight-bold text-primary">Info</h6>
             </div>
             <div class="card-body">
+                {% autoescape false %}
                 {{ message }} 
+                {% endautoescape %}
             </div>
         </div>
+
         <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
         {% endif %}
         {% endfor %}
