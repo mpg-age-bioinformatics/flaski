@@ -54,13 +54,14 @@ def send_files_deletion_email(user,files):
 
 def send_exception_email(user,eapp,emsg,etime):
     with app.app_context():
+        emsg_html=emsg.split("\n")
         send_email('[Flaski] %s exception' %eapp,
                 sender=app.config['ADMINS'][0],
                 recipients=app.config['ADMINS'],
                 text_body=render_template('email/app_exception.txt',
                                             user=user, eapp=eapp, emsg=emsg, etime=etime),
                 html_body=render_template('email/app_exception.html',
-                                            user=user, eapp=eapp, emsg=emsg, etime=etime))
+                                            user=user, eapp=eapp, emsg=emsg_html, etime=etime))
 
 def send_help_email(user,eapp,emsg,etime,session_file):
     with app.app_context():
