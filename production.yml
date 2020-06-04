@@ -8,6 +8,7 @@ services:
   user: root
   volumes:
    - data:/flaski_data/users
+   - /srv/backup/stats:/backup/stats
    - /srv/backup/data/users:/backup/users_data
    - /srv/backup/mariadb:/backup/mariadb
   environment:

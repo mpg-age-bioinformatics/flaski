@@ -76,7 +76,7 @@ docker volume rm db
 
 ```bash
 docker-compose exec backup /backup.sh
-docker-compose exec backup rsync -rtvh --delete --exclude 'stats' /flaski_data/users/ /backup/users_data/
+docker-compose exec backup rsync -rtvh --delete /flaski_data/users/ /backup/users_data/
 ```
 
 ## Looking for and removing old files
@@ -121,7 +121,7 @@ db.session.commit()
 
 Collecting usage entries:
 ```bash
-docker-compose run --entrypoint="python3 /flaski/flaski.py stats /backup/users_data" init
+docker-compose run --entrypoint="python3 /flaski/flaski.py stats /backup/stats" init
 ```
 
 If you need to re-iniate your database

@@ -69,7 +69,6 @@ if __name__ == "__main__":
         df=[ [ e.id, e.email, e.action, e.date_time ] for e in entries ]
         df=pd.DataFrame(df, columns=["id","email","action", "date_time"])
         outname=str(datetime.datetime.now()).split(".")[0].replace(" ","_").replace(":",".")
-        outfolder=outfolder+"/stats/"
         if not os.path.isdir(outfolder):
             os.makedirs(outfolder)
         outname=outfolder+"/"+outname+".stats.tsv"
