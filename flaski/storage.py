@@ -208,7 +208,7 @@ def get_size(start_path = '.'):
 class PathView(MethodView):
     @login_required
     def get(self, p=''):
-        apps=session["APPS"]
+        apps=current_user.user_apps
         """
         downloading files
         """
