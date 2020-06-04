@@ -196,12 +196,14 @@ color: White ;
 
         {% if userlogged == "no" %}
 
-        <a class="align-items-center justify-content-center" href="{{ url_for('login') }}">
-        <p style="padding-bottom:20px;padding-top:50px;color: white;" ><font size="4px">Login <b>here</b> to see more apps.</font></p></a>
+        <p style="padding-bottom:20px;padding-top:50px;color: white;" >
+          <a class="align-items-center justify-content-center" style="padding-bottom:20px;padding-top:50px;color: white;" href="{{ url_for('login') }}"><font size="4px"><b>Login</b></font></a> <font size="4px">or</font> 
+          <a class="align-items-center justify-content-center" style="padding-bottom:20px;padding-top:50px;color: white;" href="{{ url_for('register') }}"><font size="4px"><b>register</b></font></a> <font size="4px">to see more apps.</font></p>
 
         {% else %}
 
-        <p style="padding-bottom:20px;padding-top:50px;color: white;" ><font size="4px">You are logged in. Click on an App to try it out.</font></p></a>
+        <p style="padding-bottom:0px;padding-top:50px;color: white;" ><font size="4px">You are logged in. Click on an App to try it out.</font></p></a>
+        <p style="padding-bottom:20px;padding-top:0px;color: white;" ><a class="align-items-center justify-content-center" style="padding-bottom:20px;padding-top:0px;color: white;" href="{{ url_for('logout') }}"><font size="4px"><b>Logout</b></font></a></p></a>
 
         {% endif %}
 
