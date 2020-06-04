@@ -170,6 +170,10 @@ def iscatterplot(download=None):
                             }   
                         groups_settings.append(group_dic)
                     plot_arguments["groups_settings"]=groups_settings
+                
+                if request.form["labels_col_value"] != "select a column.." :
+                    df=pd.read_json(session["df"])
+                    plot_arguments["available_labels"] = list(set( df[ request.form["labels_col_value"] ].tolist() ))
 
                 session["plot_arguments"]=plot_arguments
                 plot_arguments=read_request(request)
