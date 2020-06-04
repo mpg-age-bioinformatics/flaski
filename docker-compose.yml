@@ -11,7 +11,7 @@ services:
   volumes:
     - data:/flaski_data/users
     - ./:/flaski
-    - ~/flaski_backup/users_data:/backup/users_data:ro
+    - ~/flaski_backup/users_data:/backup/users_data
     - ~/flaski_backup/mariadb:/backup/mariadb:ro
   environment:
     - FLASK_ENV=init

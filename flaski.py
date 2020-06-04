@@ -1,6 +1,8 @@
 from flaski import app, db
 from flaski.models import User, UserLogging
 import sys
+import pandas as pd
+import datetime
 
 @app.shell_context_processor
 def make_shell_context():
@@ -17,6 +19,7 @@ if __name__ == "__main__":
         data_folder=app.config['USERS_DATA']
         users=os.listdir(data_folder)
         users=[ s for s in users if "tmp" not in s  ]
+        users=[ s for s in users if s != "stats" ]
         today=datetime.datetime.now()
 
         for userid in users:
@@ -61,4 +64,22 @@ if __name__ == "__main__":
         print("Done looking for old files.")
         sys.stdout.flush()
 
-    clean()
+    def stats(outfolder):
+        entries=UserLogging.query.filter_by()
+        df=[ [ e.id, e.email, e.action, e.date_time ] for e in entries ]
+        df=pd.DataFrame(df, columns=["id","email","action", "date_time"])
+        outname=str(datetime.datetime.now()).split(".")[0].replace(" ","_").replace(":",".")
+        outfolder=outfolder+"/stats/"
+        if not os.path.isdir(outfolder):
+            os.makedirs(outfolder)
+        outname=outfolder+"/"+outname+".stats.tsv"
+        df.to_csv(outname, sep="\t", index=None)
+        entries=[ db.session.delete(e) for e in entries ]
+        db.session.commit()
+        print("Done collecting usage stats.\n%s" %outname)
+        sys.stdout.flush()
+
+    if sys.argv[1] == "clean":
+        clean()
+    elif sys.argv[1] == "stats":
+        stats(sys.argv[2])

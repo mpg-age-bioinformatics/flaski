@@ -45,7 +45,7 @@ _EOF_
 
 sudo -i -u flaski bash << USER_EOF
 if [[ "$RESTORE_USERS_DATA" == "1" ]] ; then
-  rsync -rtvh /backup/users_data/ /flaski_data/users/ >> /rsync.log 2>&1
+  rsync -rtvh --exclude 'stats' /backup/users_data/ /flaski_data/users/ >> /rsync.log 2>&1
 fi
 USER_EOF
 
