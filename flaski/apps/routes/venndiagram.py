@@ -100,7 +100,7 @@ def venndiagram(download=None):
 
                 flash(message)
 
-            return render_template('/apps/venndiagram.html', figure_url=figure_url,apps=apps, **plot_arguments)
+            return render_template('/apps/venndiagram.html', figure_url=figure_url, apps=apps, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="venndiagram",session=session)
@@ -153,8 +153,4 @@ def venndiagram(download=None):
 
             return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
 
-        eventlog = UserLogging(email=current_user.email, action="visit venndiagram")
-        db.session.add(eventlog)
-        db.session.commit()
-        
-        return render_template('apps/venndiagram.html', apps=apps, **session["plot_arguments"])
+        return render_template('/apps/venndiagram.html', apps=apps , **session["plot_arguments"])

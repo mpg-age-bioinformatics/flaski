@@ -227,9 +227,5 @@ def icellplot(download=None):
             db.session.commit()
 
             return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
-
-        eventlog = UserLogging(email=current_user.email, action="visit icellplot")
-        db.session.add(eventlog)
-        db.session.commit()
         
         return render_template('apps/icellplot.html',  filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **session["plot_arguments"])

@@ -4,6 +4,11 @@ import json
 from werkzeug.utils import secure_filename
 from fuzzywuzzy import process
 import io
+from flaski import db
+from flask_login import current_user
+from flaski.models import UserLogging
+
+
 
 def fuzzy_search(query_value,available_values):
     x=query_value.split(",")
@@ -97,12 +102,18 @@ def reset_all(session):
 
 def check_session_app(session,app,apps):
     if "app" not in list(session.keys()):
+        eventlog = UserLogging(email=current_user.email, action="visit %s" %app)
+        db.session.add(eventlog)
+        db.session.commit()
         message="Could not find data for this App in your current session. Session has been reset."
         return message
     elif session["app"] == app :
         return None
     else:
         appName=[ s for s in apps if s["link"] == session["app"] ][0]["name"]
+        eventlog = UserLogging(email=current_user.email, action="visit %s" %app)
+        db.session.add(eventlog)
+        db.session.commit()
         message="Returning from '%s'. Your '%s' session has been reset."  %(appName,appName)
             #Flaski is not yet made for working with multiple Apps nor data simultaneously on one single browser. \
             #If you wish to use multiple Apps or data simultaneously please use one App/data per web browser eg. Safari + Chrome. \

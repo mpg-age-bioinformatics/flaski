@@ -154,9 +154,5 @@ def david(download=None):
             session["plot_arguments"]["categories_to_plot_value"]=list(set(david_df["Category"].tolist()))
             
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
-
-        eventlog = UserLogging(email=current_user.email, action="visit david")
-        db.session.add(eventlog)
-        db.session.commit()
         
         return render_template('apps/david.html',  apps=apps, **session["plot_arguments"])

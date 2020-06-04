@@ -551,9 +551,5 @@ def aarnaseqlake(download=None):
             session["plot_arguments"]=plot_arguments
 
             return render_template('/apps/iheatmap.html', filename=session["filename"], apps=apps, **plot_arguments)
-
-        eventlog = UserLogging(email=current_user.email, action="visit aarnaseqlake")
-        db.session.add(eventlog)
-        db.session.commit()
         
         return render_template('apps/aarnaseqlake.html',  apps=apps, **session["plot_arguments"])
