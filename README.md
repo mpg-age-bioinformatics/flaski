@@ -2,7 +2,7 @@
 
 # Flaski
 
-Flaski is a flask based collection of web apps for life-sciences. 
+Flaski is a flask based collection of web apps for life sciences. 
 
 ![flaski](/pyflaski/Flaski.Readme.1.png)
 
@@ -42,10 +42,3 @@ Please check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before doing any contr
 Flaski was build using the [Bootstrap admin theme](https://github.com/BlackrockDigital/startbootstrap-sb-admin-2) created by Start Bootstrap and the [Font-Awesome](https://github.com/FortAwesome/Font-Awesome) toolkit. Please consult the respective projects for licence information.
 
 The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing, Cologne, Germany.
-
-
-
-
-
-
-
