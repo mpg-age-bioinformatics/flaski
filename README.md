@@ -1,3 +1,5 @@
+![release](https://img.shields.io/badge/release-beta-green)
+
 # Flaski
 
 Flaski is a flask based collection of web apps for life-sciences. 
