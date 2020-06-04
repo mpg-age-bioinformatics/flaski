@@ -1,4 +1,4 @@
-![release](https://img.shields.io/badge/release-beta-green)
+![release](https://img.shields.io/badge/release-beta-green) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/mpg-age-bioinformatics/Flaski)
 
 # Flaski
 
