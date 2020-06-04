@@ -85,6 +85,10 @@ def run_david(pa):
     client = sudsclient(url)
     client.wsdl.services[0].setlocation('https://david.ncifcrf.gov/webservice/services/DAVIDWebService.DAVIDWebServiceHttpSoap11Endpoint/')
     client_auth = client.service.authenticate(user)
+    
+    if str(client_auth) == "Failed. For user registration, go to http://david.abcc.ncifcrf.gov/webservice/register.htm" :
+      return None, None
+      
     if verbose:
       print('User Authentication:', client_auth)
       sys.stdout.flush()
