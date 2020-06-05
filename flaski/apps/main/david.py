@@ -105,7 +105,7 @@ def run_david(pa):
       if verbose:
         print('Mapping rate of background ids: ', str(size_bg))
         sys.stdout.flush()
-        if not float(size) > float(0):
+        if not float(size_bg) > float(0):
           msg='Mapping rate of background ids: %s' %str(size_bg)
           return None, None, msg
 
