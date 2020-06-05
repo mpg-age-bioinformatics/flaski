@@ -26,22 +26,22 @@ FLUSH PRIVILEGES;
 _EOF_
 
       echo "mysql database created.."
+  fi
 
-      if [[ "$RESTORE_DB" == "1" ]] ; then
- 
-        tail -F /mysql_backup.log /rsync.log &
-        echo "=> Restore latest backup"
-        LATEST_BACKUP=$(find /backup/mariadb -maxdepth 1 -name 'latest.flaski.sql.gz' | tail -1 )
-        echo "=> Restore database from ${LATEST_BACKUP}"
-        set -o pipefail
-        if gunzip --stdout "${LATEST_BACKUP}" | mysql -h "${MYSQL_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}"
-          then
-            echo "=> Restore succeeded"
-          else
-            echo "=> Restore failed"
-        fi
-      fi
+  if [[ "$RESTORE_DB" == "1" ]] ; then
 
+    tail -F /mysql_backup.log /rsync.log &
+    echo "=> Restore latest backup"
+    LATEST_BACKUP=$(find /backup/mariadb -maxdepth 1 -name 'latest.flaski.sql.gz' | tail -1 )
+    echo "=> Restore database from ${LATEST_BACKUP}"
+    set -o pipefail
+    if gunzip --stdout "${LATEST_BACKUP}" | mysql -h "${MYSQL_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}"
+      then
+        echo "=> Restore succeeded"
+      else
+        echo "=> Restore failed"
+    fi
+    
   fi
 
   chown -R flaski:flaski /flaski_data /flaski_data/users /var/log/flaski /mysql_backup.log /rsync.log

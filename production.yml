@@ -13,7 +13,7 @@ services:
    - /srv/backup/mariadb:/backup/mariadb
   environment:
    FLASK_ENV: init
-   RESTORE_DB: 1
+   RESTORE_DB: 0
    RESTORE_USERS_DATA: 0
    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
    SECRET_KEY: ${SECRET_KEY}
