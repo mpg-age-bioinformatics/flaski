@@ -21,6 +21,7 @@ import random
 import json
 
 import pandas as pd
+import numpy as np
 
 import base64
 
@@ -68,7 +69,7 @@ def david(download=None):
                 return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
             # CALL FIGURE FUNCTION
-            david_df, report_stats, msg=run_david(plot_arguments)
+            david_df, report_stats, mapped, msg=run_david(plot_arguments)
             if msg:
                 flash(msg,"error")
                 return render_template('/apps/david.html', apps=apps, **plot_arguments)
@@ -80,8 +81,11 @@ def david(download=None):
             ## get this into json like in former apps
             david_df=david_df.astype(str)
             report_stats=report_stats.astype(str)
+            mapped=mapped.astype(str)
+
             session["david_df"]=david_df.to_json()
             session["report_stats"]=report_stats.to_json()
+            session["mapped"]=mapped.to_json()
 
             table_headers=david_df.columns.tolist()
             tmp=david_df[:50]
@@ -114,6 +118,8 @@ def david(download=None):
             # READ INPUT DATA FROM SESSION JSON
             david_df=pd.read_json(session["david_df"])
             report_stats=pd.read_json(session["report_stats"])
+            mapped=pd.read_json(session["mapped"])
+            mapped=mapped.replace("nan",np.nan)
 
             eventlog = UserLogging(email=current_user.email,action="download david")
             db.session.add(eventlog)
@@ -124,6 +130,7 @@ def david(download=None):
                 EXC=pd.ExcelWriter(outfile)
                 david_df.to_excel(EXC,sheet_name="david",index=None)
                 report_stats.to_excel(EXC,sheet_name="stats",index=None)
+                mapped.to_excel(EXC,sheet_name="mapped",index=None)
                 EXC.save()
                 outfile.seek(0)
                 return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"],as_attachment=True )

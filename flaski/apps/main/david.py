@@ -46,6 +46,9 @@ def run_david(pa):
     ids=[ s for s in ids if len(s) > 0 ]
     ids=[ s.split("\t") for s in ids ]
     idsdf=pd.DataFrame(ids)
+
+    # insert mapping of ensembl gene name to gene id here
+
     annotations=idsdf.columns.tolist()
     ids=idsdf[0].tolist()
     ids_map={}
@@ -62,6 +65,10 @@ def run_david(pa):
       ids_bg=[ s for s in ids_bg if len(s) > 0 ]
       if len(ids_bg) == 0:
         ids_bg = None
+
+      # else
+      # insert mapping of ensembl gene names to ensembl gene id here
+
     else:
       ids_bg=None
     name=pa["name"]
@@ -78,7 +85,7 @@ def run_david(pa):
     ids = ','.join([str(i) for i in ids])
     use_bg = 0
 
-    if ids_bg is not None:
+    if ids_bg:
       ids_bg = ','.join([str(i) for i in ids_bg])
     ssl._create_default_https_context = ssl._create_unverified_context
     url = 'https://david.ncifcrf.gov/webservice/services/DAVIDWebService?wsdl'
@@ -87,30 +94,49 @@ def run_david(pa):
     try:
       client_auth = client.service.authenticate(user)
     except:
-      return None, None, "Could not connect to DAVID. Server might be down."
+      return None, None, None, "Could not connect to DAVID. Server might be down."
     
     if str(client_auth) == "Failed. For user registration, go to http://david.abcc.ncifcrf.gov/webservice/register.htm" :
-      return None, None, str(client_auth)
+      return None, None, None, str(client_auth)
     if verbose:
       print('User Authentication:', client_auth)
       sys.stdout.flush()
+
+    if ids_bg :
+      size = client.service.addList(ids_bg, database, name, 0)
+      if float(size) > float(0):
+        client_report=client.service.getListReport()
+        bg_mapped=[]
+        for r in client_report:
+            d = dict(r)
+            bg_mapped.append(d["values"][0])
+        bg_not_mapped=[ s for s in ids_bg.split(",") if s not in bg_mapped ]
+
     size = client.service.addList(ids, database, name, 0) #| inputListIds,idType,listName,listType)
     report_stats=[['Mapping rate of ids: ', str(size)]]
     if verbose:
       print('Mapping rate of ids: ', str(size))
       sys.stdout.flush()
-    if not float(size) > float(0):
+    if float(size) <= float(0):
       msg='Mapping rate of ids: %s. Please realize that DAVID currently does not allow the usage gene symbols input due to their organism ambiguity. You should use ensembl gene ids instead. We are working on solving this for you. You can follow this issue here: https://github.com/mpg-age-bioinformatics/flaski/issues/117.' %str(size)
-      return None, None, msg
-    if ids_bg is not None:
+      return None, None, None, msg
+
+    client_report=client.service.getListReport()
+    mapped=[]
+    for r in client_report:
+        d = dict(r)
+        mapped.append(d["values"][0])
+    not_mapped=[ s for s in ids.split(",") if s not in mapped ]
+
+    if ids_bg:
       size_bg = client.service.addList(ids_bg, database, name_bg, 1)
       report_stats.append(['Mapping rate of background ids: ', str(size_bg)])
       if verbose:
         print('Mapping rate of background ids: ', str(size_bg))
         sys.stdout.flush()
-        if not float(size_bg) > float(0):
+        if float(size_bg) <= float(0):
           msg='Mapping rate of background ids: %s' %str(size_bg)
-          return None, None, msg
+          return None, None, None, msg
 
     client_categories = client.service.setCategories(categories)
     report_stats.append(['Categories used: ', client_categories])
@@ -123,6 +149,12 @@ def run_david(pa):
     if verbose:
       print('Records reported: ', str(size_report))
       sys.stdout.flush()
+
+    def get_map(x,ids_map):
+      genes=x.split(", ")
+      genes=[ str(ids_map[gene.upper()]) for gene in genes ]
+      genes=", ".join(genes)
+      return genes
 
     if size_report > 0:
         df = []
@@ -138,20 +170,49 @@ def run_david(pa):
             df[col] = df[col].apply(lambda x: x.decode())
 
         df.columns=["Category","Term","Count","%","PValue","Genes","List Total","Pop Hits","Pop Total","Fold Enrichment","Bonferroni","Benjamini","FDR"]
+        
+        # insert ensembl gene name to gene id here 
+        
         if len(list(ids_map.keys())) > 0:
-          def get_map(x,ids_map):
-            genes=x.split(", ")
-            genes=[ str(ids_map[gene.upper()]) for gene in genes ]
-            genes=", ".join(genes)
-            return genes
           for annotation in list(ids_map.keys()):
             genes_to_annotation=ids_map[annotation]
             df["annotation_%s" %str(annotation)]=df["Genes"].apply(lambda x:get_map(x,ids_map=genes_to_annotation) )
+    
     else:
-        df=pd.DataFrame()
+        df=pd.DataFrame(columns=["Category","Term","Count","%","PValue","Genes","List Total","Pop Hits","Pop Total","Fold Enrichment","Bonferroni","Benjamini","FDR"])
+
+    mapped=pd.DataFrame({ "target_mapped":mapped })
+    not_mapped=pd.DataFrame({ "target_not_mapped": not_mapped })
+
+    # insert ensembl gene name to gene id here 
+
+    if len(list(ids_map.keys())) > 0:
+
+      for annotation in list(ids_map.keys()):
+        genes_to_annotation=ids_map[annotation]
+        mapped["target_mapped_annotation_%s" %str(annotation)]=mapped["target_mapped"].apply(lambda x:get_map(x,ids_map=genes_to_annotation) )
+        not_mapped["target_not_mapped_annotation_%s" %str(annotation)]=not_mapped["target_not_mapped"].apply(lambda x:get_map(x,ids_map=genes_to_annotation) )
+
+    mapped=pd.concat([mapped,not_mapped],axis=1)
+
+    if ids_bg:
+      bg_mapped=pd.DataFrame({ "bg_mapped":bg_mapped })
+      bg_not_mapped=pd.DataFrame({ "bg_not_mapped": bg_not_mapped })
+
+      # insert ensembl gene name to gene id here 
+
+      # if len(list(ids_map.keys())) > 0:
+      #     for annotation in list(ids_map.keys()):
+      #       genes_to_annotation=ids_map[annotation]
+      #       bg_mapped["bg_mapped_annotation_%s" %str(annotation)]=bg_mapped["bg_mapped"].apply(lambda x:get_map(x,ids_map=genes_to_annotation) )
+      #       bg_not_mapped["bg_not_mapped_annotation_%s" %str(annotation)]=bg_not_mapped["bg_not_mapped"].apply(lambda x:get_map(x,ids_map=genes_to_annotation) )
+      
+      mapped=pd.concat([mapped,bg_mapped],axis=1)
+      mapped=pd.concat([mapped,bg_not_mapped],axis=1)
+
     report_stats=pd.DataFrame(report_stats,columns=["Field","Value"])
 
-    return df, report_stats, None
+    return df, report_stats, mapped, None
 
 def figure_defaults():
     """Generates default DAVID query arguments.
