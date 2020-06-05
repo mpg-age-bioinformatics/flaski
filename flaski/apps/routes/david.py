@@ -68,11 +68,14 @@ def david(download=None):
                 return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
             # CALL FIGURE FUNCTION
-            david_df, report_stats=run_david(plot_arguments)
-
-            if (not david_df) and (not report_stats):
-                flash("DAVID doesn't seem to recognize your email account. If you have just registered please be aware that it might take some hours for you account to be in their systems. Please try again later.",'error')
+            david_df, report_stats, msg=run_david(plot_arguments)
+            if msg:
+                flash(msg,"error")
                 return render_template('/apps/david.html', apps=apps, **plot_arguments)
+
+            # if (not david_df) and (not report_stats):
+            #     flash("DAVID doesn't seem to recognize your email account. Make sure you have registered your account on https://david.ncifcrf.gov/webservice/register.htm. If you have just registered please be aware that it might take some hours for you account to be in their systems. Please try again later.",'error')
+            #     return render_template('/apps/david.html', apps=apps, **plot_arguments)
         
             ## get this into json like in former apps
             david_df=david_df.astype(str)

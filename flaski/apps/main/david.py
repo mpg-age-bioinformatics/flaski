@@ -87,8 +87,7 @@ def run_david(pa):
     client_auth = client.service.authenticate(user)
     
     if str(client_auth) == "Failed. For user registration, go to http://david.abcc.ncifcrf.gov/webservice/register.htm" :
-      return None, None
-      
+      return None, None, str(client_auth)
     if verbose:
       print('User Authentication:', client_auth)
       sys.stdout.flush()
@@ -98,13 +97,18 @@ def run_david(pa):
       print('Mapping rate of ids: ', str(size))
       sys.stdout.flush()
     if not float(size) > float(0):
-      return None
+      msg='Mapping rate of ids: %s' %str(size)
+      return None, None, msg
     if ids_bg is not None:
       size_bg = client.service.addList(ids_bg, database, name_bg, 1)
       report_stats.append(['Mapping rate of background ids: ', str(size_bg)])
       if verbose:
         print('Mapping rate of background ids: ', str(size_bg))
         sys.stdout.flush()
+        if not float(size) > float(0):
+          msg='Mapping rate of background ids: %s' %str(size_bg)
+          return None, None, msg
+
     client_categories = client.service.setCategories(categories)
     report_stats.append(['Categories used: ', client_categories])
     if verbose:
@@ -144,7 +148,7 @@ def run_david(pa):
         df=pd.DataFrame()
     report_stats=pd.DataFrame(report_stats,columns=["Field","Value"])
 
-    return df, report_stats
+    return df, report_stats, None
 
 def figure_defaults():
     """Generates default DAVID query arguments.
