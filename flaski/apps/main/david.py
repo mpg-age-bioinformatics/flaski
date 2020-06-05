@@ -84,7 +84,10 @@ def run_david(pa):
     url = 'https://david.ncifcrf.gov/webservice/services/DAVIDWebService?wsdl'
     client = sudsclient(url)
     client.wsdl.services[0].setlocation('https://david.ncifcrf.gov/webservice/services/DAVIDWebService.DAVIDWebServiceHttpSoap11Endpoint/')
-    client_auth = client.service.authenticate(user)
+    try:
+      client_auth = client.service.authenticate(user)
+    except:
+      return None, None, "Could not connect to DAVID. Server might be down."
     
     if str(client_auth) == "Failed. For user registration, go to http://david.abcc.ncifcrf.gov/webservice/register.htm" :
       return None, None, str(client_auth)
