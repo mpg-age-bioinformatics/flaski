@@ -97,7 +97,7 @@ def run_david(pa):
       print('Mapping rate of ids: ', str(size))
       sys.stdout.flush()
     if not float(size) > float(0):
-      msg='Mapping rate of ids: %s' %str(size)
+      msg='Mapping rate of ids: %s. Please realize that DAVID currently does not allow the usage gene symbols input due to their organism ambiguity. You should use ensembl gene ids instead. We are working on solving this for you.' %str(size)
       return None, None, msg
     if ids_bg is not None:
       size_bg = client.service.addList(ids_bg, database, name_bg, 1)
