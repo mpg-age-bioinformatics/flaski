@@ -144,11 +144,12 @@ def histogram(download=None):
                             "linestyle_value":"solid",\
                             "line_color":None,\
                             "line_rgb":"",\
-                            "log_scale":".on",\
+                            "log_scale":"off",\
                             "fill_alpha":0.8}
+                            
                     plot_arguments["groups_settings"]=groups_settings
                     
-                
+                    
                     
                     fig=make_figure(df,plot_arguments)
 
@@ -158,8 +159,9 @@ def histogram(download=None):
                     plt.close()
                     figfile.seek(0)  # rewind to beginning of file
                     figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
-                     
-                    print("groups_settings are",plot_arguments["groups_settings"])
+                    
+                    for group,args in plot_arguments["groups_settings"].items():
+                        print("log_scale is:",args["log_scale"])
                     return render_template('/apps/histogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
                 
                 
@@ -186,7 +188,7 @@ def histogram(download=None):
                                     "linestyle_value":"solid",\
                                     "line_color":None,\
                                     "line_rgb":"",\
-                                    "log_scale":".on",\
+                                    "log_scale":"off",\
                                     "fill_alpha":0.8}
                         
                         else:
@@ -206,11 +208,11 @@ def histogram(download=None):
                             "fill_alpha":request.form["%s.fill_alpha" %group]}
                         
                             #Checkboxes are only present in request form if they are checked
-                            if group+".log_scale/" in list(request.form.keys()):
-                                groups_settings[group]["log_scale"]=request.form["%s.log_scale/" %group]
-
+                            if group+".log_scale" in list(request.form.keys()):
+                                groups_settings[group]["log_scale"]="on"
                             else:
-                                groups_settings[group]["log_scale"]=".on"
+                                groups_settings[group]["log_scale"]="off"
+
 
                     plot_arguments["groups_settings"]=groups_settings
                 
@@ -238,14 +240,20 @@ def histogram(download=None):
                         "fill_alpha":request.form["%s.fill_alpha" %group]}
                         
                         #Checkboxes are only present in request form if they are checked
-                        if group+".log_scale/" in list(request.form.keys()):
-                            groups_settings[group]["log_scale"]=request.form["%s.log_scale/" %group]
+                        if group+".log_scale" in list(request.form.keys()):
+                                print("I AM ENTERING THIS IF")
+                                groups_settings[group]["log_scale"]="on"
                         else:
-                            groups_settings[group]["log_scale"]=".on"
+                            groups_settings[group]["log_scale"]="off"
+                       
                     plot_arguments["groups_settings"]=groups_settings
+            
+           
 
             session["plot_arguments"]=plot_arguments
             plot_arguments=read_request(request)
+            
+         
 
             if "df" not in list(session.keys()):
                     error_msg="No data to plot, please upload a data or session  file."
@@ -256,7 +264,6 @@ def histogram(download=None):
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
          
-
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
 

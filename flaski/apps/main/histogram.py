@@ -49,7 +49,7 @@ def make_figure(df,pa):
         else:
             pa_["label"] = h["name"]
             
-        if h["log_scale"] == "on":
+        if h["log_scale"]=="on":
             pa_["log_scale"]=True
         else:
             pa_["log_scale"]=False
@@ -75,15 +75,6 @@ def make_figure(df,pa):
 
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
     plt.legend()
-    #locs, labels = plt.xticks()
-    #min_loc=min(locs)
-    #max_loc=max(locs)
-    #step_loc=(max_loc-min_loc)/10
-    #min_label=min(tmp.min())
-    #max_label=max(tmp.max())
-    #step_label=(max_label-min_label)/10
-    #plt.xticks(np.arange(min_loc,max_loc,step_loc),np.around(np.arange(min_label,max_label,step_label),2))
-
 
     return fig
 
