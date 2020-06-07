@@ -23,36 +23,26 @@ def make_figure(df,pa):
 
     fig, axes = plt.subplots(1, 1,figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
     
-#
-#    values=pa["values"].split(",")
-#    values=[ s.rstrip("\r") for s in values ]
-#    values=[ s for s in values if s != "" ]
+
     for h in pa["groups_settings"].values():
         pa_={}
-        if h["color_rgb"] != "":
-            pa_["color_value"] = GET_COLOR( h["color_rgb"] )
-        else:
+        if h["color_rgb"] == "" or h["color_rgb"]=="None":
             if h["color_value"]=="None":
-                h["color_value"]=None
-                pa_["color_value"] = h["color_value"]
+                pa_["color_value"]=None
             else:
                 pa_["color_value"] = h["color_value"]
+        else:
+            pa_["color_value"] = GET_COLOR( h["color_rgb"] )
                 
-        if h[ "line_rgb"] != "":
+        if h[ "line_rgb"] == "" or h["line_rgb"]==None:
+            pa_["line_color"] = str(h["line_color"])
+        else:
             pa_["line_color"] = GET_COLOR( h["line_rgb"] )
-        else:
-            if h["line_color"]=="None":
-                h["line_color"]=None
-                pa_["line_color"] = h["line_color"]
-            else:
-                pa_["line_color"] = h["line_color"]
 
-        if h["bins_number"] != "":
-            pa_["bins_number"] = int(h["bins_number"])
-        else:
+        if (h["bins_number"] == "") or (h["bins_number"]==None):
             pa_["bins_number"] = h["bins_value"]
-
-
+        else:
+            pa_["bins_number"] = int(h["bins_number"])
         
         if h[ "label"] != "":
             pa_["label"] = h["label"]
@@ -60,9 +50,9 @@ def make_figure(df,pa):
             pa_["label"] = h["name"]
             
         if h["log_scale"] == "on":
-            pa_["log_scale"]=False
-        else:
             pa_["log_scale"]=True
+        else:
+            pa_["log_scale"]=False
             
         if h["fill_alpha"]!=pa["fill_alpha"]:
             pa_["fill_alpha"]=float(h["fill_alpha"])
@@ -75,23 +65,24 @@ def make_figure(df,pa):
             pa_["linewidth"]=float(pa["linewidth"])
             
         
-        if pa_["line_color"]!=None:
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
-        else:
+        if pa_["line_color"]=="None":
             plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
+        else:
+            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
+            
             
 
 
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
     plt.legend()
-    locs, labels = plt.xticks()
-    min_loc=min(locs)
-    max_loc=max(locs)
-    step_loc=(max_loc-min_loc)/10
-    min_label=min(tmp.min())
-    max_label=max(tmp.max())
-    step_label=(max_label-min_label)/10
-    plt.xticks(np.arange(min_loc,max_loc,step_loc),np.around(np.arange(min_label,max_label,step_label),2))
+    #locs, labels = plt.xticks()
+    #min_loc=min(locs)
+    #max_loc=max(locs)
+    #step_loc=(max_loc-min_loc)/10
+    #min_label=min(tmp.min())
+    #max_label=max(tmp.max())
+    #step_label=(max_label-min_label)/10
+    #plt.xticks(np.arange(min_loc,max_loc,step_loc),np.around(np.arange(min_label,max_label,step_label),2))
 
 
     return fig
@@ -162,4 +153,5 @@ def figure_defaults():
             if allargs[i] not in excluded_list:
                 lists[allargs[i]]=allargs[i+1]
 
-    return plot_arguments, lists, notUpdateList, checkboxes
+#this function might return : , lists, notUpdateList, checkboxes
+    return plot_arguments

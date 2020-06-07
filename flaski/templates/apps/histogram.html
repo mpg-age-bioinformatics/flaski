@@ -111,100 +111,100 @@
 
                 <!-- -------------------- Histogram ARGUMENTS ---------------------- -->
 
-                    {% for val in vals %}
+                {% for group,args in groups_settings.items() %}
                     
-                        <li class="nav-item" style="padding-top: 0px;">
-                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{val.name}}" aria-expanded="true" aria-controls="collapse{{val.name}}" style="padding-top: 0px;">
-                                <i class="fas fa-fw fa-cog"></i>
-                                <span>Histogram {{val}} </span>
-                            </a>
+                    <li class="nav-item" style="padding-top: 0px;">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group.name}}" aria-expanded="true" aria-controls="collapse{{group.name}}" style="padding-top: 0px;">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Histogram {{group}} </span>
+                        </a>
                         
                             
-                            <div id="collapse{{val.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                <div class="bg-white py-2 collapse-inner rounded openmenu">
-                                    <div class="row arguments">
+                        <div id="collapse{{group.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded openmenu">
+                                <div class="row arguments">
                                         
-                                        <div class="row arg" style="padding-bottom:6px;">
-                                            <label> Label <input type="text" name={{val}}.label value={{groups_settings[val]["label"]}} style="width:300px;height:22px;padding-left 4px">
-                                        </div>
+                                    <div class="row arg" style="padding-bottom:6px;">
+                                        <label> Label <input type="text" name={{group}}.label value= "{{args.label}}" style="width:300px;height:22px;padding-left 4px">
+                                    </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-right:10px;padding-bottom:6px;">Fill color: <select value={{groups_settings[val]["color_value"]}} method="GET" action="/" style="width:100px;padding-right:10px;padding-bottom:6px;">
+                                    <div class="row arg">
+                                        <label style="padding-right:10px;padding-bottom:6px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:100px;padding-right:10px;padding-bottom:6px;">
                                             {% for colors_ in colors %}
-                                            <option value="{{colors_}}" {% if colors_==val.color_value %} selected {% endif %}>{{colors_}}</option>
+                                            <option value="{{colors_}}" {% if colors_==group.color_value %} selected {% endif %}>{{colors_}}</option>
                                             {% endfor %}
                                             </select></label>
                                         </div>
 
                                         <div class="row arg" style="padding-bottom:6px;">
-                                            <label> ..or, write a fill color name <input type="text" name={{val}}.color_rgb value={{groups_settings[val]["color_rgb"]}} style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;">
+                                            <label> ..or, write a fill color name <input type="text" name={{group}}.color_rgb value="{{args.color_rgb}}" style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;">
                                         </div>
                                         
                                         <div class="row arg">
                                             <label style="padding-right:10px;padding-bottom:6px;">Line color: <select
-                                                name={{val}}.line_color
-                                                value=groups_settings[val]["line_color"]}}  method="GET" action="/" style="width:100px;padding-bottom:6px;">
+                                                name={{group}}.line_color
+                                                value="{{args.line_color}}" method="GET" action="/" style="width:100px;padding-bottom:6px;">
                                             {% for colors_ in colors %}
-                                            <option value="{{colors_}}" {% if colors_==val.line_color %} selected {% endif %}>{{colors_}}</option>
+                                            <option value="{{colors_}}" {% if colors_==group.line_color %} selected {% endif %}>{{colors_}}</option>
                                             {% endfor %}
                                             </select></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label> ..or, write a line color name <input type="text" name={{val}}.line_rgb value={{groups_settings[val]["line_rgb"]}}  style="width:300px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
+                                            <label> ..or, write a line color name <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:300px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-bottom:6px;">Binning type: <select name={{val}}.bins_value
-                                                val={{groups_settings[val]["bins_value"]}}  method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
+                                            <label style="padding-bottom:6px;">Binning type: <select name={{group}}.bins_value
+                                                val="{{args.bins_value}}"  method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
                                             {% for bins_ in bins %}
-                                            <option value="{{bins_}}" {% if bins_==val.bins_value %} selected {% endif %}>{{bins_}}</option>
+                                            <option value="{{bins_}}" {% if bins_==group.bins_value %} selected {% endif %}>{{bins_}}</option>
                                             {% endfor %}
                                             </select></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label> ..or, write the number of bins <input type="text" name={{val}}.bins_number value={{groups_settings[val]["bins_number"]}}  style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;"></label>
+                                            <label> ..or, write the number of bins <input type="text" name={{group}}.bins_number  value="{{args.bins_number}}" style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;"></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-right:5px;padding-bottom:6px;">Orientation: <select name={{val}}.orientation_value val= {{groups_settings[val]["orientation"]}}
+                                            <label style="padding-right:5px;padding-bottom:6px;">Orientation: <select name={{group}}.orientation_value val= "{{args.orientation}}"
                                                 method="GET" action="/" style="width:80px;padding-bottom:6px;">
                                             {% for orientations_ in orientations %}
-                                                <option value="{{orientations_}}" {% if orientations_==val.orientation_value %} selected {% endif %}>{{orientations_}}</option>
+                                                <option value="{{orientations_}}" {% if orientations_==group.orientation_value %} selected {% endif %}>{{orientations_}}</option>
                                             {% endfor %}
                                             </select></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left:10px;padding-bottom:6px;">Type: <select name={{val}}.histtype_value
-                                                val= {{groups_settings[val]["histtype_value"]}}  method="GET" action="/" style="width:90px;padding-bottom:6px;">
+                                            <label style="padding-left:10px;padding-bottom:6px;">Type: <select name={{group}}.histtype_value
+                                                val= "{{group.histtype_value}}"  method="GET" action="/" style="width:90px;padding-bottom:6px;">
                                             {% for histtype_ in hist_types %}
-                                                <option value="{{histtype_}}" {% if histtype_==val.histtype_value %} selected {% endif %}>{{histtype_}}</option>
+                                                <option value="{{histtype_}}" {% if histtype_==group.histtype_value %} selected {% endif %}>{{histtype_}}</option>
                                             {% endfor %}
                                             </select></label>
                                         </div>
 
                                         
                                         <div class="row arg">
-                                            <label> Line width: <input type="text" name={{val}}.linewidth value={{groups_settings[val]["linewidth"]}}  style="width:75px;height:22px;padding-left: 20px;padding-bottom:6px;"></label>
+                                            <label> Line width: <input type="text" name={{group}}.linewidth value="{{args.linewidth}}" style="width:75px;height:22px;padding-left: 20px;padding-bottom:6px;"></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left:5px;padding-bottom:6px;">Line style: <select name={{val}}.linestyle_value val = {{groups_settings[val]["linestyle_value"]}}  method="GET" action="/" style="width:79px;padding-bottom:6px;">
+                                            <label style="padding-left:5px;padding-bottom:6px;">Line style: <select name={{group}}.linestyle_value value = "{{args.linestyle_value}}" method="GET" action="/" style="width:79px;padding-bottom:6px;">
                                             {% for linestyles_ in linestyles %}
-                                            <option value="{{linestyles_}}" {% if linestyles_==val.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                            <option value="{{linestyles_}}" {% if linestyles_==group.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
                                             {% endfor %}
                                             </select></label>
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-bottom:6px;padding-right:5px">Fill alpha: <input type="text" name={{val}}.fill_alpha value={{groups_settings[val]["fill_alpha"]}}  style="width:85px;height:22px;padding-left:20px;padding-bottom:6px;"></label>
+                                            <label style="padding-bottom:6px;padding-right:5px">Fill alpha: <input type="text" name={{group}}.fill_alpha value="{{args.fill_alpha}}"  style="width:85px;height:22px;padding-left:20px;padding-bottom:6px;"></label>
                                         </div>
                                         
                                         <div class="row arg">
                                             <label style="width:80px;padding-left:1px;padding-bottom:6px;">Log scale:</label>
-                                            <label style="padding-right:1px;padding-bottom:6px;;"><input type="checkbox" name= {{val}}.log_scale {% if val.log_scale =="on" %} checked {% elif val.log_scale==".on" %} checked {% endif %}/></label>
+                                            <label  style="padding-right:1px;padding-bottom:6px;;"><input type="checkbox" name= {{group}}.log_scale value="{{args.log_scale}}" {% if group.log_scale =="on" %} checked {% elif group.log_scale==".on" %} checked {% endif %}/></label>
                                         </div>
                                         
                                         
