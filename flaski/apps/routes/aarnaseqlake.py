@@ -41,11 +41,11 @@ def fix_go(x):
 
 def nFormat(x):
     if float(x) == 0:
-        return x
+        return str(x)
     elif ( float(x) < 0.01 ) & ( float(x) > -0.01 ) :
-        return '{:.3e}'.format(float(x))
+        return str('{:.3e}'.format(float(x)))
     else:
-        return '{:.3f}'.format(float(x))
+        return str('{:.3f}'.format(float(x)))
 
 def get_tables(plot_arguments):
 
@@ -142,6 +142,10 @@ def get_tables(plot_arguments):
     selected_ge.rename(columns=ids2labels,inplace=True)
     df_ge=selected_ge.copy()
     selected_ge=selected_ge[:50]
+    cols_to_format=selected_ge.columns.tolist()
+    cols_to_format=[ s for s in cols_to_format if s not in ["gene_id","gene_name"] ]
+    for c in cols_to_format:
+        selected_ge[c]=selected_ge[c].apply(lambda x: nFormat(x) )
 
     plot_arguments["selected_ge_50_cols"]=selected_ge.columns.tolist()
 
@@ -157,17 +161,21 @@ def get_tables(plot_arguments):
                                     (groups_to_files["Group_2"].isin(plot_arguments["selected_groups"]) ) & \
                                     (groups_to_files["Set"].isin(plot_arguments["selected_data_sets"])  )]["File"].tolist()[0]
         
-        selected_dge=pd.read_csv(session["plot_arguments"]["path_to_files"]+"pairwise/"+selected_dge,sep="\t", index_col=[0])
-        cols=["baseMean","log2FoldChange","lfcSE","pvalue","padj"]
-        selected_dge=selected_dge[cols]
-        selected_dge=pd.merge(df_ge,selected_dge,left_on=["gene_id"],right_index=True, how="left")
-        selected_dge=selected_dge.dropna(subset=cols,how="all")
-        # for c in ["log2FoldChange","pvalue","padj","lfcSE","baseMean"]:
-        #     selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
+        selected_dge=pd.read_csv(session["plot_arguments"]["path_to_files"]+"pairwise/"+selected_dge,sep="\t")#, index_col=[0])
+        selected_dge=pd.merge(selected_genes[["gene_id"]], selected_dge, on=["gene_id"],how="left")
+        cols_to_format=selected_dge.columns.tolist()
+        cols_to_format=[ s for s in cols_to_format if s not in ["gene_id","gene_name"] ]
+        #cols=["baseMean","log2FoldChange","lfcSE","pvalue","padj"]
+        #selected_dge=selected_dge[cols]
+        #selected_dge=pd.merge(df_ge,selected_dge,left_on=["gene_id"],right_index=True, how="left")
+        #selected_dge=selected_dge.dropna(subset=cols,how="all")
+
         plot_arguments["selected_dge_50_cols"]=selected_dge.columns.tolist()
         
         df_dge=selected_dge.copy()
         selected_dge=selected_dge[:50]
+        for c in cols_to_format:
+            selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
         selected_dge=list(selected_dge.values)
         selected_dge=[ list(s) for s in selected_dge ]
         plot_arguments["selected_dge_50"]=selected_dge
