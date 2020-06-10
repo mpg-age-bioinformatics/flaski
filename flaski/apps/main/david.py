@@ -89,6 +89,7 @@ def run_david(pa):
           if database in names_dbs:
             file_dic={"name_hsa_ensembl":"Homo_sapiens.GRCh38.99.tsv", "name_mus_ensembl":"Mus_musculus.GRCm38.99.tsv", "name_cel_ensembl":"Caenorhabditis_elegans.WBcel235.99.tsv","name_dros_ensembl":"Drosophila_melanogaster.BDGP6.28.99.tsv"}
             id_name=pd.read_csv("data/"+file_dic[database],sep="\t")
+            id_name_=id_name.copy()
             db_names=id_name["gene_name"].tolist()
             query_names=",".join(ids_bg)
             found_values, emsg=fuzzy_search(query_names,db_names)
@@ -98,6 +99,13 @@ def run_david(pa):
             id_name.index=id_name["gene_name"].tolist()
             id_name=id_name.to_dict()["gene_id"]
             ids_bg=[ id_name[ str(x).lower() ] for x in ids_bg  ]
+            id_name_=id_name_[ id_name_["gene_id"].isin(ids_bg) ]
+            id_name_["gene_id"]=id_name_["gene_id"].apply(lambda x: str(x).upper() )
+            id_name_.index=id_name_["gene_id"].tolist()
+            id_name_=id_name_.to_dict()["gene_name"]
+          else:
+            id_name_=None
+
             # bg_gene_names= keep on here
 
     else:
@@ -152,7 +160,7 @@ def run_david(pa):
       print('Mapping rate of ids: ', str(size))
       sys.stdout.flush()
     if float(size) <= float(0):
-      msg='Mapping rate of ids: %s. Please realize that DAVID currently does not allow the usage gene symbols input due to their organism ambiguity. You should use ensembl gene ids instead. We are working on solving this for you. You can follow this issue here: https://github.com/mpg-age-bioinformatics/flaski/issues/117.' %str(size)
+      msg='Mapping rate of ids: %s.' %str(size)
       return None, None, None, msg
 
     client_report=client.service.getListReport()
@@ -232,7 +240,9 @@ def run_david(pa):
     if ids_bg:
       bg_mapped=pd.DataFrame({ "bg_mapped":bg_mapped })
       bg_not_mapped=pd.DataFrame({ "bg_not_mapped": bg_not_mapped })
-
+      if id_name_:
+        bg_mapped["bg_mapped_name"]=bg_mapped["bg_mapped"].apply(lambda x: id_name_[x] )
+        bg_not_mapped["bg_not_mapped_name"]=bg_not_mapped["bg_not_mapped"].apply(lambda x: id_name_[x] )
 
       # insert ensembl gene name to gene id here 
 
@@ -267,6 +277,7 @@ def figure_defaults():
         dict: A dictionary of the style { "argument":"value"}
     """
 
+    # 'GENE_SYMBOL',
     plot_arguments={
         "database":['AFFYMETRIX_3PRIME_IVT_ID', 'AFFYMETRIX_EXON_GENE_ID',
           'AFFYMETRIX_SNP_ID', 'AGILENT_CHIP_ID',
@@ -276,7 +287,7 @@ def figure_defaults():
           'FLYBASE_TRANSCRIPT_ID','GENBANK_ACCESSION',
           'GENPEPT_ACCESSION', 'GENOMIC_GI_ACCESSION',
           'PROTEIN_GI_ACCESSION', 'ILLUMINA_ID',
-          'IPI_ID', 'MGI_ID', 'GENE_SYMBOL', 'PFAM_ID',
+          'IPI_ID', 'MGI_ID', 'PFAM_ID',
           'PIR_ACCESSION','PIR_ID','PIR_NREF_ID', 'REFSEQ_GENOMIC',
           'REFSEQ_MRNA','REFSEQ_PROTEIN','REFSEQ_RNA','RGD_ID',
           'SGD_ID','TAIR_ID','UCSC_GENE_ID','UNIGENE',
