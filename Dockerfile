@@ -52,7 +52,7 @@ RUN groupadd flaski --gid=1000 && useradd -m flaski --uid=1000 --gid=1000 && ech
     chpasswd
 
 # data folders and access rights
-RUN mkdir -p /var/log/flaski /flaski/.git /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users /backup/users_data /backup/mariadb
+RUN mkdir -p /var/log/flaski /flaski/.git /flaski/data /flaski/flaski /flaski/migrations /flaski/utils /flaski/services /flaski/pyflaski /flaski_data/users /backup/users_data /backup/mariadb
 RUN touch /mysql_backup.log && touch /rsync.log
 RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /var/log/flaski /mysql_backup.log /rsync.log
 
@@ -69,6 +69,7 @@ COPY pyflaski /flaski/pyflaski
 COPY services /flaski/services
 COPY utils /flaski/utils
 COPY flaski /flaski/flaski
+COPY data /flaski/data
 COPY .git /flaski/.git
 
 # Jupyter port
