@@ -2,6 +2,8 @@ import pandas as pd
 import sys
 from suds.client import Client as sudsclient
 import ssl
+from flaski.routines import fuzzy_search
+
 
 david_categories = [
   'GOTERM_BP_FAT', 'GOTERM_CC_FAT', 'GOTERM_MF_FAT', 'KEGG_PATHWAY',
@@ -47,6 +49,24 @@ def run_david(pa):
     ids=[ s.split("\t") for s in ids ]
     idsdf=pd.DataFrame(ids)
 
+    names_dbs=["name_hsa_ensembl", "name_mus_ensembl", "name_cel_ensembl","name_dros_ensembl" ]
+    if database in names_dbs:
+      file_dic={"name_hsa_ensembl":"Homo_sapiens.GRCh38.99.tsv", "name_mus_ensembl":"Mus_musculus.GRCm38.99.tsv", "name_cel_ensembl":"Caenorhabditis_elegans.WBcel235.99.tsv","name_dros_ensembl":"Drosophila_melanogaster.BDGP6.28.99.tsv"}
+      id_name=pd.read_csv("data/"+file_dic[database],sep="\t")
+      db_names=id_name["gene_name"].tolist()
+      query_names=idsdf[0].tolist()
+      query_names=",".join(query_names)
+      found_values, emsg=fuzzy_search(query_names,db_names)
+      if emsg:
+        return None, None, None, emsg
+      newcol=idsdf.columns.tolist()[-1]+1
+      id_name["gene_name"]=id_name["gene_name"].apply(lambda x: str(x).lower() )
+      id_name.index=id_name["gene_name"].tolist()
+      id_name=id_name.to_dict()["gene_id"]
+      idsdf[newcol]=idsdf[0]
+      idsdf[0]=idsdf[0].apply(lambda x: id_name[ str(x).lower() ])
+
+
     # insert mapping of ensembl gene name to gene id here
 
     annotations=idsdf.columns.tolist()
@@ -65,9 +85,20 @@ def run_david(pa):
       ids_bg=[ s for s in ids_bg if len(s) > 0 ]
       if len(ids_bg) == 0:
         ids_bg = None
-
-      # else
-      # insert mapping of ensembl gene names to ensembl gene id here
+      else:
+          if database in names_dbs:
+            file_dic={"name_hsa_ensembl":"Homo_sapiens.GRCh38.99.tsv", "name_mus_ensembl":"Mus_musculus.GRCm38.99.tsv", "name_cel_ensembl":"Caenorhabditis_elegans.WBcel235.99.tsv","name_dros_ensembl":"Drosophila_melanogaster.BDGP6.28.99.tsv"}
+            id_name=pd.read_csv("data/"+file_dic[database],sep="\t")
+            db_names=id_name["gene_name"].tolist()
+            query_names=",".join(ids_bg)
+            found_values, emsg=fuzzy_search(query_names,db_names)
+            if emsg:
+              return None, None, None, emsg
+            id_name["gene_name"]=id_name["gene_name"].apply(lambda x: str(x).lower() )
+            id_name.index=id_name["gene_name"].tolist()
+            id_name=id_name.to_dict()["gene_id"]
+            ids_bg=[ id_name[ str(x).lower() ] for x in ids_bg  ]
+            # bg_gene_names= keep on here
 
     else:
       ids_bg=None
@@ -84,6 +115,9 @@ def run_david(pa):
     verbose=True
     ids = ','.join([str(i) for i in ids])
     use_bg = 0
+
+    if database in names_dbs:
+      database="ENSEMBL_GENE_ID"
 
     if ids_bg:
       ids_bg = ','.join([str(i) for i in ids_bg])
@@ -199,6 +233,7 @@ def run_david(pa):
       bg_mapped=pd.DataFrame({ "bg_mapped":bg_mapped })
       bg_not_mapped=pd.DataFrame({ "bg_not_mapped": bg_not_mapped })
 
+
       # insert ensembl gene name to gene id here 
 
       # if len(list(ids_map.keys())) > 0:
@@ -236,7 +271,7 @@ def figure_defaults():
         "database":['AFFYMETRIX_3PRIME_IVT_ID', 'AFFYMETRIX_EXON_GENE_ID',
           'AFFYMETRIX_SNP_ID', 'AGILENT_CHIP_ID',
           'AGILENT_ID', 'AGILENT_OLIGO_ID',
-          'ENSEMBL_GENE_ID', 'ENSEMBL_TRANSCRIPT_ID',
+          'ENSEMBL_GENE_ID',"name_hsa_ensembl", "name_mus_ensembl", "name_cel_ensembl","name_dros_ensembl", 'ENSEMBL_TRANSCRIPT_ID',
           'ENTREZ_GENE_ID', 'FLYBASE_GENE_ID',
           'FLYBASE_TRANSCRIPT_ID','GENBANK_ACCESSION',
           'GENPEPT_ACCESSION', 'GENOMIC_GI_ACCESSION',
