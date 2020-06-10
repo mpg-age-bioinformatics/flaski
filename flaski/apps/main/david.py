@@ -17,7 +17,7 @@ david_fields = [
 # 'fisher'
 # 'termName' to 'term' and 'term_name'
 
-def run_david(pa):
+def run_david(pa, path_to_ensembl_maps="/flaski/data"):
     #database, categories, user, ids, ids_bg = None, name = '', name_bg = '', verbose = False, p = 0.1, n = 2):
     # Modified from https://david.ncifcrf.gov/content.jsp?file=WS.html
     # by courtesy of HuangYi @ 20110424
@@ -52,7 +52,7 @@ def run_david(pa):
     names_dbs=["name_hsa_ensembl", "name_mus_ensembl", "name_cel_ensembl","name_dros_ensembl" ]
     if database in names_dbs:
       file_dic={"name_hsa_ensembl":"Homo_sapiens.GRCh38.99.tsv", "name_mus_ensembl":"Mus_musculus.GRCm38.99.tsv", "name_cel_ensembl":"Caenorhabditis_elegans.WBcel235.99.tsv","name_dros_ensembl":"Drosophila_melanogaster.BDGP6.28.99.tsv"}
-      id_name=pd.read_csv("data/"+file_dic[database],sep="\t")
+      id_name=pd.read_csv(path_to_ensembl_maps+file_dic[database],sep="\t")
       db_names=id_name["gene_name"].tolist()
       query_names=idsdf[0].tolist()
       query_names=",".join(query_names)
@@ -87,8 +87,8 @@ def run_david(pa):
         ids_bg = None
       else:
           if database in names_dbs:
-            file_dic={"name_hsa_ensembl":"Homo_sapiens.GRCh38.99.tsv", "name_mus_ensembl":"Mus_musculus.GRCm38.99.tsv", "name_cel_ensembl":"Caenorhabditis_elegans.WBcel235.99.tsv","name_dros_ensembl":"Drosophila_melanogaster.BDGP6.28.99.tsv"}
-            id_name=pd.read_csv("data/"+file_dic[database],sep="\t")
+            file_dic={"name_hsa_ensembl":"Homo_sapiens.GRCh38.92.tsv", "name_mus_ensembl":"Mus_musculus.GRCm38.92.tsv", "name_cel_ensembl":"Caenorhabditis_elegans.WBcel235.92.tsv","name_dros_ensembl":"Drosophila_melanogaster.BDGP6.92.tsv"}
+            id_name=pd.read_csv(path_to_ensembl_maps+file_dic[database],sep="\t")
             id_name_=id_name.copy()
             db_names=id_name["gene_name"].tolist()
             query_names=",".join(ids_bg)
