@@ -117,7 +117,7 @@ def get_tables(plot_arguments):
         plot_arguments["selected_gene_names"]=selected_gene_names
 
     nsets=len(plot_arguments["selected_data_sets"])
-    if (nsets > 1) & (plot_arguments["selected_data_sets"][0] != "all"):
+    if (nsets > 1) | ("all" in plot_arguments["selected_data_sets"] ):
         selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
     else:
         selected_results_files["Labels"]=selected_results_files["Reps"]
@@ -144,6 +144,7 @@ def get_tables(plot_arguments):
     selected_ge=selected_ge[:50]
     cols_to_format=selected_ge.columns.tolist()
     cols_to_format=[ s for s in cols_to_format if s not in ["gene_id","gene_name"] ]
+    # print(type(selected_ge),selected_ge.head())
     for c in cols_to_format:
         selected_ge[c]=selected_ge[c].apply(lambda x: nFormat(x) )
 
@@ -162,7 +163,8 @@ def get_tables(plot_arguments):
                                     (groups_to_files["Set"].isin(plot_arguments["selected_data_sets"])  )]["File"].tolist()[0]
         
         selected_dge=pd.read_csv(session["plot_arguments"]["path_to_files"]+"pairwise/"+selected_dge,sep="\t")#, index_col=[0])
-        selected_dge=pd.merge(selected_genes[["gene_id"]], selected_dge, on=["gene_id"],how="left")
+        selected_dge=pd.merge(selected_genes[["gene_id"]], selected_dge, on=["gene_id"],how="inner")
+        selected_dge=selected_dge.sort_values(by=["padj"],ascending=True)
         cols_to_format=selected_dge.columns.tolist()
         cols_to_format=[ s for s in cols_to_format if s not in ["gene_id","gene_name"] ]
         #cols=["baseMean","log2FoldChange","lfcSE","pvalue","padj"]
