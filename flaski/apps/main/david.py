@@ -131,7 +131,11 @@ def run_david(pa, path_to_ensembl_maps="/flaski/data"):
       ids_bg = ','.join([str(i) for i in ids_bg])
     ssl._create_default_https_context = ssl._create_unverified_context
     url = 'https://david.ncifcrf.gov/webservice/services/DAVIDWebService?wsdl'
-    client = sudsclient(url)
+    try:
+      client = sudsclient(url)
+    except:
+      return None, None, None, "Could not connect to DAVID. Server might be down."
+
     client.wsdl.services[0].setlocation('https://david.ncifcrf.gov/webservice/services/DAVIDWebService.DAVIDWebServiceHttpSoap11Endpoint/')
     try:
       client_auth = client.service.authenticate(user)
