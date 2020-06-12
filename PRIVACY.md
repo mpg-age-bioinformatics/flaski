@@ -12,7 +12,7 @@ Flaski collects your first name, last name, organization name, and email address
 
 **What personal data Flaski does not collect**
 
-Flaski does not collect your input data. You can store your data in our servers but we generally will not look into it other than stated below 
+Flaski does not collect your input data. You can store your data in our servers but we generally will not look into it other than stated below.
 
 **How Flaski collets information**
 
@@ -65,13 +65,13 @@ Flaski, the Max Planck Institute for Biology of Ageing, and it's personnel can n
 
 Flaski personnel do not access private repositories unless required to for security purposes, to assist the repository owner with a support matter, to maintain the integrity of the service, or to comply with our legal obligations. However, while we do not generally search for content in your repositories, we may scan our servers and content to detect certain tokens or security signatures, known active malware, or other content such as violent extremist or terrorist content or child exploitation imagery, based on algorithmic fingerprinting techniques.
 
-Flaski regularly scans it's server for old, untouched data and marks it for deletion. Users are informed or this mark and are given time to properly backup their data.
+Flaski regularly scans it's servers for old, untouched data and marks it for deletion. Users are informed of this mark and are given time to properly backup their data.
 
 Personal data, ie. firstname, last name, email, and organization are kept until you ask us to delete it or either European or German regulations enforce it.
 
 *Data analysis*
 
-Flaski purpose is to support researchers on the analysis for their data. For this we constantly enhance the number and quality of our app promptly responding to user's requests. Flaski, the Max Planck Institute for Biology of Ageing, and it's personnel can not be hold responsible for any data analysis performed with Flaski nor for any misinterpretation that might come from an undesirable or misunderstood function. Flaski's code is public and open source and we encourage all users to follow it's code as a trace to their analysis.   
+Flaski purpose is to support researchers on the analysis of their data. For this we constantly enhance the number and quality of our app promptly responding to user's requests. Flaski, the Max Planck Institute for Biology of Ageing, and it's personnel can not be hold responsible for any data analysis performed with Flaski nor for any misinterpretation that might come from an undesirable or misunderstood function. Flaski's code is public and open source and we encourage all users to follow it's code as a trace to their analysis.   
 
 *What are my rights as a data subject?*
 

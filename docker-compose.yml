@@ -11,7 +11,8 @@ services:
   volumes:
     - data:/flaski_data/users
     - ./:/flaski
-    - ~/flaski_backup/users_data:/backup/users_data:ro
+    - ~/flaski_backup/stats:/backup/stats
+    - ~/flaski_backup/users_data:/backup/users_data
     - ~/flaski_backup/mariadb:/backup/mariadb:ro
   environment:
     - FLASK_ENV=init
@@ -48,6 +49,7 @@ services:
    - SECRET_KEY=${SECRET_KEY}
    - REDIS_ADDRESS=redis:6379/0
    - REDIS_PASSWORD=${REDIS_PASSWORD}
+   - MAIL_USERNAME=flaski@age.mpg.de
    - MYSQL_USER=flaski
    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
    - MYSQL_HOST=mariadb

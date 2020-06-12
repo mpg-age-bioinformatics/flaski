@@ -4,6 +4,9 @@
 
 if [[ "$FLASK_ENV" == "init" ]] ; then
 
+  touch /mysql_backup.log
+  touch /rsync.log
+
   while ! mysqladmin --user=root --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} status ; 
     do echo "Waiting for mysql.. " && sleep 4
   done
@@ -26,8 +29,7 @@ _EOF_
   fi
 
   if [[ "$RESTORE_DB" == "1" ]] ; then
-    touch /mysql_backup.log
-    touch /rsync.log
+
     tail -F /mysql_backup.log /rsync.log &
     echo "=> Restore latest backup"
     LATEST_BACKUP=$(find /backup/mariadb -maxdepth 1 -name 'latest.flaski.sql.gz' | tail -1 )
@@ -39,6 +41,7 @@ _EOF_
       else
         echo "=> Restore failed"
     fi
+    
   fi
 
   chown -R flaski:flaski /flaski_data /flaski_data/users /var/log/flaski /mysql_backup.log /rsync.log

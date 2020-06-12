@@ -82,7 +82,7 @@ docker-compose exec backup rsync -rtvh --delete /flaski_data/users/ /backup/user
 ## Looking for and removing old files
 
 ```bash
-docker-compose run --entrypoint="python3 /flaski/flaski.py" init
+docker-compose run --entrypoint="python3 /flaski/flaski.py clean" init
 ```
 
 ## Email logging
@@ -109,6 +109,7 @@ and then for removing a user from the db:
 ```python
 u=User.query.filter_by(email=<user_email>).first()
 db.session.delete(u)
+db.session.commit()
 ```
 for editing entries eg.:
 ```python
@@ -116,6 +117,11 @@ user=User.query.filter_by(email=<user_email>).first()
 user.active = False
 db.session.add(user)
 db.session.commit()
+```
+
+Collecting usage entries:
+```bash
+docker-compose run --entrypoint="python3 /flaski/flaski.py stats /backup/stats" init
 ```
 
 If you need to re-iniate your database

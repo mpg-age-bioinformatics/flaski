@@ -1,6 +1,8 @@
 <p>{{eapp}}</p>
 <p></p>
-<p>{{emsg}}</p>
+{% for line in emsg %}
+<p>{{line}}</p>
+{% endfor %}
 <p></p>
 <p>{{user.firstname}} {{user.lastname}}: {{user.email}}</p>
 <p></p>
