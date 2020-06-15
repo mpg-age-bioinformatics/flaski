@@ -41,8 +41,12 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"Venn diagram", "id":'venndiagram_more',"link":'venndiagram' ,"java":"javascript:ReverseDisplay('venndiagram_more')", "description":"A venn diagram plotting app."},\
         { "name":"DAVID", "id":'david_more',"link":'david' ,"java":"javascript:ReverseDisplay('david_more')", "description":"A DAVID querying plot."},\
         { "name":"iCell plot", "id":'icellplot_more',"link":'icellplot' ,"java":"javascript:ReverseDisplay('icellplot_more')", "description":"A DAVID reporting plot."}] #,\
-        #{ "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A histogram."},\
-        #{ "name":"Violinplot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violinplot app."} ]
+
+if app.config['INSTANCE'] != "production" :
+    DEVAPPS=[{ "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A histogram."},\
+            { "name":"Violinplot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violinplot app."},\
+            { "name":"PCA", "id":'pca_more',"link":'pca' ,"java":"javascript:ReverseDisplay('pca_more')", "description":"A PCA app."} ]
+    FREEAPPS=FREEAPPS+DEVAPPS
 
 
 @app.route('/', methods=['GET', 'POST'])
