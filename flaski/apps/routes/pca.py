@@ -24,6 +24,16 @@ import pandas as pd
 
 import base64
 
+def nFormat(x):
+    if str(x) == "nan":
+        return ""
+    elif float(x) == 0:
+        return str(x)
+    elif ( float(x) < 0.01 ) & ( float(x) > -0.01 ) :
+        return str('{:.3e}'.format(float(x)))
+    else:
+        return str('{:.3f}'.format(float(x)))
+
 @app.route('/pca/<download>', methods=['GET', 'POST'])
 @app.route('/pca', methods=['GET', 'POST'])
 @login_required
@@ -124,10 +134,38 @@ def pca(download=None):
 
             # CALL FIGURE FUNCTION
             # try:
-            df_out=make_figure(df,plot_arguments)
+            df_pca, features=make_figure(df,plot_arguments)
+
+            df_pca=df_pca.astype(str)
+            session["df_pca"]=df_pca.to_json()
+
+            features=features.astype(str)
+            session["features"]=features.to_json()
+
+            df_selected=df_pca[:50]
+            cols_to_format=df_selected.columns.tolist()
+            #cols_to_format=[ s for s in cols_to_format if s not in ["gene_id","gene_name"] ]
+            table_headers=[cols_to_format[0]]
+            for c in cols_to_format[1:]:
+                df_selected[c]=df_selected[c].apply(lambda x: nFormat(x) )
+                new_name=c.split(" - ")[0]+" - "+nFormat(float(c.split(" - ")[-1].split("%")[0]))+"%"
+                table_headers.append(new_name)
+            df_selected=list(df_selected.values)
+            df_selected=[ list(s) for s in df_selected ]
 
 
-            return render_template('/apps/pca.html', filename=filename, apps=apps, **plot_arguments)
+            features_selected=features[:50]
+            cols_to_format=features_selected.columns.tolist()
+            cols_to_format=[ s for s in cols_to_format if "key" not in s ]
+            features_headers=features_selected.columns.tolist()
+            for c in cols_to_format[1:]:
+                features_selected[c]=features_selected[c].apply(lambda x: nFormat(x) )
+            features_selected=features_selected.astype(str)
+            features_selected=features_selected.replace("nan","")
+            features_selected=list(features_selected.values)
+            features_selected=[ list(s) for s in features_selected ]
+            
+            return render_template('/apps/pca.html', table_headers=table_headers, table_contents=df_selected, features_headers=features_headers, features_contents=features_selected, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="pca",session=session)
@@ -141,15 +179,15 @@ def pca(download=None):
             plot_arguments=session["plot_arguments"]
 
             # READ INPUT DATA FROM SESSION JSON
-            df=pd.read_json(session["df"])
+            df_pca=pd.read_json(session["df_pca"])
+            features=pd.read_json(session["features"])
 
             # CALL FIGURE FUNCTION
 
-            df_out=make_figure(df,plot_arguments)
-
             excelfile = io.BytesIO()
             EXC=pd.ExcelWriter(excelfile)
-            df_out.to_excel(EXC,index=None)
+            df_pca.to_excel(EXC,sheet_name="pca", index=None)
+            features.to_excel(EXC,sheet_name="features", index=None)
             EXC.save()
             excelfile.seek(0)
 
