@@ -207,6 +207,9 @@ def aarnaseqlake(download=None):
 
     apps=current_user.user_apps
 
+    if "aarnaseqlake" not in [ s["link"] for s in apps ] :
+        return redirect(url_for('index'))
+
     reset_info=check_session_app(session,"aarnaseqlake",apps)
     if reset_info:
         flash(reset_info,'error')
