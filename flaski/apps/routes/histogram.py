@@ -128,8 +128,6 @@ def histogram(download=None):
                     groups=plot_arguments["vals"]
                     groups.sort()
                     groups_settings=dict()
-                    #RGB tuple of float values in closed interval [0, 1] (e.g., (0.1, 0.2, 0.5))
-                    #Select an integer (e.g. 10) or sequence (e.g. [1, 2, 3, 4])
                     for group in groups:
                         groups_settings[group]={"name":group,\
                             "values":df[group],\
@@ -144,7 +142,6 @@ def histogram(download=None):
                             "linestyle_value":"solid",\
                             "line_color":None,\
                             "line_rgb":"",\
-                            "log_scale":"off",\
                             "fill_alpha":0.8}
                             
                     plot_arguments["groups_settings"]=groups_settings
@@ -159,9 +156,6 @@ def histogram(download=None):
                     plt.close()
                     figfile.seek(0)  # rewind to beginning of file
                     figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
-                    
-                    for group,args in plot_arguments["groups_settings"].items():
-                        print("log_scale is:",args["log_scale"])
                     return render_template('/apps/histogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
                 
                 
@@ -188,7 +182,6 @@ def histogram(download=None):
                                     "linestyle_value":"solid",\
                                     "line_color":None,\
                                     "line_rgb":"",\
-                                    "log_scale":"off",\
                                     "fill_alpha":0.8}
                         
                         else:
@@ -206,12 +199,6 @@ def histogram(download=None):
                             "line_color":request.form["%s.line_color" %group],\
                             "line_rgb":request.form["%s.line_rgb" %group],\
                             "fill_alpha":request.form["%s.fill_alpha" %group]}
-                        
-                            #Checkboxes are only present in request form if they are checked
-                            if group+".log_scale" in list(request.form.keys()):
-                                groups_settings[group]["log_scale"]="on"
-                            else:
-                                groups_settings[group]["log_scale"]="off"
 
 
                     plot_arguments["groups_settings"]=groups_settings
@@ -222,7 +209,6 @@ def histogram(download=None):
                     groups.sort()
                     groups_settings=dict()
                     group_dic={}
-                    print("las request form se ve asi",list(request.form.items()))
                     for group in groups:
                         groups_settings[group]={"name":group,\
                         "values":df[group],\
@@ -239,12 +225,6 @@ def histogram(download=None):
                         "line_rgb":request.form["%s.line_rgb" %group],\
                         "fill_alpha":request.form["%s.fill_alpha" %group]}
                         
-                        #Checkboxes are only present in request form if they are checked
-                        if group+".log_scale" in list(request.form.keys()):
-                                print("I AM ENTERING THIS IF")
-                                groups_settings[group]["log_scale"]="on"
-                        else:
-                            groups_settings[group]["log_scale"]="off"
                        
                     plot_arguments["groups_settings"]=groups_settings
             
