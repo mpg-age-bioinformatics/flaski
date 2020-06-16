@@ -25,8 +25,11 @@ def make_figure(df,pa):
     #    df_pca=pd.DataFrame(stats.zscore(df_pca, axis=0, ddof=1),columns=df_pca.columns.tolist(), index=df_pca.index.tolist())
 
     pca = PCA(copy=True, iterated_power='auto', n_components=int(pa["ncomponents"]), random_state=None, svd_solver='auto', tol=0.0, whiten=False)
-    #if pa["scale"] in [".on","on"]:
-    df_pca_scaled = preprocessing.scale(df_pca)
+    if pa["scale_value"] == "feature":
+        axis=0
+    elif pa["scale_value"] == "sample":
+        axis=1
+    df_pca_scaled = preprocessing.scale(df_pca,axis=axis)
     #else:
     #    df_pca_scaled = df_pca.as_matrix()
     projected=pca.fit_transform(df_pca_scaled)
@@ -103,6 +106,8 @@ def figure_defaults():
         "yvals":"",\
         "ncomponents":"2",\
         "percvar":"100",\
+        "scale":["feature","sample"],\
+        "scale_value":"sample",\
         "download_format":["tsv","xlsx"],\
         "downloadf":"xlsx",\
         "downloadn":"PCA",\
