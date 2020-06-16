@@ -3,7 +3,7 @@
 {% block app_title %}
 
 <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
-    <h1 class="h3 mb-0 text-gray-800">Heatmap</h1>
+    <h1 class="h3 mb-0 text-gray-800">PCA</h1>
 </div>
 
 {% endblock %}
@@ -20,15 +20,10 @@
 
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
-        <!-- div class="sidebar-brand-icon rotate-n-15"-->
-            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
-        <!-- /div -->
-        <!--div style="padding-right: 0px; padding-left: px;" -->
             <div class="sidebar-brand-icon rotate-n-0">
                 <i class="fas fa-dog"></i>
             </div>
-        <!--/div-->
-        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div>
     </a>
 
     <!-- Divider -->
@@ -36,7 +31,7 @@
 
     <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
 
-        <form action="{{ url_for('heatmap') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ url_for('pca') }}" method="post" enctype="multipart/form-data">
 
             <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
             <!-- Heading -->
@@ -45,11 +40,8 @@
             <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
-                    <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
                     <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
                 </div>
-                <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
-                <!--input class="form-control" type="text" placeholder="input file"-->
             </div>    
 
             <!-- Divider -->
@@ -82,18 +74,6 @@
                     </div>
                 </div>
 
-                <!--div class="column">
-                    <div class="sidebar-heading" style="padding-left: 6px;">Groups:</div>
-                    <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
-                        <select name=groups_value method="GET" action="/" style="width:114px">
-                            {% for groups_ in groups %}
-                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div-->
-
-
             </div>
 
             <!-- Divider -->
@@ -110,139 +90,18 @@
             <li class="nav-item" style="padding-bottom: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Figure</span>
+                    <span>Reduction</span>
                 </a>
                 <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
                             <div class="row arg">
-                                    <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px"></label>
-                                    <label style="padding-left: 7px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px"></label>
-                            </div>
-
-
-                            <div class="row arg">
-                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=title_size_value method="GET" action="/" style="width:50px">
-                                    {% for title_size_ in title_size %}
-                                        <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
-                                    {% endfor %}
-                                </select></label>
+                                <label>Number of components: <input type="text" name="ncomponents" value='{{ ncomponents }}' style="width:145px;height:22px;padding-left: 4px"></label>
+                                <label>Top % most variable rows: <input type="text" name="percvar" value='{{ percvar }}' style="width:131px;height:22px;padding-left: 4px"></label>
+                                <!-- <label style="padding-left:0x;width:150px;"><input type="checkbox" name="scale" {% if scale=="on" %} checked {% elif scale==".on" %} checked {% endif %}/> Scale </label> -->
                             </div>
                         
-                        </div>
-                    </div>
-                </div>
-            </li>
-
-
-            <!-- -------------------- Clustering ARGUMENTS ---------------------- -->
-
-            <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseClustering" aria-expanded="true" aria-controls="collapseClustering" style="padding-top: 0px;">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Cluster</span>
-                </a>
-                <div id="collapseClustering" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-
-                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="col_cluster" {% if col_cluster=="on" %} checked {% elif col_cluster==".on" %} checked {% endif %}/> Columns cluster </label>
-                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="row_cluster" {% if row_cluster=="on" %} checked {% elif row_cluster==".on" %} checked {% endif %}/> Row cluster </label>
-
-                            <label style="width:300px">Dendogram-to-figure ratio:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px"></label>
-
-                            <label style="width:300px">Number of clusters to highlight:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="n_cols_cluster" value='{{ n_cols_cluster }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="n_rows_cluster" value='{{ n_rows_cluster }}' style="width:98px;height:22px;padding-left: 4px"></label>
-
-
-                            <label>Method: <select name=method method="GET" action="/" style="width:78px">
-                                {% for method_ in method %}
-                                    <option value="{{method_}}" {% if method_==method_value %} selected {% endif %}>{{method_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-left:8px;"> Distance: <select name=distance_value method="GET" action="/" style="width:98px">
-                                {% for distance_ in distance %}
-                                    <option value="{{distance_}}" {% if distance_==distance_value %} selected {% endif %}>{{distance_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="width:300px">Pre-defined markers:</label>
-                            <label style="padding-left:16px;">columns: <select name=xvals_colors method="GET" action="/" style="width:225px">
-                                {% for xcols_ in xvals_colors_list %}
-                                    <option value="{{xcols_}}" {% if xcols_==xvals_colors %} selected {% endif %}>{{xcols_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-left:16px;">rows: <select name=yvals_colors method="GET" action="/" style="width:246px">
-                                {% if yvals_colors=="" %}
-                                    <option value="select a column.." selected>select a column..</option>
-                                {% else %}
-                                    <option value="select a column..">select a column..</option>
-                                {% endif %}
-                                {% for ycols_ in ycols %}
-                                    <option value="{{ycols_}}" {% if ycols_==yvals_colors %} selected {% endif %}>{{ycols_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                        </div>
-        
-                    </div>
-                </div>
-            </li>
-
-
-            <!-- -------------------- PLOT ARGUMENTS ---------------------- -->
-
-            <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePlot" aria-expanded="true" aria-controls="collapsePlot" style="padding-top: 0px;">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Plot</span>
-                </a>
-                <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-
-
-                            <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/> Column labels</label>
-                            <label style="padding-left:0px;padding-right:4px;width:150px;"><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/> Row labels</label>
-
-                            <label>Labels font size: </label>
-                            <label style="padding-left:21px;padding-right:0px;"> columns: <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
-                            <label style="padding-left:21px;padding-right:0px;"> rows: <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
-
-                            <label>CMAP: <select name=cmap_value method="GET" action="/">
-                                {% for cmap_ in cmap %}
-                                    <option value="{{cmap_}}" {% if cmap_==cmap_value %} selected {% endif %}>{{cmap_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-left:24px;">z-score: <select name=zscore_value method="GET" action="/">
-                                {% for zscore_ in zscore %}
-                                    <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <label style="padding-left:0px;padding-right:0px;"><input type="checkbox" name="robust" {% if robust=="on" %} checked {% elif robust==".on" %} checked {% endif %}/> Robust</label>
-                            <label style="padding-left:76px;padding-right:0px;">Center: <input type="text" name="center" value='{{ center }}' style="width:114px;height:22px;padding-left:4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">Min: <input type="text" name="vmin" value='{{ vmin }}' style="width:114px;height:22px;padding-left:4px"></label>
-                            <label style="padding-left:8px;padding-right:0px;">Max: <input type="text" name="vmax" value='{{ vmax }}' style="width:114px;height:22px;padding-left:4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">Color bar label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:202px;height:22px;padding-left: 4px"></label>
-
-                            <label style="padding-left:0x;padding-right:4px;">Line width: <input type="text" name="linewidths" value='{{ linewidths }}' style="width:50px;height:22px;padding-left: 4px"></label>
-                            <label  style="padding-left:8px">Line color: <select style="width:98px;"name=linecolor_value method="GET" action="/">
-                                {% for linecolor_ in linecolor %}
-                                    <option value="{{linecolor_}}" {% if linecolor_==linecolor_value %} selected {% endif %}>{{linecolor_}}</option>
-                                {% endfor %}
-                            </select></label>
-
-                            <!--label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="annotate" {% if annotate=="on" %} checked {% elif annotate==".on" %} checked {% endif %}/> Annotate</label-->
-
                         </div>
                     </div>
                 </div>
@@ -256,14 +115,12 @@
             <!-- Heading -->
             <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
 
-            {% if figure_url %}
-
             <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
 
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-download"></i>
-                    <span>Figure</span>
+                    <span>Tables</span>
                 </a>
                 <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
@@ -284,8 +141,6 @@
                     </div>
                 </div>
             </li>
-
-            {% endif %}
 
             <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
 
@@ -360,14 +215,7 @@
             </div>
         </form>
 
-                <!-- Divider -->
-        <!--hr class="sidebar-divider d-none d-md-block"-->
     </div>
-    
-      <!-- Sidebar Toggler (Sidebar) -->
-      <!-- div class="text-center d-none d-md-inline" -->
-        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
-      <!-- /div -->
 
 </ul>
 
@@ -376,9 +224,8 @@
 <!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
 
 {% block content %}
-<div class="container-fluid">
-
-
+<div style="margin-left:150px;" id="loading"></div>
+<div id="contentready" class="container-fluid">
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -393,7 +240,6 @@
                 {{ message }} 
             </div>
         </div>
-        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
         {% elif category == "traceback" %}
         <!-- ATTENTION CARD -->
         <div class="card shadow mb-4">
@@ -437,53 +283,145 @@
     {% endif %}
     {% endwith %}
 
-    {% if figure_url %}
-        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
-        <img src="data:image/png;base64,{{ figure_url }}">
+    {% if table_contents %}
 
-        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+    <div class="tab">
+        <button class="tablinks" onclick="openCity(event, 'projection')" id="defaultOpen">Projection</button>
+        <button class="tablinks" onclick="openCity(event, 'features')">Features</button>
+    </div>
+
+    <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
+
+        <div id="projection" class="tabcontent">
+            <h2><br>Projection</h2>
+
+            <table id="listr-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in table_headers %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">Showing top 50 results. Download table to see the complete list of results.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+                    {% for entry in table_contents %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="features" class="tabcontent">
+            <h2><br>Features</h2>
+
+            <table id="listr-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in features_headers %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">Showing top 50 results. Download table to see the complete list of results.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+                    {% for entry in features_contents %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
-            <div style="padding-right: 2px;">
-                <form action="{{ url_for('heatmap', download='download') }}" method="get">
-                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                        <i class="fas fa-download fa-sm text-white-50"></i> Figure
-                    </button>
-                </form>
-            </div>
-
-            <div style="padding-left:2px;padding-right:2px;">
-                <form action="{{ url_for('heatmap', download='clusters') }}" method="get">
-                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                        <i class="far fa-file-excel fa-sm text-white-50"></i> Clusters
-                    </button>
-                </form>
-            </div>
-
-            <div style="padding-left: 2px;padding-right: 2px;">
-                <form action="{{ url_for('download', json_type='arg') }}" method="get">
-                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
-                    </button>
-                </form>
-            </div>
-
-            <div style="padding-left: 2px;">
-                <form action="{{ url_for('download', json_type='ses') }}" method="get">
-                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                            <i class="fas fa-th fa-sm text-white-50"></i> Session
-                    </button>
-                </form>
-            </div>
-
+        <div style="padding-left:2px;padding-right:2px;">
+            <form action="{{ url_for('pca', download='download') }}" method="get">
+                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                    <i class="far fa-file-excel fa-sm text-white-50"></i> Results
+                </button>
+            </form>
         </div>
+
+        <div style="padding-right: 2px;">
+            <form action="{{ url_for('pca', download='scatter') }}" method="get">
+                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                    <i class="far fa-chart-bar"></i> iScatter plot
+                </button>
+            </form>
         </div>
+
+        <div style="padding-left: 2px;padding-right: 2px;">
+            <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                    <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                </button>
+            </form>
+        </div>
+
+        <div style="padding-left: 2px;">
+            <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <i class="fas fa-th fa-sm text-white-50"></i> Session
+                </button>
+            </form>
+        </div>
+
+    </div>
+    <!-- </div> -->
 
     {% endif %}
 </div>
 
+<script>
+    // Get the element with id="defaultOpen" and click on it
+    document.getElementById("defaultOpen").click();
+</script>
+
+<script>
+function openCity(evt, cityName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+  
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+  
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+  
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+</script>
+
 {% endblock %}
-
-
 
 {% block in_app_footer %}
 <!-- Footer -->

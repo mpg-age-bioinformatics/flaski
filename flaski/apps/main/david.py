@@ -174,7 +174,12 @@ def run_david(pa, path_to_ensembl_maps="/flaski/data"):
         mapped.append(d["values"][0])
     not_mapped=[ s for s in ids.split(",") if s not in mapped ]
 
+    #print("Finished retrieving list report.")
+    #sys.stdout.flush()
+
     if ids_bg:
+      #print("User given BG.")
+      #sys.stdout.flush()
       size_bg = client.service.addList(ids_bg, database, name_bg, 1)
       report_stats.append(['Mapping rate of background ids: ', str(size_bg)])
       if verbose:
