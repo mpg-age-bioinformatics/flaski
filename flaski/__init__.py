@@ -26,7 +26,7 @@ from flaski import routes, models, errors, storage
 
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca
 
-if app.config['INSTANCE'] != "production" :
+if app.config['INSTANCE'] != "latest" :
     from flaski.apps.routes import histogram, violinplot
 
 if not app.debug:
