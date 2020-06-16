@@ -153,7 +153,6 @@ def pca(download=None):
             df_selected=list(df_selected.values)
             df_selected=[ list(s) for s in df_selected ]
 
-
             features_selected=features[:50]
             cols_to_format=features_selected.columns.tolist()
             cols_to_format=[ s for s in cols_to_format if "key" not in s ]
@@ -184,17 +183,20 @@ def pca(download=None):
 
             # CALL FIGURE FUNCTION
 
-            excelfile = io.BytesIO()
-            EXC=pd.ExcelWriter(excelfile)
-            df_pca.to_excel(EXC,sheet_name="pca", index=None)
-            features.to_excel(EXC,sheet_name="features", index=None)
-            EXC.save()
-            excelfile.seek(0)
-
             eventlog = UserLogging(email=current_user.email,action="download table pca values")
             db.session.add(eventlog)
             db.session.commit()
 
-            return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx")
+            if plot_arguments["download_format_value"] == "xlsx":
+                excelfile = io.BytesIO()
+                EXC=pd.ExcelWriter(excelfile)
+                df_pca.to_excel(EXC,sheet_name="pca", index=None)
+                features.to_excel(EXC,sheet_name="features", index=None)
+                EXC.save()
+                excelfile.seek(0)
+                return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx" )
+
+            elif plot_arguments["download_format_value"] == "tsv":               
+                return Response(df_pca.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
         
         return render_template('apps/pca.html',  filename=session["filename"], apps=apps, **session["plot_arguments"])            

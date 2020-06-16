@@ -16,8 +16,11 @@ def make_figure(df,pa):
     #elif pa["zscore_value"] == "columns":
     #    df_pca=pd.DataFrame(stats.zscore(df_pca, axis=0, ddof=1),columns=df_pca.columns.tolist(), index=df_pca.index.tolist())
 
-    pca = PCA(copy=True, iterated_power='auto', n_components=2, random_state=None, svd_solver='auto', tol=0.0, whiten=False)
-    df_pca_scaled = preprocessing.scale(df_pca)
+    pca = PCA(copy=True, iterated_power='auto', n_components=int(pa["ncomponents"]), random_state=None, svd_solver='auto', tol=0.0, whiten=False)
+    if pa["scale"] in [".on","on"]:
+        df_pca_scaled = preprocessing.scale(df_pca)
+    else:
+        df_pca_scaled = df_pca.as_matrix()
     projected=pca.fit_transform(df_pca_scaled)
 
     def get_important_features(transformed_features, components_, columns):
@@ -104,61 +107,19 @@ def figure_defaults():
         dict: A dictionary of the style { "argument":"value"}
     """
     plot_arguments={
-        "fig_width":"6.0",\
-        "fig_height":"6.0",\
         "xcols":[],\
         "xvals":"",\
-        "xvals_colors_list":[],\
-        "xvals_colors":"",\
         "ycols":[],\
         "yvals":"",\
-        "yvals_colors":"",\
-        "title":'',\
-        "title_size_value":"10",\
-        "xticklabels":'.off',\
-        "yticklabels":".on",\
-        "method":['single','complete','average', 'weighted','centroid','median','ward'],\
-        "method_value":"ward",\
-        "distance":["euclidean","minkowski","cityblock","seuclidean","sqeuclidean",\
-                   "cosine","correlation","hamming","jaccard","chebyshev","canberra",\
-                   "braycurtis","mahalanobis","yule","matching","dice","kulsinski","rogerstanimoto",\
-                   "russellrao","sokalmichener","sokalsneath","wminkowski"],\
-        "distance_value":"euclidean",\
-        "n_cols_cluster":"0",\
-        "n_rows_cluster":"0",\
-        "cmap":["viridis","plasma","inferno","magma","cividis","Greys","Purples",\
-               "Blues","Greens","Oranges","Reds","YlOrBr","YlOrRd","OrRd","PuRd",\
-               "RdPu","BuPu","GnBu","PuBu","YlGnBu","PuBuGn","BuGn","YlGn",\
-               "binary","gist_yard","gist_gray","gray","bone","pink","spring",\
-               "summer","autumn","winter","cool","Wistia","hot","afmhot","gist_heat",\
-               "copper","PiYg","PRGn","BrBG","PuOr","RdGy","RdBu","RdYlBu","Spectral",\
-               "coolwarm","bwr","seismic","Pastel1","Pastel2","Paired","Accent","Dark2",\
-               "Set1","Set2","Set3","tab10","tab20","tab20b","tab20c","flag","prism","ocean",\
-               "gist_earth", "gnuplot","gnuplot2","CMRmap","cubehelix","brg","hsv",\
-               "gist_rainbow","rainbow","jet","nipy_spectral","gist_ncar"],\
-        "cmap_value":"YlOrRd",\
-        "vmin":"",\
-        "vmax":"",\
-        "linewidths":"0",\
-        "linecolor_value":"white",\
-        "color_bar_label":"",\
-        "center":"",\
-        "row_cluster":".on",\
-        "col_cluster":".on",\
-        "robust":".on",\
-        "col_dendogram_ratio":"0.25",\
-        "row_dendogram_ratio":"0.25",\
-        "zscore":["none","row","columns"],\
-        "zscore_value":"none",\
-        "xaxis_font_size":"10",\
-        "yaxis_font_size":"10",\
-        "annotate":".off",\
-        "download_format":["png","pdf","svg"],\
-        "downloadf":"pdf",\
-        "downloadn":"heatmap",\
-        "session_downloadn":"MySession.heatmap",\
+        "ncomponents":"2",\
+        "percvar":"100",\
+        "scale":".on",\
+        "download_format":["tsv","xlsx"],\
+        "downloadf":"xlsx",\
+        "downloadn":"PCA",\
+        "session_downloadn":"MySession.PCA",\
         "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.heatmap",\
+        "session_argumentsn":"MyArguments.PCA",\
         "inputargumentsfile":"Select file.."}
 
     return plot_arguments
