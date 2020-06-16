@@ -16,13 +16,26 @@ def GET_COLOR(x):
         
 
 def make_figure(df,pa):
+
+    """Generates figure.
+
+    Args:
+        df (pandas.core.frame.DataFrame): Pandas DataFrame containing the input data.
+        pa (dict): A dictionary of the style { "argument":"value"} as outputted by `figure_defaults`.
+
+    Returns:
+        A Plotly figure
+        
+    """
     
     tmp=df.copy()
     tmp=tmp[pa["vals"]]
 
 
+
     fig, axes = plt.subplots(1, 1,figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
     
+    #Read histogram arguments and plot one histogram per column selected by user
 
     for h in pa["groups_settings"].values():
         pa_={}
@@ -49,11 +62,6 @@ def make_figure(df,pa):
         else:
             pa_["label"] = h["name"]
             
-        if h["log_scale"]=="on":
-            pa_["log_scale"]=True
-        else:
-            pa_["log_scale"]=False
-            
         if h["fill_alpha"]!=pa["fill_alpha"]:
             pa_["fill_alpha"]=float(h["fill_alpha"])
         else:
@@ -63,18 +71,98 @@ def make_figure(df,pa):
             pa_["linewidth"]=float(h["linewidth"])
         else:
             pa_["linewidth"]=float(pa["linewidth"])
-            
+
+        if pa["log_scale"]=="on":
+            pa_["log_scale"]=True
+        else:
+            pa_["log_scale"]=False
+
         
         if pa_["line_color"]=="None":
             plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
         else:
             plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
-            
-            
+
+
+
+    for axis in ['top','bottom','left','right']:
+        axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
+
+    for axis,argv in zip(['top','bottom','left','right'], [pa["upper_axis"],pa["lower_axis"],pa["left_axis"],pa["right_axis"]]):
+        if (argv =="on") | (argv ==".on"):
+            axes.spines[axis].set_visible(True)
+        else:
+            axes.spines[axis].set_visible(False)
+
+    ticks={}
+    for axis,argv in zip(['top','bottom','left','right'], \
+        [pa["tick_upper_axis"],pa["tick_lower_axis"],pa["tick_left_axis"],pa["tick_right_axis"]]):
+        if (argv =="on") | (argv ==".on"):
+            show=True
+        else:
+            show=False
+        ticks[axis]=show
+
+    axes.tick_params(right= ticks["right"],top=ticks["top"],\
+        left=ticks["left"], bottom=ticks["bottom"])
+
+    axes.tick_params(direction=pa["ticks_direction_value"], width=float(pa["axis_line_width"]),length=float(pa["ticks_length"]))  
+
+    if (pa["x_lower_limit"]!="") or (pa["x_upper_limit"]!="") :
+        xmin, xmax = axes.get_xlim()
+        if pa["x_lower_limit"]!="":
+            xmin=float(pa["x_lower_limit"])
+        if pa["x_upper_limit"]!="":
+            xmax=float(pa["x_upper_limit"])
+        plt.xlim(xmin, xmax)
+
+    if (pa["y_lower_limit"]!="") or (pa["y_upper_limit"]!="") :
+        ymin, ymax = axes.get_ylim()
+        if pa["y_lower_limit"]!="":
+            ymin=float(pa["y_lower_limit"])
+        if pa["y_upper_limit"]!="":
+            ymax=float(pa["y_upper_limit"])
+        plt.ylim(xmin, ymax)
+
+    if pa["maxxticks"]!="":
+        axes.xaxis.set_major_locator(plt.MaxNLocator(int(pa["maxxticks"])))
+
+    if pa["maxyticks"]!="":
+        axes.yaxis.set_major_locator(plt.MaxNLocator(int(pa["maxyticks"])))
+
+    plt.xlabel(pa["xlabel"], fontsize=int(pa["xlabels"]))
+    plt.ylabel(pa["ylabel"], fontsize=int(pa["ylabels"]))
+
+    plt.xticks(fontsize=float(pa["xticks_fontsize"]), rotation=float(pa["xticks_rotation"]))
+    plt.yticks(fontsize=float(pa["yticks_fontsize"]), rotation=float(pa["yticks_rotation"]))
+
+    if pa["grid_value"] != "None":
+        if pa["grid_color_text"]!="":
+            grid_color=GET_COLOR(pa["grid_color_text"])
+        else:
+            grid_color=GET_COLOR(pa["grid_color_value"])
+
+        axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
+
+    #if pa["labels_col_value"] != "select a column..":
+     #   tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
+     #   tmp=tmp[~tmp[pa["labels_col_value"]].isin(["","nan"]) ]
+     #   x=tmp[pa["xvals"]].tolist()
+     #   y=tmp[pa["yvals"]].tolist()
+     #   t=tmp[pa["labels_col_value"]].tolist()
+     #   texts = [plt.text( x[i], y[i], t[i] , size=float(pa["labels_font_size"]), color=pa["labels_font_color_value"] ) for i in range(len(x))]
+     #   if pa["labels_arrows_value"] != "None":
+     #       adjust_text(texts, arrowprops=dict(arrowstyle=pa["labels_arrows_value"], color=pa['labels_colors_value'], lw=float(pa["labels_line_width"]), alpha=float(pa["labels_alpha"]) ))
+     #   else:
+     #       adjust_text(texts)
+
+    plt.tight_layout()
+    
 
 
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
-    plt.legend()
+    if pa["show_legend"]=="on":
+        plt.legend()
 
     return fig
 
@@ -86,6 +174,7 @@ HIST_TYPES=['bar', 'barstacked', 'step',  'stepfilled']
 #LOG_TYPES=[False,True]
 STANDARD_ORIENTATIONS=['vertical','horizontal']
 STANDARD_ALIGNMENTS=['left','right','mid']
+TICKS_DIRECTIONS=["in","out", "inout"]
 
 def figure_defaults():
     plot_arguments={
@@ -94,15 +183,17 @@ def figure_defaults():
         "title":'Histogram',\
         "title_size":STANDARD_SIZES,\
         "title_size_value":"20",\
+        "titles":"20",\
         "fill_alpha":0.8,\
         "linewidth":1.0,\
+        "show_legend":"on",\
+        "axis_line_width":1.0,\
         "cols":[],\
         "groups":[],\
         "vals":[],\
         "list_of_groups":[],\
         "groups_settings":dict(),\
-        "show_legend":".on",\
-        "log_scale":".off",\
+        "log_scale":"off",\
         "legend_font_size":"14",\
         "colors":STANDARD_COLORS,\
         "bins":STANDARD_BINS,\
@@ -113,6 +204,42 @@ def figure_defaults():
         "linestyles":LINE_STYLES,\
         "linestyle_value":"",\
         "orientations":STANDARD_ORIENTATIONS, \
+        "xlabel_size":STANDARD_SIZES,\
+        "ylabel_size":STANDARD_SIZES,\
+        "xlabel":"",\
+        "ylabel":"Frequency",\
+        "xlabels":"14",\
+        "ylabels":"14",\
+        "left_axis":".on" ,\
+        "right_axis":".on",\
+        "upper_axis":".on",\
+        "lower_axis":".on",\
+        "tick_left_axis":".on" ,\
+        "tick_right_axis":".off",\
+        "tick_upper_axis":".off",\
+        "tick_lower_axis":".on",\
+        "ticks_direction":TICKS_DIRECTIONS,\
+        "ticks_direction_value":TICKS_DIRECTIONS[1],\
+        "ticks_length":"6.0",\
+        "xticks_fontsize":"14",\
+        "yticks_fontsize":"14",\
+        "xticks_rotation":"0",\
+        "yticks_rotation":"0",\
+        "x_lower_limit":"",\
+        "y_lower_limit":"",\
+        "x_upper_limit":"",\
+        "y_upper_limit":"",\
+        "maxxticks":"",\
+        "maxyticks":"",\
+        "grid":["None","both","x","y"],\
+        "grid_value":"None",\
+        "grid_color_text":"",\
+        "grid_colors":STANDARD_COLORS,\
+        "grid_color_value":"black",\
+        "grid_linestyle":['-', '--', '-.', ':'],\
+        "grid_linestyle_value":'--',\
+        "grid_linewidth":"1",\
+        "grid_alpha":"0.1",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"Histogram",\
@@ -121,28 +248,4 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.histogram.plot",\
         "inputargumentsfile":"Select file.."
     }
-    # grid colors not implemented in UI
-
-
-    checkboxes=["show_legend","log_scale"]
-
-    # not update list
-    notUpdateList=["inputsessionfile"]
-
-    # lists without a default value on the arguments
-    excluded_list=[]
-
-    # lists with a default value on the arguments
-    allargs=list(plot_arguments.keys())
-
-    # dictionary of the type 
-    # {"key_list_name":"key_default_value"} 
-    # eg. {"marker_size":"markers"}
-    lists={} 
-    for i in range(len(allargs)):
-        if type(plot_arguments[allargs[i]]) == type([]):
-            if allargs[i] not in excluded_list:
-                lists[allargs[i]]=allargs[i+1]
-
-#this function might return : , lists, notUpdateList, checkboxes
     return plot_arguments
