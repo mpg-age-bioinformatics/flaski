@@ -20,15 +20,10 @@
 
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
-        <!-- div class="sidebar-brand-icon rotate-n-15"-->
-            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
-        <!-- /div -->
-        <!--div style="padding-right: 0px; padding-left: px;" -->
             <div class="sidebar-brand-icon rotate-n-0">
                 <i class="fas fa-dog"></i>
             </div>
-        <!--/div-->
-        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div>
     </a>
 
     <!-- Divider -->
@@ -45,11 +40,8 @@
             <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
-                    <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
                     <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
                 </div>
-                <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
-                <!--input class="form-control" type="text" placeholder="input file"-->
             </div>    
 
             <!-- Divider -->
@@ -82,18 +74,6 @@
                     </div>
                 </div>
 
-                <!--div class="column">
-                    <div class="sidebar-heading" style="padding-left: 6px;">Groups:</div>
-                    <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
-                        <select name=groups_value method="GET" action="/" style="width:114px">
-                            {% for groups_ in groups %}
-                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div-->
-
-
             </div>
 
             <!-- Divider -->
@@ -119,7 +99,7 @@
                             <div class="row arg">
                                 <label>Number of components: <input type="text" name="ncomponents" value='{{ ncomponents }}' style="width:145px;height:22px;padding-left: 4px"></label>
                                 <label>Top % most variable rows: <input type="text" name="percvar" value='{{ percvar }}' style="width:131px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left:0x;width:150px;"><input type="checkbox" name="scale" {% if scale=="on" %} checked {% elif scale==".on" %} checked {% endif %}/> Scale </label>
+                                <!-- <label style="padding-left:0x;width:150px;"><input type="checkbox" name="scale" {% if scale=="on" %} checked {% elif scale==".on" %} checked {% endif %}/> Scale </label> -->
                             </div>
                         
                         </div>
@@ -135,14 +115,12 @@
             <!-- Heading -->
             <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
 
-            {% if figure_url %}
-
             <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
 
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-download"></i>
-                    <span>Figure</span>
+                    <span>Tables</span>
                 </a>
                 <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
@@ -163,8 +141,6 @@
                     </div>
                 </div>
             </li>
-
-            {% endif %}
 
             <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
 
@@ -239,14 +215,7 @@
             </div>
         </form>
 
-                <!-- Divider -->
-        <!--hr class="sidebar-divider d-none d-md-block"-->
     </div>
-    
-      <!-- Sidebar Toggler (Sidebar) -->
-      <!-- div class="text-center d-none d-md-inline" -->
-        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
-      <!-- /div -->
 
 </ul>
 
@@ -271,7 +240,6 @@
                 {{ message }} 
             </div>
         </div>
-        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
         {% elif category == "traceback" %}
         <!-- ATTENTION CARD -->
         <div class="card shadow mb-4">

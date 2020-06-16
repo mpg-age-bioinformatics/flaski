@@ -1,4 +1,4 @@
-from scipy import stats
+# from scipy import stats
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 import pandas as pd
@@ -9,6 +9,16 @@ def make_figure(df,pa):
     df_pca=df.copy()
     df_pca.index=df_pca[pa["xvals"]].tolist()
     df_pca=df_pca[pa["yvals"]]
+
+    if float( pa["percvar"].replace(",",".") ) < 100 :
+        print(len(df_pca))
+        df_pca["__std__"]=df_pca.std(axis=1)
+        df_pca=df_pca.sort_values( by=["__std__"],ascending=False )
+        nrows=round(len(df_pca)*float( pa["percvar"].replace(",",".") )/100)
+        df_pca=df_pca[:nrows] 
+        df_pca=df_pca.drop(["__std__"],axis=1)
+        print(len(df_pca))
+
     df_pca=df_pca.T
 
     #if pa["zscore_value"] == "row":
@@ -17,13 +27,13 @@ def make_figure(df,pa):
     #    df_pca=pd.DataFrame(stats.zscore(df_pca, axis=0, ddof=1),columns=df_pca.columns.tolist(), index=df_pca.index.tolist())
 
     pca = PCA(copy=True, iterated_power='auto', n_components=int(pa["ncomponents"]), random_state=None, svd_solver='auto', tol=0.0, whiten=False)
-    if pa["scale"] in [".on","on"]:
-        df_pca_scaled = preprocessing.scale(df_pca)
-    else:
-        df_pca_scaled = df_pca.as_matrix()
+    #if pa["scale"] in [".on","on"]:
+    df_pca_scaled = preprocessing.scale(df_pca)
+    #else:
+    #    df_pca_scaled = df_pca.as_matrix()
     projected=pca.fit_transform(df_pca_scaled)
 
-    def get_important_features(transformed_features, components_, columns):
+    def get_important_features( transformed_features, components_, columns ):
         """
         This function will return the most "important" 
         features so we can determine which have the most
@@ -68,25 +78,9 @@ def make_figure(df,pa):
         cols=components_.columns.tolist()
         cols[0]="row"
         components_.columns=cols
-        # print(components_.head())           
-
-        # # Scale the principal components by the max value in
-        # # the transformed set belonging to that component
-        # xvector = components_[0] * max(transformed_features[:,0])
-        # yvector = components_[1] * max(transformed_features[:,1])
-
-        # # Sort each column by it's length. These are your *original*
-        # # columns, not the principal components.
-        # important_features = { columns[i] : math.sqrt(xvector[i]**2 + yvector[i]**2) for i in range(num_columns) }
-        # important_features = sorted(zip(important_features.values(), important_features.keys()), reverse=True)
-        # return important_features,xvector,yvector
         return components_
 
-    #important_features,xvector,yvector=get_important_features(projected, pca.components_, df_pca.columns.values)
-
     features=get_important_features(projected, pca.components_, df_pca.columns.values)
-
-    #print(important_features[:10], xvector[:10])
 
     projected=pd.DataFrame(projected)
     cols=projected.columns.tolist()
@@ -95,8 +89,6 @@ def make_figure(df,pa):
     projected.index=df_pca.index.tolist()
     projected.reset_index(inplace=True, drop=False)
     projected.columns=["row"]+cols
-
-    #components = pd.DataFrame(pca.components_, columns = df_pca.columns, index=[ s+1 for s in range(len(pca.components_)) ])
 
     return projected, features
 
@@ -113,7 +105,6 @@ def figure_defaults():
         "yvals":"",\
         "ncomponents":"2",\
         "percvar":"100",\
-        "scale":".on",\
         "download_format":["tsv","xlsx"],\
         "downloadf":"xlsx",\
         "downloadn":"PCA",\
@@ -121,5 +112,8 @@ def figure_defaults():
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.PCA",\
         "inputargumentsfile":"Select file.."}
+
+        #"scale":".on",\
+
 
     return plot_arguments

@@ -8,6 +8,7 @@ from datetime import datetime
 from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.pca import make_figure, figure_defaults
+from flaski.apps.main import iscatterplot
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file
 import plotly
@@ -122,7 +123,7 @@ def pca(download=None):
             
             if "df" not in list(session.keys()):
                     error_message="No data to plot, please upload a data or session  file."
-                    flash(error_msg,'error')
+                    flash(error_message,'error')
                     return render_template('/apps/pca.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
@@ -187,16 +188,50 @@ def pca(download=None):
             db.session.add(eventlog)
             db.session.commit()
 
-            if plot_arguments["download_format_value"] == "xlsx":
+            if plot_arguments["downloadf"] == "xlsx":
                 excelfile = io.BytesIO()
                 EXC=pd.ExcelWriter(excelfile)
                 df_pca.to_excel(EXC,sheet_name="pca", index=None)
                 features.to_excel(EXC,sheet_name="features", index=None)
                 EXC.save()
                 excelfile.seek(0)
-                return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx" )
+                return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx",as_attachment=True)
 
-            elif plot_arguments["download_format_value"] == "tsv":               
-                return Response(df_pca.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
+            elif plot_arguments["downloadf"] == "tsv":               
+                return Response(df_pca.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["downloadn"]})
         
+        if download == "scatter":
+
+            # READ INPUT DATA FROM SESSION JSON
+            df_pca=pd.read_json(session["df_pca"])
+
+            reset_info=check_session_app(session,"iscatterplot",apps)
+            if reset_info:
+                flash(reset_info,'error')
+
+            # INITIATE SESSION
+            session["filename"]="<from PCA>"
+            plot_arguments=iscatterplot.figure_defaults()
+            session["COMMIT"]=app.config['COMMIT']
+            session["app"]="iscatterplot"
+
+            df_pca=df_pca.astype(str)
+            session["df"]=df_pca.to_json()
+
+            plot_arguments["xcols"]=df_pca.columns.tolist()
+            plot_arguments["ycols"]=df_pca.columns.tolist()
+            plot_arguments["groups"]=plot_arguments["groups"]+df_pca.columns.tolist()
+            plot_arguments["labels_col"]=df_pca.columns.tolist()
+
+            plot_arguments["xvals"]=df_pca.columns.tolist()[1]
+            plot_arguments["yvals"]=df_pca.columns.tolist()[2]
+            plot_arguments["labels_col_value"]=df_pca.columns.tolist()[0]
+            plot_arguments["title"]="PCA"
+            plot_arguments["xlabel"]=df_pca.columns.tolist()[1].split(" - ")[0]+" - "+nFormat(float(df_pca.columns.tolist()[1].split(" - ")[-1].split("%")[0]))+"%"
+            plot_arguments["ylabel"]=df_pca.columns.tolist()[2].split(" - ")[0]+" - "+nFormat(float(df_pca.columns.tolist()[2].split(" - ")[-1].split("%")[0]))+"%"
+
+            session["plot_arguments"]=plot_arguments
+
+            return render_template('/apps/iscatterplot.html', filename=session["filename"], apps=apps, **plot_arguments)
+
         return render_template('apps/pca.html',  filename=session["filename"], apps=apps, **session["plot_arguments"])            
