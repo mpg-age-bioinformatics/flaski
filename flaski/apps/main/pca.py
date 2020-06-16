@@ -11,13 +11,11 @@ def make_figure(df,pa):
     df_pca=df_pca[pa["yvals"]]
 
     if float( pa["percvar"].replace(",",".") ) < 100 :
-        print(len(df_pca))
         df_pca["__std__"]=df_pca.std(axis=1)
         df_pca=df_pca.sort_values( by=["__std__"],ascending=False )
         nrows=round(len(df_pca)*float( pa["percvar"].replace(",",".") )/100)
         df_pca=df_pca[:nrows] 
         df_pca=df_pca.drop(["__std__"],axis=1)
-        print(len(df_pca))
 
     df_pca=df_pca.T
 
