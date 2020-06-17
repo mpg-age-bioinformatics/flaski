@@ -56,11 +56,6 @@ def make_figure(df,pa):
             pa_["bins_number"] = h["bins_value"]
         else:
             pa_["bins_number"] = int(h["bins_number"])
-        
-        if h[ "label"] != "":
-            pa_["label"] = h["label"]
-        else:
-            pa_["label"] = h["name"]
             
         if h["fill_alpha"]!=pa["fill_alpha"]:
             pa_["fill_alpha"]=float(h["fill_alpha"])
@@ -79,9 +74,9 @@ def make_figure(df,pa):
 
         
         if pa_["line_color"]=="None":
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
+            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
         else:
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],label=pa_["label"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
+            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
 
 
 
@@ -144,25 +139,92 @@ def make_figure(df,pa):
 
         axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
 
-    #if pa["labels_col_value"] != "select a column..":
-     #   tmp=df[[pa["xvals"],pa["yvals"],pa["labels_col_value"] ]].dropna()
-     #   tmp=tmp[~tmp[pa["labels_col_value"]].isin(["","nan"]) ]
-     #   x=tmp[pa["xvals"]].tolist()
-     #   y=tmp[pa["yvals"]].tolist()
-     #   t=tmp[pa["labels_col_value"]].tolist()
-     #   texts = [plt.text( x[i], y[i], t[i] , size=float(pa["labels_font_size"]), color=pa["labels_font_color_value"] ) for i in range(len(x))]
-     #   if pa["labels_arrows_value"] != "None":
-     #       adjust_text(texts, arrowprops=dict(arrowstyle=pa["labels_arrows_value"], color=pa['labels_colors_value'], lw=float(pa["labels_line_width"]), alpha=float(pa["labels_alpha"]) ))
-     #   else:
-     #       adjust_text(texts)
+    if pa["show_legend"]!="off":
 
-    plt.tight_layout()
-    
+        labels=[x["label"] for x in pa["groups_settings"].values()]
+        pal_=dict()
+
+        facecolor= pa["facecolor"]
+        edgecolor=pa["edgecolor"]
+        loc=pa["legend_loc"]
+        ncol=int(pa["legend_ncol"])
+        mode=pa["mode"]
+        legend_title=pa["legend_title"]
+
+        if pa["markerfirst"]=="on":
+            markerfirst=True
+        else:
+            markerfirst=False
+        
+        if pa["fancybox"]== "on":
+            fancybox=True
+        else:
+            fancybox=False
+
+        if pa["shadow"]=="on":
+            shadow=True
+        else:
+            shadow=False
+
+        if pa["framealpha"]=="":
+            framealpha=None
+        else:
+            framealpha=float(pa["framealpha"])
+        
+        if pa["labelspacing"]=="":
+            labelspacing=None
+        else:
+            labelspacing=float(pa["labelspacing"])
+        
+        if pa["columnspacing"]=="":
+            columnspacing=None
+        else:
+            columnspacing=float(pa["columnspacing"])
+
+        if pa["handletextpad"]=="":
+            handletextpad=None
+        else:
+            handletextpad=float(pa["handletextpad"])
+
+        if pa["handlelength"]=="":
+            handlelength=None
+        else:
+            handlelength=float(pa["handlelength"])
+
+        if pa["borderaxespad"]=="":
+            borderaxespad=None
+        else:
+            borderaxespad=float(pa["borderaxespad"])
+
+        if pa["borderpad"]=="":
+            borderpad=None
+        else:
+            borderpad=float(pa["borderpad"])
+
+        if pa["legend_title_fontsize_value"]!="":
+            legend_title_fontsize=pa["legend_title_fontsize_value"]
+        else:
+            legend_title_fontsize=pa["legend_title_fontsize"]
+
+        if pa["legend_body_fontsize_value"]!="":
+            legend_body_fontsize=float(pa["legend_body_fontsize_value"])
+        else:
+            legend_body_fontsize=pa["legend_body_fontsize"]
+
+        
+        plt.legend(labels=labels,loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
+            markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
+            facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
+            title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
+            handlelength=handlelength,handletextpad=handletextpad,\
+            borderaxespad=borderaxespad,columnspacing=columnspacing)
+
 
 
     plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
-    if pa["show_legend"]=="on":
-        plt.legend()
+
+    plt.tight_layout()
+
 
     return fig
 
@@ -175,6 +237,9 @@ HIST_TYPES=['bar', 'barstacked', 'step',  'stepfilled']
 STANDARD_ORIENTATIONS=['vertical','horizontal']
 STANDARD_ALIGNMENTS=['left','right','mid']
 TICKS_DIRECTIONS=["in","out", "inout"]
+LEGEND_LOCATIONS=['best','upper right','upper left','lower left','lower right','right','center left','center right','lower center','upper center','center']
+LEGEND_FONTSIZES=['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large']
+MODES=["expand",None]
 
 def figure_defaults():
     plot_arguments={
@@ -194,7 +259,6 @@ def figure_defaults():
         "list_of_groups":[],\
         "groups_settings":dict(),\
         "log_scale":"off",\
-        "legend_font_size":"14",\
         "colors":STANDARD_COLORS,\
         "bins":STANDARD_BINS,\
         "alignment":STANDARD_ALIGNMENTS,\
@@ -207,7 +271,7 @@ def figure_defaults():
         "xlabel_size":STANDARD_SIZES,\
         "ylabel_size":STANDARD_SIZES,\
         "xlabel":"",\
-        "ylabel":"Frequency",\
+        "ylabel":"",\
         "xlabels":"14",\
         "ylabels":"14",\
         "left_axis":".on" ,\
@@ -240,6 +304,29 @@ def figure_defaults():
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
+        "legend_loc":"best",\
+        "legend_locations":LEGEND_LOCATIONS,\
+        "legend_ncol": "1",\
+        "legend_fontsizes":LEGEND_FONTSIZES,\
+        "legend_body_fontsize":"small",\
+        "legend_title_fontsize":"14",\
+        "legend_body_fontsize_value":"",
+        "legend_title_fontsize_value":"",
+        "markerfirst":"on",\
+        "fancybox":"on",\
+        "shadow":".off",\
+        "framealpha":"",\
+        "facecolor":None,\
+        "edgecolor":None,\
+        "mode":None,\
+        "modes":MODES,\
+        "legend_title":"",\
+        "borderpad":"",\
+        "handlelength":"",\
+        "labelspacing":"",\
+        "handletextpad":"",\
+        "borderaxespad":"",\
+        "columnspacing":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"Histogram",\

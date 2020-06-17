@@ -101,9 +101,6 @@ def histogram(download=None):
                     return render_template('/apps/histogram.html' , filename="Select file..", apps=apps, **plot_arguments)
             
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-                # SELECTION LISTS DO NOT GET UPDATED
-
-                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
                 
                 df=pd.read_json(session["df"])
                 cols=df.columns.tolist()
