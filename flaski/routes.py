@@ -45,7 +45,7 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
 
 if app.config['INSTANCE'] != "latest" :
     DEVAPPS=[{ "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A histogram."},\
-            { "name":"Violinplot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violinplot app."}]
+            { "name":"Violin plot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violin plot app."}]
     FREEAPPS=FREEAPPS+DEVAPPS
 
 

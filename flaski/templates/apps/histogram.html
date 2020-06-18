@@ -98,7 +98,7 @@
                                 <div class="row arguments">
                                     
                                     <div class="row arg">
-                                        <label>Title: <input type="text" name="title" value='{{ title }}' style="width:300px;height:22px;padding-right: 5px;"></label>
+                                        <label>Title: <input type="text" name="title" value='{{ title }}' style="width:258px;height:22px;padding-left:4px"></label>
                                     </div>
 
                                     <div class="row arg">
@@ -110,7 +110,7 @@
                                         </select></label>
 
                                         <label style=" width: 55px;padding-left:30px;">Legend: </label>
-                                        <label  style="width:5px;padding-left:30px;"><input type="checkbox" name= show_legend value="{{show_legend}}" {% if show_legend == "on"%} checked {% elif show_legend=="off" %} checked {% endif %}/></label>
+                                        <label  style="width:5px;padding-left:30px;"><input type="checkbox" name= show_legend value="{{show_legend}}" {% if show_legend == "on"%} checked {% elif show_legend=="off" %} "" {% endif %}/></label>
                                     </div>
                                     
                                     <div class="row arg">
@@ -244,7 +244,7 @@
                                     <div class="row arguments">
 
                                             <div class="row arg">
-                                                <label style="padding-bottom:6px;">Title: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:300px;height:22px;padding-left: 4px;padding-bottom: 6px ;"></label>
+                                                <label>Title: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:258px;height:22px;padding-left:4px"></label>
                                             </div>
                                             
                                             <div class="row arg">
@@ -332,11 +332,11 @@
                                     <div class="row arguments">
 
                                         <div class="row arg" style="padding-bottom:6px;">
-                                            <label>Label: <input type="text" name={{group}}.label value= "{{args.label}}" style="width:300px;height:22px;padding-left: 4px;">
+                                            <label>Label: <input type="text" name={{group}}.label value= "{{args.label}}" style="width:258px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-right:10px;padding-bottom:6px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:102px;padding-right:10px;padding-bottom:6px;">
+                                            <label style="padding-left:20px;padding-bottom:6px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
                                                 {% for colors_ in colors %}
                                                 <option value="{{colors_}}" {% if colors_==group.color_value %} selected {% endif %}>{{colors_}}</option>
                                                 {% endfor %}
@@ -344,13 +344,13 @@
                                         </div>
                                         
                                         <div class="row arg" style="padding-bottom:6px;">
-                                            <label> ..or, write a fill color name <input type="text" name={{group}}.color_rgb value="{{args.color_rgb}}" style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;">
+                                            <label style="padding-left: 25px;"> ..or write: <input type="text" name={{group}}.color_rgb value="{{args.color_rgb}}" style="width:50px;height:22px;padding-left: 4px;padding-bottom:6px;">
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-right:10px;padding-bottom:6px;">Line color: <select
+                                            <label style="padding-left:2px;padding-bottom:6px;">Line color: <select
                                                 name={{group}}.line_color
-                                                value="{{args.line_color}}" method="GET" action="/" style="width:96px;padding-bottom:6px;">
+                                                value="{{args.line_color}}" method="GET" action="/" style="width:80px;padding-bottom:6px;">
                                                 {% for colors_ in colors %}
                                                 <option value="{{colors_}}" {% if colors_==group.line_color %} selected {% endif %}>{{colors_}}</option>
                                                 {% endfor %}
@@ -358,7 +358,7 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style= "padding-bottom: 6px;"> ..or, write a line color name <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:300px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
+                                            <label style="padding-left: 24px;"> ..or write: <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:50px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
                                         </div>
                                         
                                         <div class="row arg">
@@ -371,7 +371,7 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style= "padding-bottom: 6px;"> ..or, write the number of bins <input type="text" name={{group}}.bins_number  value="{{args.bins_number}}" style="width:300px;height:22px;padding-left: 4px;padding-bottom:6px;"></label>
+                                            <label style="padding-left: 24px;"> ..or write: <input type="text" name={{group}}.bins_number  value="{{args.bins_number}}" style="width:50px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
                                         </div>
                                         
                                         <div class="row arg">
