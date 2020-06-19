@@ -91,84 +91,61 @@ def violinplot(download=None):
             
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
             
-            
                 # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                plot_arguments=read_request(request)
-                df=pd.read_json(session["df"])
-                cols=df.columns.tolist()
-                filename=session["filename"]
                 vals=request.form.getlist("vals")
-                session["plot_arguments"]["cols"]=cols
-                session["plot_arguments"]["vals"]=vals
-                
+                df=pd.read_json(session["df"])
+                plot_arguments = session["plot_arguments"]
+                filename=session["filename"]
+
+
 
                 
                 #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE VIOLINPLOT
                 if vals == []:
-                    sometext="Please select at least one numeric column from which we will plot your histograms"
+                    sometext="Please select at least one numeric column from which we will plot your violinplot"
                     plot_arguments=session["plot_arguments"]
+                    plot_arguments["vals"]=vals
                     flash(sometext,'info')
                     return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
-                #VERIFY THERE IS AT LEAST ONE NUMERIC COLUMN SELECTED BY THE USER
                 
                 else:
+
+                    #VERIFY THERE IS AT LEAST ONE NUMERIC COLUMN SELECTED BY THE USER
                     if not any(df[vals].dtypes.apply(is_numeric_dtype)):
                         sometext="Remember that at least one of the columns you select has to be numeric"
                         session["plot_arguments"]["vals"]=[]
                         plot_arguments=session["plot_arguments"]
+                        plot_arguments["vals"]=vals
                         flash(sometext,'info')
                         return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
-                    else:
-                        
-
-                        if (len(vals)==1) or ("default" in request.form.keys()):
-                            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-                            plot_arguments=session["plot_arguments"]
-
-                            # READ INPUT DATA FROM SESSION JSON
-                            df=pd.read_json(session["df"])
-                            
-                            fig=make_figure(df,plot_arguments)
-
-                            #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-                            figfile = io.BytesIO()
-                            plt.savefig(figfile, format='png')
-                            plt.close()
-                            figfile.seek(0)  # rewind to beginning of file
-                            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
-
-                            return render_template('/apps/violinplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
-                            
-                       
-                        
-                        elif "default" not in request.form.keys():
-                            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-                            filename=session["filename"]
-                            plot_arguments=session["plot_arguments"]
-
-                            # READ INPUT DATA FROM SESSION JSON
-                            df=pd.read_json(session["df"])
-
-                            fig=make_figure(df,plot_arguments)
-
-                            #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-                            figfile = io.BytesIO()
-                            plt.savefig(figfile, format='png')
-                            plt.close()
-                            figfile.seek(0)  # rewind to beginning of file
-                            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
-                            
-                            return render_template('/apps/violinplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+                    #IF THE USER HAS CHANGED THE COLUMNS TO PLOT
+                    if vals != plot_arguments["vals"]:
+                        sometext="Please tweak the arguments of your violin plot"
+                        session["plot_arguments"]["vals"]=vals
+                        plot_arguments=session["plot_arguments"]
+                        plot_arguments["vals"]=vals
+                        plot_arguments["x_vals"]=plot_arguments["x_vals"]+[None]
+                        plot_arguments["y_vals"]=plot_arguments["y_vals"]+[None]
+                        plot_arguments["hue"]=plot_arguments["hue"]+[None]
+                        flash(sometext,'info')
+                        return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
+                    
 
 
-                            
-                
+
+
+                session["plot_arguments"]=plot_arguments
+                plot_arguments=read_request(request)
+
+
             if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
                 return render_template('/apps/violinplot.html' , filename="Select file..", apps=apps,  **plot_arguments)
+
+            
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
@@ -185,7 +162,6 @@ def violinplot(download=None):
             plt.close()
             figfile.seek(0)  # rewind to beginning of file
             figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
-
             return render_template('/apps/violinplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:

@@ -212,12 +212,11 @@ def histogram(download=None):
 
                     plot_arguments["groups_settings"]=groups_settings
                 
-                #IF USER HAS NOT SELECTED NEW COLUMNS TO BE PLOTTED BU THEY HAVE UPDATED THE HISTOGRAM ARGUMENTS, THEN REQUEST ALL THE ARGUMENTS AGAIN
+                #IF USER HAS NOT SELECTED NEW COLUMNS TO BE PLOTTED BUT THEY HAVE UPDATED THE HISTOGRAM ARGUMENTS, THEN REQUEST ALL THE ARGUMENTS AGAIN
                 elif plot_arguments["vals"]==request.form.getlist("vals"):
                     groups=plot_arguments["vals"]
                     groups.sort()
                     groups_settings=dict()
-                    group_dic={}
                     for group in groups:
                         groups_settings[group]={"name":group,\
                         "values":df[group],\
@@ -251,15 +250,15 @@ def histogram(download=None):
             
            
 
-            session["plot_arguments"]=plot_arguments
-            plot_arguments=read_request(request)
+                session["plot_arguments"]=plot_arguments
+                plot_arguments=read_request(request)
             
          
 
             if "df" not in list(session.keys()):
-                    error_msg="No data to plot, please upload a data or session  file."
-                    flash(error_msg,'error')
-                    return render_template('/apps/histogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
+                error_msg="No data to plot, please upload a data or session  file."
+                flash(error_msg,'error')
+                return render_template('/apps/histogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
           
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
