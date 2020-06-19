@@ -71,12 +71,25 @@ def make_figure(df,pa):
             pa_["log_scale"]=True
         else:
             pa_["log_scale"]=False
-
         
-        if pa_["line_color"]=="None":
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
+        if h["density"]=="on":
+            pa_["density"]=True
         else:
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],linestyle=h["linestyle_value"])
+            pa_["density"]=False
+
+        if h["cumulative"]=="on":
+            pa_["cumulative"]=True
+        else:
+            pa_["cumulative"]=False
+
+        if pa_["line_color"]=="None":
+            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],\
+            color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"],\
+            cumulative=pa_["cumulative"],density=pa_["density"])
+        else:
+            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],\
+            color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],\
+            linestyle=h["linestyle_value"],cumulative=pa_["cumulative"],density=pa_["density"])
 
 
 
@@ -142,8 +155,6 @@ def make_figure(df,pa):
     if pa["show_legend"]!="off":
 
         labels=[x["label"] for x in pa["groups_settings"].values()]
-        pal_=dict()
-
         facecolor= pa["facecolor"]
         edgecolor=pa["edgecolor"]
         loc=pa["legend_loc"]
@@ -258,7 +269,7 @@ def figure_defaults():
         "vals":[],\
         "list_of_groups":[],\
         "groups_settings":dict(),\
-        "log_scale":"off",\
+        "log_scale":".off",\
         "colors":STANDARD_COLORS,\
         "bins":STANDARD_BINS,\
         "alignment":STANDARD_ALIGNMENTS,\

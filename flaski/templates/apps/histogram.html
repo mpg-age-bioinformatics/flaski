@@ -98,7 +98,7 @@
                                 <div class="row arguments">
                                     
                                     <div class="row arg">
-                                        <label>Title: <input type="text" name="title" value='{{ title }}' style="width:258px;height:22px;padding-left:4px"></label>
+                                        <label>Title: <input type="text" name="title" value='{{ title }}' style="width:262px;height:22px;padding-left:4px"></label>
                                     </div>
 
                                     <div class="row arg">
@@ -108,9 +108,8 @@
                                             <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                             {% endfor %}
                                         </select></label>
-
                                         <label style=" width: 55px;padding-left:30px;">Legend: </label>
-                                        <label  style="width:5px;padding-left:30px;"><input type="checkbox" name= show_legend value="{{show_legend}}" {% if show_legend == "on"%} checked {% elif show_legend=="off" %} "" {% endif %}/></label>
+                                        <label  style="width:5px;padding-left:30px;"><input type="checkbox" name= show_legend {% if show_legend == "on"%} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
                                     </div>
                                     
                                     <div class="row arg">
@@ -161,17 +160,17 @@
                                     </div>
 
                                     <div class="row arg">
-                                        <label style="width:80;">Log scale:</label>
-                                        <label style="width:5px;padding-left:5px;"><input type="checkbox" name= log_scale value="{{log_scale}}" {% if log_scale == "on" %} checked {% elif log_scale== "off" %} "" {% endif %}/></label>
-                                        <label style="padding-left:60px;" >Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;height:22px;padding-left: 4px"></label></label>
+                                        <label style="width:86;padding-left:70px;">Log scale:</label>
+                                        <label style="width:5px;padding-left:5px;"><input type="checkbox" name= log_scale {% if log_scale == "on" %} checked {% elif log_scale== ".on" %} checked {% endif %}/></label>
+                                        <label style="padding-left:30px;" >Line width: <label style="padding-left:9px;"><input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;height:22px;padding-left: 4px"></label></label>
                                     </div>
                                     <div class="row arg">
-                                        <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;height:22px;padding-left: 4px">
                                         <label style="padding-left:2px;"> Ticks direction: <select name=ticks_direction_value method="GET" action="/" style="width:64px">
                                             {% for ticks_direction_ in ticks_direction %}
                                                 <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
                                             {% endfor %}
                                         </select>
+                                        <label>Ticks length: <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;height:22px;padding-left: 4px">
                                     </div>
 
                                     <div class="row arg">
@@ -208,13 +207,13 @@
                                     </div>
 
                                     <div class="row arg">
-                                        <label>Grid: <label style="padding-left:2px;"><select name=grid_value method="GET" action="/" style="width:97px">
+                                        <label style="padding-left:68px;" >Grid: <label><select name=grid_value method="GET" action="/" style="width:65px">
                                             {% for grid_ in grid %}
                                                 <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                             {% endfor %}
                                         </select></label></label>
 
-                                        <label style="padding-left:32px;">style: <label style="padding-left:2px;"><select name=grid_linestyle_value method="GET" action="/" style="width:97px">
+                                        <label style="padding-left:28px;">Style: <label style="padding-left:2px;"><select name=grid_linestyle_value method="GET" action="/" style="width:65px">
                                             {% for grid_linestyle_ in grid_linestyle %}
                                                 <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
                                             {% endfor %}
@@ -223,8 +222,8 @@
                                     </div>
 
                                     <div class="row arg">
-                                        <label style="padding-left:0px;">Grid alpha: <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:74px;height:22px;padding-left:4px;"></label>
-                                        <label style="padding-left:35px;"> width: <label style="padding-left:2px;"><input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:74px;height:22px;padding-left:4px;"></label></label>
+                                        <label style="padding-left:22px;">Grid alpha: <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:74px;height:22px;padding-left:4px;"></label>
+                                        <label style="padding-left:9px;"> Width: <label style="padding-left:2px;"><input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:74px;height:22px;padding-left:4px;"></label></label>
                                     </div>
 
                                 </div>
@@ -244,11 +243,11 @@
                                     <div class="row arguments">
 
                                             <div class="row arg">
-                                                <label>Title: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:258px;height:22px;padding-left:4px"></label>
+                                                <label>Title: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:263px;height:22px;padding-left:4px"></label>
                                             </div>
                                             
                                             <div class="row arg">
-                                                <label style="padding-bottom:6px;" >Title fontsize: <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:80px;height:22px;padding-left:10px; padding-bottom: 6px;">
+                                                <label style="padding-bottom:7px;" >Title fontsize: <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:80px;height:22px;padding-left:10px; padding-bottom: 6px;">
                                                     {% for legend_title_fontsize_ in title_size %}
                                                         <option value="{{legend_title_fontsize_}}" {% if legend_title_fontsize_==legend_title_fontsize %} selected {% endif %}>{{legend_title_fontsize_}}</option>
                                                     {% endfor %}
@@ -266,9 +265,9 @@
                                             </div>
 
                                             <div class="row arg">
-                                                <label style="padding-right:4px;padding-bottom: 6px;"> Markerfirst: <input style= "padding-bottom: 6px; padding-top: 4px; width:7px;" type="checkbox" name="markerfirst" value="{{markerfirst}}" {% if markerfirst =="on" %} checked {% elif markerfirst ==".on" %} checked {% endif %}/></label>
-                                                <label style="padding-left:32px;padding-right:4px;padding-bottom: 6px;">Fancybox: <input style= "padding-bottom: 6px;padding-top: 4px; width:7px;" type="checkbox" name="fancybox" value="{{fancybox}}" {% if fancybox =="on" %} checked {% elif fancybox ==".on" %} checked {% endif %}/></label>
-                                                <label style="padding-left:32px;padding-right:4px;padding-bottom: 6px;">Shadow: <input style= "padding-bottom: 6px;padding-top: 4px; width:7px;" type="checkbox" name="shadow" value="{{shadow}}" {% if shadow =="on" %} checked {% elif shadow==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-right:4px;padding-bottom: 6px;"> Markerfirst: <input style= "padding-bottom: 6px; padding-top: 4px; width:7px;" type="checkbox" name="markerfirst" {% if markerfirst =="on" %} checked {% elif markerfirst ==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-left:32px;padding-right:4px;padding-bottom: 6px;">Fancybox: <input style= "padding-bottom: 6px;padding-top: 4px; width:7px;" type="checkbox" name="fancybox"{% if fancybox =="on" %} checked {% elif fancybox ==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-left:32px;padding-right:4px;padding-bottom: 6px;">Shadow: <input style= "padding-bottom: 6px;padding-top: 4px; width:7px;" type="checkbox" name="shadow"{% if shadow =="on" %} checked {% elif shadow==".on" %} checked {% endif %}/></label>
                                             </div>
 
                                             <div class="row arg">
@@ -307,7 +306,7 @@
                                                 <label style="padding-left: 3px;padding-bottom: 6px;">Label spacing:  <input type="text" name="labelspacing" value='{{ labelspacing }}' style="width:40px;height:22px;padding-left:4px;padding-bottom: 6px;"></label>                                            
                                                 <label style="padding-left: 15px;padding-bottom: 6px;">Column spacing:  <input type="text" name="columnspacing" value='{{ columnspacing }}' style="width:40px;height:22px;padding-left:4px;padding-bottom: 6px;"></label>
                                                 <label style="padding-left: 16px;padding-bottom: 6px;">Framealpha:  <input type="text" name="framealpha" value='{{ framealpha }}' style="width:40px;height:22px;padding-left:4px;padding-bottom: 6px;"></label>
-                                                <label style="padding-left: 48px;padding-bottom: 6px;" >N columns: <input type="text" name="legend_ncol" value="{{legend_ncol}}" style="width:40px;height:22px;padding-left:4px;padding-bottom: 6px;"></label>
+                                                <label style="padding-left: 49px;padding-bottom: 6px;" >N columns: <input type="text" name="legend_ncol" value="{{legend_ncol}}" style="width:40px;height:22px;padding-left:4px;padding-bottom: 6px;"></label>
                                             </div>
 
                                     </div>
@@ -336,7 +335,7 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-left:20px;padding-bottom:6px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
+                                            <label style="padding-left:22px;padding-bottom:6px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
                                                 {% for colors_ in colors %}
                                                 <option value="{{colors_}}" {% if colors_==group.color_value %} selected {% endif %}>{{colors_}}</option>
                                                 {% endfor %}
@@ -348,7 +347,7 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-left:2px;padding-bottom:6px;">Line color: <select
+                                            <label style="padding-left:14px;padding-bottom:6px;">Line color: <select
                                                 name={{group}}.line_color
                                                 value="{{args.line_color}}" method="GET" action="/" style="width:80px;padding-bottom:6px;">
                                                 {% for colors_ in colors %}
@@ -358,7 +357,7 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-left: 24px;"> ..or write: <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:50px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
+                                            <label style="padding-left: 25px;"> ..or write: <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:50px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
                                         </div>
                                         
                                         <div class="row arg">
@@ -375,7 +374,7 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-right:5px;padding-bottom:6px;">Orientation: <select name={{group}}.orientation_value val= "{{args.orientation}}"
+                                            <label style="padding-left:5px;padding-bottom:6px;">Orientation: <select name={{group}}.orientation_value val= "{{args.orientation}}"
                                                 method="GET" action="/" style="width:80px;padding-bottom:6px;">
                                                 {% for orientations_ in orientations %}
                                                 <option value="{{orientations_}}" {% if orientations_==group.orientation_value %} selected {% endif %}>{{orientations_}}</option>
@@ -384,29 +383,30 @@
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-left:9px;padding-bottom:6px;">Type: <select name={{group}}.histtype_value
+                                            <label style="padding-left:10px;padding-bottom:6px;">Type: <select name={{group}}.histtype_value
                                                 val= "{{group.histtype_value}}"  method="GET" action="/" style="width:90px;padding-bottom:6px;">
                                                 {% for histtype_ in hist_types %}
                                                 <option value="{{histtype_}}" {% if histtype_==group.histtype_value %} selected {% endif %}>{{histtype_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         </div>
-                                        
-                                        
+                                                                            
                                         <div class="row arg">
-                                            <label style="padding-left:4px;" > Line width: <input type="text" name={{group}}.linewidth value="{{args.linewidth}}" style="width:75px;height:22px;padding-left: 4px;padding-bottom:6px;"></label>
-                                        </div>
-                                        
-                                        <div class="row arg">
-                                            <label style="padding-left:5px;padding-bottom:6px;">Line style: <select name={{group}}.linestyle_value value = "{{args.linestyle_value}}" method="GET" action="/" style="width:77px;padding-bottom:6px;">
+                                            <label style="padding-left:18px;padding-bottom:6px;">Line style: <select name={{group}}.linestyle_value value = "{{args.linestyle_value}}" method="GET" action="/" style="width:77px;padding-bottom:6px;">
                                                 {% for linestyles_ in linestyles %}
                                                 <option value="{{linestyles_}}" {% if linestyles_==group.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         </div>
-                                        
+
                                         <div class="row arg">
-                                            <label style="padding-bottom:6px;padding-left:14px">Fill alpha: <input type="text" name={{group}}.fill_alpha value="{{args.fill_alpha}}"  style="width:75px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
+                                            <label style="padding-left:36px;"> Line width: <input type="text" name={{group}}.linewidth value="{{args.linewidth}}" style="width:50px;height:22px;padding-left: 4px;padding-bottom:6px;"></label>
+                                            <label style="padding-bottom:6px;padding-left:25px">Fill alpha: <input type="text" name={{group}}.fill_alpha value="{{args.fill_alpha}}"  style="width:50px;height:22px;padding-left:4px;padding-bottom:6px;"></label>
+                                        </div>
+
+                                        <div class="row arg">
+                                            <label style="padding-left:76px;">Density: </label><label style="width:5px;padding-left:20px;"><input type="checkbox" name= {{group}}.density {% if args.density  == "on"%} checked {% elif args.density ==".on" %} checked {% endif %}/></label>
+                                            <label style="padding-left:44px;">Cumulative: </label><label  style="width:5px;padding-left:20px;"><input type="checkbox" name= {{group}}.cumulative {% if args.cumulative  == "on"%} checked {% elif args.cumulative ==".on" %} checked {% endif %}/></label>
                                         </div>
                                         
                                         

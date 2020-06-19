@@ -139,14 +139,13 @@ def histogram(download=None):
                             "linestyle_value":"solid",\
                             "line_color":None,\
                             "line_rgb":"",\
-                            "fill_alpha":0.8}
+                            "fill_alpha":0.8,\
+                            "density":".off",\
+                            "cumulative":".off"}
                             
-                    plot_arguments["groups_settings"]=groups_settings
-                    
-                    
-                    
+                    plot_arguments["groups_settings"]=groups_settings                    
+                    #CALL FIGURE FUNCTION
                     fig=make_figure(df,plot_arguments)
-
                     #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
                     figfile = io.BytesIO()
                     plt.savefig(figfile, format='png')
@@ -162,7 +161,6 @@ def histogram(download=None):
                     groups=plot_arguments["vals"]
                     groups.sort()
                     groups_settings=dict()
-                    group_dic={}
                                         
                     for group in groups:
                         if group not in plot_arguments["groups_settings"].keys():
@@ -179,7 +177,9 @@ def histogram(download=None):
                                     "linestyle_value":"solid",\
                                     "line_color":None,\
                                     "line_rgb":"",\
-                                    "fill_alpha":0.8}
+                                    "fill_alpha":0.8,
+                                    "density":".off",\
+                                    "cumulative":".off"}
                         
                         else:
                             groups_settings[group]={"name":group,\
@@ -196,6 +196,18 @@ def histogram(download=None):
                             "line_color":request.form["%s.line_color" %group],\
                             "line_rgb":request.form["%s.line_rgb" %group],\
                             "fill_alpha":request.form["%s.fill_alpha" %group]}
+                            
+                            #If the user does not tick the options the arguments do not appear as keys in request.form
+                            if "%s.density"%group in request.form.keys():
+                                groups_settings[group]["density"]=request.form["%s.density" %group]
+                            else:
+                                groups_settings[group]["density"]=".off"
+                            
+                            if "%s.cumulative"%group in request.form.keys():
+                                groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                            else:
+                                groups_settings[group]["cumulative"]=".off"
+
 
 
                     plot_arguments["groups_settings"]=groups_settings
@@ -221,6 +233,18 @@ def histogram(download=None):
                         "line_color":request.form["%s.line_color" %group],\
                         "line_rgb":request.form["%s.line_rgb" %group],\
                         "fill_alpha":request.form["%s.fill_alpha" %group]}
+                        
+                        #If the user does not tick the options the arguments do not appear as keys in request.form
+
+                        if "%s.density"%group in request.form.keys():
+                            groups_settings[group]["density"]=request.form["%s.density" %group]
+                        else:
+                            groups_settings[group]["density"]=".off"
+                        
+                        if "%s.cumulative"%group in request.form.keys():
+                            groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                        else:
+                            groups_settings[group]["cumulative"]=".off"
                         
                        
                     plot_arguments["groups_settings"]=groups_settings
