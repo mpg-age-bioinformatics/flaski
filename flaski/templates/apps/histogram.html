@@ -66,7 +66,7 @@
                         <div class="column" >
                             <div class="sidebar-heading">Data columns:</div>
                             <div style="padding-left:13px;">
-                                <select name="vals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                                <select name="vals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:368px;">
                                     {% for col in cols %}
                                     <option value="{{col}}" {% if col in vals %} selected {% endif %}>{{col}}</option>
                                     {% endfor %}
@@ -248,7 +248,7 @@
                                             
                                             <!-- <div class="row arg"> -->
                                                 <label>Font size </label>
-                                                <label>title: <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:80px;height:22px;padding-left:10px;">
+                                                <label style="padding-left:4px;"> title: <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:80px;height:22px;padding-left:10px;">
                                                     {% for legend_title_fontsize_ in title_size %}
                                                         <option value="{{legend_title_fontsize_}}" {% if legend_title_fontsize_==legend_title_fontsize %} selected {% endif %}>{{legend_title_fontsize_}}</option>
                                                     {% endfor %}
@@ -265,8 +265,8 @@
 
                                             <!-- <div class="row arg"> -->
                                                 <label style="padding-right:4px;"> Markerfirst: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="markerfirst" {% if markerfirst =="on" %} checked {% elif markerfirst ==".on" %} checked {% endif %}/></label>
-                                                <label style="padding-left:27px;padding-right:4px;">Fancybox: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="fancybox"{% if fancybox =="on" %} checked {% elif fancybox ==".on" %} checked {% endif %}/></label>
-                                                <label style="padding-left:27px;padding-right:4px;">Shadow: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="shadow"{% if shadow =="on" %} checked {% elif shadow==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-left:32px;padding-right:4px;">Fancybox: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="fancybox"{% if fancybox =="on" %} checked {% elif fancybox ==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-left:32px;padding-right:4px;">Shadow: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="shadow"{% if shadow =="on" %} checked {% elif shadow==".on" %} checked {% endif %}/></label>
                                             <!-- </div> -->
 
                                             <!-- <div class="row arg"> -->
