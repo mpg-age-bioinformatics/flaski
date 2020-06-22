@@ -94,8 +94,8 @@ def violinplot(download=None):
                 # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
                 vals=request.form.getlist("vals")
                 df=pd.read_json(session["df"])
-                plot_arguments = session["plot_arguments"]
                 filename=session["filename"]
+                plot_arguments=session["plot_arguments"]
 
 
 
@@ -121,20 +121,15 @@ def violinplot(download=None):
                         return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
                     #IF THE USER HAS CHANGED THE COLUMNS TO PLOT
-                    if vals != plot_arguments["vals"]:
+                    if vals+["None"] != plot_arguments["vals"]:
+                        plot_arguments=figure_defaults()
+                        cols=df.columns.tolist()                   
+                        plot_arguments["vals"]=vals+["None"]
+                        plot_arguments["cols"]=cols
+                        session["plot_arguments"]=plot_arguments 
                         sometext="Please tweak the arguments of your violin plot"
-                        session["plot_arguments"]["vals"]=vals
-                        plot_arguments=session["plot_arguments"]
-                        plot_arguments["vals"]=vals
-                        plot_arguments["x_vals"]=plot_arguments["x_vals"]+[None]
-                        plot_arguments["y_vals"]=plot_arguments["y_vals"]+[None]
-                        plot_arguments["hue"]=plot_arguments["hue"]+[None]
                         flash(sometext,'info')
                         return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
-                    
-
-
-
 
                 session["plot_arguments"]=plot_arguments
                 plot_arguments=read_request(request)
@@ -150,6 +145,8 @@ def violinplot(download=None):
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
+            plot_arguments["vals"]=vals+["None"]
+            session["plot_arguments"]["vals"]=vals+["None"]
 
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])

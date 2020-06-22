@@ -41,15 +41,29 @@ def make_figure(df,pa,fig=None,ax=None):
     fig, axes = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
         
     #UPLOAD ARGUMENTS
+    vals=pa["vals"].copy()
+    vals.remove("None")
     tmp=df.copy()
-    tmp=tmp[pa["vals"]]
-    x=pa["x_vals"]
-    y=pa["y_vals"]
-    hue=pa["hue"]
+    tmp=tmp[vals]
     scale=pa["scale"]
     scale_hue=pa["scale_hue"]
     split=pa["split"]
     dodge=pa["dodge"]
+
+    if pa["x_val"]=="None":
+        x=None
+    else:
+        x=pa["x_val"]
+
+    if pa["y_val"]=="None":
+        y=None
+    else:
+        y=pa["y_val"]
+
+    if pa["hue"]=="None":
+        hue=None
+    else:
+        hue=pa["hue"]
 
     if pa["order"]=="None":
         order=None
@@ -64,7 +78,7 @@ def make_figure(df,pa,fig=None,ax=None):
     if pa["color_rgb"] != "":
         color=GET_COLOR(pa["color_rgb"])
     else:
-        if pa["color_value"]=="default":
+        if pa["color_value"]=="None":
             color=None
         else:
             color=pa["color_value"]
@@ -104,7 +118,7 @@ def make_figure(df,pa,fig=None,ax=None):
     else:
         palette=pa["palette"]
 
-    if pa["saturation"]=="":
+    if pa["saturation"]!="":
         saturation=float(pa["saturation"])
     else:
         saturation=0.75
@@ -115,11 +129,88 @@ def make_figure(df,pa,fig=None,ax=None):
         orient=pa["orient"]
 
     if pa["default"]!="on":
-        sns.violinplot(x=x,y=y,hue=hue,data=tmp,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
+        sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
         scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
         linewidth=linewidth,color=color,saturation=saturation)
+        
+        # Set legend options
+        facecolor= pa["facecolor"]
+        edgecolor=pa["edgecolor"]
+        loc=pa["legend_loc"]
+        ncol=int(pa["legend_ncol"])
+        mode=pa["mode"]
+        legend_title=pa["legend_title"]
+
+        if pa["markerfirst"]=="on":
+            markerfirst=True
+        else:
+            markerfirst=False
+        
+        if pa["fancybox"]== "on":
+            fancybox=True
+        else:
+            fancybox=False
+
+        if pa["shadow"]=="on":
+            shadow=True
+        else:
+            shadow=False
+
+        if pa["framealpha"]=="":
+            framealpha=None
+        else:
+            framealpha=float(pa["framealpha"])
+        
+        if pa["labelspacing"]=="":
+            labelspacing=None
+        else:
+            labelspacing=float(pa["labelspacing"])
+        
+        if pa["columnspacing"]=="":
+            columnspacing=None
+        else:
+            columnspacing=float(pa["columnspacing"])
+
+        if pa["handletextpad"]=="":
+            handletextpad=None
+        else:
+            handletextpad=float(pa["handletextpad"])
+
+        if pa["handlelength"]=="":
+            handlelength=None
+        else:
+            handlelength=float(pa["handlelength"])
+
+        if pa["borderaxespad"]=="":
+            borderaxespad=None
+        else:
+            borderaxespad=float(pa["borderaxespad"])
+
+        if pa["borderpad"]=="":
+            borderpad=None
+        else:
+            borderpad=float(pa["borderpad"])
+
+        if pa["legend_title_fontsize_value"]!="":
+            legend_title_fontsize=pa["legend_title_fontsize_value"]
+        else:
+            legend_title_fontsize=pa["legend_title_fontsize"]
+
+        if pa["legend_body_fontsize_value"]!="":
+            legend_body_fontsize=float(pa["legend_body_fontsize_value"])
+        else:
+            legend_body_fontsize=pa["legend_body_fontsize"]
+
+        
+        plt.legend(loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
+            markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
+            facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
+            title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
+            handlelength=handlelength,handletextpad=handletextpad,\
+            borderaxespad=borderaxespad,columnspacing=columnspacing)
+
     else:
-        sns.violinplot(data=tmp,bw=bw,cut=cut,scale=scale,gridsize=gridsize,width=v_width,inner=inner,orient=orient,\
+        sns.violinplot(data=df[vals],bw=bw,cut=cut,scale=scale,gridsize=gridsize,width=v_width,inner=inner,orient=orient,\
         linewidth=linewidth,color=color,saturation=saturation)
 
     #Plot grid, axes and ticks
@@ -193,7 +284,7 @@ STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
 
 BWS=["scott","silverman"]
-STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white","default"]
+STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
 STANDARD_SCALES=["area","count","width"]
 STANDARD_INNER=["box", "quartile", "point", "stick", None]
 STANDARD_PALETTES=["deep", "muted", "bright", "pastel", "dark", "colorblind",None]
@@ -231,8 +322,8 @@ def figure_defaults():
         "titles":"20",\
         "default":"on",\
         "hue":None,\
-        "x_vals":None,\
-        "y_vals":None,\
+        "x_val":None,\
+        "y_val":None,\
         "cols":[],\
         "vals":[],\
         "order":None,\
@@ -296,6 +387,29 @@ def figure_defaults():
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
+        "legend_loc":"best",\
+        "legend_locations":LEGEND_LOCATIONS,\
+        "legend_ncol": "1",\
+        "legend_fontsizes":LEGEND_FONTSIZES,\
+        "legend_body_fontsize":"small",\
+        "legend_title_fontsize":"14",\
+        "legend_body_fontsize_value":"",
+        "legend_title_fontsize_value":"",
+        "markerfirst":"on",\
+        "fancybox":"on",\
+        "shadow":".off",\
+        "framealpha":"",\
+        "facecolor":None,\
+        "edgecolor":None,\
+        "mode":None,\
+        "modes":MODES,\
+        "legend_title":"",\
+        "borderpad":"",\
+        "handlelength":"",\
+        "labelspacing":"",\
+        "handletextpad":"",\
+        "borderaxespad":"",\
+        "columnspacing":"",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
