@@ -336,7 +336,7 @@
                                         <!-- <div class="row arg"> -->
                                             <label style="padding-left:27px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;">
                                                 {% for colors_ in colors %}
-                                                <option value="{{colors_}}" {% if colors_==group.color_value %} selected {% endif %}>{{colors_}}</option>
+                                                <option value="{{colors_}}" {% if colors_==args.color_value %} selected {% endif %}>{{colors_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -350,7 +350,7 @@
                                                 name={{group}}.line_color
                                                 value="{{args.line_color}}" method="GET" action="/" style="width:80px;">
                                                 {% for colors_ in colors %}
-                                                <option value="{{colors_}}" {% if colors_==group.line_color %} selected {% endif %}>{{colors_}}</option>
+                                                <option value="{{colors_}}" {% if colors_==args.line_color %} selected {% endif %}>{{colors_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -363,7 +363,7 @@
                                             <label>Binning type: <select name={{group}}.bins_value
                                                 val="{{args.bins_value}}"  method="GET" action="/" style="width:80px;padding-right:10px;">
                                                 {% for bins_ in bins %}
-                                                <option value="{{bins_}}" {% if bins_==group.bins_value %} selected {% endif %}>{{bins_}}</option>
+                                                <option value="{{bins_}}" {% if bins_==args.bins_value %} selected {% endif %}>{{bins_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -376,7 +376,7 @@
                                             <label style="padding-left:8px;">Orientation: <select name={{group}}.orientation_value val= "{{args.orientation}}"
                                                 method="GET" action="/" style="width:80px;">
                                                 {% for orientations_ in orientations %}
-                                                <option value="{{orientations_}}" {% if orientations_==group.orientation_value %} selected {% endif %}>{{orientations_}}</option>
+                                                <option value="{{orientations_}}" {% if orientations_==args.orientation_value %} selected {% endif %}>{{orientations_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -385,7 +385,7 @@
                                             <label style="padding-left:8px;">Type: <select name={{group}}.histtype_value
                                                 val= "{{group.histtype_value}}"  method="GET" action="/" style="width:90px;">
                                                 {% for histtype_ in hist_types %}
-                                                <option value="{{histtype_}}" {% if histtype_==group.histtype_value %} selected {% endif %}>{{histtype_}}</option>
+                                                <option value="{{histtype_}}" {% if histtype_==args.histtype_value %} selected {% endif %}>{{histtype_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -393,7 +393,7 @@
                                         <!-- <div class="row arg"> -->
                                             <label style="padding-left:19px;">Line style: <select name={{group}}.linestyle_value value = "{{args.linestyle_value}}" method="GET" action="/" style="width:80px;">
                                                 {% for linestyles_ in linestyles %}
-                                                <option value="{{linestyles_}}" {% if linestyles_==group.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                                <option value="{{linestyles_}}" {% if linestyles_==args.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->

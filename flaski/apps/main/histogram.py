@@ -83,11 +83,11 @@ def make_figure(df,pa):
             pa_["cumulative"]=False
 
         if pa_["line_color"]=="None":
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],\
+            plt.hist(x=df[h["name"]].tolist(),bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],\
             color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],log=pa_["log_scale"],linestyle=h["linestyle_value"],\
             cumulative=pa_["cumulative"],density=pa_["density"])
         else:
-            plt.hist(x=h["values"],bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],\
+            plt.hist(x=df[h["name"]].tolist(),bins=pa_["bins_number"],histtype=h["histtype_value"],orientation=h["orientation_value"],\
             color=pa_["color_value"], alpha=pa_["fill_alpha"],lw=pa_["linewidth"],edgecolor=pa_["line_color"],log=pa_["log_scale"],\
             linestyle=h["linestyle_value"],cumulative=pa_["cumulative"],density=pa_["density"])
 
