@@ -60,7 +60,7 @@ def histogram(download=None):
                 if error:
                     flash(msg,'error')
                     return render_template('/apps/histogram.html' , filename=session["filename"],apps=apps, **plot_arguments)
-                    flash(msg,"info")
+                flash(msg,"info")
 
             if request.files["inputargumentsfile"] :
                 msg, plot_arguments, error=read_argument_file(request.files["inputargumentsfile"],"histogram")
@@ -78,16 +78,12 @@ def histogram(download=None):
                 if allowed_file(inputfile.filename):
 
                     df=read_tables(inputfile)
-                    
                     cols=df.columns.tolist()
                     
                     # INDICATE THE USER TO SELECT THE COLUMNS TO PLOT AS HISTOGRAMS
                     session["plot_arguments"]=figure_defaults()
                     session["plot_arguments"]["cols"]=cols
-                    df=df.astype(str)
-                    session["df"]=df.to_json()
 
-                                    
                     sometext="Please select the columns from which we will plot your histograms"
                     plot_arguments=session["plot_arguments"]
                     flash(sometext,'info')
@@ -99,14 +95,18 @@ def histogram(download=None):
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
                     return render_template('/apps/histogram.html' , filename="Select file..", apps=apps, **plot_arguments)
+
+            if "df" not in list(session.keys()):
+                error_msg="No data to plot, please upload a data or session  file."
+                flash(error_msg,'error')
+                return render_template('/apps/histogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
             
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-                
+
                 df=pd.read_json(session["df"])
                 cols=df.columns.tolist()
                 filename=session["filename"]
 
-                
                 #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE HISTOGRAMS
                 if request.form.getlist("vals") == []:
                     filename=session["filename"]
@@ -143,7 +143,9 @@ def histogram(download=None):
                             "density":".off",\
                             "cumulative":".off"}
                             
-                    plot_arguments["groups_settings"]=groups_settings                    
+                    plot_arguments["groups_settings"]=groups_settings
+                    plot_arguments=read_request(request)
+                    
                     #CALL FIGURE FUNCTION
                     fig=make_figure(df,plot_arguments)
                     #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
@@ -156,70 +158,32 @@ def histogram(download=None):
                 
                 
                 #IF THE USER HAS SELECTED NEW COLUMNS TO BE PLOTTED
-                if plot_arguments["vals"]!=request.form.getlist("vals"):
-                    plot_arguments["vals"]=request.form.getlist("vals")
-                    groups=plot_arguments["vals"]
-                    groups.sort()
-                    groups_settings=dict()
-                                        
-                    for group in groups:
-                        if group not in plot_arguments["groups_settings"].keys():
-                            groups_settings[group]={"name":group,\
-                                    "values":df[group],\
-                                    "label":group,\
-                                    "color_value":None,\
-                                    "color_rgb":"",\
-                                    "bins_value":"auto",\
-                                    "bins_number":"",\
-                                    "orientation_value":"vertical",\
-                                    "histtype_value":"bar",\
-                                    "linewidth":0.5,\
-                                    "linestyle_value":"solid",\
-                                    "line_color":None,\
-                                    "line_rgb":"",\
-                                    "fill_alpha":0.8,
-                                    "density":".off",\
-                                    "cumulative":".off"}
-                        
-                        else:
-                            groups_settings[group]={"name":group,\
-                            "values":df[group],\
-                            "label":request.form["%s.label" %group],\
-                            "color_value":request.form["%s.color_value" %group],\
-                            "color_rgb":request.form["%s.color_rgb" %group],\
-                            "bins_value":request.form["%s.bins_value" %group],\
-                            "bins_number":request.form["%s.bins_number" %group],\
-                            "orientation_value":request.form["%s.orientation_value" %group],\
-                            "histtype_value":request.form["%s.histtype_value" %group],\
-                            "linewidth":request.form["%s.linewidth" %group],\
-                            "linestyle_value":request.form["%s.linestyle_value" %group],\
-                            "line_color":request.form["%s.line_color" %group],\
-                            "line_rgb":request.form["%s.line_rgb" %group],\
-                            "fill_alpha":request.form["%s.fill_alpha" %group]}
-                            
-                            #If the user does not tick the options the arguments do not appear as keys in request.form
-                            if "%s.density"%group in request.form.keys():
-                                groups_settings[group]["density"]=request.form["%s.density" %group]
-                            else:
-                                groups_settings[group]["density"]=".off"
-                            
-                            if "%s.cumulative"%group in request.form.keys():
-                                groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
-                            else:
-                                groups_settings[group]["cumulative"]=".off"
-
-
-
-                    plot_arguments["groups_settings"]=groups_settings
-                
-                #IF USER HAS NOT SELECTED NEW COLUMNS TO BE PLOTTED BUT THEY HAVE UPDATED THE HISTOGRAM ARGUMENTS, THEN REQUEST ALL THE ARGUMENTS AGAIN
-                elif plot_arguments["vals"]==request.form.getlist("vals"):
-                    groups=plot_arguments["vals"]
-                    groups.sort()
-                    groups_settings=dict()
-                    for group in groups:
+                # if plot_arguments["vals"]!=request.form.getlist("vals"):
+                plot_arguments=read_request(request)
+                groups=plot_arguments["vals"]
+                groups.sort()
+                groups_settings=dict()
+                                    
+                for group in groups:
+                    if group not in plot_arguments["groups_settings"].keys():
                         groups_settings[group]={"name":group,\
-                        "values":df[group],\
+                                "label":group,\
+                                "color_value":None,\
+                                "color_rgb":"",\
+                                "bins_value":"auto",\
+                                "bins_number":"",\
+                                "orientation_value":"vertical",\
+                                "histtype_value":"bar",\
+                                "linewidth":0.5,\
+                                "linestyle_value":"solid",\
+                                "line_color":None,\
+                                "line_rgb":"",\
+                                "fill_alpha":0.8,
+                                "density":".off",\
+                                "cumulative":".off"}
+                    
+                    else:
+                        groups_settings[group]={"name":group,\
                         "label":request.form["%s.label" %group],\
                         "color_value":request.form["%s.color_value" %group],\
                         "color_rgb":request.form["%s.color_rgb" %group],\
@@ -234,31 +198,20 @@ def histogram(download=None):
                         "fill_alpha":request.form["%s.fill_alpha" %group]}
                         
                         #If the user does not tick the options the arguments do not appear as keys in request.form
-
                         if "%s.density"%group in request.form.keys():
                             groups_settings[group]["density"]=request.form["%s.density" %group]
                         else:
-                            groups_settings[group]["density"]=".off"
+                            groups_settings[group]["density"]="off"
                         
                         if "%s.cumulative"%group in request.form.keys():
                             groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
                         else:
-                            groups_settings[group]["cumulative"]=".off"
-                        
-                       
+                            groups_settings[group]["cumulative"]="off"
+
                     plot_arguments["groups_settings"]=groups_settings
-            
-           
 
-                session["plot_arguments"]=plot_arguments
-                plot_arguments=read_request(request)
-            
-         
+                session["plot_arguments"]=plot_arguments           
 
-            if "df" not in list(session.keys()):
-                error_msg="No data to plot, please upload a data or session  file."
-                flash(error_msg,'error')
-                return render_template('/apps/histogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
           
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
@@ -289,7 +242,6 @@ def histogram(download=None):
 
         if download == "download":
 
-        
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
             plot_arguments=session["plot_arguments"]
