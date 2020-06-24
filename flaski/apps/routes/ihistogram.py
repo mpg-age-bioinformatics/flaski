@@ -11,8 +11,6 @@ from flaski.apps.main.ihistogram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file
 from flaski.email import send_exception_email
-import plotly
-import plotly.io as pio
 
 
 import os
@@ -20,6 +18,13 @@ import io
 import sys
 import random
 import json
+
+import matplotlib
+matplotlib.use('agg')
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.backends.backend_svg import FigureCanvasSVG
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 import pandas as pd
 
@@ -29,30 +34,29 @@ import base64
 @app.route('/ihistogram', methods=['GET', 'POST'])
 @login_required
 def ihistogram(download=None):
-    """ 
-    renders the plot on the fly.
-    https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
-    """       
+
     apps=current_user.user_apps
-
     reset_info=check_session_app(session,"ihistogram",apps)
+    
     if reset_info:
-        flash(reset_info,'error')
 
+        flash(reset_info,'error')
         # INITIATE SESSION
         session["filename"]="Select file.."
         plot_arguments=figure_defaults()
         session["plot_arguments"]=plot_arguments
         session["COMMIT"]=app.config['COMMIT']
         session["app"]="ihistogram"
-
+        
+    """
+    renders the plot on the fly.
+    https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
+    """
     if request.method == 'POST' :
-
+        
         try:
-            # READ SESSION FILE IF AVAILABLE 
-            # AND OVERWRITE VARIABLES
             if request.files["inputsessionfile"] :
-                msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"ihistogram")
+                msg,plot_arguments,error=read_session_file(request.files["inputsessionfile"],"ihistogram")
                 if error:
                     flash(msg,'error')
                     return render_template('/apps/ihistogram.html' , filename=session["filename"],apps=apps, **plot_arguments)
@@ -65,39 +69,25 @@ def ihistogram(download=None):
                     return render_template('/apps/ihistogram.html' , filename=session["filename"], apps=apps, **plot_arguments)
                 flash(msg,"info")
             
-            # IF THE UPLOADS A NEW FILE 
-            # THAN UPDATE THE SESSION FILE
+            # IF THE USER UPLOADS A NEW FILE
+            # THEN UPDATE THE SESSION FILE
             # READ INPUT FILE
             inputfile = request.files["inputfile"]
             if inputfile:
                 filename = secure_filename(inputfile.filename)
                 if allowed_file(inputfile.filename):
+
                     df=read_tables(inputfile)
-                   
                     cols=df.columns.tolist()
+                    
+                    # INDICATE THE USER TO SELECT THE COLUMNS TO PLOT AS HISTOGRAMS
+                    session["plot_arguments"]=figure_defaults()
+                    session["plot_arguments"]["cols"]=cols
 
-                    if session["plot_arguments"]["groups"] not in cols:
-                        session["plot_arguments"]["groups"]=["None"]+cols
-
-                    columns_select=["markerstyles_cols", "markerc_cols", "markersizes_cols","markeralpha_col",\
-                        "labels_col","edgecolor_cols","edge_linewidth_cols",]
-                    for parg in columns_select:
-                        if session["plot_arguments"]["markerstyles_cols"] not in cols:
-                            session["plot_arguments"][parg]=["select a column.."]+cols
-
-                    # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
-                    if (session["plot_arguments"]["xvals"] not in cols) & (session["plot_arguments"]["yvals"] not in cols):
-
-                        session["plot_arguments"]["xcols"]=cols
-                        session["plot_arguments"]["xvals"]=cols[0]
-
-                        session["plot_arguments"]["ycols"]=cols
-                        session["plot_arguments"]["yvals"]=cols[1]
-                                    
-                        sometext="Please select which values should map to the x and y axes."
-                        plot_arguments=session["plot_arguments"]
-                        flash(sometext,'info')
-                        return render_template('/apps/ihistogram.html' , filename=filename, apps=apps,**plot_arguments)
+                    sometext="Please select the columns from which we will plot your iHistograms"
+                    plot_arguments=session["plot_arguments"]
+                    flash(sometext,'info')
+                    return render_template('/apps/ihistogram.html' , filename=filename, apps=apps,**plot_arguments)
                     
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
@@ -105,103 +95,153 @@ def ihistogram(download=None):
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
                     return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps, **plot_arguments)
-            
-            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-                # SELECTION LISTS DO NOT GET UPDATED 
-                # lists=session["lists"]
-
-                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                # WITH THE EXCEPTION OF SELECTION LISTS
-                plot_arguments = session["plot_arguments"]
-
-                if plot_arguments["groups_value"]!=request.form["groups_value"]:
-                    if request.form["groups_value"]  != "None":
-                        df=pd.read_json(session["df"])
-                        df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
-                        df=df.astype(str)
-                        session["df"]=df.to_json()
-                        groups=df[request.form["groups_value"]]
-                        groups=list(set(groups))
-                        groups.sort()
-                        plot_arguments["list_of_groups"]=groups
-                        groups_settings=[]
-                        group_dic={}
-                        for group in groups:
-                            group_dic={"name":group,\
-                                "markers":plot_arguments["markers"],\
-                                "markersizes_col":"select a column..",\
-                                "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
-                                "markerc_col":"select a column..",\
-                                "markerc_write":plot_arguments["markerc_write"],\
-                                "edge_linewidth":plot_arguments["edge_linewidth"],\
-                                "edge_linewidth_col":"select a column..",\
-                                "edgecolor":plot_arguments["edgecolor"],\
-                                "edgecolor_col":"select a column..",\
-                                "edgecolor_write":"",\
-                                "marker":random.choice(plot_arguments["markerstyles"]),\
-                                "markerstyles_col":"select a column..",\
-                                "marker_alpha":plot_arguments["marker_alpha"],\
-                                "markeralpha_col_value":"select a column.."}
-                            groups_settings.append(group_dic)
-                        plot_arguments["groups_settings"]=groups_settings
-                    elif request.form["groups_value"] == "None" :
-                        plot_arguments["groups_settings"]=[]
-                        plot_arguments["list_of_groups"]=[]
-
-                elif plot_arguments["groups_value"] != "None":
-                    groups_settings=[]
-                    group_dic={}
-                    for group in plot_arguments["list_of_groups"]:
-                        group_dic={"name":group,\
-                            "markers":request.form["%s.markers" %group],\
-                            "markersizes_col":request.form["%s.markersizes_col" %group],\
-                            "markerc":request.form["%s.markerc" %group],\
-                            "markerc_col":request.form["%s.markerc_col" %group],\
-                            "markerc_write":request.form["%s.markerc_write" %group],\
-                            "edge_linewidth":request.form["%s.edge_linewidth" %group],\
-                            "edge_linewidth_col":request.form["%s.edge_linewidth_col" %group],\
-                            "edgecolor":request.form["%s.edgecolor" %group],\
-                            "edgecolor_col":request.form["%s.edgecolor_col" %group],\
-                            "edgecolor_write":request.form["%s.edgecolor_write" %group],\
-                            "marker":request.form["%s.marker" %group],\
-                            "markerstyles_col":request.form["%s.markerstyles_col" %group],\
-                            "marker_alpha":request.form["%s.marker_alpha" %group],\
-                            "markeralpha_col_value":request.form["%s.markeralpha_col_value" %group]
-                            }   
-                        groups_settings.append(group_dic)
-                    plot_arguments["groups_settings"]=groups_settings
-                
-                if request.form["labels_col_value"] != "select a column.." :
-                    df=pd.read_json(session["df"])
-                    plot_arguments["available_labels"] = list(set( df[ request.form["labels_col_value"] ].tolist() ))
-
-                session["plot_arguments"]=plot_arguments
-                plot_arguments=read_request(request)
 
             if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
                 return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
+            
+            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
 
+                df=pd.read_json(session["df"])
+                cols=df.columns.tolist()
+                filename=session["filename"]
+
+                #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE HISTOGRAMS
+                if request.form.getlist("vals") == []:
+                    filename=session["filename"]
+                    session["plot_arguments"]=figure_defaults()
+                    session["plot_arguments"]["cols"]=cols
+                    sometext="Please select the columns from which we will plot your ihistograms"
+                    plot_arguments=session["plot_arguments"]
+                    flash(sometext,'info')
+                    return render_template('/apps/ihistogram.html' , filename=filename, apps=apps,**plot_arguments)
+                    
+                #IF THE USER SELECTED THE COLUMNS TO BE PLOTTED FOR THE FIRST TIME,
+                #WE INITIALIZE THE DICTIONARY GROUPS SETTINGS
+                plot_arguments=session["plot_arguments"]
+                if plot_arguments["groups_settings"] == dict():
+                    plot_arguments["vals"]=request.form.getlist("vals")
+                    groups=plot_arguments["vals"]
+                    groups.sort()
+                    groups_settings=dict()
+                    for group in groups:
+                        groups_settings[group]={"name":group,\
+                            "values":df[group],\
+                            "label":group,\
+                            "color_value":None,\
+                            "color_rgb":"",\
+                            "bins_value":"auto",\
+                            "bins_number":"",\
+                            "orientation_value":"vertical",\
+                            "histtype_value":"bar",\
+                            "linewidth":0.5,\
+                            "linestyle_value":"solid",\
+                            "line_color":None,\
+                            "line_rgb":"",\
+                            "fill_alpha":0.8,\
+                            "density":".off",\
+                            "cumulative":".off"}
+                            
+                    plot_arguments["groups_settings"]=groups_settings
+                    plot_arguments=read_request(request)
+                    
+                    #CALL FIGURE FUNCTION
+                    fig=make_figure(df,plot_arguments)
+                    #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+                    figfile = io.BytesIO()
+                    plt.savefig(figfile, format='png')
+                    plt.close()
+                    figfile.seek(0)  # rewind to beginning of file
+                    figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+                    return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+                
+                
+                #IF THE USER HAS SELECTED NEW COLUMNS TO BE PLOTTED
+                # if plot_arguments["vals"]!=request.form.getlist("vals"):
+                plot_arguments=read_request(request)
+                groups=plot_arguments["vals"]
+                groups.sort()
+                groups_settings=dict()
+                                    
+                for group in groups:
+                    if group not in plot_arguments["groups_settings"].keys():
+                        groups_settings[group]={"name":group,\
+                                "label":group,\
+                                "color_value":None,\
+                                "color_rgb":"",\
+                                "bins_value":"auto",\
+                                "bins_number":"",\
+                                "orientation_value":"vertical",\
+                                "histtype_value":"bar",\
+                                "linewidth":0.5,\
+                                "linestyle_value":"solid",\
+                                "line_color":None,\
+                                "line_rgb":"",\
+                                "fill_alpha":0.8,
+                                "density":".off",\
+                                "cumulative":".off"}
+                    
+                    else:
+                        groups_settings[group]={"name":group,\
+                        "label":request.form["%s.label" %group],\
+                        "color_value":request.form["%s.color_value" %group],\
+                        "color_rgb":request.form["%s.color_rgb" %group],\
+                        "bins_value":request.form["%s.bins_value" %group],\
+                        "bins_number":request.form["%s.bins_number" %group],\
+                        "orientation_value":request.form["%s.orientation_value" %group],\
+                        "histtype_value":request.form["%s.histtype_value" %group],\
+                        "linewidth":request.form["%s.linewidth" %group],\
+                        "linestyle_value":request.form["%s.linestyle_value" %group],\
+                        "line_color":request.form["%s.line_color" %group],\
+                        "line_rgb":request.form["%s.line_rgb" %group],\
+                        "fill_alpha":request.form["%s.fill_alpha" %group]}
+                        
+                        #If the user does not tick the options the arguments do not appear as keys in request.form
+                        if "%s.density"%group in request.form.keys():
+                            groups_settings[group]["density"]=request.form["%s.density" %group]
+                        else:
+                            groups_settings[group]["density"]="off"
+                        
+                        if "%s.cumulative"%group in request.form.keys():
+                            groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                        else:
+                            groups_settings[group]["cumulative"]="off"
+
+                    plot_arguments["groups_settings"]=groups_settings
+
+                session["plot_arguments"]=plot_arguments           
+
+          
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
-
+         
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
 
             #CALL FIGURE FUNCTION
+            # try:
             fig=make_figure(df,plot_arguments)
-            figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+            #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+            figfile = io.BytesIO()
+            plt.savefig(figfile, format='png')
+            plt.close()
+            figfile.seek(0)  # rewind to beginning of file
+            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+            
             return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
-            tb_str=handle_exception(e,user=current_user,eapp="ihistogram",session=session)
-            flash(tb_str,'traceback')
-            return render_template('/apps/ihistogram.html', filename=filename, apps=apps, **plot_arguments)
+                tb_str=handle_exception(e,user=current_user,eapp="ihistogram",session=session)
+                flash(tb_str,'traceback')
+                return render_template('/apps/ihistogram.html', filename=session["filename"], apps=apps, **session["plot_arguments"])
 
     else:
+
         if download == "download":
+
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
             plot_arguments=session["plot_arguments"]
@@ -209,26 +249,10 @@ def ihistogram(download=None):
             # CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
 
-            pio.orca.config.executable='/miniconda/bin/orca'
-            pio.orca.config.use_xvfb = True
-            #pio.orca.config.save()
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
-
-            pa_={}
-            for v in ["fig_height","fig_width"]:
-                if plot_arguments[v] != "":
-                    pa_[v]=False
-                elif plot_arguments[v]:
-                    pa_[v]=float(plot_arguments[v])
-                else:
-                    pa_[v]=False
-
-            if (pa_["fig_height"]) & (pa_["fig_width"]):
-                fig.write_image( figfile, format=plot_arguments["downloadf"], height=pa_["fig_height"] , width=pa_["fig_width"] )
-            else:
-                fig.write_image( figfile, format=plot_arguments["downloadf"] )
-
+            plt.savefig(figfile, format=plot_arguments["downloadf"])
+            plt.close()
             figfile.seek(0)  # rewind to beginning of file
 
             eventlog = UserLogging(email=current_user.email,action="download figure ihistogram")
@@ -236,5 +260,5 @@ def ihistogram(download=None):
             db.session.commit()
 
             return send_file(figfile, mimetype=mimetypes[plot_arguments["downloadf"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["downloadf"] )
-        
+            
         return render_template('apps/ihistogram.html',  filename=session["filename"], apps=apps, **session["plot_arguments"])
