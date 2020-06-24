@@ -54,8 +54,8 @@ if app.config['INSTANCE'] != "latest" :
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
-        user.user_apps=FREEAPPS+read_private_apps(current_user.email,app)
-        db.session.add(user)
+        current_user.user_apps=FREEAPPS+read_private_apps(current_user.email,app)
+        db.session.add(current_user)
         db.session.commit()
         apps=current_user.user_apps
         return render_template('index.html',userlogged="yes", apps=apps, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
