@@ -8,6 +8,7 @@ import pyflaski.venndiagram
 import pyflaski.david
 import pyflaski.icellplot
 import pyflaski.histogram
+import pyflaski.iHistogram
 
 
 import json
