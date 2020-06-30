@@ -24,48 +24,64 @@ def make_figure(df,pa):
         else:
             pa_[n]=float(pa[n])
 
-    fig = go.Figure( )
-    fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
-    
     tmp=df.copy()
     tmp=tmp[pa["vals"]]
-    
-    #Read histogram arguments and plot one histogram per column selected by user
+
+    fig = go.Figure( )
+    fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
+
+    # MAIN FIGURE
+    pab={}
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis"]:
+        if pa[arg] in ["off",".off"]:
+            pab[arg]=False
+        else:
+            pab[arg]=True
 
     for h in pa["groups_settings"].values():
-        pa_={}
+
+        if h["label"]!="":
+            name=h["label"]
+        else:
+            name=""
+
         if h["color_rgb"] == "" or h["color_rgb"]=="None":
             if h["color_value"]=="None":
-                pa_["color_value"]=None
+                marker_color=None
             else:
-                pa_["color_value"] = h["color_value"]
+                marker_color = h["color_value"]
         else:
-            pa_["color_value"] = GET_COLOR( h["color_rgb"] )
+            marker_color = GET_COLOR( h["color_rgb"] )
                 
         if h[ "line_rgb"] == "" or h["line_rgb"]==None:
-            pa_["line_color"] = str(h["line_color"])
+            line_color = str(h["line_color"])
         else:
-            pa_["line_color"] = GET_COLOR( h["line_rgb"] )
+            line_color = GET_COLOR( h["line_rgb"] )
+
+        if h["histnorm"] == "None":
+            histnorm = ""
+        else:
+            histnorm = h["histnorm"]
 
         if (h["bins_number"] == "") or (h["bins_number"]==None):
-            pa_["bins_number"] = h["bins_value"]
+            nbins = None
         else:
-            pa_["bins_number"] = int(h["bins_number"])
+            nbins = int(h["bins_number"])
             
         if h["fill_alpha"]!=pa["fill_alpha"]:
-            pa_["fill_alpha"]=float(h["fill_alpha"])
+            opacity=float(h["fill_alpha"])
         else:
-            pa_["fill_alpha"]=float(pa["fill_alpha"])
+            opacity=float(pa["fill_alpha"])
         
         if h["linewidth"]!=pa["linewidth"]:
-            pa_["linewidth"]=float(h["linewidth"])
+            linewidth=float(h["linewidth"])
         else:
-            pa_["linewidth"]=float(pa["linewidth"])
+            linewidth=float(pa["linewidth"])
 
         if pa["log_scale"]=="on":
-            pa_["log_scale"]=True
+            log=True
         else:
-            pa_["log_scale"]=False
+            log=False
         
         if h["density"]=="on":
             pa_["density"]=True
@@ -73,27 +89,26 @@ def make_figure(df,pa):
             pa_["density"]=False
 
         if h["cumulative"]=="on":
-            pa_["cumulative"]=True
+            cumulative_enabled=True
         else:
-            pa_["cumulative"]=False
+            cumulative_enabled=False
 
-        print("ESTOY ACA",h["name"])
-        if h["orientation_value"]=="horizontal":
-            fig.add_trace(go.Histogram(y=df[h["name"]],cumulative_enabled=pa_["cumulative"]))
+        if h["orientation_value"]=="vertical":
+            fig.add_trace(go.Histogram(x=tmp[h["name"]],cumulative_enabled=cumulative_enabled,\
+                opacity=opacity,nbinsx=nbins,marker_color=marker_color,name=name))
+            
+            if pa["log_scale"]==True:
+                fig.update_xaxes(type="log")
+
         else:
-            fig.add_trace(go.Histogram(x=df[h["name"]],cumulative_enabled=pa_["cumulative"]))
+            fig.add_trace(go.Histogram(y=tmp[h["name"]],cumulative_enabled=cumulative_enabled,\
+                opacity=opacity,nbinsy=nbins,marker_color=marker_color,name=name))
 
+            if pa["log_scale"]==True:
+                fig.update_xyaxes(type="log")
+    #Update layout of histograms
+    fig.update_layout(barmode=pa["barmode"])
 
-    
-    #Update the axis, ticks and grid
-
-    pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis"]:
-        if pa[arg] in ["off",".off"]:
-            pab[arg]=False
-        else:
-            pab[arg]=True
-    
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
 
@@ -115,7 +130,7 @@ def make_figure(df,pa):
 
     if pa["maxyticks"]!="":
         fig.update_yaxes(nticks=int(pa["maxyticks"]))
-
+    
     fig.update_layout(
         title={
             'text': pa['title'],
@@ -155,8 +170,7 @@ def make_figure(df,pa):
     fig.update_layout(template='plotly_white')
 
 
-    #Update legend
-    if pa["show_legend"]!="off":
+    if pab["show_legend"]==True:
 
         labels=[x["label"] for x in pa["groups_settings"].values()]
         facecolor= pa["facecolor"]
@@ -227,13 +241,15 @@ def make_figure(df,pa):
             legend_body_fontsize=pa["legend_body_fontsize"]
 
         
-        fig.update_layout(legend_title_text=legend_title,legend=dict(size=legend_title_fontsize))
+        fig.update_layout(showlegend=True,legend_title_text=legend_title)
+        fig.update_layout(
+        legend=dict(
+            font=dict(
+            size=legend_body_fontsize,
+            ),
+            )
+        )
 
-
-
-    fig.update_layout(title_text=pa["title"])
-
-    
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
@@ -263,11 +279,11 @@ ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'squa
   'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
   'line-ne-open', 'line-nw', 'line-nw-open']
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
-STANDARD_BINS=['auto', 'sturges','fd','doane', 'scott','rice','sqrt']
+STANDARD_HISTNORMS=['None', 'percent', 'probability', 'density', 'probability density']
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
-HIST_TYPES=['bar', 'barstacked', 'step',  'stepfilled']
+STANDARD_BARMODES=["stack", "group","overlay","relative"]
 STANDARD_ORIENTATIONS=['vertical','horizontal']
 STANDARD_ALIGNMENTS=['left','right','mid']
 TICKS_DIRECTIONS=["inside","outside",'']
@@ -295,9 +311,9 @@ def figure_defaults():
 
 def figure_defaults():
     plot_arguments={
-        "fig_width":"10",\
-        "fig_height":"10",\
-        "title":'Histogram',\
+        "fig_width":"600",\
+        "fig_height":"600",\
+        "title":'iHistogram',\
         "title_size":STANDARD_SIZES,\
         "title_size_value":"20",\
         "titles":"20",\
@@ -312,10 +328,11 @@ def figure_defaults():
         "groups_settings":dict(),\
         "log_scale":".off",\
         "colors":STANDARD_COLORS,\
-        "bins":STANDARD_BINS,\
+        "histnorms":STANDARD_HISTNORMS,\
         "alignment":STANDARD_ALIGNMENTS,\
         "alignment_value":"mid",\
-        "hist_types":HIST_TYPES,\
+        "barmode":"overlay",\
+        "barmodes":STANDARD_BARMODES,\
         "histtype_value":"bar",\
         "linestyles":LINE_STYLES,\
         "linestyle_value":"",\

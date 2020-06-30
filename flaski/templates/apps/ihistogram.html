@@ -117,6 +117,15 @@
                                         <label style="padding-left: 18px;">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:92px;height:22px;padding-left: 4px;"></label>
                                     </div>
                                     
+                                    <div class="row arg">
+                                        <label>Barmode: <select name=barmode
+                                        val= "barmode"  method="GET" action="/" style="width:90px;">
+                                        {% for barmode_ in barmodes %}
+                                            <option value="{{barmode_}}" {% if barmode_==barmode %} selected {% endif %}>{{barmode_}}</option>
+                                         {% endfor %}
+                                        </select></label>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -373,10 +382,10 @@
 
                                         
                                         <!-- <div class="row arg"> -->
-                                            <label>Binning type: <select name={{group}}.bins_value
-                                                val="{{args.bins_value}}"  method="GET" action="/" style="width:80px;padding-right:10px;">
-                                                {% for bins_ in bins %}
-                                                <option value="{{bins_}}" {% if bins_==args.bins_value %} selected {% endif %}>{{bins_}}</option>
+                                            <label>Normalization: <select name={{group}}.histnorm
+                                                val="{{args.histnorm}}"  method="GET" action="/" style="width:80px;">
+                                                {% for histnorms_ in histnorms %}
+                                                <option value="{{histnorms_}}" {% if histnorms_==args.histnorm %} selected {% endif %}>{{histnorms_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -390,15 +399,6 @@
                                                 method="GET" action="/" style="width:80px;">
                                                 {% for orientations_ in orientations %}
                                                 <option value="{{orientations_}}" {% if orientations_==args.orientation_value %} selected {% endif %}>{{orientations_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                        <!-- </div> -->
-                                        
-                                        <!-- <div class="row arg"> -->
-                                            <label style="padding-left:8px;">Type: <select name={{group}}.histtype_value
-                                                val= "{{group.histtype_value}}"  method="GET" action="/" style="width:90px;">
-                                                {% for histtype_ in hist_types %}
-                                                <option value="{{histtype_}}" {% if histtype_==args.histtype_value %} selected {% endif %}>{{histtype_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         <!-- </div> -->
@@ -613,8 +613,14 @@
     {% endwith %}
 
     {% if figure_url %}
-        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
-        <img src="data:image/png;base64,{{ figure_url }}">
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+        <div class="chart" id="ihistogram" style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+            <script>
+                var graphs = {{figure_url | safe}};
+                Plotly.plot('ihistogram',graphs,{});
+            </script>
 
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
