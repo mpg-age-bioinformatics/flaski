@@ -108,8 +108,12 @@
                                             <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                             {% endfor %}
                                         </select></label>
-                                        <label style=" width: 55px;padding-left:3px;">Legend: </label>
-                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_legend {% if show_legend == "on"%} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
+                                        <label style="padding-left: 8px;" >Barmode: <select name=barmode
+                                            val= "barmode"  method="GET" action="/" style="width:77px;">
+                                            {% for barmode_ in barmodes %}
+                                                <option value="{{barmode_}}" {% if barmode_==barmode %} selected {% endif %}>{{barmode_}}</option>
+                                             {% endfor %}
+                                            </select></label>
                                     </div>
                                     
                                     <div class="row arg">
@@ -118,12 +122,8 @@
                                     </div>
                                     
                                     <div class="row arg">
-                                        <label>Barmode: <select name=barmode
-                                        val= "barmode"  method="GET" action="/" style="width:90px;">
-                                        {% for barmode_ in barmodes %}
-                                            <option value="{{barmode_}}" {% if barmode_==barmode %} selected {% endif %}>{{barmode_}}</option>
-                                         {% endfor %}
-                                        </select></label>
+                                        <label style=" width: 55px;padding-left:3px;">Legend: </label>
+                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_legend {% if show_legend == "on"%} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
                                     </div>
 
                                 </div>
@@ -221,13 +221,6 @@
                                                 <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                             {% endfor %}
                                         </select></label>
-
-                                        <label style="padding-left:26px;"> Style: <select name=grid_linestyle_value method="GET" action="/" style="width:65px">
-                                            {% for grid_linestyle_ in grid_linestyle %}
-                                                <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-
                                     </div>
 
                                     <div class="row arg">
@@ -341,10 +334,32 @@
                                         <!-- <div class="row arg" style="padding-bottom:6px;"> -->
                                             <label>Label: <input type="text" name={{group}}.label value= "{{args.label}}" style="width:259px;height:22px;padding-left:4px;"></label>
                                         <!-- </div> -->
+
+                                        <!-- <div class="row arg" style="padding-bottom:6px;"> -->
+                                            <label>Text: <input type="text" name={{group}}.text value= "{{args.text}}" style="width:259px;height:22px;padding-left:4px;"></label>
+                                        <!-- </div> -->
+
+                                        <!-- <div class="row arg"> -->
+                                            <label style="padding-left:27px;">Hover info: <select  name={{group}}.hoverinfo value="{{args.hoverinfo}}" method="GET" action="/" style="width:80px;">
+                                                {% for hoverinfo_ in hoverinfos %}
+                                                <option value="{{hoverinfo_}}" {% if hoverinfo_==args.hoverinfo %} selected {% endif %}>{{hoverinfo_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                        <!-- </div> -->
+
+                                        <!-- <div class="row arg"> -->
+                                            <label style="padding-left:27px;">Function: <select  name={{group}}.histfunc value="{{args.histfunc}}" method="GET" action="/" style="width:80px;">
+                                                {% for histfunc_ in histfuncs %}
+                                                <option value="{{histfunc_}}" {% if histfunc_==args.histfunc %} selected {% endif %}>{{histfunc_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                        <!-- </div> -->
+
+
                                         
                                         <label style="padding-left:0px;">Density: </label><label style="width:5px;padding-left:4px;"><input type="checkbox" name= {{group}}.density {% if args.density  == "on"%} checked {% elif args.density ==".on" %} checked {% endif %}/></label>
                                         <label style="padding-left:26px;">Cumulative: </label><label  style="width:5px;padding-left:4px;"><input type="checkbox" name= {{group}}.cumulative {% if args.cumulative  == "on"%} checked {% elif args.cumulative ==".on" %} checked {% endif %}/></label>
-                                        <label style="padding-left:26px;">Fill alpha: <input type="text" name={{group}}.fill_alpha value="{{args.fill_alpha}}"  style="width:50px;height:22px;padding-left:4px;"></label>
+                                        <label style="padding-left:26px;">Fill alpha: <input type="text" name={{group}}.opacity value="{{args.opacity}}"  style="width:50px;height:22px;padding-left:4px;"></label>
                                     
 
                                         <!-- <div class="row arg"> -->

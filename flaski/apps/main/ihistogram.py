@@ -40,10 +40,18 @@ def make_figure(df,pa):
 
     for h in pa["groups_settings"].values():
 
+        hoverinfo=h["hoverinfo"]
+        histfunc=h["histfunc"]
+
         if h["label"]!="":
             name=h["label"]
         else:
             name=""
+        
+        if h["text"]!="":
+            text=h["text"]
+        else:
+            text=""
 
         if h["color_rgb"] == "" or h["color_rgb"]=="None":
             if h["color_value"]=="None":
@@ -63,25 +71,20 @@ def make_figure(df,pa):
         else:
             histnorm = h["histnorm"]
 
-        if (h["bins_number"] == "") or (h["bins_number"]==None):
-            nbins = None
+        if (h["bins_number"] == ""):
+            nbins = 0
         else:
             nbins = int(h["bins_number"])
             
-        if h["fill_alpha"]!=pa["fill_alpha"]:
-            opacity=float(h["fill_alpha"])
+        if h["opacity"]!=pa["opacity"]:
+            opacity=float(h["opacity"])
         else:
-            opacity=float(pa["fill_alpha"])
+            opacity=float(pa["opacity"])
         
         if h["linewidth"]!=pa["linewidth"]:
             linewidth=float(h["linewidth"])
         else:
             linewidth=float(pa["linewidth"])
-
-        if pa["log_scale"]=="on":
-            log=True
-        else:
-            log=False
         
         if h["density"]=="on":
             pa_["density"]=True
@@ -93,22 +96,21 @@ def make_figure(df,pa):
         else:
             cumulative_enabled=False
 
-        if h["orientation_value"]=="vertical":
-            fig.add_trace(go.Histogram(x=tmp[h["name"]],cumulative_enabled=cumulative_enabled,\
+        if h["orientation_value"]=="v":
+            fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative_enabled=cumulative_enabled,\
                 opacity=opacity,nbinsx=nbins,marker_color=marker_color,name=name))
-            
-            if pa["log_scale"]==True:
-                fig.update_xaxes(type="log")
 
         else:
-            fig.add_trace(go.Histogram(y=tmp[h["name"]],cumulative_enabled=cumulative_enabled,\
+            fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative_enabled=cumulative_enabled,\
                 opacity=opacity,nbinsy=nbins,marker_color=marker_color,name=name))
 
-            if pa["log_scale"]==True:
-                fig.update_xyaxes(type="log")
     #Update layout of histograms
     fig.update_layout(barmode=pa["barmode"])
+    if pa["log_scale"]==True:
+        print("I AM HERE")
+        fig.update_yaxes(type="log")
 
+    print("PAB IS",pab)
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
 
@@ -149,14 +151,14 @@ def make_figure(df,pa):
     fig.update_xaxes(tickangle=float(pa["xticks_rotation"]), tickfont=dict(size=float(pa["xticks_fontsize"])))
     fig.update_yaxes(tickangle=float(pa["yticks_rotation"]), tickfont=dict(size=float(pa["yticks_fontsize"])))
 
-
+    #UPDATE GRID PROPERTIES
     if pa["grid_value"] != "None":
         if pa["grid_color_text"]!="":
             grid_color=pa["grid_color_text"]
         else:
             grid_color=pa["grid_color_value"]
         if pa["grid_value"] in ["both","x"]:
-            fig.update_xaxes(showgrid=True, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color)
+            fig.update_xaxes(showgrid=True, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color,)
         else:
             fig.update_xaxes(showgrid=False, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color)
         if pa["grid_value"] in ["both","y"]:
@@ -169,7 +171,7 @@ def make_figure(df,pa):
 
     fig.update_layout(template='plotly_white')
 
-
+    #UPDATE LEGEND PROPERTIES
     if pab["show_legend"]==True:
 
         labels=[x["label"] for x in pa["groups_settings"].values()]
@@ -231,14 +233,14 @@ def make_figure(df,pa):
             borderpad=float(pa["borderpad"])
 
         if pa["legend_title_fontsize_value"]!="":
-            legend_title_fontsize=pa["legend_title_fontsize_value"]
+            legend_title_fontsize=float(pa["legend_title_fontsize_value"])
         else:
-            legend_title_fontsize=pa["legend_title_fontsize"]
+            legend_title_fontsize=float(pa["legend_title_fontsize"])
 
         if pa["legend_body_fontsize_value"]!="":
             legend_body_fontsize=float(pa["legend_body_fontsize_value"])
         else:
-            legend_body_fontsize=pa["legend_body_fontsize"]
+            legend_body_fontsize=float(pa["legend_body_fontsize"])
 
         
         fig.update_layout(showlegend=True,legend_title_text=legend_title)
@@ -249,47 +251,49 @@ def make_figure(df,pa):
             ),
             )
         )
+    else:
+        fig.update_layout(showlegend=False)
+    
 
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'square', 'square-open', 
-'square-dot', 'square-open-dot', 'diamond', 'diamond-open', 'diamond-dot', 'diamond-open-dot', 
-'cross', 'cross-open', 'cross-dot', 'cross-open-dot', 'x', 'x-open', 'x-dot', 'x-open-dot', 
-'triangle-up', 'triangle-up-open', 'triangle-up-dot', 'triangle-up-open-dot', 'triangle-down', 
-'triangle-down-open', 'triangle-down-dot', 'triangle-down-open-dot', 'triangle-left', 'triangle-left-open', 
-'triangle-left-dot', 'triangle-left-open-dot', 'triangle-right', 'triangle-right-open', 'triangle-right-dot', 
-'triangle-right-open-dot', 'triangle-ne', 'triangle-ne-open', 'triangle-ne-dot', 'triangle-ne-open-dot', 
-'triangle-se', 'triangle-se-open', 'triangle-se-dot', 'triangle-se-open-dot', 'triangle-sw', 
-'triangle-sw-open', 'triangle-sw-dot', 'triangle-sw-open-dot', 'triangle-nw', 'triangle-nw-open',
- 'triangle-nw-dot', 'triangle-nw-open-dot', 'pentagon', 'pentagon-open', 'pentagon-dot', 'pentagon-open-dot', 
- 'hexagon', 'hexagon-open', 'hexagon-dot', 'hexagon-open-dot', 'hexagon2', 'hexagon2-open', 'hexagon2-dot',
-  'hexagon2-open-dot', 'octagon', 'octagon-open', 'octagon-dot', 'octagon-open-dot', 'star', 'star-open', 
-  'star-dot', 'star-open-dot', 'hexagram', 'hexagram-open', 'hexagram-dot', 'hexagram-open-dot', 
-  'star-triangle-up', 'star-triangle-up-open', 'star-triangle-up-dot', 'star-triangle-up-open-dot', 
-  'star-triangle-down', 'star-triangle-down-open', 'star-triangle-down-dot', 'star-triangle-down-open-dot', 
-  'star-square', 'star-square-open', 'star-square-dot', 'star-square-open-dot', 'star-diamond', 
-  'star-diamond-open', 'star-diamond-dot', 'star-diamond-open-dot', 'diamond-tall', 'diamond-tall-open', 
-  'diamond-tall-dot', 'diamond-tall-open-dot', 'diamond-wide', 'diamond-wide-open', 'diamond-wide-dot', 
-  'diamond-wide-open-dot', 'hourglass', 'hourglass-open', 'bowtie', 'bowtie-open', 'circle-cross', 
-  'circle-cross-open', 'circle-x', 'circle-x-open', 'square-cross', 'square-cross-open', 'square-x', 
-  'square-x-open', 'diamond-cross', 'diamond-cross-open', 'diamond-x', 'diamond-x-open', 'cross-thin', 
-  'cross-thin-open', 'x-thin', 'x-thin-open', 'asterisk', 'asterisk-open', 'hash', 'hash-open', 
-  'hash-dot', 'hash-open-dot', 'y-up', 'y-up-open', 'y-down', 'y-down-open', 'y-left', 'y-left-open', 
-  'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
-  'line-ne-open', 'line-nw', 'line-nw-open']
-STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
+STANDARD_COLORS=["aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
+    "bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood",\
+    "cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk",\
+    "crimson","cyan","darkblue","darkcyan","darkgoldenrod","darkgray","darkgrey",\
+    "darkgreen","darkkhaki","darkmagenta","darkolivegreen","darkorange","darkorchid",\
+    "darkred","darksalmon","darkseagreen","darkslateblue","darkslategray","darkslategrey",\
+    "darkturquoise","darkviolet","deeppink","deepskyblue","dimgray","dimgrey","dodgerblue",\
+    "firebrick","floralwhite","forestgreen","fuchsia","gainsboro","ghostwhite","gold",\
+    "goldenrod","gray","grey","green","greenyellow","honeydew","hotpink","indianred","indigo",\
+    "ivory","khaki","lavender","lavenderblush","lawngreen","lemonchiffon","lightblue","lightcoral",\
+    "lightcyan","lightgoldenrodyellow","lightgray","lightgrey","lightgreen","lightpink","lightsalmon",\
+    "lightseagreen","lightskyblue","lightslategray","lightslategrey","lightsteelblue","lightyellow",\
+    "lime","limegreen","linen","magenta","maroon","mediumaquamarine","mediumblue","mediumorchid",\
+    "mediumpurple","mediumseagreen","mediumslateblue","mediumspringgreen","mediumturquoise",\
+    "mediumvioletred","midnightblue","mintcream","mistyrose","moccasin","navajowhite","navy",\
+    "oldlace","olive","olivedrab","orange","orangered","orchid","palegoldenrod","palegreen",\
+    "paleturquoise","palevioletred","papayawhip","peachpuff","peru","pink","plum","powderblue",\
+    "purple","red","rosybrown","royalblue","rebeccapurple","saddlebrown","salmon","sandybrown",\
+    "seagreen","seashell","sienna","silver","skyblue","slateblue","slategray","slategrey","snow",\
+    "springgreen","steelblue","tan","teal","thistle","tomato","turquoise","violet","wheat","white",\
+    "whitesmoke","yellow","yellowgreen"]
 STANDARD_HISTNORMS=['None', 'percent', 'probability', 'density', 'probability density']
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
-STANDARD_ORIENTATIONS=['vertical','horizontal']
+STANDARD_ORIENTATIONS=['v','h']
 STANDARD_ALIGNMENTS=['left','right','mid']
+STANDARD_FONTS=["Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono",\
+                "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"]
 TICKS_DIRECTIONS=["inside","outside",'']
 LEGEND_LOCATIONS=['best','upper right','upper left','lower left','lower right','right','center left','center right','lower center','upper center','center']
-LEGEND_FONTSIZES=['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large']
 MODES=["expand",None]
+STANDARD_HOVERINFO=["x", "y", "z", "text", "name","all","none","skip","x+y","x+text","x+name",\
+                    "y+text","y+name","text+name","x+y+name","x+y+text","x+text+name","y+text+name"]
+STANDARD_HISTFUNC=["count","sum","avg","min","max"]
 
 def figure_defaults():
     """Generates default figure arguments.
@@ -317,7 +321,9 @@ def figure_defaults():
         "title_size":STANDARD_SIZES,\
         "title_size_value":"20",\
         "titles":"20",\
-        "fill_alpha":0.8,\
+        "opacity":0.8,\
+        "hoverinfos":STANDARD_HOVERINFO,\
+        "histfuncs":STANDARD_HISTFUNC,\
         "linewidth":1.0,\
         "show_legend":"on",\
         "axis_line_width":1.0,\
@@ -369,15 +375,13 @@ def figure_defaults():
         "grid_color_text":"",\
         "grid_colors":STANDARD_COLORS,\
         "grid_color_value":"black",\
-        "grid_linestyle":['-', '--', '-.', ':'],\
-        "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
         "legend_loc":"best",\
         "legend_locations":LEGEND_LOCATIONS,\
         "legend_ncol": "1",\
-        "legend_fontsizes":LEGEND_FONTSIZES,\
-        "legend_body_fontsize":"small",\
+        "legend_fontsizes":STANDARD_SIZES,\
+        "legend_body_fontsize":"14",\
         "legend_title_fontsize":"14",\
         "legend_body_fontsize_value":"",
         "legend_title_fontsize_value":"",

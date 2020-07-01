@@ -89,11 +89,6 @@ def ihistogram(download=None):
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
                     return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps, **plot_arguments)
-
-            if "df" not in list(session.keys()):
-                error_msg="No data to plot, please upload a data or session  file."
-                flash(error_msg,'error')
-                return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
             
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
 
@@ -101,9 +96,9 @@ def ihistogram(download=None):
                 cols=df.columns.tolist()
                 filename=session["filename"]
 
+
                 #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE HISTOGRAMS
                 if request.form.getlist("vals") == []:
-                    filename=session["filename"]
                     session["plot_arguments"]=figure_defaults()
                     session["plot_arguments"]["cols"]=cols
                     sometext="Please select the columns from which we will plot your iHistograms"
@@ -132,7 +127,10 @@ def ihistogram(download=None):
                             "linestyle_value":"solid",\
                             "line_color":None,\
                             "line_rgb":"",\
-                            "fill_alpha":0.8,\
+                            "opacity":0.8,\
+                            "text":"",\
+                            "hoverinfo":"all",\
+                            "histfunc":"count",\
                             "density":".off",\
                             "cumulative":".off"}
                             
@@ -165,7 +163,10 @@ def ihistogram(download=None):
                                     "linestyle_value":"solid",\
                                     "line_color":None,\
                                     "line_rgb":"",\
-                                    "fill_alpha":0.8,
+                                    "opacity":0.8,\
+                                    "text":"",\
+                                    "hoverinfo":"all",\
+                                    "histfunc":"count",\
                                     "density":".off",\
                                     "cumulative":".off"}
                         
@@ -181,7 +182,11 @@ def ihistogram(download=None):
                             "linestyle_value":request.form["%s.linestyle_value" %group],\
                             "line_color":request.form["%s.line_color" %group],\
                             "line_rgb":request.form["%s.line_rgb" %group],\
-                            "fill_alpha":request.form["%s.fill_alpha" %group]}
+                            "opacity":request.form["%s.opacity" %group],\
+                            "text":request.form["%s.text" %group],\
+                            "hoverinfo":request.form["%s.hoverinfo" %group],\
+                            "histfunc":request.form["%s.histfunc" %group]
+                            }
                             
                             #If the user does not tick the options the arguments do not appear as keys in request.form
                             if "%s.density"%group in request.form.keys():
@@ -197,6 +202,12 @@ def ihistogram(download=None):
                     plot_arguments["groups_settings"]=groups_settings
 
                 session["plot_arguments"]=plot_arguments           
+                plot_arguments=read_request(request)
+
+            if "df" not in list(session.keys()):
+                error_msg="No data to plot, please upload a data or session  file."
+                flash(error_msg,'error')
+                return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
           
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
