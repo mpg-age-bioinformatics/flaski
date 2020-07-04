@@ -95,6 +95,8 @@ def ihistogram(download=None):
                 df=pd.read_json(session["df"])
                 cols=df.columns.tolist()
                 filename=session["filename"]
+                plot_arguments=session["plot_arguments"]
+
 
 
                 #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE HISTOGRAMS
@@ -108,7 +110,6 @@ def ihistogram(download=None):
                     
                 #IF THE USER SELECTED THE COLUMNS TO BE PLOTTED FOR THE FIRST TIME,
                 #WE INITIALIZE THE DICTIONARY GROUPS SETTINGS
-                plot_arguments=session["plot_arguments"]
                 if plot_arguments["groups_settings"] == dict():
                     plot_arguments["vals"]=request.form.getlist("vals")
                     groups=plot_arguments["vals"]
@@ -118,20 +119,27 @@ def ihistogram(download=None):
                         groups_settings[group]={"name":group,\
                             "values":df[group],\
                             "label":group,\
-                            "color_value":None,\
+                            "color_value":"None",\
                             "color_rgb":"",\
                             "histnorm":"",\
-                            "bins_number":"",\
-                            "orientation_value":"vertical",\
+                            "orientation_value":"v",\
                             "linewidth":0.5,\
                             "linestyle_value":"solid",\
-                            "line_color":None,\
+                            "line_color":"None",\
                             "line_rgb":"",\
                             "opacity":0.8,\
                             "text":"",\
+                            "bins_number":"",\
                             "hoverinfo":"all",\
+                            "hover_bgcolor":"None",\
+                            "hover_bordercolor":"None",\
+                            "hover_align":"auto",\
+                            "hover_fontfamily":"Default",\
+                            "hover_fontsize":"12",\
+                            "hover_fontcolor":"None",\
                             "histfunc":"count",\
                             "density":".off",\
+                            "cumulative_direction":"increasing",\
                             "cumulative":".off"}
                             
                     plot_arguments["groups_settings"]=groups_settings
@@ -154,20 +162,27 @@ def ihistogram(download=None):
                         if group not in plot_arguments["groups_settings"].keys():
                             groups_settings[group]={"name":group,\
                                     "label":group,\
-                                    "color_value":None,\
+                                    "color_value":"None",\
                                     "color_rgb":"",\
                                     "histnorm":"",\
-                                    "bins_number":"",\
-                                    "orientation_value":"vertical",\
+                                    "orientation_value":"v",\
                                     "linewidth":0.5,\
                                     "linestyle_value":"solid",\
-                                    "line_color":None,\
+                                    "line_color":"None",\
                                     "line_rgb":"",\
                                     "opacity":0.8,\
                                     "text":"",\
+                                    "bins_number":"",\
                                     "hoverinfo":"all",\
+                                    "hover_bgcolor":"None",\
+                                    "hover_bordercolor":"None",\
+                                    "hover_align":"auto",\
+                                    "hover_fontfamily":"Default",\
+                                    "hover_fontsize":"12",\
+                                    "hover_fontcolor":"None",\
                                     "histfunc":"count",\
                                     "density":".off",\
+                                    "cumulative_direction":"increasing",\
                                     "cumulative":".off"}
                         
                         else:
@@ -176,7 +191,6 @@ def ihistogram(download=None):
                             "color_value":request.form["%s.color_value" %group],\
                             "color_rgb":request.form["%s.color_rgb" %group],\
                             "histnorm":request.form["%s.histnorm" %group],\
-                            "bins_number":request.form["%s.bins_number" %group],\
                             "orientation_value":request.form["%s.orientation_value" %group],\
                             "linewidth":request.form["%s.linewidth" %group],\
                             "linestyle_value":request.form["%s.linestyle_value" %group],\
@@ -184,7 +198,15 @@ def ihistogram(download=None):
                             "line_rgb":request.form["%s.line_rgb" %group],\
                             "opacity":request.form["%s.opacity" %group],\
                             "text":request.form["%s.text" %group],\
+                            "bins_number":request.form["%s.bins_number" %group],\
                             "hoverinfo":request.form["%s.hoverinfo" %group],\
+                            "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
+                            "hover_bodercolor":request.form["%s.hover_bordercolor" %group],\
+                            "hover_align":request.form["%s.hover_align" %group],\
+                            "hover_fontsize":request.form["%s.hover_fontsize" %group],\
+                            "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
+                            "hover_fontfamily":request.form["%s.hover_fontfamily" %group],\
+                            "cumulative_direction":request.form["%s.cumulative_direction" %group],\
                             "histfunc":request.form["%s.histfunc" %group]
                             }
                             
@@ -200,9 +222,7 @@ def ihistogram(download=None):
                                 groups_settings[group]["cumulative"]="off"
 
                     plot_arguments["groups_settings"]=groups_settings
-
-                session["plot_arguments"]=plot_arguments           
-                plot_arguments=read_request(request)
+                
 
             if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
@@ -211,6 +231,51 @@ def ihistogram(download=None):
 
           
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
+            plot_arguments=read_request(request)
+
+            # UPDATE VALUES FROM GROUPS_SETTINGS WHICH DO NOT GET UPDATED WITH THE READ_REQUEST FUNCTION
+            groups=plot_arguments["vals"]
+            groups_settings=dict()
+            groups.sort()                                        
+            for group in groups:
+                groups_settings[group]={"name":group,\
+                    "label":request.form["%s.label" %group],\
+                    "color_value":request.form["%s.color_value" %group],\
+                    "color_rgb":request.form["%s.color_rgb" %group],\
+                    "histnorm":request.form["%s.histnorm" %group],\
+                    "orientation_value":request.form["%s.orientation_value" %group],\
+                    "linewidth":request.form["%s.linewidth" %group],\
+                    "linestyle_value":request.form["%s.linestyle_value" %group],\
+                    "line_color":request.form["%s.line_color" %group],\
+                    "line_rgb":request.form["%s.line_rgb" %group],\
+                    "opacity":request.form["%s.opacity" %group],\
+                    "text":request.form["%s.text" %group],\
+                    "bins_number":request.form["%s.bins_number" %group],\
+                    "hoverinfo":request.form["%s.hoverinfo" %group],\
+                    "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
+                    "hover_bordercolor":request.form["%s.hover_bordercolor" %group],\
+                    "hover_align":request.form["%s.hover_align" %group],\
+                    "hover_fontsize":request.form["%s.hover_fontsize" %group],\
+                    "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
+                    "hover_fontfamily":request.form["%s.hover_fontfamily" %group],\
+                    "cumulative_direction":request.form["%s.cumulative_direction" %group],\
+                    "histfunc":request.form["%s.histfunc" %group]
+                    }
+                            
+                    #If the user does not tick the options the arguments do not appear as keys in request.form
+                if "%s.density"%group in request.form.keys():
+                    groups_settings[group]["density"]=request.form["%s.density" %group]
+                else:
+                    groups_settings[group]["density"]="off"
+                            
+                if "%s.cumulative"%group in request.form.keys():
+                    groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                else:
+                    groups_settings[group]["cumulative"]="off"
+
+            plot_arguments["groups_settings"]=groups_settings
+
+            session["plot_arguments"]=plot_arguments
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
          

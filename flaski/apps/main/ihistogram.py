@@ -31,8 +31,9 @@ def make_figure(df,pa):
     fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
 
     # MAIN FIGURE
+    # PLOT ONE HISTOGRAM PER COLUMN SELECTED BY USER
     pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis"]:
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar","errorbar_symmetric"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -41,7 +42,10 @@ def make_figure(df,pa):
     for h in pa["groups_settings"].values():
 
         hoverinfo=h["hoverinfo"]
+        hover_align=h["hover_align"]
+        hover_fontsize=int(h["hover_fontsize"])
         histfunc=h["histfunc"]
+        cumulative_direction=h["cumulative_direction"]
 
         if h["label"]!="":
             name=h["label"]
@@ -53,7 +57,7 @@ def make_figure(df,pa):
         else:
             text=""
 
-        if h["color_rgb"] == "" or h["color_rgb"]=="None":
+        if h["color_rgb"] == "":
             if h["color_value"]=="None":
                 marker_color=None
             else:
@@ -61,20 +65,38 @@ def make_figure(df,pa):
         else:
             marker_color = GET_COLOR( h["color_rgb"] )
                 
-        if h[ "line_rgb"] == "" or h["line_rgb"]==None:
-            line_color = str(h["line_color"])
+        if h["line_rgb"] == "":
+            if h["line_color"]=="None":
+                line_color=None
+            else:
+                line_color = h["line_color"]
         else:
             line_color = GET_COLOR( h["line_rgb"] )
+        
+        if h["hover_bgcolor"]=="None":
+            hover_bgcolor=None
+        else:
+            hover_bgcolor = h["hover_bgcolor"]
+        
+        if h["hover_bordercolor"]=="None":
+            hover_bordercolor=None
+        else:
+            hover_bordercolor = h["hover_bordercolor"]
+        
+        if h["hover_fontfamily"] == "Default":
+            hover_fontfamily= None
+        else:
+            hover_fontfamily=h["hover_fontfamily"]
+        
+        if h["hover_fontcolor"]=="None":
+            hover_fontcolor=None
+        else:
+            hover_fontcolor = h["hover_fontcolor"]
 
         if h["histnorm"] == "None":
             histnorm = ""
         else:
             histnorm = h["histnorm"]
-
-        if (h["bins_number"] == ""):
-            nbins = 0
-        else:
-            nbins = int(h["bins_number"])
             
         if h["opacity"]!=pa["opacity"]:
             opacity=float(h["opacity"])
@@ -95,22 +117,79 @@ def make_figure(df,pa):
             cumulative_enabled=True
         else:
             cumulative_enabled=False
-
-        if h["orientation_value"]=="v":
-            fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative_enabled=cumulative_enabled,\
-                opacity=opacity,nbinsx=nbins,marker_color=marker_color,name=name))
-
+    
+        if h["bins_number"]=="":
+            bins_number=None
         else:
-            fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative_enabled=cumulative_enabled,\
-                opacity=opacity,nbinsy=nbins,marker_color=marker_color,name=name))
+            bins_number=int(h["bins_number"])
 
-    #Update layout of histograms
+            
+        
+        marker=dict(color=marker_color,line=dict(width=linewidth,color=line_color))
+        cumulative=dict(enabled=cumulative_enabled,direction=cumulative_direction)
+
+        hoverlabel=dict(bgcolor=hover_bgcolor,bordercolor=hover_bordercolor,align=hover_align,\
+            font=dict(family=hover_fontfamily,size=hover_fontsize,color=hover_fontcolor))
+        
+        if pab["errorbar"]==True:
+                errorbar=True
+                errorbar_value=float(pa["errorbar_value"])
+                errorbar_type=pa["errorbar_type"]
+                errorbar_symmetric=pab["errorbar_symmetric"]
+                errorbar_thickness=float(pa["errorbar_thickness"])
+                errorbar_width=float(pa["errorbar_width"])
+                if pa["errorbar_color"]=="None":
+                    errorbar_color=None
+                else:
+                    errorbar_color = pa["errorbar_color"]
+
+        if h["orientation_value"]=="vertical":
+
+            if pab["errorbar"]==True:
+                error_y=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
+                    thickness=errorbar_thickness,width=errorbar_width)
+            else:
+                error_y=dict(visible=False)
+                
+            trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
+            opacity=opacity,nbinsx=bins_number,name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
+
+
+        elif h["orientation_value"]=="horizontal":
+
+            if pab["errorbar"]==True:
+                error_x=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
+                    thickness=errorbar_thickness,width=errorbar_width)
+            else:
+                error_x=dict(visible=False)
+            
+            fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
+            opacity=opacity,nbinsy=bins_number,name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
+
+
+
+    #UPDATE LAYOUT OF HISTOGRAMS
+    if pa["title_fontfamily"]=="Default":
+        title_fontfamily=None
+    else:
+        title_fontfamily=pa["title_fontfamily"]
+
+    if pa["title_fontcolor"]=="None":
+        title_fontcolor=None
+    else:
+        title_fontcolor=pa["title_fontcolor"]
+
+    title_fontsize=int(pa["title_fontsize"])
+
+    title=dict(text=pa["title"],font=dict(family=title_fontfamily,size=title_fontsize,color=title_fontfamily),\
+        xref=,yref=,x=,y=,xanchor=,yanchor=)
+
+    fig.update_layout(title=title)
+
     fig.update_layout(barmode=pa["barmode"])
     if pa["log_scale"]==True:
-        print("I AM HERE")
         fig.update_yaxes(type="log")
 
-    print("PAB IS",pab)
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
 
@@ -132,13 +211,6 @@ def make_figure(df,pa):
 
     if pa["maxyticks"]!="":
         fig.update_yaxes(nticks=int(pa["maxyticks"]))
-    
-    fig.update_layout(
-        title={
-            'text': pa['title'],
-            'xanchor': 'left',
-            'yanchor': 'top' ,
-            "font": {"size": float(pa["titles"]) } } )
 
     fig.update_layout(
         xaxis = dict(
@@ -258,7 +330,7 @@ def make_figure(df,pa):
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-STANDARD_COLORS=["aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
+STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
     "bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood",\
     "cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk",\
     "crimson","cyan","darkblue","darkcyan","darkgoldenrod","darkgray","darkgrey",\
@@ -281,12 +353,11 @@ STANDARD_COLORS=["aliceblue","antiquewhite","aqua","aquamarine","azure","beige",
     "whitesmoke","yellow","yellowgreen"]
 STANDARD_HISTNORMS=['None', 'percent', 'probability', 'density', 'probability density']
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
-STANDARD_ORIENTATIONS=['v','h']
-STANDARD_ALIGNMENTS=['left','right','mid']
-STANDARD_FONTS=["Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono",\
+STANDARD_ORIENTATIONS=['vertical','horizontal']
+STANDARD_ALIGNMENTS=["left","right","auto"]
+STANDARD_FONTS=["Arial", "Balto", "Courier New", "Default", "Droid Sans", "Droid Serif", "Droid Sans Mono",\
                 "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"]
 TICKS_DIRECTIONS=["inside","outside",'']
 LEGEND_LOCATIONS=['best','upper right','upper left','lower left','lower right','right','center left','center right','lower center','upper center','center']
@@ -294,6 +365,10 @@ MODES=["expand",None]
 STANDARD_HOVERINFO=["x", "y", "z", "text", "name","all","none","skip","x+y","x+text","x+name",\
                     "y+text","y+name","text+name","x+y+name","x+y+text","x+text+name","y+text+name"]
 STANDARD_HISTFUNC=["count","sum","avg","min","max"]
+STANDARD_CUMULATIVE_DIRECTIONS=["increasing","decreasing"]
+STANDARD_ERRORBAR_TYPES=["percent","constant","sqrt"]
+STANDARD_REFERENCES=["container","paper"]
+STANDARD_ANCHORS=["auto","left","center","right"]
 
 def figure_defaults():
     """Generates default figure arguments.
@@ -318,14 +393,24 @@ def figure_defaults():
         "fig_width":"600",\
         "fig_height":"600",\
         "title":'iHistogram',\
-        "title_size":STANDARD_SIZES,\
-        "title_size_value":"20",\
+        "title_fontsize":"20",\
+        "title_fontfamily":"Default",\
+        "title_fontcolor":"None",\
         "titles":"20",\
         "opacity":0.8,\
         "hoverinfos":STANDARD_HOVERINFO,\
+        "hover_alignments":STANDARD_ALIGNMENTS,\
         "histfuncs":STANDARD_HISTFUNC,\
         "linewidth":1.0,\
         "show_legend":"on",\
+        "errorbar":".off",\
+        "errorbar_value":"10",\
+        "errorbar_type":"percent",\
+        "errorbar_types":STANDARD_ERRORBAR_TYPES,\
+        "errorbar_symmetric":".off",\
+        "errorbar_color":"None",\
+        "errorbar_width":"2",\
+        "errorbar_thickness":"2",\
         "axis_line_width":1.0,\
         "cols":[],\
         "groups":[],\
@@ -333,16 +418,17 @@ def figure_defaults():
         "list_of_groups":[],\
         "groups_settings":dict(),\
         "log_scale":".off",\
+        "fonts":STANDARD_FONTS,\
+        "cumulative_directions":STANDARD_CUMULATIVE_DIRECTIONS,\
         "colors":STANDARD_COLORS,\
         "histnorms":STANDARD_HISTNORMS,\
-        "alignment":STANDARD_ALIGNMENTS,\
-        "alignment_value":"mid",\
         "barmode":"overlay",\
         "barmodes":STANDARD_BARMODES,\
         "histtype_value":"bar",\
         "linestyles":LINE_STYLES,\
         "linestyle_value":"",\
         "orientations":STANDARD_ORIENTATIONS, \
+        "fontsizes":STANDARD_SIZES,\
         "xlabel_size":STANDARD_SIZES,\
         "ylabel_size":STANDARD_SIZES,\
         "xlabel":"",\
