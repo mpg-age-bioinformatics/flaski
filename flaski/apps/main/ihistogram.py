@@ -180,9 +180,15 @@ def make_figure(df,pa):
         title_fontcolor=pa["title_fontcolor"]
 
     title_fontsize=int(pa["title_fontsize"])
-
+    xref=pa["xref"]
+    yref=pa["yref"]
+    xanchor=pa["xanchor"]
+    yanchor=pa["yanchor"]
+    x=float(pa["x"])
+    y=float(pa["y"])
+        
     title=dict(text=pa["title"],font=dict(family=title_fontfamily,size=title_fontsize,color=title_fontfamily),\
-        xref=,yref=,x=,y=,xanchor=,yanchor=)
+        xref=xref,yref=yref,x=x,y=y,xanchor=xanchor,yanchor=yanchor)
 
     fig.update_layout(title=title)
 
@@ -247,82 +253,78 @@ def make_figure(df,pa):
     if pab["show_legend"]==True:
 
         labels=[x["label"] for x in pa["groups_settings"].values()]
-        facecolor= pa["facecolor"]
-        edgecolor=pa["edgecolor"]
-        loc=pa["legend_loc"]
-        ncol=int(pa["legend_ncol"])
-        mode=pa["mode"]
+
+        if pa["legend_bgcolor"]=="None":
+            legend_bgcolor=None
+        else:
+            legend_bgcolor=pa["legend_bgcolor"]
+        
+        if pa["legend_bordercolor"]=="None":
+            legend_bordercolor=None
+        else:
+            legend_bordercolor=pa["legend_bordercolor"]
+        
+        if pa["legend_borderwidth"]=="":
+            legend_borderwidth=0
+        else:
+            legend_borderwidth=float(pa["legend_borderwidth"])
+        
+        if pa["legend_fontfamily"]=="Default":
+            legend_fontfamily=None
+        else:
+            legend_fontfamily=pa["legend_fontfamily"]
+
+        if pa["legend_fontcolor"]=="None":
+            legend_fontcolor=None
+        else:
+            legend_fontcolor=pa["legend_fontcolor"]
+
+        legend_fontsize=int(pa["legend_fontsize"])
+
         legend_title=pa["legend_title"]
 
-        if pa["markerfirst"]=="on":
-            markerfirst=True
+        if pa["legend_title_fontfamily"]=="Default":
+            legend_title_fontfamily=None
         else:
-            markerfirst=False
+            legend_title_fontfamily=pa["legend_title_fontfamily"]
+
+        if pa["legend_title_fontcolor"]=="None":
+            legend_title_fontcolor=None
+        else:
+            legend_title_fontcolor=pa["legend_title_fontcolor"]
+
+        legend_title_fontsize=int(pa["legend_title_fontsize"])
+
+        if pa["legend_orientation"]=="vertical":
+            legend_orientation="v"
+        elif pa["legend_orientation"]=="horizontal":
+            legend_orientation="h"
+
+        legend_traceorder=pa["legend_traceorder"]
+
+        if pa["legend_tracegroupgap"]=="":
+            legend_tracegroupgap=10
+        else:
+            legend_tracegroupgap=float(pa["legend_tracegroupgap"])
+
+        if pa["legend_x"]=="":
+            legend_x=1.02
+        else:
+            legend_x=float(pa["legend_x"])
         
-        if pa["fancybox"]== "on":
-            fancybox=True
+        if pa["legend_y"]=="":
+            legend_y=1
         else:
-            fancybox=False
-
-        if pa["shadow"]=="on":
-            shadow=True
-        else:
-            shadow=False
-
-        if pa["framealpha"]=="":
-            framealpha=None
-        else:
-            framealpha=float(pa["framealpha"])
+            legend_y=float(pa["legend_y"])
         
-        if pa["labelspacing"]=="":
-            labelspacing=None
-        else:
-            labelspacing=float(pa["labelspacing"])
-        
-        if pa["columnspacing"]=="":
-            columnspacing=None
-        else:
-            columnspacing=float(pa["columnspacing"])
-
-        if pa["handletextpad"]=="":
-            handletextpad=None
-        else:
-            handletextpad=float(pa["handletextpad"])
-
-        if pa["handlelength"]=="":
-            handlelength=None
-        else:
-            handlelength=float(pa["handlelength"])
-
-        if pa["borderaxespad"]=="":
-            borderaxespad=None
-        else:
-            borderaxespad=float(pa["borderaxespad"])
-
-        if pa["borderpad"]=="":
-            borderpad=None
-        else:
-            borderpad=float(pa["borderpad"])
-
-        if pa["legend_title_fontsize_value"]!="":
-            legend_title_fontsize=float(pa["legend_title_fontsize_value"])
-        else:
-            legend_title_fontsize=float(pa["legend_title_fontsize"])
-
-        if pa["legend_body_fontsize_value"]!="":
-            legend_body_fontsize=float(pa["legend_body_fontsize_value"])
-        else:
-            legend_body_fontsize=float(pa["legend_body_fontsize"])
+        legend_valign=pa["legend_valign"]
+        legend_title_side=pa["legend_side"]
 
         
-        fig.update_layout(showlegend=True,legend_title_text=legend_title)
-        fig.update_layout(
-        legend=dict(
-            font=dict(
-            size=legend_body_fontsize,
-            ),
-            )
-        )
+        fig.update_layout(showlegend=True,legend=dict(bgcolor=legend_bgcolor,bordercolor=legend_bordercolor,borderwidth=legend_borderwidth,valign=legend_valign,\
+            font=dict(family=legend_fontfamily,size=legend_fontsize,color=legend_fontcolor),orientation=legend_orientation,traceorder=legend_traceorder,tracegroupgap=legend_tracegroupgap,\
+            title=dict(text=legend_title,side=legend_title_side,font=dict(family=legend_title_fontfamily,size=legend_title_fontsize,color=legend_title_fontcolor))))
+    
     else:
         fig.update_layout(showlegend=False)
     
@@ -357,6 +359,7 @@ LINE_STYLES=["solid","dashed","dashdot","dotted"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
 STANDARD_ORIENTATIONS=['vertical','horizontal']
 STANDARD_ALIGNMENTS=["left","right","auto"]
+STANDARD_VERTICAL_ALIGNMENTS=["top", "middle","bottom"]
 STANDARD_FONTS=["Arial", "Balto", "Courier New", "Default", "Droid Sans", "Droid Serif", "Droid Sans Mono",\
                 "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"]
 TICKS_DIRECTIONS=["inside","outside",'']
@@ -369,6 +372,8 @@ STANDARD_CUMULATIVE_DIRECTIONS=["increasing","decreasing"]
 STANDARD_ERRORBAR_TYPES=["percent","constant","sqrt"]
 STANDARD_REFERENCES=["container","paper"]
 STANDARD_ANCHORS=["auto","left","center","right"]
+STANDARD_TRACEORDERS=["reversed", "grouped", "reversed+grouped", "normal"]
+STANDARD_SIDES=["top","left","top left"]
 
 def figure_defaults():
     """Generates default figure arguments.
@@ -401,6 +406,14 @@ def figure_defaults():
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "histfuncs":STANDARD_HISTFUNC,\
+        "references":STANDARD_REFERENCES,\
+        "xref":"container",\
+        "yref":"container",\
+        "x":"0.5",\
+        "y":"0.9",\
+        "anchors":STANDARD_ANCHORS,\
+        "xanchor":"auto",\
+        "yanchor":"auto",\
         "linewidth":1.0,\
         "show_legend":"on",\
         "errorbar":".off",\
@@ -463,29 +476,29 @@ def figure_defaults():
         "grid_color_value":"black",\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
-        "legend_loc":"best",\
-        "legend_locations":LEGEND_LOCATIONS,\
-        "legend_ncol": "1",\
-        "legend_fontsizes":STANDARD_SIZES,\
-        "legend_body_fontsize":"14",\
-        "legend_title_fontsize":"14",\
-        "legend_body_fontsize_value":"",
-        "legend_title_fontsize_value":"",
-        "markerfirst":"on",\
-        "fancybox":"on",\
-        "shadow":".off",\
-        "framealpha":"",\
-        "facecolor":None,\
-        "edgecolor":None,\
-        "mode":None,\
-        "modes":MODES,\
         "legend_title":"",\
-        "borderpad":"",\
-        "handlelength":"",\
-        "labelspacing":"",\
-        "handletextpad":"",\
-        "borderaxespad":"",\
-        "columnspacing":"",\
+        "legend_bgcolor":"None",\
+        "legend_borderwidth":"0",\
+        "legend_bordercolor":"None",\
+        "legend_borderwidth":"0",\
+        "legend_fontfamily":"Default",\
+        "legend_fontsize":"12",\
+        "legend_fontcolor":"None",\
+        "legend_title_fontfamily":"Default",\
+        "legend_title_fontsize":"12",\
+        "legend_title_fontcolor":"None",\
+        "legend_orientation":"vertical",\
+        "traceorders":STANDARD_TRACEORDERS,\
+        "legend_traceorder":"normal",\
+        "legend_tracegroupgap":"10",\
+        "legend_y":"1",\
+        "legend_x":"1.02",\
+        "legend_xanchor":"left",\
+        "legend_yanchor":"auto",\
+        "legend_valign":"middle",\
+        "valignments":STANDARD_VERTICAL_ALIGNMENTS,\
+        "sides":STANDARD_SIDES,\
+        "legend_side":"left",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"ihistogram",\
