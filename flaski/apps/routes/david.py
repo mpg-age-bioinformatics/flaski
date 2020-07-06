@@ -119,7 +119,7 @@ def david(download=None):
             david_df=pd.read_json(session["david_df"])
             report_stats=pd.read_json(session["report_stats"])
             # mapped=pd.read_json(session["mapped"])
-            mapped=mapped.replace("nan",np.nan)
+            # mapped=mapped.replace("nan",np.nan)
 
             eventlog = UserLogging(email=current_user.email,action="download david")
             db.session.add(eventlog)
