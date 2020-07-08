@@ -125,7 +125,7 @@ def ihistogram(download=None):
                             "orientation_value":"v",\
                             "linewidth":0.5,\
                             "linestyle_value":"solid",\
-                            "line_color":"None",\
+                            "line_color":"lightgrey",\
                             "line_rgb":"",\
                             "opacity":0.8,\
                             "text":"",\
@@ -168,7 +168,7 @@ def ihistogram(download=None):
                                     "orientation_value":"v",\
                                     "linewidth":0.5,\
                                     "linestyle_value":"solid",\
-                                    "line_color":"None",\
+                                    "line_color":"lightgrey",\
                                     "line_rgb":"",\
                                     "opacity":0.8,\
                                     "text":"",\
