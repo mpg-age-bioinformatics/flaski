@@ -193,8 +193,21 @@ def make_figure(df,pa):
     fig.update_layout(title=title)
 
     fig.update_layout(barmode=pa["barmode"])
-    if pa["log_scale"]==True:
+
+    if pa["log_scale"]==True and pa["orientation"]=="vertical":
         fig.update_yaxes(type="log")
+    elif pa["log_scale"]==True and pa["orientation"]=="horizontal":
+        fig.update_xaxes(type="log")
+    
+    if pa["paper_bgcolor"]=="None":
+        paper_bgcolor=None
+    else:
+        paper_bgcolor=pa["paper_bgcolor"]
+    if pa["plot_bgcolor"]=="None":
+        plot_bgcolor=None
+    else:
+        plot_bgcolor=pa["plot_bgcolor"]
+
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
@@ -403,6 +416,8 @@ def figure_defaults():
         "title_fontcolor":"None",\
         "titles":"20",\
         "opacity":0.8,\
+        "paper_bgcolor":"None",\
+        "plot_bgcolor":"None",\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "histfuncs":STANDARD_HISTFUNC,\
