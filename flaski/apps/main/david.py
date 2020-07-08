@@ -103,6 +103,7 @@ def run_david(pa, path_to_ensembl_maps="/flaski/data"):
     ids=[ s for s in ids if len(s) > 0 ]
     ids=[ s.split("\t") for s in ids ]
     idsdf=pd.DataFrame(ids)
+    idsdf[0]=idsdf[0].apply( lambda x: str(x).split(";")[0] )
 
     names_dbs=["name_hsa_ensembl", "name_mus_ensembl", "name_cel_ensembl","name_dros_ensembl" ]
     if database in names_dbs:
