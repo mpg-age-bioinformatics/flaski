@@ -126,10 +126,22 @@ def david(download=None):
             db.session.commit()
 
             if plot_arguments["download_format_value"] == "xlsx":
+                def getGOID(x):
+                    if "GO:" in x :
+                        r=x.split("~")[0]
+                    else:
+                        r=np.nan
+                    return r
+                
+                revigo=david_df[["Term","PValue"]]
+                revigo["Term"]=revigo["Term"].apply(lambda x: getGOID(x) )
+                revigo=revigo.dropna()
+                
                 outfile = io.BytesIO()
                 EXC=pd.ExcelWriter(outfile)
                 david_df.to_excel(EXC,sheet_name="david",index=None)
                 report_stats.to_excel(EXC,sheet_name="stats",index=None)
+                revigo.to_excel(EXC,sheet_name="revigo",index=None)
                 # mapped.to_excel(EXC,sheet_name="mapped",index=None)
                 EXC.save()
                 outfile.seek(0)
