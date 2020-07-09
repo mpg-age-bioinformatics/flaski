@@ -33,7 +33,7 @@ def make_figure(df,pa):
     # MAIN FIGURE
     # PLOT ONE HISTOGRAM PER COLUMN SELECTED BY USER
     pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar","errorbar_symmetric"]:
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar","errorbar_symmetric","tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -169,6 +169,7 @@ def make_figure(df,pa):
 
 
     #UPDATE LAYOUT OF HISTOGRAMS
+    #Update title
     if pa["title_fontfamily"]=="Default":
         title_fontfamily=None
     else:
@@ -193,14 +194,60 @@ def make_figure(df,pa):
     fig.update_layout(title=title)
 
     fig.update_layout(barmode=pa["barmode"])
-    if pa["log_scale"]==True:
+
+    if pa["log_scale"]==True and pa["orientation"]=="vertical":
         fig.update_yaxes(type="log")
+    elif pa["log_scale"]==True and pa["orientation"]=="horizontal":
+        fig.update_xaxes(type="log")
+    
+    if pa["paper_bgcolor"]=="None":
+        paper_bgcolor=None
+    else:
+        paper_bgcolor=pa["paper_bgcolor"]
+    if pa["plot_bgcolor"]=="None":
+        plot_bgcolor=None
+    else:
+        plot_bgcolor=pa["plot_bgcolor"]
 
-    fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
-    fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
+    #Update axes
+    if pa["axis_line_color"]=="None":
+        linecolor=None
+    else:
+        linecolor=pa["axis_line_color"]
+    fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor=linecolor)
+    fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor=linecolor)
 
-    fig.update_xaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
-    fig.update_yaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    #Update ticks
+    if pa["ticks_color"]=="None":
+        tickcolor=None
+    else:
+        tickcolor=pa["ticks_color"]
+    if pab["tick_lower_axis"]==False and pab["tick_right_axis"]==False and pab["tick_left_axis"]==False and pab["tick_upper_axis"]==False:
+        pa["ticks_direction_value"]=""
+        ticks=""
+    else:
+        ticks=pa["ticks_direction_value"]
+    fig.update_xaxes(ticks=ticks, tickwidth=float(pa["ticks_line_width"]), tickcolor=tickcolor, ticklen=float(pa["ticks_length"]))
+    fig.update_yaxes(ticks=ticks, tickwidth=float(pa["ticks_line_width"]), tickcolor=tickcolor, ticklen=float(pa["ticks_length"]))
+
+    #Update mirror property of axis based on ticks and axis selected by user
+    #Determines if the axis lines or/and ticks are mirrored to the opposite side of the plotting area. 
+    # If "True", the axis lines are mirrored. If "ticks", the axis lines and ticks are mirrored. If "False", mirroring is disable. 
+    # If "all", axis lines are mirrored on all shared-axes subplots. If "allticks", axis lines and ticks are mirrored on all shared-axes subplots.
+    if pab["upper_axis"]==True and pab["tick_upper_axis"]==True:
+        fig.update_xaxes(mirror="ticks")
+    elif pab["upper_axis"]==True and pab["tick_upper_axis"]==False:
+        fig.update_xaxes(mirror=True)
+    else:
+        fig.update_xaxes(mirror=False)
+    
+    
+    if pab["right_axis"]==True and pab["tick_right_axis"]==True:
+        fig.update_yaxes(mirror="ticks")
+    elif pab["right_axis"]==True and pab["tick_right_axis"]==False:
+        fig.update_yaxes(mirror=True)
+    else:
+        fig.update_xaxes(mirror=False)
 
     if (pa["x_lower_limit"]!="") and (pa["x_upper_limit"]!="") :
         xmin=float(pa["x_lower_limit"])
@@ -218,34 +265,84 @@ def make_figure(df,pa):
     if pa["maxyticks"]!="":
         fig.update_yaxes(nticks=int(pa["maxyticks"]))
 
+    #Update spikes
+    if pa["spikes_color"]=="None":
+        spikecolor=None
+    else:
+        spikeccolor=pa["spikes_color"]
+    spikethickness=float(pa["spikes_thickness"])
+    spikedash=pa["spikes_dash"]
+    spikemode=pa["spikes_mode"]
+    
+    if pa["spikes_value"]=="both":
+        fig.update_xaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)
+        fig.update_yaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)
+   
+    elif pa["spikes_value"]=="x":
+        fig.update_xaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)   
+    
+    elif pa["spikes_value"]=="y":
+        fig.update_yaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)   
+
+    elif pa["spikes_value"]=="None":
+        fig.update_xaxes(showspikes=None)
+        fig.update_yaxes(showspikes=None)
+
+
+    #UPDATE X AXIS AND Y AXIS LAYOUT
+    xlabel=pa["xlabel"]
+    ylabel=pa["xlabel"]
+    xlabel_fontsize=int(pa["label_fontsize"])
+    ylabel_fontsize=int(pa["label_fontsize"])
+
+    if pa["label_fontfamily"]=="Default":
+        xlabel_fontfamily=None
+    else:
+        xlabel_fontfamily=pa["label_fontfamily"]
+
+    if pa["label_fontfamily"]=="Default":
+        ylabel_fontfamily=None
+    else:
+        ylabel_fontfamily=pa["label_fontfamily"]
+
+    if pa["label_fontcolor"]=="None":
+        xlabel_fontcolor=None
+    else:
+        xlabel_fontcolor = pa["label_fontcolor"]
+
+    if pa["label_fontcolor"]=="None":
+        ylabel_fontcolor=None
+    else:
+        ylabel_fontcolor = pa["label_fontcolor"]
+    
+    xaxis=dict(visible=True, title=dict(text=xlabel,font=dict(family=xlabel_fontfamily,size=xlabel_fontsize,color=xlabel_fontcolor)))
+    yaxis=dict(visible=True, title=dict(text=ylabel,font=dict(family=ylabel_fontfamily,size=ylabel_fontsize,color=ylabel_fontcolor)))
+
     fig.update_layout(
-        xaxis = dict(
-        title_text = pa["xlabel"],
-        title_font = {"size": int(pa["xlabels"])}),
-        yaxis = dict(
-        title_text = pa["ylabel"],
-        title_font = {"size": int(pa["xlabels"])} ) )
+        xaxis = xaxis,
+        yaxis = yaxis)
 
     fig.update_xaxes(tickangle=float(pa["xticks_rotation"]), tickfont=dict(size=float(pa["xticks_fontsize"])))
     fig.update_yaxes(tickangle=float(pa["yticks_rotation"]), tickfont=dict(size=float(pa["yticks_fontsize"])))
 
     #UPDATE GRID PROPERTIES
-    if pa["grid_value"] != "None":
-        if pa["grid_color_text"]!="":
-            grid_color=pa["grid_color_text"]
-        else:
-            grid_color=pa["grid_color_value"]
-        if pa["grid_value"] in ["both","x"]:
-            fig.update_xaxes(showgrid=True, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color,)
-        else:
-            fig.update_xaxes(showgrid=False, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color)
-        if pa["grid_value"] in ["both","y"]:
-            fig.update_yaxes(showgrid=True, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color)
-        else:
-            fig.update_yaxes(showgrid=False, gridwidth=float(pa["grid_linewidth"]), gridcolor=grid_color)
+    gridwidth=pa["grid_width"]
+    if pa["grid_color"]=="None":
+        gridcolor=None
     else:
+        gridcolor=pa["grid_color"]
+
+    if pa["grid_value"] == "None":
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=False)
+
+    elif pa["grid_value"]=="x":
+        fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+    elif pa["grid_value"]=="y":
+        fig.update_yaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+    elif pa["grid_value"]=="both":
+        fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+        fig.update_yaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
 
     fig.update_layout(template='plotly_white')
 
@@ -355,7 +452,7 @@ STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","
     "whitesmoke","yellow","yellowgreen"]
 STANDARD_HISTNORMS=['None', 'percent', 'probability', 'density', 'probability density']
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-LINE_STYLES=["solid","dashed","dashdot","dotted"]
+LINE_STYLES=["solid", "dot", "dash", "longdash", "dashdot","longdashdot"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
 STANDARD_ORIENTATIONS=['vertical','horizontal']
 STANDARD_ALIGNMENTS=["left","right","auto"]
@@ -374,6 +471,8 @@ STANDARD_REFERENCES=["container","paper"]
 STANDARD_ANCHORS=["auto","left","center","right"]
 STANDARD_TRACEORDERS=["reversed", "grouped", "reversed+grouped", "normal"]
 STANDARD_SIDES=["top","left","top left"]
+STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker","across+marker","toaxis+across+marker"]
+
 
 def figure_defaults():
     """Generates default figure arguments.
@@ -403,6 +502,8 @@ def figure_defaults():
         "title_fontcolor":"None",\
         "titles":"20",\
         "opacity":0.8,\
+        "paper_bgcolor":"None",\
+        "plot_bgcolor":"None",\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "histfuncs":STANDARD_HISTFUNC,\
@@ -425,6 +526,9 @@ def figure_defaults():
         "errorbar_width":"2",\
         "errorbar_thickness":"2",\
         "axis_line_width":1.0,\
+        "axis_line_color":"lightgrey",\
+        "ticks_line_width":1.0,\
+        "ticks_color":"lightgrey",\
         "cols":[],\
         "groups":[],\
         "vals":[],\
@@ -446,6 +550,9 @@ def figure_defaults():
         "ylabel_size":STANDARD_SIZES,\
         "xlabel":"",\
         "ylabel":"",\
+        "label_fontfamily":"Default",\
+        "label_fontsize":"15",\
+        "label_fontcolor":"None",\
         "xlabels":"14",\
         "ylabels":"14",\
         "left_axis":".on" ,\
@@ -469,13 +576,18 @@ def figure_defaults():
         "y_upper_limit":"",\
         "maxxticks":"",\
         "maxyticks":"",\
+        "spikes":["None","both","x","y"],\
+        "spikes_value":"None",\
+        "spikes_color":"None",\
+        "spikes_thickness":"3",\
+        "dashes":LINE_STYLES,\
+        "spikes_dash":"dash",\
+        "spikes_mode":"toaxis",\
+        "spikes_modes":STANDARD_SPIKEMODES,\
         "grid":["None","both","x","y"],\
         "grid_value":"None",\
-        "grid_color_text":"",\
-        "grid_colors":STANDARD_COLORS,\
-        "grid_color_value":"black",\
-        "grid_linewidth":"1",\
-        "grid_alpha":"0.1",\
+        "grid_width":"1",\
+        "grid_color":"lightgrey",\
         "legend_title":"",\
         "legend_bgcolor":"None",\
         "legend_borderwidth":"0",\
