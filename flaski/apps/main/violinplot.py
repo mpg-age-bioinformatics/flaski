@@ -355,7 +355,7 @@ def figure_defaults():
         "bw_float":"",\
         "cut":"2",\
         "colors":STANDARD_COLORS,\
-        "color_value":"default",\
+        "color_value":"None",\
         "color_rgb":"",\
         "gridsize":"100",\
         "scale":"area",\
