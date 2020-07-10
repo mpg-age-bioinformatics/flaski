@@ -40,7 +40,6 @@ def make_figure(df,pa):
             pab[arg]=True
 
     for h in pa["groups_settings"].values():
-
         hoverinfo=h["hoverinfo"]
         hover_align=h["hover_align"]
         hover_fontsize=int(h["hover_fontsize"])
@@ -183,13 +182,14 @@ def make_figure(df,pa):
     title_fontsize=int(pa["title_fontsize"])
     xref=pa["xref"]
     yref=pa["yref"]
-    xanchor=pa["xanchor"]
-    yanchor=pa["yanchor"]
+
+    title_xanchor=pa["title_xanchor"]
+    title_yanchor=pa["title_yanchor"]
     x=float(pa["x"])
     y=float(pa["y"])
         
-    title=dict(text=pa["title"],font=dict(family=title_fontfamily,size=title_fontsize,color=title_fontfamily),\
-        xref=xref,yref=yref,x=x,y=y,xanchor=xanchor,yanchor=yanchor)
+    title=dict(text=pa["title"],font=dict(family=title_fontfamily,size=title_fontsize,color=title_fontcolor),\
+        xref=xref,yref=yref,x=x,y=y,xanchor=title_xanchor,yanchor=title_yanchor)
 
     fig.update_layout(title=title)
 
@@ -199,15 +199,6 @@ def make_figure(df,pa):
         fig.update_yaxes(type="log")
     elif pa["log_scale"]==True and pa["orientation"]=="horizontal":
         fig.update_xaxes(type="log")
-    
-    if pa["paper_bgcolor"]=="None":
-        paper_bgcolor=None
-    else:
-        paper_bgcolor=pa["paper_bgcolor"]
-    if pa["plot_bgcolor"]=="None":
-        plot_bgcolor=None
-    else:
-        plot_bgcolor=pa["plot_bgcolor"]
 
     #Update axes
     if pa["axis_line_color"]=="None":
@@ -269,7 +260,8 @@ def make_figure(df,pa):
     if pa["spikes_color"]=="None":
         spikecolor=None
     else:
-        spikeccolor=pa["spikes_color"]
+        spikecolor=pa["spikes_color"]
+
     spikethickness=float(pa["spikes_thickness"])
     spikedash=pa["spikes_dash"]
     spikemode=pa["spikes_mode"]
@@ -291,7 +283,7 @@ def make_figure(df,pa):
 
     #UPDATE X AXIS AND Y AXIS LAYOUT
     xlabel=pa["xlabel"]
-    ylabel=pa["xlabel"]
+    ylabel=pa["ylabel"]
     xlabel_fontsize=int(pa["label_fontsize"])
     ylabel_fontsize=int(pa["label_fontsize"])
 
@@ -314,19 +306,29 @@ def make_figure(df,pa):
         ylabel_fontcolor=None
     else:
         ylabel_fontcolor = pa["label_fontcolor"]
+
+    if pa["paper_bgcolor"]=="None":
+        paper_bgcolor=None
+    else:
+        paper_bgcolor=pa["paper_bgcolor"]
+    if pa["plot_bgcolor"]=="None":
+        plot_bgcolor=None
+    else:
+        plot_bgcolor=pa["plot_bgcolor"]    
     
     xaxis=dict(visible=True, title=dict(text=xlabel,font=dict(family=xlabel_fontfamily,size=xlabel_fontsize,color=xlabel_fontcolor)))
     yaxis=dict(visible=True, title=dict(text=ylabel,font=dict(family=ylabel_fontfamily,size=ylabel_fontsize,color=ylabel_fontcolor)))
 
-    fig.update_layout(
-        xaxis = xaxis,
-        yaxis = yaxis)
+    fig.update_layout(paper_bgcolor=paper_bgcolor,
+    plot_bgcolor=plot_bgcolor,
+    xaxis = xaxis,
+    yaxis = yaxis)
 
     fig.update_xaxes(tickangle=float(pa["xticks_rotation"]), tickfont=dict(size=float(pa["xticks_fontsize"])))
     fig.update_yaxes(tickangle=float(pa["yticks_rotation"]), tickfont=dict(size=float(pa["yticks_fontsize"])))
 
     #UPDATE GRID PROPERTIES
-    gridwidth=pa["grid_width"]
+    gridwidth=float(pa["grid_width"])
     if pa["grid_color"]=="None":
         gridcolor=None
     else:
@@ -337,9 +339,9 @@ def make_figure(df,pa):
         fig.update_yaxes(showgrid=False)
 
     elif pa["grid_value"]=="x":
-        fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
-    elif pa["grid_value"]=="y":
         fig.update_yaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+    elif pa["grid_value"]=="y":
+        fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
     elif pa["grid_value"]=="both":
         fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
         fig.update_yaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
@@ -468,7 +470,10 @@ STANDARD_HISTFUNC=["count","sum","avg","min","max"]
 STANDARD_CUMULATIVE_DIRECTIONS=["increasing","decreasing"]
 STANDARD_ERRORBAR_TYPES=["percent","constant","sqrt"]
 STANDARD_REFERENCES=["container","paper"]
-STANDARD_ANCHORS=["auto","left","center","right"]
+STANDARD_TITLE_XANCHORS=["auto","left","center","right"]
+STANDARD_TITLE_YANCHORS=["top","middle","bottom"]
+STANDARD_LEGEND_XANCHORS=["auto","left","center","right"]
+STANDARD_LEGEND_YANCHORS=["auto","top","middle","bottom"]
 STANDARD_TRACEORDERS=["reversed", "grouped", "reversed+grouped", "normal"]
 STANDARD_SIDES=["top","left","top left"]
 STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker","across+marker","toaxis+across+marker"]
@@ -512,9 +517,10 @@ def figure_defaults():
         "yref":"container",\
         "x":"0.5",\
         "y":"0.9",\
-        "anchors":STANDARD_ANCHORS,\
-        "xanchor":"auto",\
-        "yanchor":"auto",\
+        "title_xanchors":STANDARD_TITLE_XANCHORS,\
+        "title_yanchors":STANDARD_TITLE_YANCHORS,\
+        "title_xanchor":"auto",\
+        "title_yanchor":"auto",\
         "linewidth":1.0,\
         "show_legend":"on",\
         "errorbar":".off",\
@@ -522,7 +528,7 @@ def figure_defaults():
         "errorbar_type":"percent",\
         "errorbar_types":STANDARD_ERRORBAR_TYPES,\
         "errorbar_symmetric":".off",\
-        "errorbar_color":"None",\
+        "errorbar_color":"darkgrey",\
         "errorbar_width":"2",\
         "errorbar_thickness":"2",\
         "axis_line_width":1.0,\
@@ -579,7 +585,7 @@ def figure_defaults():
         "spikes":["None","both","x","y"],\
         "spikes_value":"None",\
         "spikes_color":"None",\
-        "spikes_thickness":"3",\
+        "spikes_thickness":"3.0",\
         "dashes":LINE_STYLES,\
         "spikes_dash":"dash",\
         "spikes_mode":"toaxis",\
@@ -607,6 +613,8 @@ def figure_defaults():
         "legend_x":"1.02",\
         "legend_xanchor":"left",\
         "legend_yanchor":"auto",\
+        "legend_xanchors":STANDARD_LEGEND_XANCHORS,\
+        "legend_yanchors":STANDARD_LEGEND_YANCHORS,\
         "legend_valign":"middle",\
         "valignments":STANDARD_VERTICAL_ALIGNMENTS,\
         "sides":STANDARD_SIDES,\

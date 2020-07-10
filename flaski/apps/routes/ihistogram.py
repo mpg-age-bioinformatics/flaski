@@ -95,7 +95,6 @@ def ihistogram(download=None):
                 df=pd.read_json(session["df"])
                 cols=df.columns.tolist()
                 filename=session["filename"]
-                plot_arguments=session["plot_arguments"]
 
 
 
@@ -110,7 +109,9 @@ def ihistogram(download=None):
                     
                 #IF THE USER SELECTED THE COLUMNS TO BE PLOTTED FOR THE FIRST TIME,
                 #WE INITIALIZE THE DICTIONARY GROUPS SETTINGS
-                if plot_arguments["groups_settings"] == dict():
+                
+                if session["plot_arguments"]["groups_settings"] == dict():
+                    plot_arguments=session["plot_arguments"]
                     plot_arguments["vals"]=request.form.getlist("vals")
                     groups=plot_arguments["vals"]
                     groups.sort()
@@ -143,17 +144,23 @@ def ihistogram(download=None):
                             "cumulative":".off"}
                             
                     plot_arguments["groups_settings"]=groups_settings
-                    plot_arguments=read_request(request)
-                    
-                    #CALL FIGURE FUNCTION
+                    session["plot_arguments"]=plot_arguments
+                    filename=session["filename"]
+                    #plot_arguments=session["plot_arguments"]
+         
+                    # READ INPUT DATA FROM SESSION JSON
+                    df=pd.read_json(session["df"])
+
+                     #CALL FIGURE FUNCTION
                     fig=make_figure(df,plot_arguments)
                     figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
                     return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
                 
-                
                 #IF THE USER HAS SELECTED NEW COLUMNS TO BE PLOTTED
-                if plot_arguments["vals"]!=request.form.getlist("vals"):
-                    plot_arguments=read_request(request)
+                if session["plot_arguments"]["vals"]!=request.form.getlist("vals"):
+                    plot_arguments=session["plot_arguments"]
+                    plot_arguments["vals"]=request.form.getlist("vals")
                     groups=plot_arguments["vals"]
                     groups.sort()
                     groups_settings=dict()
@@ -201,7 +208,7 @@ def ihistogram(download=None):
                             "bins_number":request.form["%s.bins_number" %group],\
                             "hoverinfo":request.form["%s.hoverinfo" %group],\
                             "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
-                            "hover_bodercolor":request.form["%s.hover_bordercolor" %group],\
+                            "hover_bordercolor":request.form["%s.hover_bordercolor" %group],\
                             "hover_align":request.form["%s.hover_align" %group],\
                             "hover_fontsize":request.form["%s.hover_fontsize" %group],\
                             "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
@@ -222,6 +229,17 @@ def ihistogram(download=None):
                                 groups_settings[group]["cumulative"]="off"
 
                     plot_arguments["groups_settings"]=groups_settings
+                    session["plot_arguments"]=plot_arguments
+                    filename=session["filename"]
+         
+                    # READ INPUT DATA FROM SESSION JSON
+                    df=pd.read_json(session["df"])
+
+                     #CALL FIGURE FUNCTION
+                    fig=make_figure(df,plot_arguments)
+                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                    return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+
                 
 
             if "df" not in list(session.keys()):
@@ -234,7 +252,8 @@ def ihistogram(download=None):
             plot_arguments=read_request(request)
 
             # UPDATE VALUES FROM GROUPS_SETTINGS WHICH DO NOT GET UPDATED WITH THE READ_REQUEST FUNCTION
-            groups=plot_arguments["vals"]
+            #plot_arguments=session["plot_arguments"]
+            groups=request.form.getlist("vals")
             groups_settings=dict()
             groups.sort()                                        
             for group in groups:
@@ -274,7 +293,6 @@ def ihistogram(download=None):
                     groups_settings[group]["cumulative"]="off"
 
             plot_arguments["groups_settings"]=groups_settings
-
             session["plot_arguments"]=plot_arguments
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
@@ -285,6 +303,7 @@ def ihistogram(download=None):
             #CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
             figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
             return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
