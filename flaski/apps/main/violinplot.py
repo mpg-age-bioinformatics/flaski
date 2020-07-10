@@ -131,86 +131,100 @@ def make_figure(df,pa,fig=None,ax=None):
     # else:
     #     orient=pa["orient"]
 
-    # if pa["default"]!="on":
-    #     sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
-    #     scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
-    #     linewidth=linewidth,color=color,saturation=saturation)
+    # scale_hue=pa["scale_hue"]
+    # split=pa["split"]
+    # dodge=pa["dodge"]
+
+    if pa["default"]!="on":
+        sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=int(pa["cut"]),scale=pa["scale"],\
+        scale_hue=pa["scale_hue"],gridsize=int(pa["gridsize"]),width=float(pa["v_width"]),inner=pa["inner"],split=pa["split"],dodge=pa["dodge"],orient=pa["orient"],\
+        linewidth=linewidth,color=color,saturation=float(pa["saturation"]))
         
-    #     # Set legend options
-    #     facecolor= pa["facecolor"]
-    #     edgecolor=pa["edgecolor"]
-    #     loc=pa["legend_loc"]
-    #     ncol=int(pa["legend_ncol"])
-    #     mode=pa["mode"]
-    #     legend_title=pa["legend_title"]
+        # Set legend options
 
-    #     if pa["markerfirst"]=="on":
-    #         markerfirst=True
-    #     else:
-    #         markerfirst=False
+        pa_leg={}
+
+        onoffs=["markerfirst", "fancybox", "shadow"]
+        for a in onoffs:
+            if pa[a] in ["on", ".on"]:
+                pa_leg[a]=True
+            else:
+                pa_leg[a]=False
+
+        # if pa["markerfirst"]=="on":
+        #     markerfirst=True
+        # else:
+        #     markerfirst=False
         
-    #     if pa["fancybox"]== "on":
-    #         fancybox=True
-    #     else:
-    #         fancybox=False
+        # if pa["fancybox"]== "on":
+        #     fancybox=True
+        # else:
+        #     fancybox=False
 
-    #     if pa["shadow"]=="on":
-    #         shadow=True
-    #     else:
-    #         shadow=False
+        # if pa["shadow"]=="on":
+        #     shadow=True
+        # else:
+        #     shadow=False
 
-    #     if pa["framealpha"]=="":
-    #         framealpha=None
-    #     else:
-    #         framealpha=float(pa["framealpha"])
+        floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
+            "handlelength","borderaxespad","borderpad"]
+        for a in floats:
+            if pa[a] == "":
+                pa_leg[a]=None
+            else:
+                pa_leg[a]=float(pa[a])
+
+        # if pa["framealpha"]=="":
+        #     framealpha=None
+        # else:
+        #     framealpha=float(pa["framealpha"])
         
-    #     if pa["labelspacing"]=="":
-    #         labelspacing=None
-    #     else:
-    #         labelspacing=float(pa["labelspacing"])
+        # if pa["labelspacing"]=="":
+        #     labelspacing=None
+        # else:
+        #     labelspacing=float(pa["labelspacing"])
         
-    #     if pa["columnspacing"]=="":
-    #         columnspacing=None
-    #     else:
-    #         columnspacing=float(pa["columnspacing"])
+        # if pa["columnspacing"]=="":
+        #     columnspacing=None
+        # else:
+        #     columnspacing=float(pa["columnspacing"])
 
-    #     if pa["handletextpad"]=="":
-    #         handletextpad=None
-    #     else:
-    #         handletextpad=float(pa["handletextpad"])
+        # if pa["handletextpad"]=="":
+        #     handletextpad=None
+        # else:
+        #     handletextpad=float(pa["handletextpad"])
 
-    #     if pa["handlelength"]=="":
-    #         handlelength=None
-    #     else:
-    #         handlelength=float(pa["handlelength"])
+        # if pa["handlelength"]=="":
+        #     handlelength=None
+        # else:
+        #     handlelength=float(pa["handlelength"])
 
-    #     if pa["borderaxespad"]=="":
-    #         borderaxespad=None
-    #     else:
-    #         borderaxespad=float(pa["borderaxespad"])
+        # if pa["borderaxespad"]=="":
+        #     borderaxespad=None
+        # else:
+        #     borderaxespad=float(pa["borderaxespad"])
 
-    #     if pa["borderpad"]=="":
-    #         borderpad=None
-    #     else:
-    #         borderpad=float(pa["borderpad"])
+        # if pa["borderpad"]=="":
+        #     borderpad=None
+        # else:
+        #     borderpad=float(pa["borderpad"])
 
-    #     if pa["legend_title_fontsize_value"]!="":
-    #         legend_title_fontsize=pa["legend_title_fontsize_value"]
-    #     else:
-    #         legend_title_fontsize=pa["legend_title_fontsize"]
+        if pa["legend_title_fontsize_value"]!="":
+            legend_title_fontsize=pa["legend_title_fontsize_value"]
+        else:
+            legend_title_fontsize=pa["legend_title_fontsize"]
 
-    #     if pa["legend_body_fontsize_value"]!="":
-    #         legend_body_fontsize=float(pa["legend_body_fontsize_value"])
-    #     else:
-    #         legend_body_fontsize=pa["legend_body_fontsize"]
+        if pa["legend_body_fontsize_value"]!="":
+            legend_body_fontsize=float(pa["legend_body_fontsize_value"])
+        else:
+            legend_body_fontsize=pa["legend_body_fontsize"]
 
-        
-    #     plt.legend(loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
-    #         markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
-    #         facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
-    #         title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
-    #         handlelength=handlelength,handletextpad=handletextpad,\
-    #         borderaxespad=borderaxespad,columnspacing=columnspacing)
+        plt.legend(loc=pa["legend_loc"],ncol=int(pa["legend_ncol"]),fontsize=legend_body_fontsize,\
+            markerfirst=pa_leg["markerfirst"],fancybox=pa_leg["fancybox"],shadow=pa_leg["shadow"],framealpha=pa_leg["framealpha"], \
+            facecolor=pa["facecolor"], edgecolor=pa["edgecolor"],mode=pa["mode"],title=pa["legend_title"],\
+            title_fontsize=legend_title_fontsize,borderpad=pa_leg["borderpad"] ,labelspacing=pa_leg["labelspacing"],\
+            handlelength=pa_leg["handlelength"],handletextpad=pa_leg["handletextpad"],\
+            borderaxespad=pa_leg["borderaxespad"],columnspacing=pa_leg["columnspacing"] )
 
     # else:
     # x / x_val, y_val, hue, order, hue_order, inner, linewidth, orient
