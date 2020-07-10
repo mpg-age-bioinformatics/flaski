@@ -42,38 +42,41 @@ def make_figure(df,pa,fig=None,ax=None):
         
     #UPLOAD ARGUMENTS
     vals=pa["vals"].copy()
-    vals.remove("None")
-    tmp=df.copy()
-    tmp=tmp[vals]
-    scale=pa["scale"]
-    scale_hue=pa["scale_hue"]
-    split=pa["split"]
-    dodge=pa["dodge"]
+    # tmp=df.copy()
+    # tmp=tmp[vals]
 
-    if pa["x_val"]=="None":
-        x=None
-    else:
-        x=pa["x_val"]
+    pa_={}
+    possible_nones=[ "x_val" , "y_val" , "hue", "order", "hue_order" , "inner",\
+        "palette","orient"]
+    for p in possible_nones:
+        if pa[p] == "None" :
+            pa[p]=None
 
-    if pa["y_val"]=="None":
-        y=None
-    else:
-        y=pa["y_val"]
 
-    if pa["hue"]=="None":
-        hue=None
-    else:
-        hue=pa["hue"]
+    # if pa["x_val"]=="None":
+    #     x=None
+    # else:
+    #     x=pa["x_val"]
 
-    if pa["order"]=="None":
-        order=None
-    else:
-        order=pa["order"]
+    # if pa["y_val"]=="None":
+    #     y=None
+    # else:
+    #     y=pa["y_val"]
+
+    # if pa["hue"]=="None":
+    #     hue=None
+    # else:
+    #     hue=pa["hue"]
+
+    # if pa["order"]=="None":
+    #     order=None
+    # else:
+    #     order=pa["order"]
     
-    if pa["hue_order"]=="None":
-        hue_order=None
-    else:
-        hue_order=pa["hue_order"]
+    # if pa["hue_order"]=="None":
+    #     hue_order=None
+    # else:
+    #     hue_order=pa["hue_order"]
                 
     if pa["color_rgb"] != "":
         color=GET_COLOR(pa["color_rgb"])
@@ -83,135 +86,149 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             color=pa["color_value"]
     
-    if pa["cut"]!="":
-        cut=float(pa["cut"])
-    else:
-        cut=2
+    # if pa["cut"]!="":
+    #     cut=float(pa["cut"])
+    # else:
+    #     cut=2
 
     if pa["bw_float"]!="":
         bw=float(pa["bw_float"])
     else:
         bw=pa["bw"]
     
-    if pa["gridsize"]!="":
-        gridsize=int(pa["gridsize"])
-    else:
-        gridsize=100
+    # if pa["gridsize"]!="":
+    #     gridsize=int(pa["gridsize"])
+    # else:
+    #     gridsize=100
 
-    if pa["v_width"]!="":
-        v_width=float(pa["v_width"])
-    else:
-        v_width=0.8
+    # if pa["v_width"]!="":
+    #     v_width=float(pa["v_width"])
+    # else:
+    #     v_width=0.8
     
-    if pa["inner"]=="None":
-        inner=None
-    else:
-        inner=pa["inner"]
+    # if pa["inner"]=="None":
+    #     inner=None
+    # else:
+    #     inner=pa["inner"]
 
     if pa["linewidth"]!="":
         linewidth=float(pa["linewidth"])
     else:
         linewidth=None
 
-    if pa["palette"]=="None":
-        palette=None
-    else:
-        palette=pa["palette"]
+    # if pa["palette"]=="None":
+    #     palette=None
+    # else:
+    #     palette=pa["palette"]
 
-    if pa["saturation"]!="":
-        saturation=float(pa["saturation"])
-    else:
-        saturation=0.75
+    # if pa["saturation"]!="":
+    #     saturation=float(pa["saturation"])
+    # else:
+    #     saturation=0.75
     
-    if pa["orient"]=="None":
-        orient=None
-    else:
-        orient=pa["orient"]
+    # if pa["orient"]=="None":
+    #     orient=None
+    # else:
+    #     orient=pa["orient"]
 
-    if pa["default"]!="on":
-        sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
-        scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
-        linewidth=linewidth,color=color,saturation=saturation)
+    # if pa["default"]!="on":
+    #     sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
+    #     scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
+    #     linewidth=linewidth,color=color,saturation=saturation)
         
-        # Set legend options
-        facecolor= pa["facecolor"]
-        edgecolor=pa["edgecolor"]
-        loc=pa["legend_loc"]
-        ncol=int(pa["legend_ncol"])
-        mode=pa["mode"]
-        legend_title=pa["legend_title"]
+    #     # Set legend options
+    #     facecolor= pa["facecolor"]
+    #     edgecolor=pa["edgecolor"]
+    #     loc=pa["legend_loc"]
+    #     ncol=int(pa["legend_ncol"])
+    #     mode=pa["mode"]
+    #     legend_title=pa["legend_title"]
 
-        if pa["markerfirst"]=="on":
-            markerfirst=True
-        else:
-            markerfirst=False
+    #     if pa["markerfirst"]=="on":
+    #         markerfirst=True
+    #     else:
+    #         markerfirst=False
         
-        if pa["fancybox"]== "on":
-            fancybox=True
-        else:
-            fancybox=False
+    #     if pa["fancybox"]== "on":
+    #         fancybox=True
+    #     else:
+    #         fancybox=False
 
-        if pa["shadow"]=="on":
-            shadow=True
-        else:
-            shadow=False
+    #     if pa["shadow"]=="on":
+    #         shadow=True
+    #     else:
+    #         shadow=False
 
-        if pa["framealpha"]=="":
-            framealpha=None
-        else:
-            framealpha=float(pa["framealpha"])
+    #     if pa["framealpha"]=="":
+    #         framealpha=None
+    #     else:
+    #         framealpha=float(pa["framealpha"])
         
-        if pa["labelspacing"]=="":
-            labelspacing=None
-        else:
-            labelspacing=float(pa["labelspacing"])
+    #     if pa["labelspacing"]=="":
+    #         labelspacing=None
+    #     else:
+    #         labelspacing=float(pa["labelspacing"])
         
-        if pa["columnspacing"]=="":
-            columnspacing=None
-        else:
-            columnspacing=float(pa["columnspacing"])
+    #     if pa["columnspacing"]=="":
+    #         columnspacing=None
+    #     else:
+    #         columnspacing=float(pa["columnspacing"])
 
-        if pa["handletextpad"]=="":
-            handletextpad=None
-        else:
-            handletextpad=float(pa["handletextpad"])
+    #     if pa["handletextpad"]=="":
+    #         handletextpad=None
+    #     else:
+    #         handletextpad=float(pa["handletextpad"])
 
-        if pa["handlelength"]=="":
-            handlelength=None
-        else:
-            handlelength=float(pa["handlelength"])
+    #     if pa["handlelength"]=="":
+    #         handlelength=None
+    #     else:
+    #         handlelength=float(pa["handlelength"])
 
-        if pa["borderaxespad"]=="":
-            borderaxespad=None
-        else:
-            borderaxespad=float(pa["borderaxespad"])
+    #     if pa["borderaxespad"]=="":
+    #         borderaxespad=None
+    #     else:
+    #         borderaxespad=float(pa["borderaxespad"])
 
-        if pa["borderpad"]=="":
-            borderpad=None
-        else:
-            borderpad=float(pa["borderpad"])
+    #     if pa["borderpad"]=="":
+    #         borderpad=None
+    #     else:
+    #         borderpad=float(pa["borderpad"])
 
-        if pa["legend_title_fontsize_value"]!="":
-            legend_title_fontsize=pa["legend_title_fontsize_value"]
-        else:
-            legend_title_fontsize=pa["legend_title_fontsize"]
+    #     if pa["legend_title_fontsize_value"]!="":
+    #         legend_title_fontsize=pa["legend_title_fontsize_value"]
+    #     else:
+    #         legend_title_fontsize=pa["legend_title_fontsize"]
 
-        if pa["legend_body_fontsize_value"]!="":
-            legend_body_fontsize=float(pa["legend_body_fontsize_value"])
-        else:
-            legend_body_fontsize=pa["legend_body_fontsize"]
+    #     if pa["legend_body_fontsize_value"]!="":
+    #         legend_body_fontsize=float(pa["legend_body_fontsize_value"])
+    #     else:
+    #         legend_body_fontsize=pa["legend_body_fontsize"]
 
         
-        plt.legend(loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
-            markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
-            facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
-            title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
-            handlelength=handlelength,handletextpad=handletextpad,\
-            borderaxespad=borderaxespad,columnspacing=columnspacing)
+    #     plt.legend(loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
+    #         markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
+    #         facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
+    #         title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
+    #         handlelength=handlelength,handletextpad=handletextpad,\
+    #         borderaxespad=borderaxespad,columnspacing=columnspacing)
 
-    else:
-        sns.violinplot(data=df[vals],bw=bw,cut=cut,scale=scale,gridsize=gridsize,width=v_width,inner=inner,orient=orient,\
-        linewidth=linewidth,color=color,saturation=saturation)
+    # else:
+    # x / x_val, y_val, hue, order, hue_order, inner, linewidth, orient
+    # scale=pa["scale"]
+    # scale_hue=pa["scale_hue"]
+    # split=pa["split"]
+    # dodge=pa["dodge"]
+
+    sns.violinplot(data=df[vals],\
+        saturation=float(pa["saturation"]),\
+        bw=bw,\
+        cut=int(pa["cut"]),\
+        scale=pa["scale"],\
+        gridsize=int(pa["gridsize"]),\
+        width=float(pa["v_width"]),\
+        inner=pa["inner"], \
+        orient=pa["orient"],\
+        linewidth=linewidth, color=color)
 
     #Plot grid, axes and ticks
     for axis in ['top','bottom','left','right']:
@@ -313,6 +330,11 @@ def figure_defaults():
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
+    #     cut=2
+    # gridsize=100
+    # v_width=0.8
+    # saturation=0.75
+
     plot_arguments={
         "fig_width":"6.0",\
         "fig_height":"6.0",\
@@ -413,9 +435,9 @@ def figure_defaults():
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
-        "session_downloadn":"MySession.scatter.plot",\
+        "session_downloadn":"MySession.violin.plot",\
         "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.scatter.plot",\
+        "session_argumentsn":"MyArguments.violin.plot",\
         "inputargumentsfile":"Select file.."
     }
     # grid colors not implemented in UI

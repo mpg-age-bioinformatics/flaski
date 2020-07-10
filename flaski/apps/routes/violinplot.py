@@ -74,12 +74,12 @@ def violinplot(download=None):
                     df=read_tables(inputfile)
                     cols=df.columns.tolist()
                                     
-                    sometext="Please select at least one numeric column to create your violin plot."
-                    
+                    # sometext="Please select at least one numeric column to create your violin plot."
                     session["plot_arguments"]["cols"]=cols
                     plot_arguments=session["plot_arguments"]
+                    # plot_arguments=read_request(request)
 
-                    flash(sometext,'info')
+                    # flash(sometext,'info')
                     return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
                 else:
@@ -89,67 +89,63 @@ def violinplot(download=None):
                     flash(error_msg,'error')
                     return render_template('/apps/violinplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
             
-            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-            
-                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
-                vals=request.form.getlist("vals")
-                df=pd.read_json(session["df"])
-                filename=session["filename"]
-                plot_arguments=session["plot_arguments"]
-
-
-
-                
-                #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE VIOLINPLOT
-                if vals == []:
-                    sometext="Please select at least one numeric column from which we will plot your violinplot"
-                    plot_arguments=session["plot_arguments"]
-                    plot_arguments["vals"]=vals
-                    flash(sometext,'info')
-                    return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
-                    
-                
-                else:
-
-                    #VERIFY THERE IS AT LEAST ONE NUMERIC COLUMN SELECTED BY THE USER
-                    if not any(df[vals].dtypes.apply(is_numeric_dtype)):
-                        sometext="Remember that at least one of the columns you select has to be numeric"
-                        session["plot_arguments"]["vals"]=[]
-                        plot_arguments=session["plot_arguments"]
-                        plot_arguments["vals"]=vals
-                        flash(sometext,'info')
-                        return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
-                    
-                    #IF THE USER HAS CHANGED THE COLUMNS TO PLOT
-                    if vals+["None"] != plot_arguments["vals"]:
-                        plot_arguments=figure_defaults()
-                        cols=df.columns.tolist()                   
-                        plot_arguments["vals"]=vals+["None"]
-                        plot_arguments["cols"]=cols
-                        session["plot_arguments"]=plot_arguments 
-                        sometext="Please tweak the arguments of your violin plot"
-                        flash(sometext,'info')
-                        return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
-
-                session["plot_arguments"]=plot_arguments
-                plot_arguments=read_request(request)
-
-
             if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
                 return render_template('/apps/violinplot.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
+            # if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
             
+            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+            plot_arguments=read_request(request)
+            # vals=request.form.getlist("vals")
+            vals=plot_arguments["vals"]
+            df=pd.read_json(session["df"])
+            filename=session["filename"]
+
+            # print(plot_arguments)
+            # plot_arguments=session["plot_arguments"]
+
+            #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE VIOLINPLOT
+            if  vals == []:
+                sometext="Please select at least one numeric column from which we will plot your violinplot"
+                # plot_arguments=session["plot_arguments"]
+                # plot_arguments["vals"]=vals
+                # flash(sometext,'info')
+                return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
+                
+            #VERIFY THERE IS AT LEAST ONE NUMERIC COLUMN SELECTED BY THE USER
+            if not any(df[vals].dtypes.apply(is_numeric_dtype)):
+                sometext="Remember that at least one of the columns you select has to be numeric"
+                # session["plot_arguments"]["vals"]=[]
+                # plot_arguments=session["plot_arguments"]
+                # plot_arguments["vals"]=vals
+                flash(sometext,'info')
+                return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
+            
+                #IF THE USER HAS CHANGED THE COLUMNS TO PLOT
+                # if vals+["None"] != plot_arguments["vals"]:
+                #     plot_arguments=figure_defaults()
+                #     cols=df.columns.tolist()                   
+                #     plot_arguments["vals"]=vals+["None"]
+                #     plot_arguments["cols"]=cols
+                #     session["plot_arguments"]=plot_arguments 
+                #     sometext="Please tweak the arguments of your violin plot"
+                #     flash(sometext,'info')
+                #     return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
+
+            # session["plot_arguments"]=plot_arguments
+            # plot_arguments=read_request(request)
+
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-            filename=session["filename"]
-            plot_arguments=session["plot_arguments"]
-            plot_arguments["vals"]=vals+["None"]
-            session["plot_arguments"]["vals"]=vals+["None"]
+            # filename=session["filename"]
+            # plot_arguments=session["plot_arguments"]
+            # plot_arguments["vals"]=vals+["None"]
+            # session["plot_arguments"]["vals"]=vals+["None"]
 
             # READ INPUT DATA FROM SESSION JSON
-            df=pd.read_json(session["df"])
+            # df=pd.read_json(session["df"])
 
             fig=make_figure(df,plot_arguments)
 
