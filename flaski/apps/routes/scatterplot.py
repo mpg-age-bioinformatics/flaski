@@ -100,6 +100,7 @@ def scatterplot(download=None):
                         flash(sometext,'info')
                         return render_template('/apps/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
+                    plot_arguments=session["plot_arguments"]
                     flash("New file uploaded.",'info')
                     return render_template('/apps/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                     

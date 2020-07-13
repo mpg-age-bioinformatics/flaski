@@ -98,7 +98,8 @@ def iscatterplot(download=None):
                         plot_arguments=session["plot_arguments"]
                         flash(sometext,'info')
                         return render_template('/apps/iscatterplot.html' , filename=filename, apps=apps,**plot_arguments)
-                    
+                        
+                    plot_arguments=session["plot_arguments"]
                     flash("New file uploaded.",'info')
                     return render_template('/apps/iscatterplot.html' , filename=filename, apps=apps,**plot_arguments)
 
