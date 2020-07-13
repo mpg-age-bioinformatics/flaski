@@ -64,7 +64,7 @@
                     <div class="column" >
                         <div class="sidebar-heading">Data columns:</div>
                         <div style="padding-left:13px;">
-                            <select name="vals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            <select name="vals" value="{vals}" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
                                 {% for col in cols %}
                                 <option value="{{col}}" {% if col in vals %} selected {% endif %}>{{col}}</option>
                                 {% endfor %}
@@ -107,7 +107,7 @@
                                     {% endfor %}
                                 </select></label>
                                 <label style="padding-left:30px;">Default plotting style:
-                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="default"{% if default=="on" %} checked {% elif default==".on" %} checked {% endif %}/></label>
+                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="default" {% if default=="on" %} checked {% elif default==".on" %} checked {% endif %}/></label>
                             </div>
                             
                             <div class="row arg">

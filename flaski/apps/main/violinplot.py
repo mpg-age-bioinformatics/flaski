@@ -46,7 +46,7 @@ def make_figure(df,pa,fig=None,ax=None):
     tmp=tmp[vals]
 
     possible_nones=[ "x_val" , "y_val" , "hue", "order", "hue_order" , "inner",\
-        "palette","orient"]
+        "palette"]
     for p in possible_nones:
         if pa[p] == "None" :
             pa[p]=None
@@ -54,7 +54,7 @@ def make_figure(df,pa,fig=None,ax=None):
     pab={}
     for arg in ["upper_axis","lower_axis","left_axis","right_axis",\
         "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
-        "split","dodge","scale_hue","shadow","fancybox","markerfirst"]:
+        "split","dodge","scale_hue","shadow","fancybox","markerfirst", "default"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -134,17 +134,20 @@ def make_figure(df,pa,fig=None,ax=None):
     else:
         saturation=0.75
     
-    if pa["orient"]=="None":
-        orient=None
-    else:
-        orient=pa["orient"]
+    if pa["orient"]=="horizontal":
+        orient="h"
+    elif pa["orient"]=="vertical":
+        orient="v"
     
     scale=pa["scale"]
     scale_hue=pab["scale_hue"]
     split=pab["split"]
     dodge=pab["dodge"]
 
-    if pa["default"]!="on":
+
+    if pab["default"]==False:
+        print("VALS ARE AND I AM IN DEFAULT FALSE",vals)
+        print("WHAT IS DEFAULT",pa["default"])
         sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
         scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
         linewidth=linewidth,color=color,saturation=saturation)
@@ -226,6 +229,8 @@ def make_figure(df,pa,fig=None,ax=None):
             borderaxespad=borderaxespad,columnspacing=columnspacing)
         
     else:
+        print("VALS ARE AND I AM IN DEFAULT TRUE",vals)
+
         sns.violinplot(data=df[vals],bw=bw,cut=cut,scale=scale,gridsize=gridsize,width=v_width,inner=inner,orient=orient,\
         linewidth=linewidth,color=color,saturation=saturation)
 
@@ -360,7 +365,7 @@ def figure_defaults():
         "title_size_value":"20",\
         "title_size":STANDARD_SIZES,\
         "titles":"20",\
-        "default":"on",\
+        "default":".on",\
         "hue":None,\
         "x_val":None,\
         "y_val":None,\
