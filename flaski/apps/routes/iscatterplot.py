@@ -84,14 +84,14 @@ def iscatterplot(download=None):
                     for parg in columns_select:
                         if session["plot_arguments"]["markerstyles_cols"] not in cols:
                             session["plot_arguments"][parg]=["select a column.."]+cols
+                        
+                    session["plot_arguments"]["xcols"]=cols
+                    session["plot_arguments"]["ycols"]=cols
 
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
-                    if (session["plot_arguments"]["xvals"] not in cols) & (session["plot_arguments"]["yvals"] not in cols):
+                    if (session["plot_arguments"]["xvals"] not in cols) | (session["plot_arguments"]["yvals"] not in cols):
 
-                        session["plot_arguments"]["xcols"]=cols
                         session["plot_arguments"]["xvals"]=cols[0]
-
-                        session["plot_arguments"]["ycols"]=cols
                         session["plot_arguments"]["yvals"]=cols[1]
                                     
                         sometext="Please select which values should map to the x and y axes."
@@ -99,6 +99,9 @@ def iscatterplot(download=None):
                         flash(sometext,'info')
                         return render_template('/apps/iscatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
+                    flash("New file uploaded.",'info')
+                    return render_template('/apps/iscatterplot.html' , filename=filename, apps=apps,**plot_arguments)
+
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                     error_msg="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \

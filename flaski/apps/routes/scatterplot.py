@@ -82,21 +82,26 @@ def scatterplot(download=None):
                     for parg in columns_select:
                         if session["plot_arguments"]["markerstyles_cols"] not in cols:
                             session["plot_arguments"][parg]=["select a column.."]+cols
-
+                    
+                    session["plot_arguments"]["xcols"]=cols
+                    session["plot_arguments"]["ycols"]=cols
 
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
-                    if (session["plot_arguments"]["xvals"] not in cols) & (session["plot_arguments"]["yvals"] not in cols):
+                    if (session["plot_arguments"]["xvals"] not in cols) | (session["plot_arguments"]["yvals"] not in cols):
 
-                        session["plot_arguments"]["xcols"]=cols
-                        session["plot_arguments"]["xvals"]=cols[0]
+                        if session["plot_arguments"]["xvals"] not in cols : 
+                            session["plot_arguments"]["xvals"]=cols[0]
 
-                        session["plot_arguments"]["ycols"]=cols
-                        session["plot_arguments"]["yvals"]=cols[1]
+                        if session["plot_arguments"]["yvals"] not in cols:
+                            session["plot_arguments"]["yvals"]=cols[1]
                                     
                         sometext="Please select which values should map to the x and y axes."
                         plot_arguments=session["plot_arguments"]
                         flash(sometext,'info')
                         return render_template('/apps/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
+                    
+                    flash("New file uploaded.",'info')
+                    return render_template('/apps/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
