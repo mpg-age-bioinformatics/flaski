@@ -155,6 +155,11 @@ def get_tables(plot_arguments):
     session["plot_arguments"]["selected_ge_50"]=selected_ge
 
     ngroups=len(plot_arguments["selected_groups"])
+
+    if len(plot_arguments["selected_data_sets"]) == 0 :
+        emsg="You need to select at least one data set. Alternatively, you can select 'all'"
+        flash(emsg,'error')
+
     if (ngroups == 2) & ( nsets == 1 ) & ( plot_arguments["selected_data_sets"][0] != "all" ):
         groups_to_files=pd.read_csv(plot_arguments["path_to_files"]+"metadata.tsv",sep="\t")
 
