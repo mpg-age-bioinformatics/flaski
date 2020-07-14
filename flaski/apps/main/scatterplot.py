@@ -73,13 +73,12 @@ def make_figure(df,pa,fig=None,ax=None):
                 c=[ GET_COLOR(i) for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
                 if type(c) == list:
                     c=np.array([c]*len(tmp))/255.0
-            elif str(pa["markerc_write"]) != "":
+            elif str(pa_["markerc_write"]) != "":
                 c=GET_COLOR(pa_["markerc_write"])
                 if type(c) == list:
                     c=np.array([c]*len(tmp))/255.0
             else:
                 c=pa_["markerc"]
-
 
             if pa_["edgecolor_col"] != "select a column..":
                 edgecolor=[ GET_COLOR(i) for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
