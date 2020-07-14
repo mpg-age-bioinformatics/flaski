@@ -91,7 +91,7 @@ def make_figure(df,pa,fig=None,ax=None):
             else:
                 edgecolor=pa_["edgecolor"]
 
-            if pa["edge_linewidth_col"] != "select a column..":
+            if pa_["edge_linewidth_col"] != "select a column..":
                 edge_linewidth=[ float(i) for i in tmp[[pa_["edge_linewidth_col"]]].dropna()[pa_["edge_linewidth_col"]].tolist() ][0]
             else:
                 edge_linewidth=float(pa_["edge_linewidth"])
