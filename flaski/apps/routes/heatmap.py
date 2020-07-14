@@ -86,22 +86,31 @@ def heatmap(download=None):
                     df=read_tables(inputfile)
                     cols=df.columns.tolist()
 
+                    session["plot_arguments"]["xcols"]=cols
+                    session["plot_arguments"]["ycols"]=cols
+
+
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                     if (session["plot_arguments"]["yvals"] not in cols) | (session["plot_arguments"]["xvals"] not in cols):
 
-                        session["plot_arguments"]["xcols"]=cols
-                        session["plot_arguments"]["xvals"]=cols[0]
+                        if session["plot_arguments"]["xvals"] not in cols:
+                            session["plot_arguments"]["xvals"]=cols[0]
+                            session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[session["plot_arguments"]["xvals"]].tolist()
 
-                        session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[session["plot_arguments"]["xvals"]].tolist()
-
-                        session["plot_arguments"]["ycols"]=cols
-                        session["plot_arguments"]["yvals"]=cols[1:]
+                        if session["plot_arguments"]["yvals"] not in cols:
+                            session["plot_arguments"]["yvals"]=cols[1:]
                                     
                         sometext="Please select which columns should be used for plotting."
                         plot_arguments=session["plot_arguments"]
                         flash(sometext,'info')
                         return render_template('/apps/heatmap.html' , filename=filename, apps=apps,**plot_arguments)
                     
+                    plot_arguments=session["plot_arguments"]
+                    flash("New file uploaded.",'info')
+                    return render_template('/apps/heatmap.html' , filename=filename, apps=apps,**plot_arguments)
+
+
+
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                     error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \

@@ -135,7 +135,8 @@ def session_to_file(session,file_type):
             for k in ["david_df","report_stats"]:
                 del(session_[k])
         session_["ftype"]="arguments"
-        del(session_["df"])
+        if "df" in list(session_.keys()):
+            del(session_["df"])
     return session_
 
 def read_private_apps(useremail,app):
