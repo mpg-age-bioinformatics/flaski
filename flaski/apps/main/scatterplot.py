@@ -212,7 +212,7 @@ def make_figure(df,pa,fig=None,ax=None):
             ymin=float(pa["y_lower_limit"])
         if pa["y_upper_limit"]!="":
             ymax=float(pa["y_upper_limit"])
-        plt.ylim(xmin, ymax)
+        plt.ylim(ymin, ymax)
 
     if pa["maxxticks"]!="":
         axes.xaxis.set_major_locator(plt.MaxNLocator(int(pa["maxxticks"])))
