@@ -64,7 +64,7 @@
                     <div class="column" >
                         <div class="sidebar-heading">Data columns:</div>
                         <div style="padding-left:13px;">
-                            <select name="vals" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            <select name="vals" value="{vals}" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
                                 {% for col in cols %}
                                 <option value="{{col}}" {% if col in vals %} selected {% endif %}>{{col}}</option>
                                 {% endfor %}
@@ -106,8 +106,8 @@
                                     <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
                                 </select></label>
-                                <label style="padding-left:28px;">Default plotting style:
-                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="default"{% if default=="on" %} checked {% elif default==".on" %} checked {% endif %}/></label>
+                                <label style="padding-left:30px;">Default plotting style:
+                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="default" {% if default=="on" %} checked {% elif default==".on" %} checked {% endif %}/></label>
                             </div>
                             
                             <div class="row arg">
@@ -262,7 +262,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-bottom:6px;padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
+                                <label style="padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
                                     {% for scale_ in scales %}
                                     <option value="{{scale_}}" {% if bins_==scale %} selected {% endif %}>{{scale_}}</option>
                                     {% endfor %}
@@ -271,7 +271,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-bottom:6px;padding-left: 1px;"> Orientation: <select name=orient val= "{{orient}}" method="GET" action="/" style="width:80px;">
+                                <label style="padding-left: 1px;"> Orientation: <select name=orient val= "{{orient}}" method="GET" action="/" style="width:80px;">
                                     {% for orient_ in orientations %}
                                     <option value="{{orient_}}" {% if orient_==orient %} selected {% endif %}>{{orient_}}</option>
                                     {% endfor %}
@@ -280,7 +280,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-left:40px;padding-bottom:6px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
+                                <label style="padding-left:40px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
                                     {% for inner_ in inner_values %}
                                     <option value="{{inner_}}" {% if inner_==inner %} selected {% endif %}>{{inner_}}</option>
                                     {% endfor %}
@@ -289,8 +289,8 @@
                             </div>                            
         
                             <div class="row arg">
-                                <label style="padding-left:49px"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:50px;height:22px;padding-bottom:6px;padding-left: 4px;"></label>
-                                <label style="padding-bottom:6px;padding-left:16px"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
+                                <label style="padding-left:49px"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                <label style="padding-left:16px"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
                             </div>
                             
                         </div>
@@ -317,7 +317,7 @@
                             
                             <div class="row">
                                 <div class="sidebar-heading">X values: </div>
-                                <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
+                                <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 18px; padding-bottom: 15px;" >
                                     <select title=x_val name=x_val method="GET" action="/" style="width:300px;height:32px;"> 
                                         {% for x_val_ in vals %} 
                                         <option value="{{x_val_}}" {% if x_val_==x_val %} selected {% endif %}>{{x_val_}}</option>
@@ -368,7 +368,7 @@
                         <div class="row arguments">
                             
                             <div class="row arg">
-                                <label style="padding-left:20px;padding-bottom:6px;">Fill color: <select  name=color_value value="{{color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;padding-bottom:6px;">
+                                <label style="padding-left:20px;">Fill color: <select  name=color_value value="{{color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                     {% for colors_ in colors %}
                                     <option value="{{colors_}}" {% if colors_==color_value %} selected {% endif %}>{{colors_}}</option>
                                     {% endfor %}
@@ -377,7 +377,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-left:2px;padding-bottom:6px;">Bandwidth: <select name=bw value="{{bw}}" method="GET" action="/" style="width:80px;padding-bottom:6px;">
+                                <label style="padding-left:2px;">Bandwidth: <select name=bw value="{{bw}}" method="GET" action="/" style="width:80px;">
                                     {% for bw_ in bws %}
                                     <option value="{{bw_}}" {% if bw_==bw %} selected {% endif%}>{{bw_}}</option>
                                     {% endfor %}
@@ -386,7 +386,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-bottom:6px;padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
+                                <label style="padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
                                     {% for scale_ in scales %}
                                     <option value="{{scale_}}" {% if bins_==scale %} selected {% endif %}>{{scale_}}</option>
                                     {% endfor %}
@@ -395,7 +395,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-bottom:6px;padding-left: 1px;"> Orientation: <select name=orient val= "{{orient}}" method="GET" action="/" style="width:80px;">
+                                <label style="padding-left: 1px;"> Orientation: <select name=orient val= "{{orient}}" method="GET" action="/" style="width:80px;">
                                     {% for orient_ in orientations %}
                                     <option value="{{orient_}}" {% if orient_==orient %} selected {% endif %}>{{orient_}}</option>
                                     {% endfor %}
@@ -404,7 +404,7 @@
                             </div>
                             
                             <div class="row arg">
-                                <label style="padding-left:40px;padding-bottom:6px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
+                                <label style="padding-left:40px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
                                     {% for inner_ in inner_values %}
                                     <option value="{{inner_}}" {% if inner_==inner %} selected {% endif %}>{{inner_}}</option>
                                     {% endfor %}
@@ -413,14 +413,14 @@
                             </div>                            
         
                             <div class="row arg">
-                                <label style="padding-left:51px"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                                <label style="padding-bottom:6px;padding-left:15px"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
+                                <label style="padding-left:51px;"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                <label style="padding-left:15px;"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
                             </div>
 
                             <div class="row arg">
-                                <label style="padding-left: 13px;">Scale Hue: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= scale_hue {% if scale_hue == "on"%} checked {% elif scale_hue=="off" %} checked {% endif %}/></label>
-                                <label style="padding-left: 55px;">Split: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= split {% if scale_hue == "on"%} checked {% elif split=="off" %} checked {% endif %}/></label>
-                                <label style="padding-left: 55px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= dodge {% if scale_hue == "on"%} checked {% elif dodge=="off" %} checked {% endif %}/></label>
+                                <label style="padding-left: 13px;">Scale Hue: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= scale_hue value="{{scale_hue}}" {% if scale_hue == "on"%} checked {% elif scale_hue==".on" %} checked {% endif %}/></label>
+                                <label style="padding-left: 55px;">Split: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= split value="{{split}}" {% if split == "on"%} checked {% elif split==".on" %} checked {% endif %}/></label>
+                                <label style="padding-left: 55px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= dodge value="{{dodge}}" {% if dodge == "on"%} checked {% elif dodge==".on" %} checked {% endif %}/></label>
                             </div>
 
 

@@ -37,46 +37,54 @@ def make_figure(df,pa,fig=None,ax=None):
 
     #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
 
-    # MAIN FIGURE
+   # MAIN FIGURE
     fig, axes = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
         
     #UPLOAD ARGUMENTS
     vals=pa["vals"].copy()
-    # tmp=df.copy()
-    # tmp=tmp[vals]
+    tmp=df.copy()
+    tmp=tmp[vals]
 
-    pa_={}
     possible_nones=[ "x_val" , "y_val" , "hue", "order", "hue_order" , "inner",\
-        "palette","orient"]
+        "palette"]
     for p in possible_nones:
         if pa[p] == "None" :
             pa[p]=None
-
-
-    # if pa["x_val"]=="None":
-    #     x=None
-    # else:
-    #     x=pa["x_val"]
-
-    # if pa["y_val"]=="None":
-    #     y=None
-    # else:
-    #     y=pa["y_val"]
-
-    # if pa["hue"]=="None":
-    #     hue=None
-    # else:
-    #     hue=pa["hue"]
-
-    # if pa["order"]=="None":
-    #     order=None
-    # else:
-    #     order=pa["order"]
     
-    # if pa["hue_order"]=="None":
-    #     hue_order=None
-    # else:
-    #     hue_order=pa["hue_order"]
+    pab={}
+    for arg in ["upper_axis","lower_axis","left_axis","right_axis",\
+        "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
+        "split","dodge","scale_hue","shadow","fancybox","markerfirst", "default"]:
+        if pa[arg] in ["off",".off"]:
+            pab[arg]=False
+        else:
+            pab[arg]=True
+
+
+    if pa["x_val"]=="None":
+        x=None
+    else:
+          x=pa["x_val"]
+
+    if pa["y_val"]=="None":
+        y=None
+    else:
+        y=pa["y_val"]
+
+    if pa["hue"]=="None":
+        hue=None
+    else:
+        hue=pa["hue"]
+
+    if pa["order"]=="None":
+        order=None
+    else:
+        order=pa["order"]
+    
+    if pa["hue_order"]=="None":
+        hue_order=None
+    else:
+        hue_order=pa["hue_order"]
                 
     if pa["color_rgb"] != "":
         color=GET_COLOR(pa["color_rgb"])
@@ -86,46 +94,127 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             color=pa["color_value"]
     
-    # if pa["cut"]!="":
-    #     cut=float(pa["cut"])
-    # else:
-    #     cut=2
+    if pa["cut"]!="":
+        cut=float(pa["cut"])
+    else:
+        cut=2
 
     if pa["bw_float"]!="":
         bw=float(pa["bw_float"])
     else:
         bw=pa["bw"]
     
-    # if pa["gridsize"]!="":
-    #     gridsize=int(pa["gridsize"])
-    # else:
-    #     gridsize=100
+    if pa["gridsize"]!="":
+        gridsize=int(pa["gridsize"])
+    else:
+        gridsize=100
 
-    # if pa["v_width"]!="":
-    #     v_width=float(pa["v_width"])
-    # else:
-    #     v_width=0.8
+    if pa["v_width"]!="":
+        v_width=float(pa["v_width"])
+    else:
+        v_width=0.8
     
-    # if pa["inner"]=="None":
-    #     inner=None
-    # else:
-    #     inner=pa["inner"]
+    if pa["inner"]=="None":
+        inner=None
+    else:
+        inner=pa["inner"]
 
     if pa["linewidth"]!="":
         linewidth=float(pa["linewidth"])
     else:
         linewidth=None
 
-    # if pa["palette"]=="None":
-    #     palette=None
-    # else:
-    #     palette=pa["palette"]
+    if pa["palette"]=="None":
+        palette=None
+    else:
+        palette=pa["palette"]
 
-    # if pa["saturation"]!="":
-    #     saturation=float(pa["saturation"])
-    # else:
-    #     saturation=0.75
+    if pa["saturation"]!="":
+        saturation=float(pa["saturation"])
+    else:
+        saturation=0.75
     
+    if pa["orient"]=="horizontal":
+        orient="h"
+    elif pa["orient"]=="vertical":
+        orient="v"
+    
+    scale=pa["scale"]
+    scale_hue=pab["scale_hue"]
+    split=pab["split"]
+    dodge=pab["dodge"]
+
+
+    if pab["default"]==False:
+        print("VALS ARE AND I AM IN DEFAULT FALSE",vals)
+        print("WHAT IS DEFAULT",pa["default"])
+        sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
+        scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
+        linewidth=linewidth,color=color,saturation=saturation)
+        
+        #Set legend options
+        facecolor= pa["facecolor"]
+        edgecolor=pa["edgecolor"]
+        loc=pa["legend_loc"]
+        ncol=int(pa["legend_ncol"])
+        mode=pa["mode"]
+        legend_title=pa["legend_title"]
+
+        if pa["markerfirst"]=="on":
+            markerfirst=True
+        else:
+            markerfirst=False
+        
+        if pa["fancybox"]== "on":
+            fancybox=True
+        else:
+            fancybox=False
+
+        if pa["shadow"]=="on":
+            shadow=True
+        else:
+            shadow=False
+
+        if pa["framealpha"]=="":
+            framealpha=None
+        else:
+            framealpha=float(pa["framealpha"])
+        
+        if pa["labelspacing"]=="":
+            labelspacing=None
+        else:
+            labelspacing=float(pa["labelspacing"])
+        
+        if pa["columnspacing"]=="":
+            columnspacing=None
+        else:
+            columnspacing=float(pa["columnspacing"])
+
+        if pa["handletextpad"]=="":
+            handletextpad=None
+        else:
+            handletextpad=float(pa["handletextpad"])
+
+        if pa["handlelength"]=="":
+            handlelength=None
+        else:
+            handlelength=float(pa["handlelength"])
+
+        if pa["borderaxespad"]=="":
+            borderaxespad=None
+        else:
+            borderaxespad=float(pa["borderaxespad"])
+
+        if pa["borderpad"]=="":
+            borderpad=None
+        else:
+            borderpad=float(pa["borderpad"])
+
+        if pa["legend_title_fontsize_value"]!="":
+            legend_title_fontsize=pa["legend_title_fontsize_value"]
+        else:
+            legend_title_fontsize=pa["legend_title_fontsize"]
+
     # if pa["orient"]=="None":
     #     orient=None
     # else:
@@ -219,6 +308,21 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             legend_body_fontsize=pa["legend_body_fontsize"]
 
+        
+        plt.legend(loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
+            markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
+            facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
+            title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
+            handlelength=handlelength,handletextpad=handletextpad,\
+            borderaxespad=borderaxespad,columnspacing=columnspacing)
+        
+    else:
+        print("VALS ARE AND I AM IN DEFAULT TRUE",vals)
+
+        sns.violinplot(data=df[vals],bw=bw,cut=cut,scale=scale,gridsize=gridsize,width=v_width,inner=inner,orient=orient,\
+        linewidth=linewidth,color=color,saturation=saturation)
+
+
         plt.legend(loc=pa["legend_loc"],ncol=int(pa["legend_ncol"]),fontsize=legend_body_fontsize,\
             markerfirst=pa_leg["markerfirst"],fancybox=pa_leg["fancybox"],shadow=pa_leg["shadow"],framealpha=pa_leg["framealpha"], \
             facecolor=pa["facecolor"], edgecolor=pa["edgecolor"],mode=pa["mode"],title=pa["legend_title"],\
@@ -228,21 +332,24 @@ def make_figure(df,pa,fig=None,ax=None):
 
     # else:
     # x / x_val, y_val, hue, order, hue_order, inner, linewidth, orient
-    # scale=pa["scale"]
-    # scale_hue=pa["scale_hue"]
-    # split=pa["split"]
-    # dodge=pa["dodge"]
+    #MAYBE THIS HAS TO BE REMOVED
+    #scale=pa["scale"]
+    #scale_hue=pa["scale_hue"]
+    #split=pa["split"]
+    #dodge=pa["dodge"]
 
-    sns.violinplot(data=df[vals],\
-        saturation=float(pa["saturation"]),\
-        bw=bw,\
-        cut=int(pa["cut"]),\
-        scale=pa["scale"],\
-        gridsize=int(pa["gridsize"]),\
-        width=float(pa["v_width"]),\
-        inner=pa["inner"], \
-        orient=pa["orient"],\
-        linewidth=linewidth, color=color)
+    
+
+    # sns.violinplot(data=df[vals],\
+    #     saturation=float(pa["saturation"]),\
+    #     bw=bw,\
+    #     cut=int(pa["cut"]),\
+    #     scale=pa["scale"],\
+    #     gridsize=int(pa["gridsize"]),\
+    #     width=float(pa["v_width"]),\
+    #     inner=pa["inner"], \
+    #     orient=pa["orient"],\
+    #     linewidth=linewidth, color=color)
 
     #Plot grid, axes and ticks
     for axis in ['top','bottom','left','right']:
@@ -335,8 +442,6 @@ def figure_defaults():
     
     # https://matplotlib.org/3.1.1/api/markers_api.html
     # https://matplotlib.org/2.0.2/api/colors_api.html
-
-
     # lists allways need to have the default value after the list
     # eg.:
     # "title_size":standard_sizes,\
@@ -344,10 +449,10 @@ def figure_defaults():
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
-    #     cut=2
-    # gridsize=100
-    # v_width=0.8
-    # saturation=0.75
+    cut=2
+    gridsize=100
+    v_width=0.8
+    saturation=0.75
 
     plot_arguments={
         "fig_width":"6.0",\
@@ -356,7 +461,7 @@ def figure_defaults():
         "title_size_value":"20",\
         "title_size":STANDARD_SIZES,\
         "titles":"20",\
-        "default":"on",\
+        "default":".on",\
         "hue":None,\
         "x_val":None,\
         "y_val":None,\
@@ -374,14 +479,14 @@ def figure_defaults():
         "gridsize":"100",\
         "scale":"area",\
         "scales":STANDARD_SCALES,\
-        "scale_hue":True,\
+        "scale_hue":".off",\
         "v_width":"0.8",\
         "linewidth":"",\
         "inner":"box",\
         "inner_values":STANDARD_INNER,\
-        "split":False,\
-        "dodge":True,\
-        "orient":None,\
+        "split":".off",\
+        "dodge":".off",\
+        "orient":"vertical",\
         "orientations":STANDARD_ORIENTATIONS,\
         "palette":None,\
         "palettes":STANDARD_PALETTES,\
@@ -454,7 +559,7 @@ def figure_defaults():
         "session_argumentsn":"MyArguments.violin.plot",\
         "inputargumentsfile":"Select file.."
     }
-    # grid colors not implemented in UI
+    #grid colors not implemented in UI
     return plot_arguments
 
     
