@@ -324,6 +324,9 @@
 
     <div class="tab">
     <button class="tablinks" onclick="openCity(event, 'Metadata')" id="defaultOpen">Metadata</button>
+    {% if siggenesdf_columns %}
+    <button class="tablinks" onclick="openCity(event, 'Significantsets')" id="defaultOpen">Significant sets</button>
+    {% endif %}
     <button class="tablinks" onclick="openCity(event, 'GeneExpression')">Gene Expression</button>
     {% if selected_dge_50 %}
     <button class="tablinks" onclick="openCity(event, 'DifferentialGeneExpression')">Differential Gene Expression</button>
