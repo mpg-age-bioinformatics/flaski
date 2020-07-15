@@ -73,13 +73,12 @@ def make_figure(df,pa,fig=None,ax=None):
                 c=[ GET_COLOR(i) for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
                 if type(c) == list:
                     c=np.array([c]*len(tmp))/255.0
-            elif str(pa["markerc_write"]) != "":
+            elif str(pa_["markerc_write"]) != "":
                 c=GET_COLOR(pa_["markerc_write"])
                 if type(c) == list:
                     c=np.array([c]*len(tmp))/255.0
             else:
                 c=pa_["markerc"]
-
 
             if pa_["edgecolor_col"] != "select a column..":
                 edgecolor=[ GET_COLOR(i) for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
@@ -92,7 +91,7 @@ def make_figure(df,pa,fig=None,ax=None):
             else:
                 edgecolor=pa_["edgecolor"]
 
-            if pa["edge_linewidth_col"] != "select a column..":
+            if pa_["edge_linewidth_col"] != "select a column..":
                 edge_linewidth=[ float(i) for i in tmp[[pa_["edge_linewidth_col"]]].dropna()[pa_["edge_linewidth_col"]].tolist() ][0]
             else:
                 edge_linewidth=float(pa_["edge_linewidth"])
@@ -212,7 +211,7 @@ def make_figure(df,pa,fig=None,ax=None):
             ymin=float(pa["y_lower_limit"])
         if pa["y_upper_limit"]!="":
             ymax=float(pa["y_upper_limit"])
-        plt.ylim(xmin, ymax)
+        plt.ylim(ymin, ymax)
 
     if pa["maxxticks"]!="":
         axes.xaxis.set_major_locator(plt.MaxNLocator(int(pa["maxxticks"])))
