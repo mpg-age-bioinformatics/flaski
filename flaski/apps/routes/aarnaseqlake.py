@@ -116,6 +116,19 @@ def get_tables(plot_arguments):
         selected_gene_names=", ".join(selected_gene_names)
         plot_arguments["selected_gene_names"]=selected_gene_names
 
+    if ( plot_arguments["selected_gene_ids"] != "" ) | (plot_arguments["selected_gene_names"] != ""):
+        siggenesdf=pd.read_csv(session["plot_arguments"]["path_to_files"]+"significant.genes.tsv",sep="\t")
+        siggenesdf=siggenesdf[ siggenesdf["gene_id"].isin( selected_genes["gene_id"].tolist() ) ]
+        plot_arguments["siggenesdf_columns"]=siggenesdf.columns.tolist()
+        siggenesdf_values=list(siggenesdf[:50].values)
+        siggenesdf_values=[ list(s) for s in siggenesdf_values ]
+        plot_arguments["siggenesdf_values"]=siggenesdf_values
+    else:
+        siggenesdf=None
+        if "siggenesdf_values" in list(plot_arguments.keys()):
+            del(plot_arguments["siggenesdf_columns"])
+            del(plot_arguments["siggenesdf_values"])
+    
     nsets=len(plot_arguments["selected_data_sets"])
     if (nsets > 1) | ("all" in plot_arguments["selected_data_sets"] ):
         selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
@@ -202,7 +215,7 @@ def get_tables(plot_arguments):
     selected_results_files=[ list(s) for s in selected_results_files ]
     plot_arguments["selected_results_files"]=selected_results_files
 
-    return plot_arguments, df_metadata, df_dge, df_ge
+    return plot_arguments, df_metadata, df_dge, df_ge, siggenesdf
 
 
 @app.route('/aarnaseqlake/<download>', methods=['GET', 'POST'])
@@ -261,7 +274,7 @@ def aarnaseqlake(download=None):
         session["plot_arguments"]["inputargumentsfile"]="Select file.."
 
         plot_arguments=session["plot_arguments"]
-        plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+        plot_arguments, df_metadata, df_dge, df_ge, siggenesdf=get_tables(plot_arguments)
         session["plot_arguments"]=plot_arguments
 
         session["COMMIT"]=app.config['COMMIT']
@@ -271,7 +284,7 @@ def aarnaseqlake(download=None):
 
         try:
             plot_arguments=read_request(request)
-            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf=get_tables(plot_arguments)
             session["plot_arguments"]=plot_arguments
 
             return render_template('/apps/aarnaseqlake.html', apps=apps, **plot_arguments)
@@ -287,7 +300,7 @@ def aarnaseqlake(download=None):
 
             plot_arguments=session["plot_arguments"]
 
-            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf=get_tables(plot_arguments)
 
             eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
             db.session.add(eventlog)
@@ -304,11 +317,34 @@ def aarnaseqlake(download=None):
             elif plot_arguments["download_format_value"] == "tsv":               
                 return Response(df_metadata.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".metadata")})
 
+
+        if download == "siggenes":
+
+            plot_arguments=session["plot_arguments"]
+
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf=get_tables(plot_arguments)
+
+            eventlog = UserLogging(email=current_user.email,action="download aarnaseqlake")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            if plot_arguments["download_format_value"] == "xlsx":
+                outfile = io.BytesIO()
+                EXC=pd.ExcelWriter(outfile)
+                siggenesdf.to_excel(EXC,sheet_name="sig.genes",index=None)
+                EXC.save()
+                outfile.seek(0)
+                return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ ".siggenesdf." + plot_arguments["download_format_value"],as_attachment=True )
+
+            elif plot_arguments["download_format_value"] == "tsv":               
+                return Response(df_metadata.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %(plot_arguments["download_name"]+".siggenesdf")})
+
+
         if download == "geneexpression":
 
             plot_arguments=session["plot_arguments"]
 
-            plot_arguments, df_metadata, df_dge, df_ge=get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf=get_tables(plot_arguments)
 
             GO=pd.read_csv(plot_arguments["path_to_files"]+"GO.tsv",sep="\t")
             GO.columns=["gene_id","go_id","go_name","go_definition"]
@@ -336,7 +372,7 @@ def aarnaseqlake(download=None):
 
             plot_arguments=session["plot_arguments"]
 
-            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf = get_tables(plot_arguments)
 
             GO=pd.read_csv(plot_arguments["path_to_files"]+"GO.tsv",sep="\t")
             GO.columns=["gene_id","go_id","go_name","go_definition"]
@@ -363,7 +399,7 @@ def aarnaseqlake(download=None):
 
         if download == "MAplot":
             plot_arguments=session["plot_arguments"]
-            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf = get_tables(plot_arguments)
 
             if type(df_dge) != type(pd.DataFrame()):
                 flash("No differential available to perform gene expression for an MA plot.",'error')
@@ -441,7 +477,7 @@ def aarnaseqlake(download=None):
 
         if download == "Volcanoplot":
             plot_arguments=session["plot_arguments"]
-            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf = get_tables(plot_arguments)
 
             if type(df_ge) != type(pd.DataFrame()):
                 flash("No differential available to perform gene expression for an MA plot.",'error')
@@ -520,7 +556,7 @@ def aarnaseqlake(download=None):
 
 
             plot_arguments=session["plot_arguments"]
-            plot_arguments, df_metadata, df_dge, df_ge = get_tables(plot_arguments)
+            plot_arguments, df_metadata, df_dge, df_ge, siggenesdf = get_tables(plot_arguments)
             sig_genes=df_dge[df_dge["padj"]<0.05]["gene_name"].tolist()
             df_ge=df_ge[df_ge["gene_name"].isin(sig_genes)]
 

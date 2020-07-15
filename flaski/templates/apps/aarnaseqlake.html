@@ -426,6 +426,43 @@
         <!--/div-->
     </div>
     {% endif %}
+
+    {% if siggenesdf_columns %}
+
+    <div id="Significantsets" class="tabcontent">
+        <h2><br>Significant</h2>
+        <!--div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);"-->
+            <table id="listr3-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in siggenesdf_columns %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <small class="pull-xs-left text-muted" dir="ltr">First 50 entries. Download table if you want to see all entries.</small>
+                    </td>
+                </tr>
+                </tfoot>
+                <tbody>
+
+                    {% for entry in siggenesdf_values %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        <!--/div-->
+    </div>
+
+    {% endif %}
+
 </div>
 
 
@@ -438,6 +475,19 @@
                     </button>
                 </form>
             </div>
+
+            {% if siggenesdf_columns %}
+
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('aarnaseqlake', download='siggenes') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Significant
+                    </button>
+                </form>
+            </div>
+
+
+            {% endif %}
 
             <div style="padding-right: 2px;">
                 <form action="{{ url_for('aarnaseqlake', download='geneexpression') }}" method="get">
