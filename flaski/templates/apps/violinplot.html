@@ -54,24 +54,44 @@
             <hr class="sidebar-divider d-none d-md-block">
             
             {% if filename != "Select file.." %}
-            
-            
-            <!------------------- SELECT COLUMNS THAT WILL BE INCLUDED IN THE PLOT ---------------------->
-            
-            <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px; padding-top:0px;">
-                
-                <div class="row" style="padding-right:15px;padding-left:13px;padding-top:0px;padding-bottom:10px;">
-                    <div class="column" >
-                        <div class="sidebar-heading">Data columns:</div>
-                        <div style="padding-left:13px;">
-                            <select name="vals" value="{vals}" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
-                                {% for col in cols %}
-                                <option value="{{col}}" {% if col in vals %} selected {% endif %}>{{col}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+
+            <!------------ SELECT X, Y and HUE -------------------->
+            <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">                           
+
+                <div class="column">
+                    <div class="sidebar-heading" style="padding-left: 15px;">X values: </div>
+                    <div class="input-group margin-bottom-sm" style="padding-left: 15px; padding-bottom: 10px;" >
+                        <select name=x_val value="{x_val}" method="GET" action="/" style="width:115px">
+                            {% for x_val_ in vals %}
+                            <option value="{{x_val_}}" {% if x_val_==x_val %} selected {% endif %}>{{x_val_}}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
+
+                
+                <div class="column">
+                    <div class="sidebar-heading" style="padding-left: 10px;">Y values: </div>
+                    <div class="input-group margin-bottom-sm" style="padding-left: 10px; padding-bottom: 10px;" >
+                        <select name=y_val value="{y_val}" method="GET" action="/" style="width:115px">
+                            {% for y_val_ in vals %}
+                            <option value="{{y_val_}}" {% if y_val_==y_val %} selected {% endif %}>{{y_val_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="sidebar-heading" style="padding-left: 10px;">Hue: </div>
+                    <div class="input-group margin-bottom-sm" style="padding-left: 10px; padding-bottom: 10px;" >
+                        <select name=hue value="{hue}" method="GET" action="/" style="width:115px">
+                            {% for hue_ in vals %}
+                            <option value="{{hue_}}" {% if hue_==hue %} selected {% endif %}>{{hue_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            
             </div>
             
             {% if vals != [] %}
@@ -101,18 +121,23 @@
                             </div>
 
                             <div class="row arg">
-                                <label style="padding-right: 4px">Title size: <select name=title_size_value method="GET" action="/" style="width:50px">
+                                <label style="padding-left: 2px">Title size: <select name=title_size_value method="GET" action="/" style="width:80px">
                                     {% for title_size_ in title_size %}
                                     <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
                                 </select></label>
-                                <label style="padding-left:30px;">Default plotting style:
-                                <label style="padding-left:4x;padding-right:4px;"><input type="checkbox" name="default" {% if default=="on" %} checked {% elif default==".on" %} checked {% endif %}/></label>
+                            </div>
+                            <div class="row arg">
+                                <label style="padding-left: 35px">Style: <select name=style method="GET" action="/" style="width:80px">
+                                    {% for style_ in styles %}
+                                    <option value="{{style_}}" {% if style_==style %} selected {% endif %}>{{style_}}</option>
+                                    {% endfor %}
+                                </select></label>
                             </div>
                             
                             <div class="row arg">
-                                <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 6px"></label>
-                                <label style="padding-left: 6px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 6px"></label>
+                                <label style="padding-left: 17px">Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:80px;height:22px;padding-left: 6px"></label>
+                                <label style="padding-left: 26px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:80px;height:22px;padding-left: 6px"></label>
                             </div>
                                                         
                         </div>
@@ -225,11 +250,8 @@
                     </div>
                 </div>
             </li>
-
-            
-            <!-- -------------------- ARGUMENTS IF USER SELECTED ONE COLUMN ONLY ---------------------- -->
-            
-            {% if vals|length == 1  or default == "on" %}
+                        
+            <!------------ SELECT PLOT ARGUMENTS -------------------->
             
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
@@ -242,14 +264,13 @@
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
                             
-                            
                             <div class="row arg">
                                 <label style="padding-left:20px;">Fill color: <select  name=color_value value="{{color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                     {% for colors_ in colors %}
                                     <option value="{{colors_}}" {% if colors_==color_value %} selected {% endif %}>{{colors_}}</option>
                                     {% endfor %}
                                 </select></label>
-                                <label style="padding-left: 25px;"> ..or write: <input type="text" name=color_rgb value="{{color_rgb}}" style="width:50px;height:22px;padding-left: 4px;">
+                                <label style="padding-left: 0px;"> ..or write: <input type="text" name=color_rgb value="{{color_rgb}}" style="width:232px;height:22px;padding-left: 4px;">
                             </div>
                             
                             <div class="row arg">
@@ -289,131 +310,7 @@
                             </div>                            
         
                             <div class="row arg">
-                                <label style="padding-left:49px"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                                <label style="padding-left:16px"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-                
-            </li>
-            
-            
-            <!-- -------------------- ARGUMENTS IF USER SELECTED MORE THAN ONE COLUMNS ---------------------- -->
-            {% elif vals|length > 1 or default == "on" %}
-            
-            <!------------ SELECT X, Y and HUE -------------------->
-            
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseData" aria-expanded="true" aria-controls="collapseData" style="padding-top:0px;">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Data</span>
-                </a>
-                <div id="collapseData" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-                            
-                            <div class="row">
-                                <div class="sidebar-heading">X values: </div>
-                                <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 18px; padding-bottom: 15px;" >
-                                    <select title=x_val name=x_val method="GET" action="/" style="width:300px;height:32px;"> 
-                                        {% for x_val_ in vals %} 
-                                        <option value="{{x_val_}}" {% if x_val_==x_val %} selected {% endif %}>{{x_val_}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="column">
-                                <div class="sidebar-heading" style="padding-left: 6px;">Y values: </div>
-                                <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
-                                    <select name=y_val method="GET" action="/" style="width:300px;height:32px;">
-                                        {% for y_val_ in vals %}
-                                        <option value="{{y_val_}}" {% if y_val_==y_val %} selected {% endif %}>{{y_val_}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="column">
-                                <div class="sidebar-heading" style="padding-left: 6px;">Hue: </div>
-                                <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
-                                    <select name=hue method="GET" action="/" style="width:300px;height:32px;">
-                                        {% for hue_ in vals %}
-                                        <option value="{{hue_}}" {% if hue_==hue %} selected {% endif %}>{{hue_}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            
-            
-            
-            <!------------ SELECT PLOT ARGUMENTS WHEN USING X,Y and/or HUE -------------------->
-            
-            <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Arguments</span>
-                </a>
-                
-                
-                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-                            
-                            <div class="row arg">
-                                <label style="padding-left:20px;">Fill color: <select  name=color_value value="{{color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
-                                    {% for colors_ in colors %}
-                                    <option value="{{colors_}}" {% if colors_==color_value %} selected {% endif %}>{{colors_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 25px;"> ..or write: <input type="text" name=color_rgb value="{{color_rgb}}" style="width:50px;height:22px;padding-left: 4px;">
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left:2px;">Bandwidth: <select name=bw value="{{bw}}" method="GET" action="/" style="width:80px;">
-                                    {% for bw_ in bws %}
-                                    <option value="{{bw_}}" {% if bw_==bw %} selected {% endif%}>{{bw_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 24px;"> ..or write: <input type="text" name=bw_float value="{{bw_float}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
-                                    {% for scale_ in scales %}
-                                    <option value="{{scale_}}" {% if bins_==scale %} selected {% endif %}>{{scale_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 57px;"> Cut: <input type="text" name=cut value="{{cut}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left: 1px;"> Orientation: <select name=orient val= "{{orient}}" method="GET" action="/" style="width:80px;">
-                                    {% for orient_ in orientations %}
-                                    <option value="{{orient_}}" {% if orient_==orient %} selected {% endif %}>{{orient_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left:4px;"> Violin width: <input type="text" name= v_width  value="{{v_width}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left:40px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
-                                    {% for inner_ in inner_values %}
-                                    <option value="{{inner_}}" {% if inner_==inner %} selected {% endif %}>{{inner_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 12px;"> Line width: <input type="text" name=linewidth value="{{linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                            </div>                            
-        
-                            <div class="row arg">
-                                <label style="padding-left:51px;"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                <label style="padding-left:20px;"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                 <label style="padding-left:15px;"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
                             </div>
 
@@ -512,9 +409,7 @@
                 </div>
             </li>
             
-            
-            {% endif %}
-            
+                    
             {% endif %}
             
             {% endif %}
