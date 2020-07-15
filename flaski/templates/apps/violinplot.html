@@ -61,7 +61,7 @@
                 <div class="column">
                     <div class="sidebar-heading" style="padding-left: 15px;">X values: </div>
                     <div class="input-group margin-bottom-sm" style="padding-left: 15px; padding-bottom: 10px;" >
-                        <select name=xval method="GET" action="/" style="width:115px">
+                        <select name=x_val value="{x_val}" method="GET" action="/" style="width:115px">
                             {% for x_val_ in vals %}
                             <option value="{{x_val_}}" {% if x_val_==x_val %} selected {% endif %}>{{x_val_}}</option>
                             {% endfor %}
@@ -73,7 +73,7 @@
                 <div class="column">
                     <div class="sidebar-heading" style="padding-left: 10px;">Y values: </div>
                     <div class="input-group margin-bottom-sm" style="padding-left: 10px; padding-bottom: 10px;" >
-                        <select name=yval method="GET" action="/" style="width:115px">
+                        <select name=y_val value="{y_val}" method="GET" action="/" style="width:115px">
                             {% for y_val_ in vals %}
                             <option value="{{y_val_}}" {% if y_val_==y_val %} selected {% endif %}>{{y_val_}}</option>
                             {% endfor %}
@@ -84,7 +84,7 @@
                 <div class="column">
                     <div class="sidebar-heading" style="padding-left: 10px;">Hue: </div>
                     <div class="input-group margin-bottom-sm" style="padding-left: 10px; padding-bottom: 10px;" >
-                        <select name=yval method="GET" action="/" style="width:115px">
+                        <select name=hue value="{hue}" method="GET" action="/" style="width:115px">
                             {% for hue_ in vals %}
                             <option value="{{hue_}}" {% if hue_==hue %} selected {% endif %}>{{hue_}}</option>
                             {% endfor %}
@@ -250,11 +250,8 @@
                     </div>
                 </div>
             </li>
-            
-            <!-- -------------------- ARGUMENTS IF USER SELECTED MORE THAN ONE COLUMNS ---------------------- -->
-            {% if vals|length > 1 %}
-            
-            <!------------ SELECT PLOT ARGUMENTS WHEN USING X,Y and/or HUE -------------------->
+                        
+            <!------------ SELECT PLOT ARGUMENTS -------------------->
             
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
@@ -273,7 +270,7 @@
                                     <option value="{{colors_}}" {% if colors_==color_value %} selected {% endif %}>{{colors_}}</option>
                                     {% endfor %}
                                 </select></label>
-                                <label style="padding-left: 25px;"> ..or write: <input type="text" name=color_rgb value="{{color_rgb}}" style="width:50px;height:22px;padding-left: 4px;">
+                                <label style="padding-left: 0px;"> ..or write: <input type="text" name=color_rgb value="{{color_rgb}}" style="width:232px;height:22px;padding-left: 4px;">
                             </div>
                             
                             <div class="row arg">
@@ -412,9 +409,7 @@
                 </div>
             </li>
             
-            
-            {% endif %}
-            
+                    
             {% endif %}
             
             {% endif %}

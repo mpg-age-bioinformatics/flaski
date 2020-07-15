@@ -34,14 +34,12 @@ def make_figure(df,pa,fig=None,ax=None):
         A Matplotlib figure
         
     """
-
-    #matplotlib.rcParams['axes.linewidth'] = float(pa["axis_line_width"])
-
    # MAIN FIGURE
     fig, axes = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
         
     #UPLOAD ARGUMENTS
     vals=pa["vals"].copy()
+    vals.remove(None)
     tmp=df.copy()
     tmp=tmp[vals]
 
@@ -60,22 +58,20 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             pab[arg]=True
 
-    pa_leg={}
-
-    onoffs=["markerfirst", "fancybox", "shadow"]
-    for a in onoffs:
-        if pa[a] in ["on", ".on"]:
-            pa_leg[a]=True
-        else:
-            pa_leg[a]=False
-
     floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
-        "handlelength","borderaxespad","borderpad"]
+        "handlelength","borderaxespad","borderpad","cut","bw_float","v_width","linewidth","saturation"]
     for a in floats:
         if pa[a] == "":
-            pa_leg[a]=None
+            pab[a]=None
         else:
-            pa_leg[a]=float(pa[a])
+            pab[a]=float(pa[a])
+    
+    ints=["gridsize","legend_ncol"]
+    for a in ints:
+        if pa[a] == "":
+            pab[a]=None
+        else:
+            pab[a]=int(pa[a])
             
     if pa["color_rgb"] != "":
         color=GET_COLOR(pa["color_rgb"])
@@ -85,153 +81,35 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             color=pa["color_value"]
     
-    if pa["cut"]!="":
-        cut=float(pa["cut"])
-    else:
-        cut=2
-
-    if pa["bw_float"]!="":
-        bw=float(pa["bw_float"])
-    else:
-        bw=pa["bw"]
-    
-    if pa["gridsize"]!="":
-        gridsize=int(pa["gridsize"])
-    else:
-        gridsize=100
-
-    if pa["v_width"]!="":
-        v_width=float(pa["v_width"])
-    else:
-        v_width=0.8
-
-    if pa["linewidth"]!="":
-        linewidth=float(pa["linewidth"])
-    else:
-        linewidth=None
-
-    if pa["saturation"]!="":
-        saturation=float(pa["saturation"])
-    else:
-        saturation=0.75
-    
     if pa["orient"]=="horizontal":
         orient="h"
     elif pa["orient"]=="vertical":
         orient="v"
+
+    if pab["bw_float"]==None:
+        bw=pa["bw"]
+    else:
+        bw=pab["bw_float"]
     
     scale=pa["scale"]
-    scale_hue=pab["scale_hue"]
-    split=pab["split"]
-    dodge=pab["dodge"]
 
-    sns.violinplot(x=x,y=y,hue=hue,data=df,order=order,hue_order=hue_order,bw=bw,cut=cut,scale=scale,\
-    scale_hue=scale_hue,gridsize=gridsize,width=v_width,inner=inner,split=split,dodge=dodge,orient=orient,\
-    linewidth=linewidth,color=color,saturation=saturation)
+    #PLOT MAIN FIGURE
+
+    if pa["style"]=="violinplot":
+        sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
+        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["v_width"],inner=pa["inner"],split=pab["split"],dodge=pab["dodge"],orient=orient,\
+        linewidth=pab["linewidth"],color=color,saturation=pab["saturation"])
+    elif pa["style"]=="violinplot + swarmplot":
+        print("VIOLINPLOT+SWARMPLOT")
+    elif pa["style"]=="swarmplot":
+        print("SWARMPLOT ONLY")
         
-    #Set legend options
+    #SET LEGEND OPTIONS
     facecolor= pa["facecolor"]
     edgecolor=pa["edgecolor"]
     loc=pa["legend_loc"]
-    ncol=int(pa["legend_ncol"])
     mode=pa["mode"]
     legend_title=pa["legend_title"]
-
-    if pa["markerfirst"]=="on":
-        markerfirst=True
-    else:
-        markerfirst=False
-    
-    if pa["fancybox"]== "on":
-        fancybox=True
-    else:
-        fancybox=False
-
-    if pa["shadow"]=="on":
-        shadow=True
-    else:
-        shadow=False
-
-    if pa["framealpha"]=="":
-        framealpha=None
-    else:
-        framealpha=float(pa["framealpha"])
-    
-    if pa["labelspacing"]=="":
-        labelspacing=None
-    else:
-        labelspacing=float(pa["labelspacing"])
-    
-    if pa["columnspacing"]=="":
-        columnspacing=None
-    else:
-        columnspacing=float(pa["columnspacing"])
-
-    if pa["handletextpad"]=="":
-        handletextpad=None
-    else:
-        handletextpad=float(pa["handletextpad"])
-
-    if pa["handlelength"]=="":
-        handlelength=None
-    else:
-        handlelength=float(pa["handlelength"])
-
-    if pa["borderaxespad"]=="":
-        borderaxespad=None
-    else:
-        borderaxespad=float(pa["borderaxespad"])
-
-    if pa["borderpad"]=="":
-        borderpad=None
-    else:
-        borderpad=float(pa["borderpad"])
-
-    if pa["legend_title_fontsize_value"]!="":
-        legend_title_fontsize=pa["legend_title_fontsize_value"]
-    else:
-        legend_title_fontsize=pa["legend_title_fontsize"]
-
-    sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=int(pa["cut"]),scale=pa["scale"],\
-    scale_hue=pa["scale_hue"],gridsize=int(pa["gridsize"]),width=float(pa["v_width"]),inner=pa["inner"],split=pa["split"],dodge=pa["dodge"],orient=pa["orient"],\
-    linewidth=linewidth,color=color,saturation=float(pa["saturation"]))
-        
-    # Set legend options
-
-    # if pa["framealpha"]=="":
-    #     framealpha=None
-    # else:
-    #     framealpha=float(pa["framealpha"])
-    
-    # if pa["labelspacing"]=="":
-    #     labelspacing=None
-    # else:
-    #     labelspacing=float(pa["labelspacing"])
-    
-    # if pa["columnspacing"]=="":
-    #     columnspacing=None
-    # else:
-    #     columnspacing=float(pa["columnspacing"])
-
-    # if pa["handletextpad"]=="":
-    #     handletextpad=None
-    # else:
-    #     handletextpad=float(pa["handletextpad"])
-
-    # if pa["handlelength"]=="":
-    #     handlelength=None
-    # else:
-    #     handlelength=float(pa["handlelength"])
-
-    # if pa["borderaxespad"]=="":
-    #     borderaxespad=None
-    # else:
-    #     borderaxespad=float(pa["borderaxespad"])
-
-    # if pa["borderpad"]=="":
-    #     borderpad=None
-    # else:
-    #     borderpad=float(pa["borderpad"])
 
     if pa["legend_title_fontsize_value"]!="":
         legend_title_fontsize=pa["legend_title_fontsize_value"]
@@ -244,36 +122,16 @@ def make_figure(df,pa,fig=None,ax=None):
         legend_body_fontsize=pa["legend_body_fontsize"]
 
     
-    plt.legend(loc=loc,ncol=ncol,fontsize=legend_body_fontsize,\
-        markerfirst=markerfirst,fancybox=fancybox,shadow=shadow,framealpha=framealpha, \
+    plt.legend(loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
+        markerfirst=pab["markerfirst"],fancybox=pab["fancybox"],shadow=pab["shadow"],framealpha=pab["framealpha"], \
         facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
-        title_fontsize=legend_title_fontsize,borderpad=borderpad,labelspacing=labelspacing,\
-        handlelength=handlelength,handletextpad=handletextpad,\
-        borderaxespad=borderaxespad,columnspacing=columnspacing)
+        title_fontsize=legend_title_fontsize,borderpad=pab["borderpad"],labelspacing=pab["labelspacing"],\
+        handlelength=pab["handlelength"],handletextpad=pab["handletextpad"],\
+        borderaxespad=pab["borderaxespad"],columnspacing=pab["columnspacing"])
 
 
-    # else:
-    # x / x_val, y_val, hue, order, hue_order, inner, linewidth, orient
-    #MAYBE THIS HAS TO BE REMOVED
-    #scale=pa["scale"]
-    #scale_hue=pa["scale_hue"]
-    #split=pa["split"]
-    #dodge=pa["dodge"]
 
-    
-
-    # sns.violinplot(data=df[vals],\
-    #     saturation=float(pa["saturation"]),\
-    #     bw=bw,\
-    #     cut=int(pa["cut"]),\
-    #     scale=pa["scale"],\
-    #     gridsize=int(pa["gridsize"]),\
-    #     width=float(pa["v_width"]),\
-    #     inner=pa["inner"], \
-    #     orient=pa["orient"],\
-    #     linewidth=linewidth, color=color)
-
-    #Plot grid, axes and ticks
+    #SET GRID, AXIS AND TICKS
     for axis in ['top','bottom','left','right']:
         axes.spines[axis].set_linewidth(float(pa["axis_line_width"]))
 

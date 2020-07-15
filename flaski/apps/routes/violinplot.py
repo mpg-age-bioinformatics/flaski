@@ -117,8 +117,9 @@ def violinplot(download=None):
                 return render_template('/apps/violinplot.html' , filename=filename, apps=apps,**plot_arguments)
                 
             #VERIFY THERE IS AT LEAST ONE NUMERIC COLUMN SELECTED BY THE USER
-            vals.remove(None)
-            if not any(df[vals].dtypes.apply(is_numeric_dtype)):
+            vals_copy=vals.copy()
+            vals_copy.remove(None)
+            if not any(df[vals_copy].dtypes.apply(is_numeric_dtype)):
                 sometext="Remember that at least one of the columns you select has to be numeric"
                 session["plot_arguments"]["vals"]=[None]+vals
                 plot_arguments=session["plot_arguments"]
