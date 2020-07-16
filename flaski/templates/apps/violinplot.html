@@ -250,82 +250,157 @@
                     </div>
                 </div>
             </li>
-                        
-            <!------------ SELECT PLOT ARGUMENTS -------------------->
+
+            {% if style=="violinplot" or style=="violinplot + swarmplot" %}           
+                <!------------ SELECT VIOLINPLOT ARGUMENTS -------------------->
+                
+
+                <li class="nav-item" style="padding-top: 0px;">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseViolinplotArguments" aria-expanded="true" aria-controls="collapseViolinplotArguments" style="padding-top: 0px;">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Violin plot arguments </span>
+                    </a>
+                    
+                    
+                    <div id="collapseViolinplotArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded openmenu">
+                            <div class="row arguments">
+                                
+                                <div class="row arg">
+                                    <label style="padding-left:20px;">Fill color: <select  name=vp_color_value value="{{vp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
+                                        {% for vp_color_value_ in colors %}
+                                        <option value="{{vp_color_value_}}" {% if vp_color_value_==vp_color_value %} selected {% endif %}>{{vp_color_value_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                </div>
+
+                                <div class="row arg">
+                                    <label style="padding-left:28px;">Palette: <select name=vp_palette value="{{vp_palette}}" method="GET" action="/" style="width:80px;">
+                                        {% for vp_palette_ in palettes %}
+                                        <option value="{{vp_palette_}}" {% if vp_palette_==vp_palette %} selected {% endif%}>{{vp_palette_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                </div>
+
+                                <div class="row arg">
+                                    <label style="padding-left: 15px;"> ..or write: <input type="text" name=vp_color_rgb value="{{vp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label style="padding-left:2px;">Bandwidth: <select name=bw value="{{bw}}" method="GET" action="/" style="width:80px;">
+                                        {% for bw_ in bws %}
+                                        <option value="{{bw_}}" {% if bw_==bw %} selected {% endif%}>{{bw_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left: 24px;"> ..or write: <input type="text" name=bw_float value="{{bw_float}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label style="padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
+                                        {% for scale_ in scales %}
+                                        <option value="{{scale_}}" {% if scale_==scale %} selected {% endif %}>{{scale_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left: 57px;"> Cut: <input type="text" name=cut value="{{cut}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label style="padding-left: 1px;"> Orientation: <select name=vp_orient val= "{{vp_orient}}" method="GET" action="/" style="width:80px;">
+                                        {% for vp_orient_ in orientations %}
+                                        <option value="{{vp_orient_}}" {% if vp_orient_==vp_orient %} selected {% endif %}>{{vp_orient_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left:4px;"> Violin width: <input type="text" name= v_width  value="{{v_width}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label style="padding-left:40px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
+                                        {% for inner_ in inner_values %}
+                                        <option value="{{inner_}}" {% if inner_==inner %} selected {% endif %}>{{inner_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left: 12px;"> Line width: <input type="text" name=linewidth value="{{linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                </div>                            
             
-            <li class="nav-item" style="padding-top: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Arguments</span>
-                </a>
-                
-                
-                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-                            
-                            <div class="row arg">
-                                <label style="padding-left:20px;">Fill color: <select  name=color_value value="{{color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
-                                    {% for colors_ in colors %}
-                                    <option value="{{colors_}}" {% if colors_==color_value %} selected {% endif %}>{{colors_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 0px;"> ..or write: <input type="text" name=color_rgb value="{{color_rgb}}" style="width:232px;height:22px;padding-left: 4px;">
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left:2px;">Bandwidth: <select name=bw value="{{bw}}" method="GET" action="/" style="width:80px;">
-                                    {% for bw_ in bws %}
-                                    <option value="{{bw_}}" {% if bw_==bw %} selected {% endif%}>{{bw_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 24px;"> ..or write: <input type="text" name=bw_float value="{{bw_float}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left:38px;"> Scale: <select name=scale val="{{scale}}"  method="GET" action="/" style="width:80px;padding-left:10px">
-                                    {% for scale_ in scales %}
-                                    <option value="{{scale_}}" {% if bins_==scale %} selected {% endif %}>{{scale_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 57px;"> Cut: <input type="text" name=cut value="{{cut}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left: 1px;"> Orientation: <select name=orient val= "{{orient}}" method="GET" action="/" style="width:80px;">
-                                    {% for orient_ in orientations %}
-                                    <option value="{{orient_}}" {% if orient_==orient %} selected {% endif %}>{{orient_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left:4px;"> Violin width: <input type="text" name= v_width  value="{{v_width}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                            </div>
-                            
-                            <div class="row arg">
-                                <label style="padding-left:40px;">Inner:  <select name=inner val= "{{inner}}"  method="GET" action="/" style="width:80px;">
-                                    {% for inner_ in inner_values %}
-                                    <option value="{{inner_}}" {% if inner_==inner %} selected {% endif %}>{{inner_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 12px;"> Line width: <input type="text" name=linewidth value="{{linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                            </div>                            
-        
-                            <div class="row arg">
-                                <label style="padding-left:20px;"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                <label style="padding-left:15px;"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
-                            </div>
+                                <div class="row arg">
+                                    <label style="padding-left:20px;"> Gridsize: <input type="text" name= gridsize  value="{{gridsize}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                    <label style="padding-left:15px;"> Saturation:  <input type="text" name=saturation value="{{saturation}}"  style="width:50px;height:22px;padding-left: 4px;"></label>
+                                </div>
 
-                            <div class="row arg">
-                                <label style="padding-left: 13px;">Scale Hue: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= scale_hue value="{{scale_hue}}" {% if scale_hue == "on"%} checked {% elif scale_hue==".on" %} checked {% endif %}/></label>
-                                <label style="padding-left: 55px;">Split: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= split value="{{split}}" {% if split == "on"%} checked {% elif split==".on" %} checked {% endif %}/></label>
-                                <label style="padding-left: 55px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= dodge value="{{dodge}}" {% if dodge == "on"%} checked {% elif dodge==".on" %} checked {% endif %}/></label>
-                            </div>
+                                <div class="row arg">
+                                    <label style="padding-left: 13px;">Scale Hue: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= scale_hue value="{{scale_hue}}" {% if scale_hue == "on"%} checked {% elif scale_hue==".on" %} checked {% endif %}/></label>
+                                    <label style="padding-left: 55px;">Split: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= split value="{{split}}" {% if split == "on"%} checked {% elif split==".on" %} checked {% endif %}/></label>
+                                    <label style="padding-left: 55px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= vp_dodge value="{{vp_dodge}}" {% if vp_dodge == "on"%} checked {% elif vp_dodge==".on" %} checked {% endif %}/></label>
+                                </div>
 
 
 
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
+                </li>
+            {% endif %}
+            {% if style == "swarmplot" or style == "violinplot + swarmplot"%}
+                <!------------ SELECT SWARMPLOT ARGUMENTS -------------------->
+                <li class="nav-item" style="padding-top: 0px;">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSwarmplotArguments" aria-expanded="true" aria-controls="collapseSwarmplotArguments" style="padding-top: 0px;">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Swarm plot arguments </span>
+                    </a>
+                    <div id="collapseSwarmplotArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded openmenu">
+                            <div class="row arguments">
+
+                                <div class="row arg">
+                                    <label style="padding-left:20px;">Fill color: <select  name=sp_color_value value="{{sp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
+                                        {% for sp_color_value_ in colors %}
+                                        <option value="{{sp_color_value_}}" {% if sp_color_value_==sp_color_value %} selected {% endif %}>{{sp_color_value_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                </div>
+                                <div class="row arg">
+                                    <label style="padding-left:28px;">Palette: <select name=sp_palette value="{{sp_palette}}" method="GET" action="/" style="width:80px;">
+                                        {% for sp_palette_ in palettes %}
+                                        <option value="{{sp_palette_}}" {% if sp_palette_==sp_palette %} selected {% endif%}>{{sp_palette_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                </div>
+
+                                <div class="row arg">
+                                    <label style="padding-left: 15px;"> ..or write: <input type="text" name=sp_color_rgb value="{{sp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label style="padding-left:8px;"> Edgecolor: <select name=sp_edgecolor val="{{sp_edgecolor}}"  method="GET" action="/" style="width:80px;padding-left:10px">
+                                        {% for sp_edgecolor_ in colors %}
+                                        <option value="{{sp_edgecolor_}}" {% if sp_edgecolor_==sp_edgecolor %} selected {% endif %}>{{sp_edgecolor_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left: 14px;"> Line width: <input type="text" name=sp_linewidth value="{{sp_linewidth}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                </div>
+                                
+                                <div class="row arg">
+                                    <label style="padding-left: 0px;"> Orientation: <select name=sp_orient val= "{{sp_orient}}" method="GET" action="/" style="width:80px;">
+                                        {% for sp_orient_ in orientations %}
+                                        <option value="{{sp_orient_}}" {% if sp_orient_==sp_orient %} selected {% endif %}>{{sp_orient_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left:4px;"> Violin width: <input type="text" name= v_width  value="{{v_width}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                </div>
+
+                                
+                                <div class="row arg">
+
+                                    <label style="padding-left: 92px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= sp_dodge value="{{sp_dodge}}" {% if sp_dodge == "on"%} checked {% elif sp_dodge==".on" %} checked {% endif %}/></label>
+                                    <label style="padding-left: 68px;"> Size: <input type="sp_size" name=sp_size value="{{sp_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
 
              <!-- -------------------- LEGEND ARGUMENTS ---------------------- -->
              <li class="nav-item" style="padding-top: 0px;">
@@ -616,7 +691,7 @@
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-                <form action="{{ url_for('histogram', download='download') }}" method="get">
+                <form action="{{ url_for('violinplot', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Figure
                     </button>

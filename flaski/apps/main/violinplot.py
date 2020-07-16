@@ -36,15 +36,16 @@ def make_figure(df,pa,fig=None,ax=None):
     """
    # MAIN FIGURE
     fig, axes = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-        
+    print("vp_color is",GET_COLOR(pa["vp_color_rgb"]))
+  
     #UPLOAD ARGUMENTS
     vals=pa["vals"].copy()
     vals.remove(None)
     tmp=df.copy()
     tmp=tmp[vals]
 
-    possible_nones=[ "x_val" , "y_val" , "hue", "order", "hue_order" , "inner",\
-        "palette","x_val","y_val","hue"]
+    possible_nones=[ "x_val" , "y_val" , "hue", "order", "hue_order" , "inner","vp_palette",\
+        "sp_palette","x_val","y_val","hue","sp_edgecolor","edgecolor","facecolor"]
     for p in possible_nones:
         if pa[p] == "None" :
             pa[p]=None
@@ -52,14 +53,15 @@ def make_figure(df,pa,fig=None,ax=None):
     pab={}
     for arg in ["upper_axis","lower_axis","left_axis","right_axis",\
         "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
-        "split","dodge","scale_hue","shadow","fancybox","markerfirst"]:
+        "split","sp_dodge","vp_dodge","scale_hue","shadow","fancybox","markerfirst"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
             pab[arg]=True
 
     floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
-        "handlelength","borderaxespad","borderpad","cut","bw_float","v_width","linewidth","saturation"]
+        "handlelength","borderaxespad","borderpad","cut","bw_float","v_width","linewidth","saturation",\
+        "sp_size","sp_linewidth"]
     for a in floats:
         if pa[a] == "":
             pab[a]=None
@@ -73,18 +75,31 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             pab[a]=int(pa[a])
             
-    if pa["color_rgb"] != "":
-        color=GET_COLOR(pa["color_rgb"])
+    if pa["sp_color_rgb"] != "":
+        sp_color=GET_COLOR(pa["sp_color_rgb"])
     else:
-        if pa["color_value"]=="None":
-            color=None
+        if pa["sp_color_value"]=="None":
+            sp_color=None
         else:
-            color=pa["color_value"]
+            sp_color=pa["sp_color_value"]
+              
+    if pa["vp_color_rgb"] != "":
+        vp_color=GET_COLOR(pa["vp_color_rgb"])
+    else:
+        if pa["vp_color_value"]=="None":
+            vp_color=None
+        else:
+            vp_color=pa["vp_color_value"]  
     
-    if pa["orient"]=="horizontal":
-        orient="h"
-    elif pa["orient"]=="vertical":
-        orient="v"
+    if pa["sp_orient"]=="horizontal":
+        sp_orient="h"
+    elif pa["sp_orient"]=="vertical":
+        sp_orient="v"
+
+    if pa["vp_orient"]=="horizontal":
+        vp_orient="h"
+    elif pa["vp_orient"]=="vertical":
+        vp_orient="v"
 
     if pab["bw_float"]==None:
         bw=pa["bw"]
@@ -97,13 +112,23 @@ def make_figure(df,pa,fig=None,ax=None):
 
     if pa["style"]=="violinplot":
         sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
-        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["v_width"],inner=pa["inner"],split=pab["split"],dodge=pab["dodge"],orient=orient,\
-        linewidth=pab["linewidth"],color=color,saturation=pab["saturation"])
+        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["v_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=vp_orient,\
+        linewidth=pab["linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["saturation"])
     elif pa["style"]=="violinplot + swarmplot":
-        print("VIOLINPLOT+SWARMPLOT")
-    elif pa["style"]=="swarmplot":
-        print("SWARMPLOT ONLY")
+        #Violinplot
+        sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
+        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["v_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=vp_orient,\
+        linewidth=pab["linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["saturation"])
+        #Swarmplot
+        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=sp_orient, color=sp_color, palette=pa["sp_palette"],\
+        size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])  
         
+    elif pa["style"]=="swarmplot":
+        print(sp_color)
+        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=sp_orient, color=sp_color, palette=pa["sp_palette"],\
+        size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])       
+    
+    
     #SET LEGEND OPTIONS
     facecolor= pa["facecolor"]
     edgecolor=pa["edgecolor"]
@@ -229,11 +254,6 @@ def figure_defaults():
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
-    cut=2
-    gridsize=100
-    v_width=0.8
-    saturation=0.75
-
     plot_arguments={
         "fig_width":"6.0",\
         "fig_height":"6.0",\
@@ -255,8 +275,12 @@ def figure_defaults():
         "bw_float":"",\
         "cut":"2",\
         "colors":STANDARD_COLORS,\
-        "color_value":"None",\
-        "color_rgb":"",\
+        "sp_color_value":"None",\
+        "sp_color_rgb":"",\
+        "vp_color_value":"None",\
+        "vp_color_rgb":"",\
+        "sp_edgecolor":None,\
+        "sp_linewidth":"",\
         "gridsize":"100",\
         "scale":"area",\
         "scales":STANDARD_SCALES,\
@@ -266,11 +290,15 @@ def figure_defaults():
         "inner":"box",\
         "inner_values":STANDARD_INNER,\
         "split":".off",\
-        "dodge":".off",\
-        "orient":"vertical",\
+        "vp_dodge":".off",\
+        "sp_dodge":".off",\
+        "vp_orient":"vertical",\
+        "sp_orient":"vertical",\
         "orientations":STANDARD_ORIENTATIONS,\
-        "palette":None,\
+        "vp_palette":None,\
+        "sp_palette":None,\
         "palettes":STANDARD_PALETTES,\
+        "sp_size":"5",\
         "saturation":"0.75",\
         "axis_line_width":1.0,\
         "xlabel_size":STANDARD_SIZES,\
