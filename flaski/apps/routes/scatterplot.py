@@ -105,6 +105,7 @@ def scatterplot(download=None):
                     return render_template('/apps/scatterplot.html' , filename=filename, apps=apps,**plot_arguments)
                     
                 else:
+                    plot_arguments=session["plot_arguments"]
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                     error_msg="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                     has the correct format and respective extension and try uploadling it again." %filename
