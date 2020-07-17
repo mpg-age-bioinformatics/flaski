@@ -68,7 +68,7 @@ def make_figure(df,pa,fig=None,ax=None):
 
     floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
         "handlelength","borderaxespad","borderpad","cut","bw_float","vp_width","vp_linewidth","vp_saturation",\
-        "sp_size","sp_linewidth","bp_size","bp_width","bp_saturation","bp_fliersize","bp_linewidth",\
+        "sp_size","sp_linewidth","bp_width","bp_saturation","bp_fliersize","bp_linewidth",\
         "bp_whis"]
     for a in floats:
         if pa[a] == "":
@@ -314,7 +314,6 @@ def figure_defaults():
         "bp_palette":None,\
         "palettes":STANDARD_PALETTES,\
         "sp_size":"5",\
-        "bp_size":"5",\
         "vp_saturation":"0.75",\
         "bp_saturation":"0.75",\
         "axis_line_width":1.0,\

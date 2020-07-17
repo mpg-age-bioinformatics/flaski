@@ -373,7 +373,7 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 15px;"> ..or write: <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                            <label style="padding-left: 15px;"> ..or write: <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:223px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
@@ -382,21 +382,21 @@
                                                 <option value="{{bp_orient_}}" {% if bp_orient_==bp_orient %} selected {% endif %}>{{bp_orient_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left:10px;"> Width: <input type="text" name= bp_width  value="{{bp_width}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left:15px;"> Width: <input type="text" name= bp_width  value="{{bp_width}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         <div class="row arg">
                                             <label style="padding-left: 5px;"> Saturation: <input type="text" name=bp_saturation value="{{bp_saturation}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 16px;"> Whis: <input type="text" name=bp_whis value="{{bp_whis}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 22px;"> Whis: <input type="text" name=bp_whis value="{{bp_whis}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 20px;"> Fliersize: <input type="text" name=bp_fliersize value="{{bp_fliersize}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 22px;"> Size: <input type="bp_size" name=bp_size value="{{bp_size}}" style="width:80px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 4px;"> Line width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 4px;"> Fliersize: <input type="text" name=bp_fliersize value="{{bp_fliersize}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                        </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 5px;"> Line width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 72px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= bp_dodge {% if bp_dodge == "on"%} checked {% elif bp_dodge==".on" %} checked {% endif %}/></label>
+                                            <label style="padding-left: 94px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= bp_dodge {% if bp_dodge == "on"%} checked {% elif bp_dodge==".on" %} checked {% endif %}/></label>
                                         </div>
 
 
@@ -467,88 +467,90 @@
                         </li>
                     {% endif %}
 
-                    <!-- -------------------- LEGEND ARGUMENTS ---------------------- -->
-                    <li class="nav-item" style="padding-top: 0px;">
-                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLegend" aria-expanded="true" aria-controls="collapseLegend" style="padding-top: 0px;">
-                            <i class="fas fa-fw fa-cog"></i>
-                            <span>Legend</span>
-                        </a>
-                        <div id="collapseLegend" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                            <div class="bg-white py-2 collapse-inner rounded openmenu">
-                                <div class="row arguments">
+                    {% if hue != None %}
+                        <!-- -------------------- LEGEND ARGUMENTS ---------------------- -->
+                        <li class="nav-item" style="padding-top: 0px;">
+                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLegend" aria-expanded="true" aria-controls="collapseLegend" style="padding-top: 0px;">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Legend</span>
+                            </a>
+                            <div id="collapseLegend" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                <div class="bg-white py-2 collapse-inner rounded openmenu">
+                                    <div class="row arguments">
 
-                                        <div class="row arg">
-                                            <label>Title: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:263px;height:22px;padding-left:4px"></label>
-                                        </div>
+                                            <div class="row arg">
+                                                <label>Title: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:263px;height:22px;padding-left:4px"></label>
+                                            </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-left:5px;" >Title fontsize: <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:60px;height:22px;padding-left:10px; ">
-                                                {% for legend_title_fontsize_ in title_size %}
-                                                    <option value="{{legend_title_fontsize_}}" {% if legend_title_fontsize_==legend_title_fontsize %} selected {% endif %}>{{legend_title_fontsize_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:10px;"> ..or write it: <input type="text" name="legend_title_fontisize_value" value="{{legend_title_fontsize_value}}" style="width:60px;height:22px;padding-left:4px;">
-                                        </div>
+                                            <div class="row arg">
+                                                <label style="padding-left:5px;" >Title fontsize: <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:60px;height:22px;padding-left:10px; ">
+                                                    {% for legend_title_fontsize_ in title_size %}
+                                                        <option value="{{legend_title_fontsize_}}" {% if legend_title_fontsize_==legend_title_fontsize %} selected {% endif %}>{{legend_title_fontsize_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:10px;"> ..or write it: <input type="text" name="legend_title_fontisize_value" value="{{legend_title_fontsize_value}}" style="width:60px;height:22px;padding-left:4px;">
+                                            </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-bottom:0px;" >Body fontsize: <select name="legend_body_fontsize" value="{{legend_body_fontsize}}" method="GET" action="/" style="width:60px;height:22px;padding-left:2px;">
-                                                {% for legend_body_fontsize_ in legend_fontsizes %}
-                                                    <option value="{{legend_body_fontsize_}}" {% if legend_body_fontsize_==legend_body_fontsize %} selected {% endif %}>{{legend_body_fontsize_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:10px; "> ..or write it: <input type="text" name="legend_body_fontisize_value" value="{{legend_body_fontsize_value}}" style="width:60px;height:22px;padding-left:4px">
-                                        </div>
+                                            <div class="row arg">
+                                                <label style="padding-bottom:0px;" >Body fontsize: <select name="legend_body_fontsize" value="{{legend_body_fontsize}}" method="GET" action="/" style="width:60px;height:22px;padding-left:2px;">
+                                                    {% for legend_body_fontsize_ in legend_fontsizes %}
+                                                        <option value="{{legend_body_fontsize_}}" {% if legend_body_fontsize_==legend_body_fontsize %} selected {% endif %}>{{legend_body_fontsize_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:10px; "> ..or write it: <input type="text" name="legend_body_fontisize_value" value="{{legend_body_fontsize_value}}" style="width:60px;height:22px;padding-left:4px">
+                                            </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-left: 24px;">Facecolor: <select name="facecolor" value="{{facecolor}}"  method="GET" action="/" style="width:60px;">
-                                            {% for facecolor_ in colors %}
-                                                <option value="{{facecolor_}}" {% if facecolor_==facecolor %} selected {% endif %}>{{facecolor_}}</option>
-                                                {% endfor %}
-                                            </select></label>
+                                            <div class="row arg">
+                                                <label style="padding-left: 24px;">Facecolor: <select name="facecolor" value="{{facecolor}}"  method="GET" action="/" style="width:60px;">
+                                                {% for facecolor_ in colors %}
+                                                    <option value="{{facecolor_}}" {% if facecolor_==facecolor %} selected {% endif %}>{{facecolor_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
 
-                                            <label style="padding-left: 16px;">Edgecolor: <select name="edgecolor" value="{{edgecolor}}" method="GET" action="/" style="width:60px;padding-left:2px;">
-                                                {% for edgecolor_ in colors %}
-                                                    <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>
-                                                {% endfor %}
-                                            </select></label>
+                                                <label style="padding-left: 16px;">Edgecolor: <select name="edgecolor" value="{{edgecolor}}" method="GET" action="/" style="width:60px;padding-left:2px;">
+                                                    {% for edgecolor_ in colors %}
+                                                        <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
 
-                                        </div>
+                                            </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-left: 30px;">Location: <select name="legend_loc" value="{{legend_loc}}" method="GET" action="/" style="width:60px;padding-left: 2px;">
-                                                {% for legend_loc_ in legend_locations %}
-                                                    <option value="{{legend_loc_}}" {% if legend_loc_==legend_loc %} selected {% endif %}>{{legend_loc_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:45px;">Mode: <select name="mode" value='{{mode}}' method="GET" action="/" style="width:60px;">
-                                                {% for mode_ in modes %}                                                    
-                                                    <option value="{{modes_}}" {% if mode_==mode %} selected {% endif %}>{{mode_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                        </div>
+                                            <div class="row arg">
+                                                <label style="padding-left: 30px;">Location: <select name="legend_loc" value="{{legend_loc}}" method="GET" action="/" style="width:60px;padding-left: 2px;">
+                                                    {% for legend_loc_ in legend_locations %}
+                                                        <option value="{{legend_loc_}}" {% if legend_loc_==legend_loc %} selected {% endif %}>{{legend_loc_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:45px;">Mode: <select name="mode" value='{{mode}}' method="GET" action="/" style="width:60px;">
+                                                    {% for mode_ in modes %}                                                    
+                                                        <option value="{{modes_}}" {% if mode_==mode %} selected {% endif %}>{{mode_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                            </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-right:4px;"> Markerfirst: <input style= " padding-top: 4px; width:7px;" type="checkbox" name="markerfirst" {% if markerfirst =="on" %} checked {% elif markerfirst ==".on" %} checked {% endif %}/></label>
-                                            <label style="padding-left:32px;padding-right:4px;">Fancybox: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="fancybox"{% if fancybox =="on" %} checked {% elif fancybox ==".on" %} checked {% endif %}/></label>
-                                            <label style="padding-left:32px;padding-right:4px;">Shadow: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="shadow"{% if shadow =="on" %} checked {% elif shadow==".on" %} checked {% endif %}/></label>
-                                        </div>
+                                            <div class="row arg">
+                                                <label style="padding-right:4px;"> Markerfirst: <input style= " padding-top: 4px; width:7px;" type="checkbox" name="markerfirst" {% if markerfirst =="on" %} checked {% elif markerfirst ==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-left:32px;padding-right:4px;">Fancybox: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="fancybox"{% if fancybox =="on" %} checked {% elif fancybox ==".on" %} checked {% endif %}/></label>
+                                                <label style="padding-left:32px;padding-right:4px;">Shadow: <input style= "padding-top: 4px; width:7px;" type="checkbox" name="shadow"{% if shadow =="on" %} checked {% elif shadow==".on" %} checked {% endif %}/></label>
+                                            </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-left: 21px;">Borderpad:  <input type="text" name="borderpad" value='{{ borderpad }}' style="width:40px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 13px;">Border-axes pad:  <input type="text" name="borderaxespad" value='{{ borderaxespad }}' style="width:40px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 0px;">Handle length:  <input type="text" name="handlelength" value='{{ handlelength }}' style="width:40px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 20px;">Handle textpad:  <input type="text" name="handletextpad" value='{{ handletextpad }}' style="width:40px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 3px;">Label spacing:  <input type="text" name="labelspacing" value='{{ labelspacing }}' style="width:40px;height:22px;padding-left:4px;"></label>                                            
-                                            <label style="padding-left: 15px;">Column spacing:  <input type="text" name="columnspacing" value='{{ columnspacing }}' style="width:40px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 16px;">Framealpha:  <input type="text" name="framealpha" value='{{ framealpha }}' style="width:40px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 49px;" >N columns: <input type="text" name="legend_ncol" value="{{legend_ncol}}" style="width:40px;height:22px;padding-left:4px;"></label>
-                                        </div>
+                                            <div class="row arg">
+                                                <label style="padding-left: 21px;">Borderpad:  <input type="text" name="borderpad" value='{{ borderpad }}' style="width:40px;height:22px;padding-left:4px;"></label>
+                                                <label style="padding-left: 13px;">Border-axes pad:  <input type="text" name="borderaxespad" value='{{ borderaxespad }}' style="width:40px;height:22px;padding-left:4px;"></label>
+                                                <label style="padding-left: 0px;">Handle length:  <input type="text" name="handlelength" value='{{ handlelength }}' style="width:40px;height:22px;padding-left:4px;"></label>
+                                                <label style="padding-left: 20px;">Handle textpad:  <input type="text" name="handletextpad" value='{{ handletextpad }}' style="width:40px;height:22px;padding-left:4px;"></label>
+                                                <label style="padding-left: 3px;">Label spacing:  <input type="text" name="labelspacing" value='{{ labelspacing }}' style="width:40px;height:22px;padding-left:4px;"></label>                                            
+                                                <label style="padding-left: 15px;">Column spacing:  <input type="text" name="columnspacing" value='{{ columnspacing }}' style="width:40px;height:22px;padding-left:4px;"></label>
+                                                <label style="padding-left: 16px;">Framealpha:  <input type="text" name="framealpha" value='{{ framealpha }}' style="width:40px;height:22px;padding-left:4px;"></label>
+                                                <label style="padding-left: 49px;" >N columns: <input type="text" name="legend_ncol" value="{{legend_ncol}}" style="width:40px;height:22px;padding-left:4px;"></label>
+                                            </div>
 
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                        
+                        </li>
+                    {% endif %}
+   
                         
                 {% endif %}
             
