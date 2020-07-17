@@ -36,7 +36,7 @@ def make_figure(df,pa,fig=None,ax=None):
     """
    # MAIN FIGURE
     fig, axes = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-    print("vp_color is",GET_COLOR(pa["vp_color_rgb"]))
+    print("bp_color is",GET_COLOR(pa["bp_color_rgb"]))
   
     #UPLOAD ARGUMENTS
     vals=pa["vals"].copy()
@@ -44,24 +44,33 @@ def make_figure(df,pa,fig=None,ax=None):
     tmp=df.copy()
     tmp=tmp[vals]
 
+
+
     possible_nones=[ "x_val" , "y_val" , "hue", "order", "hue_order" , "inner","vp_palette",\
-        "sp_palette","x_val","y_val","hue","sp_edgecolor","edgecolor","facecolor"]
+        "sp_palette","bp_palette","x_val","y_val","hue","sp_edgecolor","edgecolor","facecolor"]
     for p in possible_nones:
         if pa[p] == "None" :
             pa[p]=None
+
+    #Set Dodge to True by default if user selected Hue
+    if pa["hue"]!=None:
+        pa["sp_dodge"]="on"
+        pa["vp_dodge"]="on"
+        pa["bp_dodge"]="on"
     
     pab={}
     for arg in ["upper_axis","lower_axis","left_axis","right_axis",\
         "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
-        "split","sp_dodge","vp_dodge","scale_hue","shadow","fancybox","markerfirst"]:
+        "split","sp_dodge","vp_dodge","bp_dodge","scale_hue","shadow","fancybox","markerfirst"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
             pab[arg]=True
 
     floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
-        "handlelength","borderaxespad","borderpad","cut","bw_float","v_width","linewidth","saturation",\
-        "sp_size","sp_linewidth"]
+        "handlelength","borderaxespad","borderpad","cut","bw_float","vp_width","vp_linewidth","vp_saturation",\
+        "sp_size","sp_linewidth","bp_size","bp_width","bp_saturation","bp_fliersize","bp_linewidth",\
+        "bp_whis"]
     for a in floats:
         if pa[a] == "":
             pab[a]=None
@@ -91,15 +100,19 @@ def make_figure(df,pa,fig=None,ax=None):
         else:
             vp_color=pa["vp_color_value"]  
     
-    if pa["sp_orient"]=="horizontal":
-        sp_orient="h"
-    elif pa["sp_orient"]=="vertical":
-        sp_orient="v"
-
-    if pa["vp_orient"]=="horizontal":
-        vp_orient="h"
-    elif pa["vp_orient"]=="vertical":
-        vp_orient="v"
+    if pa["bp_color_rgb"] != "":
+        bp_color=GET_COLOR(pa["bp_color_rgb"])
+    else:
+        if pa["bp_color_value"]=="None":
+            bp_color=None
+        else:
+            bp_color=pa["bp_color_value"]
+    
+    for each in ["sp_orient","vp_orient","bp_orient"]:
+        if pa[each]=="horizontal":
+            pab[each]="h"
+        elif pa[each]=="vertical":
+            pab[each]="v"
 
     if pab["bw_float"]==None:
         bw=pa["bw"]
@@ -108,24 +121,19 @@ def make_figure(df,pa,fig=None,ax=None):
     
     scale=pa["scale"]
 
+
     #PLOT MAIN FIGURE
 
-    if pa["style"]=="violinplot":
+    if "violinplot" in pa["style"]:
         sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
-        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["v_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=vp_orient,\
-        linewidth=pab["linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["saturation"])
-    elif pa["style"]=="violinplot + swarmplot":
-        #Violinplot
-        sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
-        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["v_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=vp_orient,\
-        linewidth=pab["linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["saturation"])
-        #Swarmplot
-        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=sp_orient, color=sp_color, palette=pa["sp_palette"],\
-        size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])  
-        
-    elif pa["style"]=="swarmplot":
-        print(sp_color)
-        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=sp_orient, color=sp_color, palette=pa["sp_palette"],\
+        scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["vp_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=pab["vp_orient"],\
+        linewidth=pab["vp_linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["vp_saturation"])
+    if "boxplot" in pa["style"]:
+        sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=pa["bp_palette"],saturation=pab["bp_saturation"],\
+        width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
+    if "swarmplot" in pa["style"]:
+        print("color is",sp_color)
+        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=pa["sp_palette"],\
         size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])       
     
     
@@ -225,7 +233,7 @@ def make_figure(df,pa,fig=None,ax=None):
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
-STANDARD_STYLES=["violinplot","swarmplot","violinplot + swarmplot"]
+STANDARD_STYLES=["violinplot","swarmplot","boxplot","violinplot + swarmplot","boxplot + swarmplot"]
 BWS=["scott","silverman"]
 STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
 STANDARD_SCALES=["area","count","width"]
@@ -279,27 +287,38 @@ def figure_defaults():
         "sp_color_rgb":"",\
         "vp_color_value":"None",\
         "vp_color_rgb":"",\
+        "bp_color_value":"None",\
+        "bp_color_rgb":"",\
+        "bp_width":"0.8",\
+        "bp_fliersize":"5",\
+        "bp_whis":"1.5",\
         "sp_edgecolor":None,\
         "sp_linewidth":"",\
+        "bp_linewidth":"",\
+        "vp_linewidth":"",\
         "gridsize":"100",\
         "scale":"area",\
         "scales":STANDARD_SCALES,\
         "scale_hue":".off",\
-        "v_width":"0.8",\
-        "linewidth":"",\
+        "vp_width":"0.8",\
         "inner":"box",\
         "inner_values":STANDARD_INNER,\
         "split":".off",\
-        "vp_dodge":".off",\
-        "sp_dodge":".off",\
+        "vp_dodge":"on",\
+        "sp_dodge":"on",\
+        "bp_dodge":"on",\
         "vp_orient":"vertical",\
         "sp_orient":"vertical",\
+        "bp_orient":"vertical",\
         "orientations":STANDARD_ORIENTATIONS,\
         "vp_palette":None,\
         "sp_palette":None,\
+        "bp_palette":None,\
         "palettes":STANDARD_PALETTES,\
         "sp_size":"5",\
-        "saturation":"0.75",\
+        "bp_size":"5",\
+        "vp_saturation":"0.75",\
+        "bp_saturation":"0.75",\
         "axis_line_width":1.0,\
         "xlabel_size":STANDARD_SIZES,\
         "ylabel_size":STANDARD_SIZES,\
