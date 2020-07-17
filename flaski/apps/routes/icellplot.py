@@ -145,7 +145,7 @@ def icellplot(download=None):
                         # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                         error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                         has the correct format and respective extension and try uploadling the gene expression file again." %filename
-                        flash(error_msg,'error')
+                        flash(error_message,'error')
                         session["ge_filename"]="Select file.."
 
             if ( (session["ge_filename"]=="Select file..") & (not annotation_columns ) ) | (session["filename"]=="Select file..")  :
