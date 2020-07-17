@@ -36,7 +36,6 @@ def make_figure(df,pa,fig=None,ax=None):
     """
    # MAIN FIGURE
     fig, axes = plt.subplots(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
-    print("bp_color is",GET_COLOR(pa["bp_color_rgb"]))
   
     #UPLOAD ARGUMENTS
     vals=pa["vals"].copy()
@@ -132,7 +131,6 @@ def make_figure(df,pa,fig=None,ax=None):
         sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=pa["bp_palette"],saturation=pab["bp_saturation"],\
         width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
     if "swarmplot" in pa["style"]:
-        print("color is",sp_color)
         sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=pa["sp_palette"],\
         size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])       
     

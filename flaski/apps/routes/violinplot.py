@@ -105,8 +105,6 @@ def violinplot(download=None):
             df=pd.read_json(session["df"])
             filename=session["filename"]
 
-            # print(plot_arguments)
-            #plot_arguments=session["plot_arguments"]
 
             #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE VIOLINPLOT
             if  vals == []:
