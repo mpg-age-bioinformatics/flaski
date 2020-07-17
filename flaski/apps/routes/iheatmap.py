@@ -109,13 +109,13 @@ def iheatmap(download=None):
                     
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
-                    error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
+                    error_msg="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
                     return render_template('/apps/iheatmap.html' , filename="Select file..", apps=apps, **plot_arguments)
             
             if "df" not in list(session.keys()):
-                    error_message="No data to plot, please upload a data or session  file."
+                    error_msg="No data to plot, please upload a data or session  file."
                     flash(error_msg,'error')
                     return render_template('/apps/iheatmap.html' , filename="Select file..", apps=apps,  **plot_arguments)
 

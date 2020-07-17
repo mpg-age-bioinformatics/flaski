@@ -116,7 +116,7 @@ def pca(download=None):
                     
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
-                    error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
+                    error_msg="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
                     return render_template('/apps/pca.html' , filename="Select file..", apps=apps, **plot_arguments)

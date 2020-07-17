@@ -115,12 +115,12 @@ def heatmap(download=None):
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
                     error_message="You can can only upload files with the following extensions: 'xlsx', 'tsv', 'csv'. Please make sure the file '%s' \
                     has the correct format and respective extension and try uploadling it again." %filename
-                    flash(error_msg,'error')
+                    flash(error_message,'error')
                     return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps, **plot_arguments)
             
             if "df" not in list(session.keys()):
                     error_message="No data to plot, please upload a data or session  file."
-                    flash(error_msg,'error')
+                    flash(error_message,'error')
                     return render_template('/apps/heatmap.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
             # READ INPUT DATA FROM SESSION JSON
