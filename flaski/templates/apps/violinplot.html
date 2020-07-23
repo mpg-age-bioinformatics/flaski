@@ -251,7 +251,7 @@
                         </div>
                     </li>
 
-                    {% if style=="violinplot" or style=="violinplot + swarmplot"%}           
+                    {% if style=="Violinplot" or style=="Violinplot and Swarmplot"%}           
                         <!------------ SELECT VIOLINPLOT ARGUMENTS -------------------->
                         
 
@@ -335,6 +335,7 @@
 
 
 
+
                                     </div>
                                 </div>
                             </div>
@@ -342,7 +343,7 @@
                     {% endif %}
 
 
-                    {% if style=="boxplot" or style=="boxplot + swarmplot" %}           
+                    {% if style=="Boxplot" or style=="Boxplot and Swarmplot" %}           
                         <!------------ SELECT BOXPLOT ARGUMENTS -------------------->
                         
 
@@ -396,7 +397,8 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 94px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= bp_dodge {% if bp_dodge == "on"%} checked {% elif bp_dodge==".on" %} checked {% endif %}/></label>
+                                            <label style="padding-left: 5px;"> Hue width: <input type="text" name=group_width value="{{group_width}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 78px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= bp_dodge {% if bp_dodge == "on"%} checked {% elif bp_dodge==".on" %} checked {% endif %}/></label>
                                         </div>
 
 
@@ -406,7 +408,7 @@
                             </div>
                         </li>
                     {% endif %}
-                    {% if style == "swarmplot" or style == "violinplot + swarmplot" or style=="boxplot + swarmplot"%}
+                    {% if style == "Swarmplot" or style == "Violinplot and Swarmplot" or style=="Boxplot and Swarmplot"%}
                         <!------------ SELECT SWARMPLOT ARGUMENTS -------------------->
                         <li class="nav-item" style="padding-top: 0px;">
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSwarmplotArguments" aria-expanded="true" aria-controls="collapseSwarmplotArguments" style="padding-top: 0px;">
@@ -433,7 +435,7 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 15px;"> ..or write: <input type="text" name=sp_color_rgb value="{{sp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                            <label style="padding-left: 15px;"> ..or write: <input type="text" name=sp_color_rgb value="{{sp_color_rgb}}" style="width:221px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
@@ -442,7 +444,7 @@
                                                 <option value="{{sp_edgecolor_}}" {% if sp_edgecolor_==sp_edgecolor %} selected {% endif %}>{{sp_edgecolor_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 14px;"> Line width: <input type="text" name=sp_linewidth value="{{sp_linewidth}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 17px;"> Line width: <input type="text" name=sp_linewidth value="{{sp_linewidth}}" style="width:50px;height:22px;padding-left: 4px;"></label>
                                         </div>
                                         
                                         <div class="row arg">
@@ -451,14 +453,12 @@
                                                 <option value="{{sp_orient_}}" {% if sp_orient_==sp_orient %} selected {% endif %}>{{sp_orient_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 54px;"> Size: <input type="sp_size" name=sp_size value="{{sp_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 57px;"> Size: <input type="sp_size" name=sp_size value="{{sp_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                         </div>
 
                                         
                                         <div class="row arg">
-
-                                            <label style="padding-left: 92px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= sp_dodge {% if sp_dodge == "on"%} checked {% elif sp_dodge==".on" %} checked {% endif %}/></label>
-
+                                            <label style="padding-left: 94px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= sp_dodge {% if sp_dodge == "on"%} checked {% elif sp_dodge==".on" %} checked {% endif %}/></label>
                                         </div>
 
                                     </div>

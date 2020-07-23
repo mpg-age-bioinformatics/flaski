@@ -22,6 +22,41 @@ def GET_COLOR(x):
     else:
         return str(x)
 
+from matplotlib.patches import PathPatch
+
+def adjust_box_widths(g, fac):
+    """
+    Adjust the widths of a seaborn-generated boxplot.
+    """
+
+    # iterating through Axes instances
+    for ax in g.axes:
+
+        # iterating through axes artists:
+        for c in ax.get_children():
+
+            # searching for PathPatches
+            if isinstance(c, PathPatch):
+                # getting current width of box:
+                p = c.get_path()
+                verts = p.vertices
+                verts_sub = verts[:-1]
+                xmin = np.min(verts_sub[:, 0])
+                xmax = np.max(verts_sub[:, 0])
+                xmid = 0.5*(xmin+xmax)
+                xhalf = 0.5*(xmax - xmin)
+
+                # setting new width of box
+                xmin_new = xmid-fac*xhalf
+                xmax_new = xmid+fac*xhalf
+                verts_sub[verts_sub[:, 0] == xmin, 0] = xmin_new
+                verts_sub[verts_sub[:, 0] == xmax, 0] = xmax_new
+
+                # setting new width of median line
+                for l in ax.lines:
+                    if np.all(l.get_xdata() == [xmin, xmax]):
+                        l.set_xdata([xmin_new, xmax_new])
+
 
 def make_figure(df,pa,fig=None,ax=None):
     """Generates figure.
@@ -69,7 +104,7 @@ def make_figure(df,pa,fig=None,ax=None):
     floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
         "handlelength","borderaxespad","borderpad","cut","bw_float","vp_width","vp_linewidth","vp_saturation",\
         "sp_size","sp_linewidth","bp_width","bp_saturation","bp_fliersize","bp_linewidth",\
-        "bp_whis"]
+        "bp_whis","group_width"]
     for a in floats:
         if pa[a] == "":
             pab[a]=None
@@ -123,17 +158,21 @@ def make_figure(df,pa,fig=None,ax=None):
 
     #PLOT MAIN FIGURE
 
-    if "violinplot" in pa["style"]:
+    if "Violinplot" in pa["style"]:
         sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
         scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["vp_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=pab["vp_orient"],\
         linewidth=pab["vp_linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["vp_saturation"])
-    if "boxplot" in pa["style"]:
+    if "Boxplot" in pa["style"]:
         sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=pa["bp_palette"],saturation=pab["bp_saturation"],\
         width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
-    if "swarmplot" in pa["style"]:
+    if "Swarmplot" in pa["style"]:
         sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=pa["sp_palette"],\
         size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])       
     
+    #Set group distance
+    if pa["hue"]!=None:
+        adjust_box_widths(fig, pab["group_width"])
+
     
     #SET LEGEND OPTIONS
     facecolor= pa["facecolor"]
@@ -222,7 +261,11 @@ def make_figure(df,pa,fig=None,ax=None):
 
         axes.grid(axis=pa["grid_value"], color=grid_color, linestyle=pa["grid_linestyle_value"], linewidth=float(pa["grid_linewidth"]), alpha=float(pa["grid_alpha"]) )
 
-    plt.title(pa["title"], fontsize=float(pa["title_size_value"]))
+    if pa["title"]=="":
+        title=pa["style"]
+    else:
+        title=pa["title"]
+    plt.title(title, fontsize=float(pa["title_size_value"]))
 
     plt.tight_layout()
 
@@ -231,7 +274,7 @@ def make_figure(df,pa,fig=None,ax=None):
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
-STANDARD_STYLES=["violinplot","swarmplot","boxplot","violinplot + swarmplot","boxplot + swarmplot"]
+STANDARD_STYLES=["Violinplot","Swarmplot","Boxplot","Violinplot and Swarmplot","Boxplot and Swarmplot"]
 BWS=["scott","silverman"]
 STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
 STANDARD_SCALES=["area","count","width"]
@@ -280,6 +323,7 @@ def figure_defaults():
         "bws":BWS,\
         "bw_float":"",\
         "cut":"2",\
+        "group_width":"0.7",\
         "colors":STANDARD_COLORS,\
         "sp_color_value":"None",\
         "sp_color_rgb":"",\
