@@ -100,26 +100,33 @@
                                     <label style="width:250px;padding-left:125px;">Layout</label>
 
                                     <div class="row arg">
-                                        <label style="padding-left: 35px;">Legend: </label>
+                                        <label style="padding-left: 0px;">Legend: </label>
                                         <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_legend {% if show_legend == "on"%} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
                                     </div>
 
                                     <div class="row arg">
-                                        <label style="width:86;padding-left:35px;">Log scale:</label>
+                                        <label style="width:86;padding-left:23px;">Log scale:</label>
                                         <label style="width:5px;padding-left:5px;"><input type="checkbox" name= log_scale {% if log_scale == "on" %} checked {% elif log_scale== ".on" %} checked {% endif %}/></label>
                                     </div>
 
                                     <div class="row arg">
-                                        <label style="padding-left:35px;">Error bar: </label>
+                                        <label style="padding-left:23px;">KDE: </label>
+                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= kde {% if kde == "on"%} checked {% elif kde ==".on" %} checked {% endif %}/></label>
+                                    </div>
+
+                                    <div class="row arg">
+                                        <label style="padding-left:23px;">Error bar: </label>
                                         <label style="width:5px;padding-left:3px;"><input type="checkbox" name= errorbar {% if errorbar == "on"%} checked {% elif errorbar==".on" %} checked {% endif %}/></label>
                                     </div>
+
+
                                     
                                     <div class="row arg">
                                         <label style="padding-left: 32px;">Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:70px;height:22px;padding-left: 4px;"></label>
-                                        <label style="padding-left: 30px;">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:70px;height:22px;padding-left: 4px;"></label>
+                                        <label style="padding-left: 31px;">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:70px;height:22px;padding-left: 4px;"></label>
                                     </div>
 
-                                    <label style="padding-left:0px;">Paper color: <select  name=paper_bgcolor value="{{paper_bgcolor}}" method="GET" action="/" style="width:70px;">
+                                    <label style="padding-left:2px;">Paper color: <select  name=paper_bgcolor value="{{paper_bgcolor}}" method="GET" action="/" style="width:70px;">
                                         {% for paper_bgcolor_ in colors %}
                                         <option value="{{paper_bgcolor_}}" {% if paper_bgcolor_==paper_bgcolor %} selected {% endif %}>{{paper_bgcolor_}}</option>
                                         {% endfor %}
@@ -524,153 +531,205 @@
                                            
                                 
                     <!-- -------------------- Histogram ARGUMENTS ---------------------- -->
-                    
-                    {% for group,args in groups_settings.items() %}
-                    
-                        <li class="nav-item" style="padding-top: 0px;">
-                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target= "#collapseHistogram{{group}}" aria-expanded="true" aria-controls="collapseHistogram{{group}}" style="padding-top: 0px;">
-                                <i class="fas fa-fw fa-cog"></i>
-                                <span>Histogram {{group}}</span>
-                            </a>
-                            
-                            <div id="collapseHistogram{{group}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                <div class="bg-white py-2 collapse-inner rounded openmenu">
-                                    <div class="row arguments">
+                    {% if kde == "on" %} 
+                    <li class="nav-item" style="padding-top: 0px;">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKDE" aria-expanded="true" aria-controls="collapseKDE" style="padding-top:0px;">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Kernel Density Estimation (KDE)</span>
+                        </a>
+                        <div id="collapseKDE" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded openmenu">
+                                <div class="row arguments">
 
-                     
-                                            <label style="width:280px;padding-left:125px;">Main body</label>
-
-                                        
-                                            <label>Label: <input type="text" name={{group}}.label value= "{{args.label}}" style="width:259px;height:22px;padding-left:4px;"></label>
-                                        
-
-                         
-                                                <label style="padding-left:23px;">Direction:
-                                                    <select name={{group}}.cumulative_direction value="{{args.cumulative_direction}}" method="GET" action="/" style="width:80px;">
-                                                    {% for cumulative_direction_ in cumulative_directions %}
-                                                        <option value="{{cumulative_direction_}}" {% if cumulative_direction_==args.cumulative_direction %} selected {% endif %}>{{cumulative_direction_}}</option>
-                                                    {% endfor %}
-                                                    </select>
-                                                </label>
-                                                <label style="padding-left:46px;">Cumulative: </label><label  style="width:5px;padding-left:4px;"><input type="checkbox" name= {{group}}.cumulative {% if args.cumulative  == "on"%} checked {% elif args.cumulative ==".on" %} checked {% endif %}/></label>
-
-                                            
-    
-                                            <label style="padding-left:25px;">Function: <select  name={{group}}.histfunc value="{{args.histfunc}}" method="GET" action="/" style="width:80px;">
-                                                {% for histfunc_ in histfuncs %}
-                                                <option value="{{histfunc_}}" {% if histfunc_==args.histfunc %} selected {% endif %}>{{histfunc_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:21px;">Fill alpha: <input type="text" name={{group}}.opacity value="{{args.opacity}}"  style="width:50px;height:22px;padding-left:4px;"></label>
-                                        
-    
-                         
-                                                <label style="padding-left:27px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;">
-                                                    {% for colors_ in colors %}
-                                                    <option value="{{colors_}}" {% if colors_==args.color_value %} selected {% endif %}>{{colors_}}</option>
-                                                    {% endfor %}
-                                                </select></label>
-                                            
-                                            
-                                            
-                                                <label style="padding-left:22px;"> ..or write: <input type="text" name={{group}}.color_rgb value="{{args.color_rgb}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                            
-                                            
-                         
-                                                <label style="padding-left:19px;">Line color: <select
-                                                    name={{group}}.line_color
-                                                    value="{{args.line_color}}" method="GET" action="/" style="width:80px;">
-                                                    {% for colors_ in colors %}
-                                                    <option value="{{colors_}}" {% if colors_==args.line_color %} selected {% endif %}>{{colors_}}</option>
-                                                    {% endfor %}
-                                                </select></label>
-                                            
-                                            
-                                                <label style="padding-left:22px;"> ..or write: <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:50px;height:22px;padding-left:4px;"></label>
-    
-                                                <label style="padding-left:19px;">Line style: <select name={{group}}.linestyle_value value = "{{args.linestyle_value}}" method="GET" action="/" style="width:80px;">
-                                                    {% for linestyles_ in linestyles %}
-                                                    <option value="{{linestyles_}}" {% if linestyles_==args.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
-                                                    {% endfor %}
-                                                </select></label>
-                                                <label style="padding-left:12px;"> Line width: <input type="text" name={{group}}.linewidth value="{{args.linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
-    
-                                            
-                         
-                                                <label style="padding-left:20px;" >Histnorm: <select name={{group}}.histnorm
-                                                    val="{{args.histnorm}}"  method="GET" action="/" style="width:80px;">
-                                                    {% for histnorms_ in histnorms %}
-                                                    <option value="{{histnorms_}}" {% if histnorms_==args.histnorm %} selected {% endif %}>{{histnorms_}}</option>
-                                                    {% endfor %}
-                                                </select></label>
-                                            
-    
-                          
-                                                <label style="padding-left:38px;">N bins: <input type="text" name={{group}}.bins_number  value="{{args.bins_number}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                            
-                                        
-                         
-                                                <label style="padding-left:8px;">Orientation: <select name={{group}}.orientation_value val= "{{args.orientation}}"
-                                                    method="GET" action="/" style="width:80px;">
-                                                    {% for orientations_ in orientations %}
-                                                    <option value="{{orientations_}}" {% if orientations_==args.orientation_value %} selected {% endif %}>{{orientations_}}</option>
-                                                    {% endfor %}
-                                                </select></label>
-                                            
-                                        
-                                            <hr class="black">
-
-                                            <label style="width:280px;padding-left:135px;">Hover</label>
-
-                                            
-                                            <label>Text: <input type="text" name={{group}}.text value= "{{args.text}}" style="width:265px;height:22px;padding-left:4px;"></label>
-                                            
-                                            
-                                            <label style="padding-left:8px;">Display: <select  name={{group}}.hoverinfo value="{{args.hoverinfo}}" method="GET" action="/" style="width:70px;">
-                                                {% for hoverinfo_ in hoverinfos %}
-                                                <option value="{{hoverinfo_}}" {% if hoverinfo_==args.hoverinfo %} selected {% endif %}>{{hoverinfo_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:25px;">Alignment: <select  name={{group}}.hover_align value="{{args.hover_align }}" method="GET" action="/" style="width:70px;">
-                                                {% for hover_align_ in hover_alignments %}
-                                                <option value="{{hover_align_}}" {% if hover_align_==args.hover_align %} selected {% endif %}>{{hover_align_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="width:200px;">Color:</label>
-                                            <label style="padding-left:12px;">Border: <select  name={{group}}.hover_bordercolor value="{{args.hover_bordercolor }}" method="GET" action="/" style="width:70px;">
-                                                {% for hover_bordercolor_ in colors %}
-                                                <option value="{{hover_bordercolor_}}" {% if hover_bordercolor_==args.hover_bordercolor %} selected {% endif %}>{{hover_bordercolor_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:15px;">Background: <select  name={{group}}.hover_bgcolor value="{{args.hover_bgcolor}}" method="GET" action="/" style="width:70px;">
-                                                {% for hover_bgcolor_ in colors %}
-                                                <option value="{{hover_bgcolor_}}" {% if hover_bgcolor_==args.hover_bgcolor %} selected {% endif %}>{{hover_bgcolor_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-
-                                            <label style="width:300px;">Font: </label>
-
-                                            <label style="padding-left:13px;">Family: <select  name={{group}}.hover_fontfamily value="{{args.hover_fontfamily }}" method="GET" action="/" style="width:70px;">
-                                                {% for hover_fontfamily_ in fonts %}
-                                                <option value="{{hover_fontfamily_}}" {% if hover_fontfamily_==args.hover_fontfamily %} selected {% endif %}>{{hover_fontfamily_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:57px;">Color: <select  name={{group}}.hover_fontcolor value="{{args.hover_fontcolor }}" method="GET" action="/" style="width:70px;">
-                                                {% for hover_fontcolor_ in colors %}
-                                                <option value="{{hover_fontcolor_}}" {% if hover_fontcolor_==args.hover_fontcolor %} selected {% endif %}>{{hover_fontcolor_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left:27px;">Size: <select  name={{group}}.hover_fontsize value="{{args.hover_fontsize  }}" method="GET" action="/" style="width:70px;">
-                                                {% for hover_fontsize_ in fontsizes %}
-                                                <option value="{{hover_fontsize_}}" {% if hover_fontsize_ ==args.hover_fontsize  %} selected {% endif %}>{{hover_fontsize_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                            
+                                    <div class="row arg">
+                                        <label style="padding-left: 45px;">Histogram: </label>
+                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_hist {% if show_hist == "on"%} checked {% elif show_hist==".on" %} checked {% endif %}/></label>
+                                        <label style="width:86;padding-left:45px;">Rug:</label>
+                                        <label style="width:5px;padding-left:5px;"><input type="checkbox" name= show_rug {% if show_rug == "on" %} checked {% elif show_rug == ".on" %} checked {% endif %}/></label>
+                                        <label style="padding-left:45px;">Curve: </label>
+                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_curve {% if show_curve == "on"%} checked {% elif show_curve ==".on" %} checked {% endif %}/></label>
                                     </div>
+
+                                    <label style="padding-left:20px;">Curve type: <select  name=curve_type value="{{curve_type}}" method="GET" action="/" style="width:80px;">
+                                        {% for curve_type_ in curve_types %}
+                                        <option value="{{curve_type_}}" {% if curve_type_==curve_type %} selected {% endif %}>{{curve_type_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left:19px;">Bin size: <input type="text" name=bin_size value="{{bin_size}}"  style="width:50px;height:22px;padding-left:4px;"></label>
+                                    
+                                    <label style="padding-left:0px;">Normalization: <select  name=histnorm value="{{histnorm}}" method="GET" action="/" style="width:80px;">
+                                        {% for histnorm_ in histnorms %}
+                                        <option value="{{histnorm_}}" {% if histnorm_==histnorm %} selected {% endif %}>{{histnorm_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left:15px;">Rug text: <input type="text" name=rug_text value="{{rug_text}}"  style="width:50px;height:22px;padding-left:4px;"></label>
+                                    
+                                    {% for group,args in groups_settings.items() %}
+
+                                    <label style="padding-left:0px;width:300px;">{{group}}: </label>
+                                    <label style="padding-left:33px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;">
+                                        {% for colors_ in colors %}
+                                        <option value="{{colors_}}" {% if colors_==args.color_value %} selected {% endif %}>{{colors_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                
+                                    <label style="padding-left:16px;"> ..or write: <input type="text" name={{group}}.color_rgb value="{{args.color_rgb}}" style="width:50px;height:22px;padding-left:4px;"></label>
+
+                                    {% endfor %}
+
                                 </div>
                             </div>
-                        </li>
-                    {% endfor %}
+                        </div>
+                    </li> 
+                    {% endif %}  
+                    {% if kde != "on" %} 
+                        {% for group,args in groups_settings.items() %}
+                        
+                            <li class="nav-item" style="padding-top: 0px;">
+                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target= "#collapseHistogram{{group}}" aria-expanded="true" aria-controls="collapseHistogram{{group}}" style="padding-top: 0px;">
+                                    <i class="fas fa-fw fa-cog"></i>
+                                    <span>Histogram {{group}}</span>
+                                </a>
+                                
+                                <div id="collapseHistogram{{group}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                                        <div class="row arguments">
+
+                        
+                                                <label style="width:280px;padding-left:125px;">Main body</label>
+
+                                            
+                                                <label>Label: <input type="text" name={{group}}.label value= "{{args.label}}" style="width:259px;height:22px;padding-left:4px;"></label>
+                                            
+
+                            
+                                                    <label style="padding-left:23px;">Direction:
+                                                        <select name={{group}}.cumulative_direction value="{{args.cumulative_direction}}" method="GET" action="/" style="width:80px;">
+                                                        {% for cumulative_direction_ in cumulative_directions %}
+                                                            <option value="{{cumulative_direction_}}" {% if cumulative_direction_==args.cumulative_direction %} selected {% endif %}>{{cumulative_direction_}}</option>
+                                                        {% endfor %}
+                                                        </select>
+                                                    </label>
+                                                    <label style="padding-left:46px;">Cumulative: </label><label  style="width:5px;padding-left:4px;"><input type="checkbox" name= {{group}}.cumulative {% if args.cumulative  == "on"%} checked {% elif args.cumulative ==".on" %} checked {% endif %}/></label>
+
+                                                
+        
+                                                <label style="padding-left:25px;">Function: <select  name={{group}}.histfunc value="{{args.histfunc}}" method="GET" action="/" style="width:80px;">
+                                                    {% for histfunc_ in histfuncs %}
+                                                    <option value="{{histfunc_}}" {% if histfunc_==args.histfunc %} selected {% endif %}>{{histfunc_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:21px;">Fill alpha: <input type="text" name={{group}}.opacity value="{{args.opacity}}"  style="width:50px;height:22px;padding-left:4px;"></label>
+                                            
+        
+                            
+                                                    <label style="padding-left:27px;">Fill color: <select  name={{group}}.color_value value="{{args.color_value}}" method="GET" action="/" style="width:80px;">
+                                                        {% for colors_ in colors %}
+                                                        <option value="{{colors_}}" {% if colors_==args.color_value %} selected {% endif %}>{{colors_}}</option>
+                                                        {% endfor %}
+                                                    </select></label>
+                                                
+                                                
+                                                
+                                                    <label style="padding-left:22px;"> ..or write: <input type="text" name={{group}}.color_rgb value="{{args.color_rgb}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                                
+                                                
+                            
+                                                    <label style="padding-left:19px;">Line color: <select
+                                                        name={{group}}.line_color
+                                                        value="{{args.line_color}}" method="GET" action="/" style="width:80px;">
+                                                        {% for colors_ in colors %}
+                                                        <option value="{{colors_}}" {% if colors_==args.line_color %} selected {% endif %}>{{colors_}}</option>
+                                                        {% endfor %}
+                                                    </select></label>
+                                                
+                                                
+                                                    <label style="padding-left:22px;"> ..or write: <input type="text" name={{group}}.line_rgb value="{{args.line_rgb}}" style="width:50px;height:22px;padding-left:4px;"></label>
+        
+                                                    <label style="padding-left:19px;">Line style: <select name={{group}}.linestyle_value value = "{{args.linestyle_value}}" method="GET" action="/" style="width:80px;">
+                                                        {% for linestyles_ in linestyles %}
+                                                        <option value="{{linestyles_}}" {% if linestyles_==args.linestyle_value %} selected {% endif %}>{{linestyles_}}</option>
+                                                        {% endfor %}
+                                                    </select></label>
+                                                    <label style="padding-left:12px;"> Line width: <input type="text" name={{group}}.linewidth value="{{args.linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
+        
+                                                
+                            
+                                                    <label style="padding-left:20px;" >Histnorm: <select name={{group}}.histnorm
+                                                        val="{{args.histnorm}}"  method="GET" action="/" style="width:80px;">
+                                                        {% for histnorms_ in histnorms %}
+                                                        <option value="{{histnorms_}}" {% if histnorms_==args.histnorm %} selected {% endif %}>{{histnorms_}}</option>
+                                                        {% endfor %}
+                                                    </select></label>
+                                                
+        
+                            
+                                                    <label style="padding-left:38px;">N bins: <input type="text" name={{group}}.bins_number  value="{{args.bins_number}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                                
+                                            
+                            
+                                                    <label style="padding-left:8px;">Orientation: <select name={{group}}.orientation_value val= "{{args.orientation}}"
+                                                        method="GET" action="/" style="width:80px;">
+                                                        {% for orientations_ in orientations %}
+                                                        <option value="{{orientations_}}" {% if orientations_==args.orientation_value %} selected {% endif %}>{{orientations_}}</option>
+                                                        {% endfor %}
+                                                    </select></label>
+                                                
+                                            
+                                                <hr class="black">
+
+                                                <label style="width:280px;padding-left:135px;">Hover</label>
+
+                                                
+                                                <label>Text: <input type="text" name={{group}}.text value= "{{args.text}}" style="width:265px;height:22px;padding-left:4px;"></label>
+                                                
+                                                
+                                                <label style="padding-left:8px;">Display: <select  name={{group}}.hoverinfo value="{{args.hoverinfo}}" method="GET" action="/" style="width:70px;">
+                                                    {% for hoverinfo_ in hoverinfos %}
+                                                    <option value="{{hoverinfo_}}" {% if hoverinfo_==args.hoverinfo %} selected {% endif %}>{{hoverinfo_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:25px;">Alignment: <select  name={{group}}.hover_align value="{{args.hover_align }}" method="GET" action="/" style="width:70px;">
+                                                    {% for hover_align_ in hover_alignments %}
+                                                    <option value="{{hover_align_}}" {% if hover_align_==args.hover_align %} selected {% endif %}>{{hover_align_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="width:200px;">Color:</label>
+                                                <label style="padding-left:12px;">Border: <select  name={{group}}.hover_bordercolor value="{{args.hover_bordercolor }}" method="GET" action="/" style="width:70px;">
+                                                    {% for hover_bordercolor_ in colors %}
+                                                    <option value="{{hover_bordercolor_}}" {% if hover_bordercolor_==args.hover_bordercolor %} selected {% endif %}>{{hover_bordercolor_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:15px;">Background: <select  name={{group}}.hover_bgcolor value="{{args.hover_bgcolor}}" method="GET" action="/" style="width:70px;">
+                                                    {% for hover_bgcolor_ in colors %}
+                                                    <option value="{{hover_bgcolor_}}" {% if hover_bgcolor_==args.hover_bgcolor %} selected {% endif %}>{{hover_bgcolor_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+
+                                                <label style="width:300px;">Font: </label>
+
+                                                <label style="padding-left:13px;">Family: <select  name={{group}}.hover_fontfamily value="{{args.hover_fontfamily }}" method="GET" action="/" style="width:70px;">
+                                                    {% for hover_fontfamily_ in fonts %}
+                                                    <option value="{{hover_fontfamily_}}" {% if hover_fontfamily_==args.hover_fontfamily %} selected {% endif %}>{{hover_fontfamily_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:57px;">Color: <select  name={{group}}.hover_fontcolor value="{{args.hover_fontcolor }}" method="GET" action="/" style="width:70px;">
+                                                    {% for hover_fontcolor_ in colors %}
+                                                    <option value="{{hover_fontcolor_}}" {% if hover_fontcolor_==args.hover_fontcolor %} selected {% endif %}>{{hover_fontcolor_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                                <label style="padding-left:27px;">Size: <select  name={{group}}.hover_fontsize value="{{args.hover_fontsize  }}" method="GET" action="/" style="width:70px;">
+                                                    {% for hover_fontsize_ in fontsizes %}
+                                                    <option value="{{hover_fontsize_}}" {% if hover_fontsize_ ==args.hover_fontsize  %} selected {% endif %}>{{hover_fontsize_}}</option>
+                                                    {% endfor %}
+                                                </select></label>
+                                
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %} 
                 {% endif %}
             {% endif %}
 

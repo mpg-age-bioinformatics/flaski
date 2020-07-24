@@ -1,7 +1,7 @@
 #from matplotlib.figure import Figure
 import plotly.express as px
 import plotly.graph_objects as go
-
+import plotly.figure_factory as ff
 from collections import OrderedDict
 import numpy as np
 
@@ -28,146 +28,173 @@ def make_figure(df,pa):
     tmp=tmp[pa["vals"]]
 
     fig = go.Figure( )
-    fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
 
     # MAIN FIGURE
-    # PLOT ONE HISTOGRAM PER COLUMN SELECTED BY USER
     pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar","errorbar_symmetric","tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis"]:
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar",\
+        "errorbar_symmetric","tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
+        "kde","show_hist","show_curve","show_rug"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
             pab[arg]=True
 
-    for h in pa["groups_settings"].values():
-        hoverinfo=h["hoverinfo"]
-        hover_align=h["hover_align"]
-        hover_fontsize=int(h["hover_fontsize"])
-        histfunc=h["histfunc"]
-        cumulative_direction=h["cumulative_direction"]
-
-        if h["label"]!="":
-            name=h["label"]
-        else:
-            name=""
-        
-        if h["text"]!="":
-            text=h["text"]
-        else:
-            text=""
-
-        if h["color_rgb"] == "":
-            if h["color_value"]=="None":
-                marker_color=None
-            else:
-                marker_color = h["color_value"]
-        else:
-            marker_color = GET_COLOR( h["color_rgb"] )
-                
-        if h["line_rgb"] == "":
-            if h["line_color"]=="None":
-                line_color=None
-            else:
-                line_color = h["line_color"]
-        else:
-            line_color = GET_COLOR( h["line_rgb"] )
-        
-        if h["hover_bgcolor"]=="None":
-            hover_bgcolor=None
-        else:
-            hover_bgcolor = h["hover_bgcolor"]
-        
-        if h["hover_bordercolor"]=="None":
-            hover_bordercolor=None
-        else:
-            hover_bordercolor = h["hover_bordercolor"]
-        
-        if h["hover_fontfamily"] == "Default":
-            hover_fontfamily= None
-        else:
-            hover_fontfamily=h["hover_fontfamily"]
-        
-        if h["hover_fontcolor"]=="None":
-            hover_fontcolor=None
-        else:
-            hover_fontcolor = h["hover_fontcolor"]
-
-        if h["histnorm"] == "None":
-            histnorm = ""
-        else:
-            histnorm = h["histnorm"]
+    #KDE (KERNEL DENSITY ESTIMATION) plot
+    if pab["kde"]==True:
+        curve_type=pa["curve_type"]
+        histnorm=pa["histnorm"]
+        rug_text=list(pa["rug_text"])
+        bin_size=float(pa["bin_size"])
+        colors=list()
+        for h in pa["groups_settings"].values():
             
-        if h["opacity"]!=pa["opacity"]:
-            opacity=float(h["opacity"])
-        else:
-            opacity=float(pa["opacity"])
-        
-        if h["linewidth"]!=pa["linewidth"]:
-            linewidth=float(h["linewidth"])
-        else:
-            linewidth=float(pa["linewidth"])
-        
-        if h["density"]=="on":
-            pa_["density"]=True
-        else:
-            pa_["density"]=False
-
-        if h["cumulative"]=="on":
-            cumulative_enabled=True
-        else:
-            cumulative_enabled=False
-    
-        if h["bins_number"]=="":
-            bins_number=None
-        else:
-            bins_number=int(h["bins_number"])
-
-            
-        
-        marker=dict(color=marker_color,line=dict(width=linewidth,color=line_color))
-        cumulative=dict(enabled=cumulative_enabled,direction=cumulative_direction)
-
-        hoverlabel=dict(bgcolor=hover_bgcolor,bordercolor=hover_bordercolor,align=hover_align,\
-            font=dict(family=hover_fontfamily,size=hover_fontsize,color=hover_fontcolor))
-        
-        if pab["errorbar"]==True:
-                errorbar=True
-                errorbar_value=float(pa["errorbar_value"])
-                errorbar_type=pa["errorbar_type"]
-                errorbar_symmetric=pab["errorbar_symmetric"]
-                errorbar_thickness=float(pa["errorbar_thickness"])
-                errorbar_width=float(pa["errorbar_width"])
-                if pa["errorbar_color"]=="None":
-                    errorbar_color=None
+            if h["color_rgb"] == "":
+                if h["color_value"]=="None":
+                    colors.append(None)
                 else:
-                    errorbar_color = pa["errorbar_color"]
-
-        if h["orientation_value"]=="vertical":
-
-            if pab["errorbar"]==True:
-                error_y=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
-                    thickness=errorbar_thickness,width=errorbar_width)
+                    colors.append(h["color_value"])
             else:
-                error_y=dict(visible=False)
-                
-            trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
-            opacity=opacity,nbinsx=bins_number,name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
+                colors.append(GET_COLOR( h["color_rgb"] ))
+        
+        hist_data=[]
+        for col in tmp.columns:
+            hist_data.append(tmp[col])
+        print("NOW I AM HERE")
 
+        fig=ff.create_distplot(hist_data=hist_data,group_labels=pa["vals"],curve_type=curve_type,show_hist=pab["show_hist"],\
+            show_curve=pab["show_curve"],show_rug=pab["show_rug"],bin_size=bin_size,rug_text=rug_text,colors=colors)
 
-        elif h["orientation_value"]=="horizontal":
+    else:
+        for h in pa["groups_settings"].values():
+            hoverinfo=h["hoverinfo"]
+            hover_align=h["hover_align"]
+            hover_fontsize=int(h["hover_fontsize"])
+            histfunc=h["histfunc"]
+            cumulative_direction=h["cumulative_direction"]
 
-            if pab["errorbar"]==True:
-                error_x=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
-                    thickness=errorbar_thickness,width=errorbar_width)
+            if h["label"]!="":
+                name=h["label"]
             else:
-                error_x=dict(visible=False)
+                name=""
             
-            fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
-            opacity=opacity,nbinsy=bins_number,name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
+            if h["text"]!="":
+                text=h["text"]
+            else:
+                text=""
+
+            if h["color_rgb"] == "":
+                if h["color_value"]=="None":
+                    marker_color=None
+                else:
+                    marker_color = h["color_value"]
+            else:
+                marker_color = GET_COLOR( h["color_rgb"] )
+                    
+            if h["line_rgb"] == "":
+                if h["line_color"]=="None":
+                    line_color=None
+                else:
+                    line_color = h["line_color"]
+            else:
+                line_color = GET_COLOR( h["line_rgb"] )
+            
+            if h["hover_bgcolor"]=="None":
+                hover_bgcolor=None
+            else:
+                hover_bgcolor = h["hover_bgcolor"]
+            
+            if h["hover_bordercolor"]=="None":
+                hover_bordercolor=None
+            else:
+                hover_bordercolor = h["hover_bordercolor"]
+            
+            if h["hover_fontfamily"] == "Default":
+                hover_fontfamily= None
+            else:
+                hover_fontfamily=h["hover_fontfamily"]
+            
+            if h["hover_fontcolor"]=="None":
+                hover_fontcolor=None
+            else:
+                hover_fontcolor = h["hover_fontcolor"]
+
+            if h["histnorm"] == "None":
+                histnorm = ""
+            else:
+                histnorm = h["histnorm"]
+                
+            if h["opacity"]!=pa["opacity"]:
+                opacity=float(h["opacity"])
+            else:
+                opacity=float(pa["opacity"])
+            
+            if h["linewidth"]!=pa["linewidth"]:
+                linewidth=float(h["linewidth"])
+            else:
+                linewidth=float(pa["linewidth"])
+            
+            if h["density"]=="on":
+                pa_["density"]=True
+            else:
+                pa_["density"]=False
+
+            if h["cumulative"]=="on":
+                cumulative_enabled=True
+            else:
+                cumulative_enabled=False
+
+            if h["bins_number"]=="":
+                bins_number=None
+            else:
+                bins_number=int(h["bins_number"])
+
+            
+            marker=dict(color=marker_color,line=dict(width=linewidth,color=line_color))
+            cumulative=dict(enabled=cumulative_enabled,direction=cumulative_direction)
+
+            hoverlabel=dict(bgcolor=hover_bgcolor,bordercolor=hover_bordercolor,align=hover_align,\
+                font=dict(family=hover_fontfamily,size=hover_fontsize,color=hover_fontcolor))
+            
+            if pab["errorbar"]==True:
+                    errorbar=True
+                    errorbar_value=float(pa["errorbar_value"])
+                    errorbar_type=pa["errorbar_type"]
+                    errorbar_symmetric=pab["errorbar_symmetric"]
+                    errorbar_thickness=float(pa["errorbar_thickness"])
+                    errorbar_width=float(pa["errorbar_width"])
+                    if pa["errorbar_color"]=="None":
+                        errorbar_color=None
+                    else:
+                        errorbar_color = pa["errorbar_color"]
+
+            if h["orientation_value"]=="vertical":
+
+                if pab["errorbar"]==True:
+                    error_y=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
+                        thickness=errorbar_thickness,width=errorbar_width)
+                else:
+                    error_y=dict(visible=False)
+
+                trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
+                    opacity=opacity,nbinsx=bins_number,name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
+            
+
+            elif h["orientation_value"]=="horizontal":
+
+                if pab["errorbar"]==True:
+                    error_x=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
+                        thickness=errorbar_thickness,width=errorbar_width)
+                else:
+                    error_x=dict(visible=False)
+                
+                fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
+                opacity=opacity,nbinsy=bins_number,name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
 
 
 
     #UPDATE LAYOUT OF HISTOGRAMS
+    #Figure size
+    fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
     #Update title
     if pa["title_fontfamily"]=="Default":
         title_fontfamily=None
@@ -269,7 +296,7 @@ def make_figure(df,pa):
     if pa["spikes_value"]=="both":
         fig.update_xaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)
         fig.update_yaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)
-   
+
     elif pa["spikes_value"]=="x":
         fig.update_xaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)   
     
@@ -477,7 +504,7 @@ STANDARD_LEGEND_YANCHORS=["auto","top","middle","bottom"]
 STANDARD_TRACEORDERS=["reversed", "grouped", "reversed+grouped", "normal"]
 STANDARD_SIDES=["top","left","top left"]
 STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker","across+marker","toaxis+across+marker"]
-
+STANDARD_CURVETYPES=["kde","normal"]
 
 def figure_defaults():
     """Generates default figure arguments.
@@ -506,6 +533,16 @@ def figure_defaults():
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
         "titles":"20",\
+        "kde":".off",\
+        "curve_type":"kde",\
+        "curve_types":STANDARD_CURVETYPES,\
+        "histnorm":"probability density",\
+        "histnorms":["probability density","probability"],\
+        "show_hist":"on",\
+        "show_curve":"on",\
+        "show_rug":"on",\
+        "rug_text":"",\
+        "bin_size":"1",\
         "opacity":0.8,\
         "paper_bgcolor":"None",\
         "plot_bgcolor":"None",\

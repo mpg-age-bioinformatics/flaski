@@ -158,7 +158,24 @@ def ihistogram(download=None):
                     return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
                 
                 #IF THE USER HAS SELECTED NEW COLUMNS TO BE PLOTTED
-                if session["plot_arguments"]["vals"]!=request.form.getlist("vals"):
+                if session["plot_arguments"]["vals"]!=request.form.getlist("vals") and session["plot_arguments"]["kde"] =="on":
+                    plot_arguments=session["plot_arguments"]
+                    plot_arguments["vals"]=request.form.getlist("vals")
+                    groups=plot_arguments["vals"]
+                    groups.sort()
+                    groups_settings=dict()
+                    for group in groups:
+                        if group not in plot_arguments["groups_settings"].keys():
+                            for group in groups:
+                                groups_settings[group]={"label":group,\
+                                        "color_value":"None",\
+                                        "color_rgb":""}
+                        else:
+                            groups_settings[group]={"label":group,\
+                                "color_value":request.form["%s.color_value" %group],\
+                                "color_rgb":request.form["%s.color_rgb" %group]}
+
+                elif session["plot_arguments"]["vals"]!=request.form.getlist("vals") and session["plot_arguments"]["kde"]!="on":
                     plot_arguments=session["plot_arguments"]
                     plot_arguments["vals"]=request.form.getlist("vals")
                     groups=plot_arguments["vals"]
@@ -255,42 +272,48 @@ def ihistogram(download=None):
             #plot_arguments=session["plot_arguments"]
             groups=request.form.getlist("vals")
             groups_settings=dict()
-            groups.sort()                                        
-            for group in groups:
-                groups_settings[group]={"name":group,\
-                    "label":request.form["%s.label" %group],\
-                    "color_value":request.form["%s.color_value" %group],\
-                    "color_rgb":request.form["%s.color_rgb" %group],\
-                    "histnorm":request.form["%s.histnorm" %group],\
-                    "orientation_value":request.form["%s.orientation_value" %group],\
-                    "linewidth":request.form["%s.linewidth" %group],\
-                    "linestyle_value":request.form["%s.linestyle_value" %group],\
-                    "line_color":request.form["%s.line_color" %group],\
-                    "line_rgb":request.form["%s.line_rgb" %group],\
-                    "opacity":request.form["%s.opacity" %group],\
-                    "text":request.form["%s.text" %group],\
-                    "bins_number":request.form["%s.bins_number" %group],\
-                    "hoverinfo":request.form["%s.hoverinfo" %group],\
-                    "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
-                    "hover_bordercolor":request.form["%s.hover_bordercolor" %group],\
-                    "hover_align":request.form["%s.hover_align" %group],\
-                    "hover_fontsize":request.form["%s.hover_fontsize" %group],\
-                    "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
-                    "hover_fontfamily":request.form["%s.hover_fontfamily" %group],\
-                    "cumulative_direction":request.form["%s.cumulative_direction" %group],\
-                    "histfunc":request.form["%s.histfunc" %group]
-                    }
-                            
-                    #If the user does not tick the options the arguments do not appear as keys in request.form
-                if "%s.density"%group in request.form.keys():
-                    groups_settings[group]["density"]=request.form["%s.density" %group]
-                else:
-                    groups_settings[group]["density"]="off"
-                            
-                if "%s.cumulative"%group in request.form.keys():
-                    groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
-                else:
-                    groups_settings[group]["cumulative"]="off"
+            groups.sort()   
+            if plot_arguments["kde"]!="on":                                    
+                for group in groups:
+                    groups_settings[group]={"name":group,\
+                        "label":request.form["%s.label" %group],\
+                        "color_value":request.form["%s.color_value" %group],\
+                        "color_rgb":request.form["%s.color_rgb" %group],\
+                        "histnorm":request.form["%s.histnorm" %group],\
+                        "orientation_value":request.form["%s.orientation_value" %group],\
+                        "linewidth":request.form["%s.linewidth" %group],\
+                        "linestyle_value":request.form["%s.linestyle_value" %group],\
+                        "line_color":request.form["%s.line_color" %group],\
+                        "line_rgb":request.form["%s.line_rgb" %group],\
+                        "opacity":request.form["%s.opacity" %group],\
+                        "text":request.form["%s.text" %group],\
+                        "bins_number":request.form["%s.bins_number" %group],\
+                        "hoverinfo":request.form["%s.hoverinfo" %group],\
+                        "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
+                        "hover_bordercolor":request.form["%s.hover_bordercolor" %group],\
+                        "hover_align":request.form["%s.hover_align" %group],\
+                        "hover_fontsize":request.form["%s.hover_fontsize" %group],\
+                        "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
+                        "hover_fontfamily":request.form["%s.hover_fontfamily" %group],\
+                        "cumulative_direction":request.form["%s.cumulative_direction" %group],\
+                        "histfunc":request.form["%s.histfunc" %group]
+                        }
+                                
+                        #If the user does not tick the options the arguments do not appear as keys in request.form
+                    if "%s.density"%group in request.form.keys():
+                        groups_settings[group]["density"]=request.form["%s.density" %group]
+                    else:
+                        groups_settings[group]["density"]="off"
+                                
+                    if "%s.cumulative"%group in request.form.keys():
+                        groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                    else:
+                        groups_settings[group]["cumulative"]="off"
+            else:
+                for group in groups:
+                    groups_settings[group]={"label":group,\
+                        "color_value":request.form["%s.color_value" %group],\
+                        "color_rgb":request.form["%s.color_rgb" %group]}
 
             plot_arguments["groups_settings"]=groups_settings
             session["plot_arguments"]=plot_arguments
