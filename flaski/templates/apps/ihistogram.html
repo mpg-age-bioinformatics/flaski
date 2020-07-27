@@ -542,11 +542,11 @@
                                 <div class="row arguments">
 
                                     <div class="row arg">
-                                        <label style="padding-left: 45px;">Histogram: </label>
+                                        <label style="padding-left: 0px;">Histogram: </label>
                                         <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_hist {% if show_hist == "on"%} checked {% elif show_hist==".on" %} checked {% endif %}/></label>
-                                        <label style="width:86;padding-left:45px;">Rug:</label>
+                                        <label style="width:86;padding-left:65px;">Rug:</label>
                                         <label style="width:5px;padding-left:5px;"><input type="checkbox" name= show_rug {% if show_rug == "on" %} checked {% elif show_rug == ".on" %} checked {% endif %}/></label>
-                                        <label style="padding-left:45px;">Curve: </label>
+                                        <label style="padding-left:69px;">Curve: </label>
                                         <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_curve {% if show_curve == "on"%} checked {% elif show_curve ==".on" %} checked {% endif %}/></label>
                                     </div>
 
@@ -557,9 +557,9 @@
                                     </select></label>
                                     <label style="padding-left:19px;">Bin size: <input type="text" name=bin_size value="{{bin_size}}"  style="width:50px;height:22px;padding-left:4px;"></label>
                                     
-                                    <label style="padding-left:0px;">Normalization: <select  name=histnorm value="{{histnorm}}" method="GET" action="/" style="width:80px;">
-                                        {% for histnorm_ in histnorms %}
-                                        <option value="{{histnorm_}}" {% if histnorm_==histnorm %} selected {% endif %}>{{histnorm_}}</option>
+                                    <label style="padding-left:0px;">Normalization: <select  name=kde_histnorm value="{{kde_histnorm}}" method="GET" action="/" style="width:80px;">
+                                        {% for kde_histnorm_ in kde_histnorms %}
+                                        <option value="{{kde_histnorm_}}" {% if kde_histnorm_==kde_histnorm %} selected {% endif %}>{{kde_histnorm_}}</option>
                                         {% endfor %}
                                     </select></label>
                                     <label style="padding-left:15px;">Rug text: <input type="text" name=rug_text value="{{rug_text}}"  style="width:50px;height:22px;padding-left:4px;"></label>
@@ -718,7 +718,7 @@
                                                     <option value="{{hover_fontcolor_}}" {% if hover_fontcolor_==args.hover_fontcolor %} selected {% endif %}>{{hover_fontcolor_}}</option>
                                                     {% endfor %}
                                                 </select></label>
-                                                <label style="padding-left:27px;">Size: <select  name={{group}}.hover_fontsize value="{{args.hover_fontsize  }}" method="GET" action="/" style="width:70px;">
+                                                <label style="padding-left:27px;">Size: <select  name={{group}}.hover_fontsize value="{{args.hover_fontsize}}" method="GET" action="/" style="width:70px;">
                                                     {% for hover_fontsize_ in fontsizes %}
                                                     <option value="{{hover_fontsize_}}" {% if hover_fontsize_ ==args.hover_fontsize  %} selected {% endif %}>{{hover_fontsize_}}</option>
                                                     {% endfor %}

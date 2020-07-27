@@ -17,19 +17,13 @@ def make_figure(df,pa):
         
     """
 
-    pa_={}
-    for n in ["fig_width","fig_height"]:
-        if pa[n] == "":
-            pa_[n]=None
-        else:
-            pa_[n]=float(pa[n])
-
     tmp=df.copy()
     tmp=tmp[pa["vals"]]
 
     fig = go.Figure( )
 
     # MAIN FIGURE
+    #Load checkboxes
     pab={}
     for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar",\
         "errorbar_symmetric","tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
@@ -39,15 +33,45 @@ def make_figure(df,pa):
         else:
             pab[arg]=True
 
+    #Load floats
+    floats=["bin_size","errorbar_value","errorbar_thickness","errorbar_width","x","y","axis_line_width","ticks_line_width",\
+        "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
+        "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
+        "legend_y","fig_width","fig_height"]
+
+    for a in floats:
+        if pa[a] == "" or pa[a]=="None" or pa[a]==None:
+            pab[a]=None
+        else:
+            pab[a]=float(pa[a])
+
+    #Load integers
+    integers=["label_fontsize","legend_fontsize","legend_title_fontsize","title_fontsize","maxxticks","maxyticks"]
+    for a in integers:
+        if pa[a] == "" or pa[a]=="None" or pa[a]==None:
+            pab[a]=None
+        else:
+            pab[a]=int(pa[a])
+
+    #Load Nones
+    possible_nones=["errorbar_color","title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
+    "paper_bgcolor","plot_bgcolor","grid_color","legend_bgcolor","legend_bordercolor","legend_fontcolor","legend_title_fontcolor",\
+     "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily"]
+    for p in possible_nones:
+        if pa[p] == "None" or pa[p]=="Default" :
+            pab[p]=None
+        else:
+            pab[p]=pa[p]
+
     #KDE (KERNEL DENSITY ESTIMATION) plot
     if pab["kde"]==True:
-        curve_type=pa["curve_type"]
-        histnorm=pa["histnorm"]
-        rug_text=list(pa["rug_text"])
-        bin_size=float(pa["bin_size"])
         colors=list()
+        if pa["rug_text"]!="":
+            rug_text=pa["rug_text"].split(",")
+        else:
+            rug_text=[]
+
         for h in pa["groups_settings"].values():
-            
             if h["color_rgb"] == "":
                 if h["color_value"]=="None":
                     colors.append(None)
@@ -59,18 +83,39 @@ def make_figure(df,pa):
         hist_data=[]
         for col in tmp.columns:
             hist_data.append(tmp[col])
-        print("NOW I AM HERE")
 
-        fig=ff.create_distplot(hist_data=hist_data,group_labels=pa["vals"],curve_type=curve_type,show_hist=pab["show_hist"],\
-            show_curve=pab["show_curve"],show_rug=pab["show_rug"],bin_size=bin_size,rug_text=rug_text,colors=colors)
+        fig=ff.create_distplot(hist_data=hist_data,group_labels=pa["vals"],curve_type=pa["curve_type"],show_hist=pab["show_hist"],\
+            show_curve=pab["show_curve"],show_rug=pab["show_rug"],bin_size=pab["bin_size"],rug_text=rug_text,colors=colors, histnorm=pa["kde_histnorm"])
 
     else:
         for h in pa["groups_settings"].values():
-            hoverinfo=h["hoverinfo"]
-            hover_align=h["hover_align"]
-            hover_fontsize=int(h["hover_fontsize"])
-            histfunc=h["histfunc"]
-            cumulative_direction=h["cumulative_direction"]
+            #Initialize dummie dict
+            h_=dict()
+
+            #Load integers
+            integers=["hover_fontsize","bins_number"]
+            for a in integers:
+                if h[a] == "" or h[a]=="None" or h[a] == None:
+                    h_[a]=None
+                else:
+                    h_[a]=int(h[a])
+
+            #Load Nones
+            possible_nones=["hover_bgcolor","hover_bordercolor","hover_fontfamily","hover_fontcolor"]
+            for p in possible_nones:
+                if h[p] == "None" or h[p]=="Default" :
+                    h_[p]=None
+                else:
+                    h_[p]=h[p]
+
+            #Load floats
+            floats=["opacity","linewidth"]
+
+            for a in floats:
+                if h[a] == "":
+                    h_[a]=None
+                else:
+                    h_[a]=float(h[a])
 
             if h["label"]!="":
                 name=h["label"]
@@ -97,156 +142,83 @@ def make_figure(df,pa):
                     line_color = h["line_color"]
             else:
                 line_color = GET_COLOR( h["line_rgb"] )
-            
-            if h["hover_bgcolor"]=="None":
-                hover_bgcolor=None
-            else:
-                hover_bgcolor = h["hover_bgcolor"]
-            
-            if h["hover_bordercolor"]=="None":
-                hover_bordercolor=None
-            else:
-                hover_bordercolor = h["hover_bordercolor"]
-            
-            if h["hover_fontfamily"] == "Default":
-                hover_fontfamily= None
-            else:
-                hover_fontfamily=h["hover_fontfamily"]
-            
-            if h["hover_fontcolor"]=="None":
-                hover_fontcolor=None
-            else:
-                hover_fontcolor = h["hover_fontcolor"]
+
 
             if h["histnorm"] == "None":
                 histnorm = ""
             else:
                 histnorm = h["histnorm"]
-                
-            if h["opacity"]!=pa["opacity"]:
-                opacity=float(h["opacity"])
-            else:
-                opacity=float(pa["opacity"])
-            
-            if h["linewidth"]!=pa["linewidth"]:
-                linewidth=float(h["linewidth"])
-            else:
-                linewidth=float(pa["linewidth"])
-            
-            if h["density"]=="on":
-                pa_["density"]=True
-            else:
-                pa_["density"]=False
 
             if h["cumulative"]=="on":
                 cumulative_enabled=True
             else:
                 cumulative_enabled=False
-
-            if h["bins_number"]=="":
-                bins_number=None
-            else:
-                bins_number=int(h["bins_number"])
-
             
-            marker=dict(color=marker_color,line=dict(width=linewidth,color=line_color))
-            cumulative=dict(enabled=cumulative_enabled,direction=cumulative_direction)
+            marker=dict(color=marker_color,line=dict(width=h_["linewidth"],color=line_color))
+            cumulative=dict(enabled=cumulative_enabled,direction=h["cumulative_direction"])
 
-            hoverlabel=dict(bgcolor=hover_bgcolor,bordercolor=hover_bordercolor,align=hover_align,\
-                font=dict(family=hover_fontfamily,size=hover_fontsize,color=hover_fontcolor))
+            hoverlabel=dict(bgcolor=h_["hover_bgcolor"],bordercolor=h_["hover_bordercolor"],align=h["hover_align"],\
+                font=dict(family=h_["hover_fontfamily"],size=h_["hover_fontsize"],color=h_["hover_fontcolor"]))
             
             if pab["errorbar"]==True:
                     errorbar=True
-                    errorbar_value=float(pa["errorbar_value"])
-                    errorbar_type=pa["errorbar_type"]
-                    errorbar_symmetric=pab["errorbar_symmetric"]
-                    errorbar_thickness=float(pa["errorbar_thickness"])
-                    errorbar_width=float(pa["errorbar_width"])
-                    if pa["errorbar_color"]=="None":
-                        errorbar_color=None
-                    else:
-                        errorbar_color = pa["errorbar_color"]
 
             if h["orientation_value"]=="vertical":
 
                 if pab["errorbar"]==True:
-                    error_y=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
-                        thickness=errorbar_thickness,width=errorbar_width)
+                    error_y=dict(visible=errorbar,value=pab["errorbar_value"],type=pa["errorbar_type"],symmetric=pab["errorbar_symmetric"],color=pab["errorbar_color"],\
+                        thickness=pab["errorbar_thickness"],width=pab["errorbar_width"])
                 else:
                     error_y=dict(visible=False)
 
-                trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
-                    opacity=opacity,nbinsx=bins_number,name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
+                trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
+                    opacity=h_["opacity"],nbinsx=h_["bins_number"],name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
             
 
             elif h["orientation_value"]=="horizontal":
 
                 if pab["errorbar"]==True:
-                    error_x=dict(visible=errorbar,value=errorbar_value,type=errorbar_type,symmetric=errorbar_symmetric,color=errorbar_color,\
-                        thickness=errorbar_thickness,width=errorbar_width)
+                    error_x=dict(visible=errorbar,value=pab["errorbar_value"],type=pa["errorbar_type"],symmetric=pab["errorbar_symmetric"],color=pab["errorbar_color"],\
+                        thickness=pab["errorbar_thickness"],width=pab["errorbar_width"])
                 else:
                     error_x=dict(visible=False)
                 
-                fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=hoverinfo,histfunc=histfunc,cumulative=cumulative,\
-                opacity=opacity,nbinsy=bins_number,name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
+                fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
+                opacity=h_["opacity"],nbinsy=h_["bins_number"],name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
 
 
 
     #UPDATE LAYOUT OF HISTOGRAMS
     #Figure size
-    fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
+    fig.update_layout( width=pab["fig_width"], height=pab["fig_height"] ) #  autosize=False,
+
     #Update title
-    if pa["title_fontfamily"]=="Default":
-        title_fontfamily=None
-    else:
-        title_fontfamily=pa["title_fontfamily"]
+    title=dict(text=pa["title"],font=dict(family=pab["title_fontfamily"],size=pab["title_fontsize"],color=pab["title_fontcolor"]),\
+        xref=pa["xref"],yref=pa["yref"],x=pab["x"],y=pab["y"],xanchor=pa["title_xanchor"],yanchor=pa["title_yanchor"])
 
-    if pa["title_fontcolor"]=="None":
-        title_fontcolor=None
-    else:
-        title_fontcolor=pa["title_fontcolor"]
+    fig.update_layout(title=title,barmode=pa["barmode"])
 
-    title_fontsize=int(pa["title_fontsize"])
-    xref=pa["xref"]
-    yref=pa["yref"]
 
-    title_xanchor=pa["title_xanchor"]
-    title_yanchor=pa["title_yanchor"]
-    x=float(pa["x"])
-    y=float(pa["y"])
-        
-    title=dict(text=pa["title"],font=dict(family=title_fontfamily,size=title_fontsize,color=title_fontcolor),\
-        xref=xref,yref=yref,x=x,y=y,xanchor=title_xanchor,yanchor=title_yanchor)
-
-    fig.update_layout(title=title)
-
-    fig.update_layout(barmode=pa["barmode"])
-
+    #Update axes
+    
     if pa["log_scale"]==True and pa["orientation"]=="vertical":
         fig.update_yaxes(type="log")
     elif pa["log_scale"]==True and pa["orientation"]=="horizontal":
         fig.update_xaxes(type="log")
 
-    #Update axes
-    if pa["axis_line_color"]=="None":
-        linecolor=None
-    else:
-        linecolor=pa["axis_line_color"]
-    fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor=linecolor)
-    fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor=linecolor)
+    fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"])
+    fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"])
 
     #Update ticks
-    if pa["ticks_color"]=="None":
-        tickcolor=None
-    else:
-        tickcolor=pa["ticks_color"]
+
     if pab["tick_lower_axis"]==False and pab["tick_right_axis"]==False and pab["tick_left_axis"]==False and pab["tick_upper_axis"]==False:
         pa["ticks_direction_value"]=""
         ticks=""
     else:
         ticks=pa["ticks_direction_value"]
-    fig.update_xaxes(ticks=ticks, tickwidth=float(pa["ticks_line_width"]), tickcolor=tickcolor, ticklen=float(pa["ticks_length"]))
-    fig.update_yaxes(ticks=ticks, tickwidth=float(pa["ticks_line_width"]), tickcolor=tickcolor, ticklen=float(pa["ticks_length"]))
+
+    fig.update_xaxes(ticks=ticks, tickwidth=pab["ticks_line_width"], tickcolor=pab["ticks_color"], ticklen=pab["ticks_length"])
+    fig.update_yaxes(ticks=ticks, tickwidth=pab["ticks_line_width"], tickcolor=pab["ticks_color"], ticklen=pab["ticks_length"])
 
     #Update mirror property of axis based on ticks and axis selected by user
     #Determines if the axis lines or/and ticks are mirrored to the opposite side of the plotting area. 
@@ -268,40 +240,32 @@ def make_figure(df,pa):
         fig.update_xaxes(mirror=False)
 
     if (pa["x_lower_limit"]!="") and (pa["x_upper_limit"]!="") :
-        xmin=float(pa["x_lower_limit"])
-        xmax=float(pa["x_upper_limit"])
+        xmin=pab["x_lower_limit"]
+        xmax=pab["x_upper_limit"]
         fig.update_xaxes(range=[xmin, xmax])
 
     if (pa["y_lower_limit"]!="") and (pa["y_upper_limit"]!="") :
-        ymin=float(pa["y_lower_limit"])
-        ymax=float(pa["y_upper_limit"])
+        ymin=pab["y_lower_limit"]
+        ymax=pab["y_upper_limit"]
         fig.update_yaxes(range=[ymin, ymax])
 
     if pa["maxxticks"]!="":
-        fig.update_yaxes(nticks=int(pa["maxxticks"]))
+        fig.update_yaxes(nticks=pab["maxxticks"])
 
     if pa["maxyticks"]!="":
-        fig.update_yaxes(nticks=int(pa["maxyticks"]))
+        fig.update_yaxes(nticks=pab["maxyticks"])
 
     #Update spikes
-    if pa["spikes_color"]=="None":
-        spikecolor=None
-    else:
-        spikecolor=pa["spikes_color"]
-
-    spikethickness=float(pa["spikes_thickness"])
-    spikedash=pa["spikes_dash"]
-    spikemode=pa["spikes_mode"]
     
     if pa["spikes_value"]=="both":
-        fig.update_xaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)
-        fig.update_yaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)
+        fig.update_xaxes(showspikes=True,spikecolor=pab["spikes_color"],spikethickness=pab["spikes_thickness"],spikedash=pa["spikes_dash"],spikemode=pa["spikes_mode"])
+        fig.update_yaxes(showspikes=True,spikecolor=pab["spikes_color"],spikethickness=pab["spikes_thickness"],spikedash=pa["spikes_dash"],spikemode=pa["spikes_mode"])
 
     elif pa["spikes_value"]=="x":
-        fig.update_xaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)   
+        fig.update_xaxes(showspikes=True,spikecolor=pab["spikes_color"],spikethickness=pab["spikes_thickness"],spikedash=pa["spikes_dash"],spikemode=pa["spikes_mode"])   
     
     elif pa["spikes_value"]=="y":
-        fig.update_yaxes(showspikes=True,spikecolor=spikecolor,spikethickness=spikethickness,spikedash=spikedash,spikemode=spikemode)   
+        fig.update_yaxes(showspikes=True,spikecolor=pab["spikes_color"],spikethickness=pab["spikes_thickness"],spikedash=pa["spikes_dash"],spikemode=pa["spikes_mode"])   
 
     elif pa["spikes_value"]=="None":
         fig.update_xaxes(showspikes=None)
@@ -309,69 +273,29 @@ def make_figure(df,pa):
 
 
     #UPDATE X AXIS AND Y AXIS LAYOUT
-    xlabel=pa["xlabel"]
-    ylabel=pa["ylabel"]
-    xlabel_fontsize=int(pa["label_fontsize"])
-    ylabel_fontsize=int(pa["label_fontsize"])
 
-    if pa["label_fontfamily"]=="Default":
-        xlabel_fontfamily=None
-    else:
-        xlabel_fontfamily=pa["label_fontfamily"]
+    xaxis=dict(visible=True, title=dict(text=pa["xlabel"],font=dict(family=pab["label_fontfamily"],size=pab["label_fontsize"],color=pab["label_fontcolor"])))
+    yaxis=dict(visible=True, title=dict(text=pa["ylabel"],font=dict(family=pab["label_fontfamily"],size=pab["label_fontsize"],color=pab["label_fontcolor"])))
 
-    if pa["label_fontfamily"]=="Default":
-        ylabel_fontfamily=None
-    else:
-        ylabel_fontfamily=pa["label_fontfamily"]
+    fig.update_layout(paper_bgcolor=pab["paper_bgcolor"],plot_bgcolor=pab["plot_bgcolor"],xaxis = xaxis,yaxis = yaxis)
 
-    if pa["label_fontcolor"]=="None":
-        xlabel_fontcolor=None
-    else:
-        xlabel_fontcolor = pa["label_fontcolor"]
-
-    if pa["label_fontcolor"]=="None":
-        ylabel_fontcolor=None
-    else:
-        ylabel_fontcolor = pa["label_fontcolor"]
-
-    if pa["paper_bgcolor"]=="None":
-        paper_bgcolor=None
-    else:
-        paper_bgcolor=pa["paper_bgcolor"]
-    if pa["plot_bgcolor"]=="None":
-        plot_bgcolor=None
-    else:
-        plot_bgcolor=pa["plot_bgcolor"]    
-    
-    xaxis=dict(visible=True, title=dict(text=xlabel,font=dict(family=xlabel_fontfamily,size=xlabel_fontsize,color=xlabel_fontcolor)))
-    yaxis=dict(visible=True, title=dict(text=ylabel,font=dict(family=ylabel_fontfamily,size=ylabel_fontsize,color=ylabel_fontcolor)))
-
-    fig.update_layout(paper_bgcolor=paper_bgcolor,
-    plot_bgcolor=plot_bgcolor,
-    xaxis = xaxis,
-    yaxis = yaxis)
-
-    fig.update_xaxes(tickangle=float(pa["xticks_rotation"]), tickfont=dict(size=float(pa["xticks_fontsize"])))
-    fig.update_yaxes(tickangle=float(pa["yticks_rotation"]), tickfont=dict(size=float(pa["yticks_fontsize"])))
+    fig.update_xaxes(tickangle=pab["xticks_rotation"], tickfont=dict(size=pab["xticks_fontsize"]))
+    fig.update_yaxes(tickangle=pab["yticks_rotation"], tickfont=dict(size=pab["yticks_fontsize"]))
 
     #UPDATE GRID PROPERTIES
-    gridwidth=float(pa["grid_width"])
-    if pa["grid_color"]=="None":
-        gridcolor=None
-    else:
-        gridcolor=pa["grid_color"]
+
 
     if pa["grid_value"] == "None":
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=False)
 
     elif pa["grid_value"]=="x":
-        fig.update_yaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+        fig.update_yaxes(showgrid=True,gridcolor=pab["grid_color"],gridwidth=pab["grid_width"])
     elif pa["grid_value"]=="y":
-        fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+        fig.update_xaxes(showgrid=True,gridcolor=pab["grid_color"],gridwidth=pab["grid_width"])
     elif pa["grid_value"]=="both":
-        fig.update_xaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
-        fig.update_yaxes(showgrid=True,gridcolor=gridcolor,gridwidth=gridwidth)
+        fig.update_xaxes(showgrid=True,gridcolor=pab["grid_color"],gridwidth=pab["grid_width"])
+        fig.update_yaxes(showgrid=True,gridcolor=pab["grid_color"],gridwidth=pab["grid_width"])
 
     fig.update_layout(template='plotly_white')
 
@@ -380,76 +304,17 @@ def make_figure(df,pa):
 
         labels=[x["label"] for x in pa["groups_settings"].values()]
 
-        if pa["legend_bgcolor"]=="None":
-            legend_bgcolor=None
-        else:
-            legend_bgcolor=pa["legend_bgcolor"]
-        
-        if pa["legend_bordercolor"]=="None":
-            legend_bordercolor=None
-        else:
-            legend_bordercolor=pa["legend_bordercolor"]
-        
-        if pa["legend_borderwidth"]=="":
-            legend_borderwidth=0
-        else:
-            legend_borderwidth=float(pa["legend_borderwidth"])
-        
-        if pa["legend_fontfamily"]=="Default":
-            legend_fontfamily=None
-        else:
-            legend_fontfamily=pa["legend_fontfamily"]
-
-        if pa["legend_fontcolor"]=="None":
-            legend_fontcolor=None
-        else:
-            legend_fontcolor=pa["legend_fontcolor"]
-
-        legend_fontsize=int(pa["legend_fontsize"])
-
-        legend_title=pa["legend_title"]
-
-        if pa["legend_title_fontfamily"]=="Default":
-            legend_title_fontfamily=None
-        else:
-            legend_title_fontfamily=pa["legend_title_fontfamily"]
-
-        if pa["legend_title_fontcolor"]=="None":
-            legend_title_fontcolor=None
-        else:
-            legend_title_fontcolor=pa["legend_title_fontcolor"]
-
-        legend_title_fontsize=int(pa["legend_title_fontsize"])
-
         if pa["legend_orientation"]=="vertical":
             legend_orientation="v"
         elif pa["legend_orientation"]=="horizontal":
             legend_orientation="h"
-
-        legend_traceorder=pa["legend_traceorder"]
-
-        if pa["legend_tracegroupgap"]=="":
-            legend_tracegroupgap=10
-        else:
-            legend_tracegroupgap=float(pa["legend_tracegroupgap"])
-
-        if pa["legend_x"]=="":
-            legend_x=1.02
-        else:
-            legend_x=float(pa["legend_x"])
         
-        if pa["legend_y"]=="":
-            legend_y=1
-        else:
-            legend_y=float(pa["legend_y"])
-        
-        legend_valign=pa["legend_valign"]
-        legend_title_side=pa["legend_side"]
-
-        
-        fig.update_layout(showlegend=True,legend=dict(bgcolor=legend_bgcolor,bordercolor=legend_bordercolor,borderwidth=legend_borderwidth,valign=legend_valign,\
-            font=dict(family=legend_fontfamily,size=legend_fontsize,color=legend_fontcolor),orientation=legend_orientation,traceorder=legend_traceorder,tracegroupgap=legend_tracegroupgap,\
-            title=dict(text=legend_title,side=legend_title_side,font=dict(family=legend_title_fontfamily,size=legend_title_fontsize,color=legend_title_fontcolor))))
+        fig.update_layout(showlegend=True,legend=dict(x=pab["legend_x"],y=pab["legend_y"],bgcolor=pab["legend_bgcolor"],bordercolor=pab["legend_bordercolor"],\
+            borderwidth=pab["legend_borderwidth"],valign=pa["legend_valign"],\
+            font=dict(family=pab["legend_fontfamily"],size=pab["legend_fontsize"],color=pab["legend_fontcolor"]),orientation=legend_orientation,\
+            traceorder=pa["legend_traceorder"],tracegroupgap=pab["legend_tracegroupgap"],\
+            title=dict(text=pa["legend_title"],side=pa["legend_side"],font=dict(family=pab["legend_title_fontfamily"],size=pab["legend_title_fontsize"],\
+            color=pab["legend_title_fontcolor"]))))
     
     else:
         fig.update_layout(showlegend=False)
@@ -457,7 +322,7 @@ def make_figure(df,pa):
 
     return fig
 
-STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
+STANDARD_SIZES=[str(i) for i in list(range(1,101))]
 STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
     "bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood",\
     "cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk",\
@@ -480,7 +345,6 @@ STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","
     "springgreen","steelblue","tan","teal","thistle","tomato","turquoise","violet","wheat","white",\
     "whitesmoke","yellow","yellowgreen"]
 STANDARD_HISTNORMS=['None', 'percent', 'probability', 'density', 'probability density']
-STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
 LINE_STYLES=["solid", "dot", "dash", "longdash", "dashdot","longdashdot"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
 STANDARD_ORIENTATIONS=['vertical','horizontal']
@@ -536,16 +400,16 @@ def figure_defaults():
         "kde":".off",\
         "curve_type":"kde",\
         "curve_types":STANDARD_CURVETYPES,\
-        "histnorm":"probability density",\
-        "histnorms":["probability density","probability"],\
+        "kde_histnorm":"probability density",\
+        "kde_histnorms":["probability density","probability"],\
         "show_hist":"on",\
         "show_curve":"on",\
         "show_rug":"on",\
         "rug_text":"",\
         "bin_size":"1",\
         "opacity":0.8,\
-        "paper_bgcolor":"None",\
-        "plot_bgcolor":"None",\
+        "paper_bgcolor":"white",\
+        "plot_bgcolor":"white",\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "histfuncs":STANDARD_HISTFUNC,\
@@ -558,7 +422,6 @@ def figure_defaults():
         "title_yanchors":STANDARD_TITLE_YANCHORS,\
         "title_xanchor":"auto",\
         "title_yanchor":"auto",\
-        "linewidth":1.0,\
         "show_legend":"on",\
         "errorbar":".off",\
         "errorbar_value":"10",\
@@ -575,7 +438,6 @@ def figure_defaults():
         "cols":[],\
         "groups":[],\
         "vals":[],\
-        "list_of_groups":[],\
         "groups_settings":dict(),\
         "log_scale":".off",\
         "fonts":STANDARD_FONTS,\
@@ -635,7 +497,6 @@ def figure_defaults():
         "legend_bgcolor":"None",\
         "legend_borderwidth":"0",\
         "legend_bordercolor":"None",\
-        "legend_borderwidth":"0",\
         "legend_fontfamily":"Default",\
         "legend_fontsize":"12",\
         "legend_fontcolor":"None",\

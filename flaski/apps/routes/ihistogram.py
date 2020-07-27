@@ -96,8 +96,6 @@ def ihistogram(download=None):
                 cols=df.columns.tolist()
                 filename=session["filename"]
 
-
-
                 #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE HISTOGRAMS
                 if request.form.getlist("vals") == []:
                     session["plot_arguments"]=figure_defaults()
@@ -107,110 +105,112 @@ def ihistogram(download=None):
                     flash(sometext,'info')
                     return render_template('/apps/ihistogram.html' , filename=filename, apps=apps,**plot_arguments)
                     
-                #IF THE USER SELECTED THE COLUMNS TO BE PLOTTED FOR THE FIRST TIME,
-                #WE INITIALIZE THE DICTIONARY GROUPS SETTINGS
+                #IF THE USER SELECTED THE COLUMNS TO BE PLOTTED FOR THE FIRST TIME OR IF THE USER CHANGES FROM KDE TO HIST OR FROM HIST TO KDE
+                if "kde" in request.form.keys() and session["plot_arguments"]["kde"]=="on":
+                    kde=False
+                elif "kde" not in request.form.keys() and session["plot_arguments"]["kde"] in [".off","off"]:
+                    kde=False
+                else:
+                    kde=True
                 
-                if session["plot_arguments"]["groups_settings"] == dict():
-                    plot_arguments=session["plot_arguments"]
-                    plot_arguments["vals"]=request.form.getlist("vals")
-                    groups=plot_arguments["vals"]
-                    groups.sort()
-                    groups_settings=dict()
-                    for group in groups:
-                        groups_settings[group]={"name":group,\
-                            "values":df[group],\
-                            "label":group,\
-                            "color_value":"None",\
-                            "color_rgb":"",\
-                            "histnorm":"",\
-                            "orientation_value":"v",\
-                            "linewidth":0.5,\
-                            "linestyle_value":"solid",\
-                            "line_color":"lightgrey",\
-                            "line_rgb":"",\
-                            "opacity":0.8,\
-                            "text":"",\
-                            "bins_number":"",\
-                            "hoverinfo":"all",\
-                            "hover_bgcolor":"None",\
-                            "hover_bordercolor":"None",\
-                            "hover_align":"auto",\
-                            "hover_fontfamily":"Default",\
-                            "hover_fontsize":"12",\
-                            "hover_fontcolor":"None",\
-                            "histfunc":"count",\
-                            "density":".off",\
-                            "cumulative_direction":"increasing",\
-                            "cumulative":".off"}
-                            
-                    plot_arguments["groups_settings"]=groups_settings
-                    session["plot_arguments"]=plot_arguments
-                    filename=session["filename"]
-                    #plot_arguments=session["plot_arguments"]
-         
-                    # READ INPUT DATA FROM SESSION JSON
-                    df=pd.read_json(session["df"])
+                if session["plot_arguments"]["groups_settings"] == dict() or kde or session["plot_arguments"]["vals"]!=request.form.getlist("vals"):
 
-                     #CALL FIGURE FUNCTION
-                    fig=make_figure(df,plot_arguments)
-                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-                    return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
-                
-                #IF THE USER HAS SELECTED NEW COLUMNS TO BE PLOTTED
-                if session["plot_arguments"]["vals"]!=request.form.getlist("vals") and session["plot_arguments"]["kde"] =="on":
-                    plot_arguments=session["plot_arguments"]
-                    plot_arguments["vals"]=request.form.getlist("vals")
-                    groups=plot_arguments["vals"]
-                    groups.sort()
-                    groups_settings=dict()
-                    for group in groups:
-                        if group not in plot_arguments["groups_settings"].keys():
-                            for group in groups:
-                                groups_settings[group]={"label":group,\
-                                        "color_value":"None",\
-                                        "color_rgb":""}
-                        else:
-                            groups_settings[group]={"label":group,\
-                                "color_value":request.form["%s.color_value" %group],\
-                                "color_rgb":request.form["%s.color_rgb" %group]}
-
-                elif session["plot_arguments"]["vals"]!=request.form.getlist("vals") and session["plot_arguments"]["kde"]!="on":
-                    plot_arguments=session["plot_arguments"]
-                    plot_arguments["vals"]=request.form.getlist("vals")
-                    groups=plot_arguments["vals"]
-                    groups.sort()
-                    groups_settings=dict()
-                                        
-                    for group in groups:
-                        if group not in plot_arguments["groups_settings"].keys():
+                    if "kde" not in request.form.keys():
+                        plot_arguments=session["plot_arguments"]
+                        plot_arguments["vals"]=request.form.getlist("vals")
+                        groups=plot_arguments["vals"]
+                        groups.sort()
+                        groups_settings=dict()
+                        for group in groups:
                             groups_settings[group]={"name":group,\
-                                    "label":group,\
-                                    "color_value":"None",\
-                                    "color_rgb":"",\
-                                    "histnorm":"",\
-                                    "orientation_value":"v",\
-                                    "linewidth":0.5,\
-                                    "linestyle_value":"solid",\
-                                    "line_color":"lightgrey",\
-                                    "line_rgb":"",\
-                                    "opacity":0.8,\
-                                    "text":"",\
-                                    "bins_number":"",\
-                                    "hoverinfo":"all",\
-                                    "hover_bgcolor":"None",\
-                                    "hover_bordercolor":"None",\
-                                    "hover_align":"auto",\
-                                    "hover_fontfamily":"Default",\
-                                    "hover_fontsize":"12",\
-                                    "hover_fontcolor":"None",\
-                                    "histfunc":"count",\
-                                    "density":".off",\
-                                    "cumulative_direction":"increasing",\
-                                    "cumulative":".off"}
+                                "values":df[group],\
+                                "label":group,\
+                                "color_value":"None",\
+                                "color_rgb":"",\
+                                "histnorm":"",\
+                                "orientation_value":"v",\
+                                "linewidth":0.5,\
+                                "linestyle_value":"solid",\
+                                "line_color":"lightgrey",\
+                                "line_rgb":"",\
+                                "opacity":"0.8",\
+                                "text":"",\
+                                "bins_number":"",\
+                                "hoverinfo":"all",\
+                                "hover_bgcolor":"None",\
+                                "hover_bordercolor":"None",\
+                                "hover_align":"auto",\
+                                "hover_fontfamily":"Default",\
+                                "hover_fontsize":"12",\
+                                "hover_fontcolor":"None",\
+                                "histfunc":"count",\
+                                "density":".off",\
+                                "cumulative_direction":"increasing",\
+                                "cumulative":".off"}
                         
-                        else:
-                            groups_settings[group]={"name":group,\
+                        plot_arguments=read_request(request)       
+                        plot_arguments["groups_settings"]=groups_settings
+                        session["plot_arguments"]=plot_arguments
+                        filename=session["filename"]
+                        plot_arguments=session["plot_arguments"]
+            
+                        # READ INPUT DATA FROM SESSION JSON
+                        df=pd.read_json(session["df"])
+
+                        #CALL FIGURE FUNCTION
+                        fig=make_figure(df,plot_arguments)
+                        figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+                        return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+
+                    else:
+                        plot_arguments=session["plot_arguments"]
+                        plot_arguments["vals"]=request.form.getlist("vals")
+                        groups=plot_arguments["vals"]
+                        groups.sort()
+                        groups_settings=dict()
+                        for group in groups:
+                            groups_settings[group]={
+                                "label":group,\
+                                "color_value":"None",\
+                                "color_rgb":"",\
+                                }
+                        plot_arguments=read_request(request)
+                        plot_arguments["groups_settings"]=groups_settings
+                        session["plot_arguments"]=plot_arguments
+                        filename=session["filename"]
+                        plot_arguments=session["plot_arguments"]
+            
+                        # READ INPUT DATA FROM SESSION JSON
+                        df=pd.read_json(session["df"])
+
+                        #CALL FIGURE FUNCTION
+                        fig=make_figure(df,plot_arguments)
+                        figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+                        return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+
+            if "df" not in list(session.keys()):
+                error_msg="No data to plot, please upload a data or session  file."
+                flash(error_msg,'error')
+                return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
+
+          
+            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
+            plot_arguments=read_request(request)
+
+            # UPDATE VALUES FROM GROUPS_SETTINGS WHICH DO NOT GET UPDATED WITH THE READ_REQUEST FUNCTION
+            #plot_arguments=session["plot_arguments"]
+            groups=request.form.getlist("vals")
+            groups_settings=dict()
+            groups.sort()
+            #IF THE USER WANTS TO PLOT A REGULAR HISTOGRAM  
+            if plot_arguments["kde"]!="on":
+
+                #FOR COLUMNS ALREADY SELECTED BY USER
+                for group in groups:
+                    if group not in plot_arguments["groups_settings"].keys():          
+                        groups_settings[group]={"name":group,\
                             "label":request.form["%s.label" %group],\
                             "color_value":request.form["%s.color_value" %group],\
                             "color_rgb":request.form["%s.color_rgb" %group],\
@@ -233,93 +233,80 @@ def ihistogram(download=None):
                             "cumulative_direction":request.form["%s.cumulative_direction" %group],\
                             "histfunc":request.form["%s.histfunc" %group]
                             }
-                            
+                                    
                             #If the user does not tick the options the arguments do not appear as keys in request.form
-                            if "%s.density"%group in request.form.keys():
-                                groups_settings[group]["density"]=request.form["%s.density" %group]
-                            else:
-                                groups_settings[group]["density"]="off"
+                        if "%s.density"%group in request.form.keys():
+                            groups_settings[group]["density"]=request.form["%s.density" %group]
+                        else:
+                            groups_settings[group]["density"]="off"
+                                    
+                        if "%s.cumulative"%group in request.form.keys():
+                            groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                        else:
+                            groups_settings[group]["cumulative"]="off"
+                    
+                    #NEW COLUMNS SELECTED BY USER
+                    else:
+                        groups_settings[group]={"name":group,\
+                            "label":request.form["%s.label" %group],\
+                            "color_value":request.form["%s.color_value" %group],\
+                            "color_rgb":request.form["%s.color_rgb" %group],\
+                            "histnorm":request.form["%s.histnorm" %group],\
+                            "orientation_value":request.form["%s.orientation_value" %group],\
+                            "linewidth":request.form["%s.linewidth" %group],\
+                            "linestyle_value":request.form["%s.linestyle_value" %group],\
+                            "line_color":request.form["%s.line_color" %group],\
+                            "line_rgb":request.form["%s.line_rgb" %group],\
+                            "opacity":request.form["%s.opacity" %group],\
+                            "text":request.form["%s.text" %group],\
+                            "bins_number":request.form["%s.bins_number" %group],\
+                            "hoverinfo":request.form["%s.hoverinfo" %group],\
+                            "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
+                            "hover_bordercolor":request.form["%s.hover_bordercolor" %group],\
+                            "hover_align":request.form["%s.hover_align" %group],\
+                            "hover_fontsize":request.form["%s.hover_fontsize" %group],\
+                            "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
+                            "hover_fontfamily":request.form["%s.hover_fontfamily" %group],\
+                            "cumulative_direction":request.form["%s.cumulative_direction" %group],\
+                            "histfunc":request.form["%s.histfunc" %group]}
                             
-                            if "%s.cumulative"%group in request.form.keys():
-                                groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
-                            else:
-                                groups_settings[group]["cumulative"]="off"
-
-                    plot_arguments["groups_settings"]=groups_settings
-                    session["plot_arguments"]=plot_arguments
-                    filename=session["filename"]
-         
-                    # READ INPUT DATA FROM SESSION JSON
-                    df=pd.read_json(session["df"])
-
-                     #CALL FIGURE FUNCTION
-                    fig=make_figure(df,plot_arguments)
-                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-                    return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
-
-                
-
-            if "df" not in list(session.keys()):
-                error_msg="No data to plot, please upload a data or session  file."
-                flash(error_msg,'error')
-                return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
-
-          
-            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-            plot_arguments=read_request(request)
-
-            # UPDATE VALUES FROM GROUPS_SETTINGS WHICH DO NOT GET UPDATED WITH THE READ_REQUEST FUNCTION
-            #plot_arguments=session["plot_arguments"]
-            groups=request.form.getlist("vals")
-            groups_settings=dict()
-            groups.sort()   
-            if plot_arguments["kde"]!="on":                                    
-                for group in groups:
-                    groups_settings[group]={"name":group,\
-                        "label":request.form["%s.label" %group],\
-                        "color_value":request.form["%s.color_value" %group],\
-                        "color_rgb":request.form["%s.color_rgb" %group],\
-                        "histnorm":request.form["%s.histnorm" %group],\
-                        "orientation_value":request.form["%s.orientation_value" %group],\
-                        "linewidth":request.form["%s.linewidth" %group],\
-                        "linestyle_value":request.form["%s.linestyle_value" %group],\
-                        "line_color":request.form["%s.line_color" %group],\
-                        "line_rgb":request.form["%s.line_rgb" %group],\
-                        "opacity":request.form["%s.opacity" %group],\
-                        "text":request.form["%s.text" %group],\
-                        "bins_number":request.form["%s.bins_number" %group],\
-                        "hoverinfo":request.form["%s.hoverinfo" %group],\
-                        "hover_bgcolor":request.form["%s.hover_bgcolor" %group],\
-                        "hover_bordercolor":request.form["%s.hover_bordercolor" %group],\
-                        "hover_align":request.form["%s.hover_align" %group],\
-                        "hover_fontsize":request.form["%s.hover_fontsize" %group],\
-                        "hover_fontcolor":request.form["%s.hover_fontcolor" %group],\
-                        "hover_fontfamily":request.form["%s.hover_fontfamily" %group],\
-                        "cumulative_direction":request.form["%s.cumulative_direction" %group],\
-                        "histfunc":request.form["%s.histfunc" %group]
-                        }
-                                
                         #If the user does not tick the options the arguments do not appear as keys in request.form
-                    if "%s.density"%group in request.form.keys():
-                        groups_settings[group]["density"]=request.form["%s.density" %group]
-                    else:
-                        groups_settings[group]["density"]="off"
-                                
-                    if "%s.cumulative"%group in request.form.keys():
-                        groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
-                    else:
-                        groups_settings[group]["cumulative"]="off"
+                        if "%s.density"%group in request.form.keys():
+                            groups_settings[group]["density"]=request.form["%s.density" %group]
+                        else:
+                            groups_settings[group]["density"]="off"
+                            
+                        if "%s.cumulative"%group in request.form.keys():
+                            groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                        else:
+                            groups_settings[group]["cumulative"]="off"
+            
+            #IF THE USER WANTS TO PLOT A KDE PLOT
             else:
+                plot_arguments=session["plot_arguments"]
+                plot_arguments["vals"]=request.form.getlist("vals")
+                groups=plot_arguments["vals"]
+                groups.sort()
+                groups_settings=dict()
                 for group in groups:
-                    groups_settings[group]={"label":group,\
-                        "color_value":request.form["%s.color_value" %group],\
-                        "color_rgb":request.form["%s.color_rgb" %group]}
-
+                    #FOR COLUMNS NEW COLUMNS SELECTED BY USER
+                    if group not in plot_arguments["groups_settings"].keys():
+                        for group in groups:
+                            groups_settings[group]={"label":group,\
+                                    "color_value":"None",\
+                                    "color_rgb":""}
+                    
+                    #FOR COLUMNS ALREADY SELECTED BY USER
+                    else:
+                        groups_settings[group]={"label":group,\
+                            "color_value":request.form["%s.color_value" %group],\
+                            "color_rgb":request.form["%s.color_rgb" %group]}
+                    
             plot_arguments["groups_settings"]=groups_settings
             session["plot_arguments"]=plot_arguments
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
-         
+
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
 
