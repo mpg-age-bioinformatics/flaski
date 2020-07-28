@@ -371,11 +371,12 @@ STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker
 STANDARD_CURVETYPES=["kde","normal"]
 
 def figure_defaults():
-        """Generates default figure arguments.
+
+    """ Generates default figure arguments.
 
     Returns:
         dict: A dictionary of the style { "argument":"value"}
-    """
+    """       
     
     # https://matplotlib.org/3.1.1/api/markers_api.html
     # https://matplotlib.org/2.0.2/api/colors_api.html
@@ -388,8 +389,7 @@ def figure_defaults():
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
-    plot_arguments={
-        "fig_width":"600",\
+    plot_arguments={"fig_width":"600",\
         "fig_height":"600",\
         "title":'iHistogram',\
         "title_fontsize":"20",\
@@ -522,6 +522,6 @@ def figure_defaults():
         "session_downloadn":"MySession.ihistogram.plot",\
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.ihistogram.plot",\
-        "inputargumentsfile":"Select file.."
-    }
+        "inputargumentsfile":"Select file.."}
+    
     return plot_arguments
