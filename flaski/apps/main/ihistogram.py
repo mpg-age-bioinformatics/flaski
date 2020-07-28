@@ -371,7 +371,7 @@ STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker
 STANDARD_CURVETYPES=["kde","normal"]
 
 def figure_defaults():
-    """Generates default figure arguments.
+        """Generates default figure arguments.
 
     Returns:
         dict: A dictionary of the style { "argument":"value"}
@@ -388,7 +388,6 @@ def figure_defaults():
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
-def figure_defaults():
     plot_arguments={
         "fig_width":"600",\
         "fig_height":"600",\
