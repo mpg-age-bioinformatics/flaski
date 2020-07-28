@@ -24,11 +24,13 @@ sess.init_app(app)
 
 from flaski import routes, models, errors, storage
 
-from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, ihistogram
+from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, ihistogram, iviolinplot
 
 if app.config['INSTANCE'] != "latest" :
     from flaski.apps.routes import violinplot
     from flaski.apps.routes import ihistogram
+    from flaski.apps.routes import iviolinplot
+
 
 
 if not app.debug:
