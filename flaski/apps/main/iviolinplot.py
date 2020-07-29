@@ -16,9 +16,11 @@ def make_figure(df,pa):
         A Plotly figure
         
     """
-
+    #UPLOAD ARGUMENTS
+    vals=pa["vals"].copy()
+    vals.remove(None)
     tmp=df.copy()
-    tmp=tmp[pa["vals"]]
+    tmp=tmp[vals]
 
     fig = go.Figure( )
 
@@ -37,7 +39,7 @@ def make_figure(df,pa):
     floats=["bin_size","errorbar_value","errorbar_thickness","errorbar_width","x","y","axis_line_width","ticks_line_width",\
         "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
-        "legend_y","fig_width","fig_height"]
+        "legend_y","fig_width","fig_height","vp_width","vp_bw"]
 
     for a in floats:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
@@ -63,132 +65,16 @@ def make_figure(df,pa):
         else:
             pab[p]=pa[p]
 
-    #KDE (KERNEL DENSITY ESTIMATION) plot
-    if pab["kde"]==True:
-        colors=list()
-        if pa["rug_text"]!="":
-            rug_text=pa["rug_text"].split(",")
-        else:
-            rug_text=[]
-
-        for h in pa["groups_settings"].values():
-            if h["color_rgb"] == "":
-                if h["color_value"]=="None":
-                    colors.append(None)
-                else:
-                    colors.append(h["color_value"])
-            else:
-                colors.append(GET_COLOR( h["color_rgb"] ))
-        
-        hist_data=[]
-        for col in tmp.columns:
-            hist_data.append(tmp[col])
-
-        fig=ff.create_distplot(hist_data=hist_data,group_labels=pa["vals"],curve_type=pa["curve_type"],show_hist=pab["show_hist"],\
-            show_curve=pab["show_curve"],show_rug=pab["show_rug"],bin_size=pab["bin_size"],rug_text=rug_text,colors=colors, histnorm=pa["kde_histnorm"])
-
+    if pa["vp_orient"]=="horizontal":
+        pab["vp_orient"]="h"
     else:
-        for h in pa["groups_settings"].values():
-            #Initialize dummie dict
-            h_=dict()
+        pab["vp_orient"]="v"
 
-            #Load integers
-            integers=["hover_fontsize","bins_number"]
-            for a in integers:
-                if h[a] == "" or h[a]=="None" or h[a] == None:
-                    h_[a]=None
-                else:
-                    h_[a]=int(h[a])
+    #MAIN BODY
+    fig.add_trace(go.Violin(x=tmp[pa["x_val"]],y=tmp[pa["y_val"]],text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
+        bandwidth=pab["vp_bw"]))
 
-            #Load Nones
-            possible_nones=["hover_bgcolor","hover_bordercolor","hover_fontfamily","hover_fontcolor"]
-            for p in possible_nones:
-                if h[p] == "None" or h[p]=="Default" :
-                    h_[p]=None
-                else:
-                    h_[p]=h[p]
-
-            #Load floats
-            floats=["opacity","linewidth"]
-
-            for a in floats:
-                if h[a] == "":
-                    h_[a]=None
-                else:
-                    h_[a]=float(h[a])
-
-            if h["label"]!="":
-                name=h["label"]
-            else:
-                name=""
-            
-            if h["text"]!="":
-                text=h["text"]
-            else:
-                text=""
-
-            if h["color_rgb"] == "":
-                if h["color_value"]=="None":
-                    marker_color=None
-                else:
-                    marker_color = h["color_value"]
-            else:
-                marker_color = GET_COLOR( h["color_rgb"] )
-                    
-            if h["line_rgb"] == "":
-                if h["line_color"]=="None":
-                    line_color=None
-                else:
-                    line_color = h["line_color"]
-            else:
-                line_color = GET_COLOR( h["line_rgb"] )
-
-
-            if h["histnorm"] == "None":
-                histnorm = ""
-            else:
-                histnorm = h["histnorm"]
-
-            if h["cumulative"]=="on":
-                cumulative_enabled=True
-            else:
-                cumulative_enabled=False
-            
-            marker=dict(color=marker_color,line=dict(width=h_["linewidth"],color=line_color))
-            cumulative=dict(enabled=cumulative_enabled,direction=h["cumulative_direction"])
-
-            hoverlabel=dict(bgcolor=h_["hover_bgcolor"],bordercolor=h_["hover_bordercolor"],align=h["hover_align"],\
-                font=dict(family=h_["hover_fontfamily"],size=h_["hover_fontsize"],color=h_["hover_fontcolor"]))
-            
-            if pab["errorbar"]==True:
-                    errorbar=True
-
-            if h["orientation_value"]=="vertical":
-
-                if pab["errorbar"]==True:
-                    error_y=dict(visible=errorbar,value=pab["errorbar_value"],type=pa["errorbar_type"],symmetric=pab["errorbar_symmetric"],color=pab["errorbar_color"],\
-                        thickness=pab["errorbar_thickness"],width=pab["errorbar_width"])
-                else:
-                    error_y=dict(visible=False)
-
-                trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
-                    opacity=h_["opacity"],nbinsx=h_["bins_number"],name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
-            
-
-            elif h["orientation_value"]=="horizontal":
-
-                if pab["errorbar"]==True:
-                    error_x=dict(visible=errorbar,value=pab["errorbar_value"],type=pa["errorbar_type"],symmetric=pab["errorbar_symmetric"],color=pab["errorbar_color"],\
-                        thickness=pab["errorbar_thickness"],width=pab["errorbar_width"])
-                else:
-                    error_x=dict(visible=False)
-                
-                fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
-                opacity=h_["opacity"],nbinsy=h_["bins_number"],name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
-
-
-
-    #UPDATE LAYOUT OF HISTOGRAMS
+    #UPDATE LAYOUT OF PLOTS
     #Figure size
     fig.update_layout( width=pab["fig_width"], height=pab["fig_height"] ) #  autosize=False,
 
@@ -323,6 +209,7 @@ def make_figure(df,pa):
     return fig
 
 STANDARD_SIZES=[str(i) for i in list(range(1,101))]
+STANDARD_STYLES=["Violinplot","Swarmplot","Boxplot","Violinplot and Swarmplot","Boxplot and Swarmplot"]
 STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
     "bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood",\
     "cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk",\
@@ -397,23 +284,18 @@ def figure_defaults():
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
         "titles":"20",\
-        "kde":".off",\
-        "curve_type":"kde",\
-        "curve_types":STANDARD_CURVETYPES,\
-        "kde_histnorm":"probability density",\
-        "kde_histnorms":["probability density","probability"],\
-        "show_hist":"on",\
-        "show_curve":"on",\
-        "show_rug":"on",\
-        "rug_text":"",\
-        "bin_size":"1",\
-        "opacity":0.8,\
+        "style":"violinplot",\
+        "styles":STANDARD_STYLES,\
         "paper_bgcolor":"white",\
         "plot_bgcolor":"white",\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "histfuncs":STANDARD_HISTFUNC,\
         "references":STANDARD_REFERENCES,\
+        "vp_text":"",\
+        "vp_width":"0",\
+        "vp_orient":"vertical",\
+        "vp_bw":"",\
         "xref":"container",\
         "yref":"container",\
         "x":"0.5",\
@@ -423,14 +305,6 @@ def figure_defaults():
         "title_xanchor":"auto",\
         "title_yanchor":"auto",\
         "show_legend":"on",\
-        "errorbar":".off",\
-        "errorbar_value":"10",\
-        "errorbar_type":"percent",\
-        "errorbar_types":STANDARD_ERRORBAR_TYPES,\
-        "errorbar_symmetric":".off",\
-        "errorbar_color":"darkgrey",\
-        "errorbar_width":"2",\
-        "errorbar_thickness":"2",\
         "axis_line_width":1.0,\
         "axis_line_color":"lightgrey",\
         "ticks_line_width":1.0,\
@@ -438,6 +312,9 @@ def figure_defaults():
         "cols":[],\
         "groups":[],\
         "vals":[],\
+        "hue":None,\
+        "x_val":None,\
+        "y_val":None,\
         "groups_settings":dict(),\
         "log_scale":".off",\
         "fonts":STANDARD_FONTS,\
