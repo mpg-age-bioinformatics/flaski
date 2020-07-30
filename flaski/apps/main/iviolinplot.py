@@ -5,6 +5,14 @@ import plotly.figure_factory as ff
 from collections import OrderedDict
 import numpy as np
 
+def GET_COLOR(x):
+    if str(x)[:3].lower() == "rgb":
+        vals=x.split("rgb(")[-1].split(")")[0].split(",")
+        vals=[ float(s.strip(" ")) for s in vals ]
+        return vals
+    else:
+        return str(x)
+
 def make_figure(df,pa):
     """Generates figure.
 
@@ -27,16 +35,15 @@ def make_figure(df,pa):
     # MAIN FIGURE
     #Load checkboxes
     pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar",\
-        "errorbar_symmetric","tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
-        "kde","show_hist","show_curve","show_rug"]:
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis",\
+        "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
             pab[arg]=True
 
     #Load floats
-    floats=["bin_size","errorbar_value","errorbar_thickness","errorbar_width","x","y","axis_line_width","ticks_line_width",\
+    floats=["x","y","axis_line_width","ticks_line_width","opacity",\
         "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
         "legend_y","fig_width","fig_height","vp_width","vp_bw"]
@@ -48,7 +55,8 @@ def make_figure(df,pa):
             pab[a]=float(pa[a])
 
     #Load integers
-    integers=["label_fontsize","legend_fontsize","legend_title_fontsize","title_fontsize","maxxticks","maxyticks"]
+    integers=["label_fontsize","legend_fontsize","legend_title_fontsize","title_fontsize","maxxticks","maxyticks",\
+        "vp_hover_fontsize"]
     for a in integers:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
             pab[a]=None
@@ -56,9 +64,10 @@ def make_figure(df,pa):
             pab[a]=int(pa[a])
 
     #Load Nones
-    possible_nones=["errorbar_color","title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
+    possible_nones=["title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
     "paper_bgcolor","plot_bgcolor","grid_color","legend_bgcolor","legend_bordercolor","legend_fontcolor","legend_title_fontcolor",\
-     "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily"]
+     "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily","vp_hover_bgcolor","vp_hover_bordercolor",\
+    "vp_hover_fontfamily","vp_hover_fontcolor"]
     for p in possible_nones:
         if pa[p] == "None" or pa[p]=="Default" :
             pab[p]=None
@@ -70,9 +79,21 @@ def make_figure(df,pa):
     else:
         pab["vp_orient"]="v"
 
+    if pa["vp_color_rgb"] != "":
+        vp_color=GET_COLOR(pa["vp_color_rgb"])
+    else:
+        if pa["vp_color_value"]=="None":
+            vp_color=None
+        else:
+            vp_color=pa["vp_color_value"]  
+
     #MAIN BODY
+    hoverlabel=dict(bgcolor=pab["vp_hover_bgcolor"],bordercolor=pab["vp_hover_bordercolor"],\
+        font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
+        align=pa["vp_hover_align"])
     fig.add_trace(go.Violin(x=tmp[pa["x_val"]],y=tmp[pa["y_val"]],text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-        bandwidth=pab["vp_bw"]))
+        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+        hoverlabel=hoverlabel,fillcolor=vp_color))
 
     #UPDATE LAYOUT OF PLOTS
     #Figure size
@@ -82,7 +103,7 @@ def make_figure(df,pa):
     title=dict(text=pa["title"],font=dict(family=pab["title_fontfamily"],size=pab["title_fontsize"],color=pab["title_fontcolor"]),\
         xref=pa["xref"],yref=pa["yref"],x=pab["x"],y=pab["y"],xanchor=pa["title_xanchor"],yanchor=pa["title_yanchor"])
 
-    fig.update_layout(title=title,barmode=pa["barmode"])
+    fig.update_layout(title=title)
 
 
     #Update axes
@@ -231,7 +252,6 @@ STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","
     "seagreen","seashell","sienna","silver","skyblue","slateblue","slategray","slategrey","snow",\
     "springgreen","steelblue","tan","teal","thistle","tomato","turquoise","violet","wheat","white",\
     "whitesmoke","yellow","yellowgreen"]
-STANDARD_HISTNORMS=['None', 'percent', 'probability', 'density', 'probability density']
 LINE_STYLES=["solid", "dot", "dash", "longdash", "dashdot","longdashdot"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
 STANDARD_ORIENTATIONS=['vertical','horizontal']
@@ -244,8 +264,7 @@ LEGEND_LOCATIONS=['best','upper right','upper left','lower left','lower right','
 MODES=["expand",None]
 STANDARD_HOVERINFO=["x", "y", "z", "text", "name","all","none","skip","x+y","x+text","x+name",\
                     "y+text","y+name","text+name","x+y+name","x+y+text","x+text+name","y+text+name"]
-STANDARD_HISTFUNC=["count","sum","avg","min","max"]
-STANDARD_CUMULATIVE_DIRECTIONS=["increasing","decreasing"]
+STANDARD_HOVERONS=["violins", "points", "kde","violins+points", "violins+kde","points+kde","violins+points+kde", "all" ]
 STANDARD_ERRORBAR_TYPES=["percent","constant","sqrt"]
 STANDARD_REFERENCES=["container","paper"]
 STANDARD_TITLE_XANCHORS=["auto","left","center","right"]
@@ -255,7 +274,6 @@ STANDARD_LEGEND_YANCHORS=["auto","top","middle","bottom"]
 STANDARD_TRACEORDERS=["reversed", "grouped", "reversed+grouped", "normal"]
 STANDARD_SIDES=["top","left","top left"]
 STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker","across+marker","toaxis+across+marker"]
-STANDARD_CURVETYPES=["kde","normal"]
 
 
 def figure_defaults():
@@ -284,18 +302,30 @@ def figure_defaults():
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
         "titles":"20",\
+        "opacity":"1",\
         "style":"violinplot",\
         "styles":STANDARD_STYLES,\
         "paper_bgcolor":"white",\
         "plot_bgcolor":"white",\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
-        "histfuncs":STANDARD_HISTFUNC,\
         "references":STANDARD_REFERENCES,\
         "vp_text":"",\
         "vp_width":"0",\
         "vp_orient":"vertical",\
+        "vp_color_rgb":"",\
+        "vp_color_value":"None",\
         "vp_bw":"",\
+        "vp_hovertext":"",\
+        "vp_hoverinfo":"all",\
+        "vp_hoveron":"violins+points+kde",\
+        "hoverons":STANDARD_HOVERONS,\
+        "vp_hover_bgcolor":"None",\
+        "vp_hover_bordercolor":"None",\
+        "vp_hover_fontfamily":"Default",\
+        "vp_hover_fontsize":"12",\
+        "vp_hover_fontcolor":"None",\
+        "vp_hover_align":"auto",\
         "xref":"container",\
         "yref":"container",\
         "x":"0.5",\
@@ -318,12 +348,7 @@ def figure_defaults():
         "groups_settings":dict(),\
         "log_scale":".off",\
         "fonts":STANDARD_FONTS,\
-        "cumulative_directions":STANDARD_CUMULATIVE_DIRECTIONS,\
         "colors":STANDARD_COLORS,\
-        "histnorms":STANDARD_HISTNORMS,\
-        "barmode":"overlay",\
-        "barmodes":STANDARD_BARMODES,\
-        "histtype_value":"bar",\
         "linestyles":LINE_STYLES,\
         "linestyle_value":"",\
         "orientations":STANDARD_ORIENTATIONS, \
