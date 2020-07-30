@@ -53,7 +53,7 @@
             <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
 
                 <div class="column">
-                    <div class="sidebar-heading">X values:</div>
+                    <div class="sidebar-heading">Select time:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
                         <select title=xcols name=xvals method="GET" action="/" style="width:365px">
                             {% for xcol in xcols %}
@@ -64,15 +64,28 @@
                 </div>
 
                 <div class="column">
-                    <div class="sidebar-heading">Data columns:</div>
+                    <div class="sidebar-heading">Select death:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;padding-bottom:15px;" >
-                        <select multiple name=yvals method="GET" action="/" style="width:365px">
+                        <select title=ycols name=yvals method="GET" action="/" style="width:365px">
                             {% for ycol in ycols %}
                                 <option value="{{ycol}}" {% if ycol in yvals %} selected {% endif %}>{{ycol}}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
+
+                <!-- <div class="column">
+                    <div class="sidebar-heading">Select groups:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;padding-bottom:15px;" >
+                        <select name=groups_value method="GET" action="/" style="width:365px">
+                            {% for groups_ in groups %}
+                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div> -->
+
+
 
             </div>
 
@@ -84,15 +97,45 @@
             Arguments:
             </div>
 
+            <!-- -------------------- ANALYSIS SETTING ARGUMENTS ---------------------- -->
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item" style="padding-bottom: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSettings" aria-expanded="true" aria-controls="collapseSettings">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Model Settings</span>
+                </a>
+                <div id="collapseSettings" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label style="width:60px">Estimate:</label>
+                                <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="Conf_Interval" {% if Conf_Interval=="on" %} checked {% elif Conf_Interval==".on" %} checked {% endif %}/> Show Confidence Intervals </label>
+                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="at_risk_counts" {% if at_risk_counts=="on" %} checked {% elif at_risk_counts==".on" %} checked {% endif %}/> Show at_risk counts </label>
+                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="show_censors" {% if show_censors=="on" %} checked {% elif show_censors==".on" %} checked {% endif %}/> Show censors </label>
+                                <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_legend" {% if ci_legend=="on" %} checked {% elif ci_legend==".on" %} checked {% endif %}/> Show legend </label>
+                                <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_force_lines" {% if ci_force_lines=="on" %} checked {% elif ci_force_lines==".on" %} checked {% endif %}/> Plot conf_int lines</label>
+                            </div>
+
+                            <div class="row arg">
+                                <label>conf_int alpha: <input type="text" name="ci_alpha" value='{{ ci_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
             <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item" style="padding-bottom: 0px;">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Figure</span>
+                    <span>Plot Settings</span>
                 </a>
-                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseSetting" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
@@ -108,30 +151,6 @@
                                         <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
                                 </select></label>
-                            </div>
-
-                            <div class="row arg">
-                                <label>Show at_risk counts: <select name=at_risk_counts_value method="GET" action="/" style="width:115px;padding-left:4px">
-                                    {% for at_risk_ in at_risk_counts %}
-                                        <option value="{{at_risk_}}" {% if at_risk_==at_risk_counts_value %} selected {% endif %}>{{at_risk_}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="row arg">
-                                <label>Show Confidence Intervals: <select name=Conf_Interval_value method="GET" action="/" style="width:115px;padding-left:4px">
-                                    {% for conf_int_ in Conf_Interval %}
-                                        <option value="{{conf_int_}}" {% if conf_int_==Conf_Interval_value %} selected {% endif %}>{{conf_int_}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="row arg">
-                                <label>Show Censors: <select name=show_censors_value method="GET" action="/" style="width:115px;padding-left:4px">
-                                    {% for censors_ in show_censors %}
-                                        <option value="{{censors_}}" {% if censors_==show_censors_value %} selected {% endif %}>{{censors_}}</option>
-                                    {% endfor %}
-                                </select>
                             </div>
 
                             <div class="row arg">
@@ -154,19 +173,10 @@
                                 </select>
                             </div>
                         
-
                         </div>
                     </div>
                 </div>
             </li>
-
-            {% endif %}
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
 
             <!-- -------------------- AXES ARGUMENTS ---------------------- -->
 
@@ -281,9 +291,7 @@
 
                 </div>
 
-            </li>            
-            
-        
+            </li>
 
             <!-- -------------------- MARKER ARGUMENTS ---------------------- -->
 
@@ -308,7 +316,6 @@
                                         <option value="{{markersizes_cols_}}" {% if markersizes_cols_==markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
                                     {% endfor %}
                                 </select> -->
-
                             </div>
 
                             <div class="row arg">
@@ -330,7 +337,7 @@
                             </div>
 
                             <div class="row arg">
-                                <label> line width: <select name=edge_linewidth method="GET" action="/" style="width:50px">
+                                <label> edge width: <select name=edge_linewidth method="GET" action="/" style="width:50px">
                                     {% for edge_linewidth_ in edge_linewidths %}
                                         <option value="{{edge_linewidth_}}" {% if edge_linewidth_==edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
                                     {% endfor %}
@@ -345,7 +352,7 @@
 
                             <div class="row arg">
                                 <div class="row arg">
-                                    <label> line color: <select name=edgecolor method="GET" action="/" style="width:80px">
+                                    <label> edge color: <select name=edgecolor method="GET" action="/" style="width:80px">
                                         {% for edgecolor_ in edge_colors %}
                                             <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
                                         {% endfor %}
@@ -378,7 +385,7 @@
                             </div>
 
                             <div class="row arg">
-                                <label>alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
+                                <label>marker alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label> 
 
                                 <!-- <label style="padding-left:1px;">&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px">
                                     {% for markeralpha_col_ in markeralpha_col %}
@@ -392,9 +399,15 @@
                 </div>
             </li>
 
-        
+            {% endif %}
 
-            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
+
+            <!-- -------------------- TABLE DOWNLOAD ARGUMENTS ---------------------- -->
 
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
@@ -420,11 +433,16 @@
                     </div>
                 </div>
 
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+            </li>
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-download"></i>
                     <span>Figure</span>
                 </a>
-                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
@@ -658,36 +676,36 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
 
-    <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
-        <div style="padding-left:2px;padding-right:2px;">
-            <form action="{{ url_for('lifespan', download='download') }}" method="get">
-                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                    <i class="far fa-file-excel fa-sm text-white-50"></i> Results
-                </button>
-            </form>
+                <div style="padding-left:2px;padding-right:2px;">
+                    <form action="{{ url_for('lifespan', download='results') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="far fa-file-excel fa-sm text-white-50"></i> Results
+                        </button>
+                    </form>
+                </div>
+        
+                <div style="padding-left: 2px;padding-right: 2px;">
+                    <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                        </button>
+                    </form>
+                </div>
+        
+                <div style="padding-left: 2px;">
+                    <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas fa-th fa-sm text-white-50"></i> Session
+                        </button>
+                    </form>
+                </div>
+            
         </div>
-
-        <div style="padding-left: 2px;padding-right: 2px;">
-            <form action="{{ url_for('download', json_type='arg') }}" method="get">
-                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                    <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
-                </button>
-            </form>
-        </div>
-
-        <div style="padding-left: 2px;">
-            <form action="{{ url_for('download', json_type='ses') }}" method="get">
-                <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                        <i class="fas fa-th fa-sm text-white-50"></i> Session
-                </button>
-            </form>
-        </div>
-
     </div>
+
     <!-- </div> -->
 
     {% endif %}

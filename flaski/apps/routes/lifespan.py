@@ -168,7 +168,7 @@ def lifespan(download=None):
         if download == "download":
 
             # READ INPUT DATA FROM SESSION JSON
-            df_ls=pd.read_json(session["df_ls"])
+            df=pd.read_json(session["df"])
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION
@@ -186,10 +186,10 @@ def lifespan(download=None):
 
             return send_file(figfile, mimetype=mimetypes[plot_arguments["download_fig"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["download_fig"] )
 
-        if download == "table":
+        if download == "results":
 
             # READ INPUT DATA FROM SESSION JSON
-            df_ls=pd.read_json(session["df_ls"])
+            df=pd.read_json(session["df"])
             plot_arguments=session["plot_arguments"]
 
             # CALL FIGURE FUNCTION

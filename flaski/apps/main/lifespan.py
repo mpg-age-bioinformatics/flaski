@@ -38,12 +38,25 @@ def make_figure(df,pa):
     df=df.reset_index(drop=True)
     df=df[["time","at_risk","removed","observed","censored","entrance","Kaplan Meier Estimate","Kaplan Meier Estimate_lower_0.95","Kaplan Meier Estimate_upper_0.95"]]
     
+    pa_={}
+    for arg in ["Conf_Interval","show_censors","at_risk_counts","ci_legend","ci_force_lines"]:
+        if pa[arg] in ["off", ".off"]:
+            pa_[arg]=False
+        else:
+            pa_[arg]=True
+
     fig = plt.figure(frameon=False, figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
-    pl=km.plot(ci_show=pa["Conf_Interval_value"],show_censors=pa["show_censors_value"], \
-        censor_styles={"marker":pa["censor_marker_value"], "markersize":int(pa["censor_marker_size_val"]), "markeredgecolor":pa["markerc"], "markerfacecolor":pa["markerc"]}, \
-        ci_alpha=int(pa["marker_alpha"]), at_risk_counts=pa["at_risk_counts_value"], linestyle=pa["linestyle_value"], \
-        linewidth=float(pa["linewidth"]), color=pa["line_color_value"])
+    pl=km.plot(show_censors=pa_["show_censors"], \
+               censor_styles={"marker":pa["censor_marker_value"], "markersize":float(pa["censor_marker_size_val"]), "markeredgecolor":pa["markerc"], "markerfacecolor":pa["markerc"], "alpha":float(pa["marker_alpha"])}, \
+               ci_alpha=float(pa["ci_alpha"]), \
+               ci_force_lines=pa_["ci_force_lines"], \
+               ci_show=pa_["Conf_Interval"], \
+               ci_legend=pa_["ci_legend"], \
+               at_risk_counts=pa_["at_risk_counts"], \
+               linestyle=pa["linestyle_value"], \
+               linewidth=float(pa["linewidth"]), \
+               color=pa["line_color_value"])
 
     plt.title(pa["title"])
     plt.xlabel(pa["xlabel"])
@@ -77,7 +90,7 @@ ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'squa
 'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
 'line-ne-open', 'line-nw', 'line-nw-open']
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-STANDARD_COLORS=[None,"blue","green","red","cyan","magenta","yellow","black","white"]
+STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white",None]
 LINE_STYLES=["solid","dashed","dashdot","dotted"]
 HIST_TYPES=['bar', 'barstacked', 'step',  'stepfilled']
 STANDARD_ORIENTATIONS=['vertical','horizontal']
@@ -104,12 +117,13 @@ def figure_defaults():
         "xvals":"",\
         "ycols":[],\
         "yvals":"",\
-        "Conf_Interval":["True","False"],\
-        "Conf_Interval_value":"True",\
-        "show_censors":["True","False"],\
-        "show_censors_value":"False",\
-        "at_risk_counts":["True","False"],\
-        "at_risk_counts_value":"False",\
+        "groups":[],\
+        "groups_value":"",\
+        "Conf_Interval":".on",\
+        "show_censors":".off",\
+        "at_risk_counts":".off",\
+        "ci_legend":".off",\
+        "ci_force_lines":".off",\
         "censor_marker": ALLOWED_MARKERS,\
         "censor_marker_value":"x",\
         "censor_marker_size":STANDARD_SIZES,\
@@ -117,7 +131,7 @@ def figure_defaults():
         "marker_color":STANDARD_COLORS,\
         "markerc":"black",\
         "markerc_write":"",\
-        "marker_alpha":"1",\
+        "ci_alpha":"0.3",\
         "colors":STANDARD_COLORS,\
         "linestyles":LINE_STYLES,\
         "linestyle_value":"solid",\
@@ -128,6 +142,7 @@ def figure_defaults():
         "edge_linewidth":"0",\
         "edge_colors":STANDARD_COLORS,\
         "edgecolor":"black",\
+        "marker_alpha":"1",\
         "xlabel":"x",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
