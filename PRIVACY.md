@@ -36,7 +36,7 @@ If you want to permanently remove all traces of your account from our data bank 
 
 **Our use of cookies and tracking**
 
-Flaski only uses minimal functionality cookies so that your input data does not vanish every time you press “Submit” or refresh the page. Session cookies are cleared every time you logout. Flaski does not perform tracking.
+Flaski only uses minimal functionality cookies so that your input data does not vanish every time you press “Submit” or refresh the page. Flaski's minimal functionality cookies only collect the values that you input into an App (eg. range of x-axis) so that the instructions you give to Flaski can be executed. Session cookies are permanently cleared every time you logout. Flaski does not perform tracking. Cookies are text files stored in the Internet browser or by the Internet browser on the user's computer system.
 
 **How Flaski secures your information**
 
@@ -67,7 +67,7 @@ Flaski personnel do not access private repositories unless required to for secur
 
 Flaski regularly scans it's servers for old, untouched data and marks it for deletion. Users are informed of this mark and are given time to properly backup their data.
 
-Personal data, ie. firstname, last name, email, and organization are kept until you ask us to delete it or either European or German regulations enforce it.
+Personal data will be deleted too if you ask us to delete it or either above purposes are achieved. Data will be delete once it reaches an age of 10 years.
 
 *Data analysis*
 
