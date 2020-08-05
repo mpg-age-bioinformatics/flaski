@@ -263,12 +263,12 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left:42px;">Side:  <select name=vp_side val= "{{vp_side}}"  method="GET" action="/" style="width:80px;">
+                                            <label style="padding-left:43px;">Side:  <select name=vp_side val= "{{vp_side}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_side_ in vp_sides %}
                                                 <option value="{{vp_side_}}" {% if vp_side_==vp_side %} selected {% endif %}>{{vp_side_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 22px;"> Point pos: <input type="text" name=vp_pointpos value="{{vp_pointpos}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 21px;"> Point pos: <input type="text" name=vp_pointpos value="{{vp_pointpos}}" style="width:50px;height:22px;padding-left: 4px;"></label>
                                             <label style="padding-left:39px;">Span:  <select name=vp_span val= "{{vp_span}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_span_ in spans %}
                                                 <option value="{{vp_span_}}" {% if vp_span_==vp_span %} selected {% endif %}>{{vp_span_}}</option>
@@ -304,33 +304,28 @@
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
                                         <label>Text: <input type="text" name={{vp_hovertext}} value= "{{vp_hovertext}}" style="width:265px;height:22px;padding-left:4px;"></label>
-                                        <label style="padding-left:8px;">Display: <select  name=vp_hoverinfo value="{{vp_hoverinfo}}" method="GET" action="/" style="width:70px;">
-                                            {% for vp_hoverinfo_ in hoverinfos %}
-                                            <option value="{{vp_hoverinfo_}}" {% if vp_hoverinfo_==vp_hoverinfo %} selected {% endif %}>{{vp_hoverinfo_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-                                        <label style="padding-left:25px;">Hover on: <select  name=vp_hoveron value="{{vp_hoveron }}" method="GET" action="/" style="width:70px;">
+                                        <label style="padding-left:16px;">Hover on: <select  name=vp_hoveron value="{{vp_hoveron }}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hoveron_ in hoverons %}
                                             <option value="{{vp_hoveron_}}" {% if vp_hoveron_==vp_hoveron %} selected {% endif %}>{{vp_hoveron_}}</option>
                                             {% endfor %}
                                         </select></label>
-                                        <label style="padding-left:15x;">Hover Info: <select  name=vp_hoverinfo value="{{vp_hoverinfo }}" method="GET" action="/" style="width:70px;">
-                                            {% for vp_hoverinfo_ in hoverinfo %}
+                                        <label style="padding-left:5px;">Hover Info: <select  name=vp_hoverinfo value="{{vp_hoverinfo }}" method="GET" action="/" style="width:70px;">
+                                            {% for vp_hoverinfo_ in hoverinfos %}
                                             <option value="{{vp_hoverinfo_}}" {% if vp_hoverinfo_==vp_hoverinfo %} selected {% endif %}>{{vp_hoverinfo_}}</option>
                                             {% endfor %}
                                         </select></label>
                                         <label style="width:200px;">Color:</label>
-                                        <label style="padding-left:12px;">Border: <select  name=hover_bordercolor value="{{vp_hover_bordercolor }}" method="GET" action="/" style="width:70px;">
-                                            {% for vp_hover_bordercolor_ in colors %}
-                                            <option value="{{vp_hover_bordercolor_}}" {% if vp_hover_bordercolor_==vp_hover_bordercolor %} selected {% endif %}>{{vp_hover_bordercolor_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-                                        <label style="padding-left:15px;">Background: <select  name=vp_hover_bgcolor value="{{vp_hover_bgcolor}}" method="GET" action="/" style="width:70px;">
+                                        <label style="padding-left:0px;">Background: <select  name=vp_hover_bgcolor value="{{vp_hover_bgcolor}}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hover_bgcolor_ in colors %}
                                             <option value="{{vp_hover_bgcolor_}}" {% if vp_hover_bgcolor_==vp_hover_bgcolor %} selected {% endif %}>{{vp_hover_bgcolor_}}</option>
                                             {% endfor %}
                                         </select></label>
-                                        <label style="padding-left:5px;">Alignment: <select  name=vp_hover_align value="{{vp_hover_align }}" method="GET" action="/" style="width:70px;">
+                                        <label style="padding-left:27px;">Border: <select  name=hover_bordercolor value="{{vp_hover_bordercolor }}" method="GET" action="/" style="width:70px;">
+                                            {% for vp_hover_bordercolor_ in colors %}
+                                            <option value="{{vp_hover_bordercolor_}}" {% if vp_hover_bordercolor_==vp_hover_bordercolor %} selected {% endif %}>{{vp_hover_bordercolor_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left:10px;">Alignment: <select  name=vp_hover_align value="{{vp_hover_align }}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hover_align_ in hover_alignments %}
                                             <option value="{{vp_hover_align_}}" {% if hover_align_==vp_hover_align %} selected {% endif %}>{{vp_hover_align_}}</option>
                                             {% endfor %}
@@ -338,17 +333,17 @@
 
                                         <label style="width:300px;">Font: </label>
 
-                                        <label style="padding-left:13px;">Family: <select  name=vp_hover_fontfamily value="{{vp_hover_fontfamily }}" method="GET" action="/" style="width:70px;">
+                                        <label style="padding-left:35px;">Family: <select  name=vp_hover_fontfamily value="{{vp_hover_fontfamily }}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hover_fontfamily_ in fonts %}
                                             <option value="{{vp_hover_fontfamily_}}" {% if vp_hover_fontfamily_==vp_hover_fontfamily %} selected {% endif %}>{{vp_hover_fontfamily_}}</option>
                                             {% endfor %}
                                         </select></label>
-                                        <label style="padding-left:57px;">Color: <select  name=vp_hover_fontcolor value="{{vp_hover_fontcolor }}" method="GET" action="/" style="width:70px;">
+                                        <label style="padding-left:35px;">Color: <select  name=vp_hover_fontcolor value="{{vp_hover_fontcolor }}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hover_fontcolor_ in colors %}
                                             <option value="{{vp_hover_fontcolor_}}" {% if vp_hover_fontcolor_==vp_hover_fontcolor %} selected {% endif %}>{{vp_hover_fontcolor_}}</option>
                                             {% endfor %}
                                         </select></label>
-                                        <label style="padding-left:27px;">Size: <select  name=vp_hover_fontsize value="{{vp_hover_fontsize}}" method="GET" action="/" style="width:70px;">
+                                        <label style="padding-left:49px;">Size: <select  name=vp_hover_fontsize value="{{vp_hover_fontsize}}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hover_fontsize_ in fontsizes %}
                                             <option value="{{vp_hover_fontsize_}}" {% if vp_hover_fontsize_ ==vp_hover_fontsize  %} selected {% endif %}>{{vp_hover_fontsize_}}</option>
                                             {% endfor %}

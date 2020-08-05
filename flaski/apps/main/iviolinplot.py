@@ -97,10 +97,20 @@ def make_figure(df,pa):
     else:
         meanline=dict(visible=False)
 
-    fig.add_trace(go.Violin(y=tmp[pa["y_val"]],text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
+    if pa["hue"]!=None:
+        fig.add_trace(go.Violin(y=tmp[pa["y_val"]],x=tmp[pa["x_val"]],text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
         bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
         hoverlabel=hoverlabel,fillcolor=vp_color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
         side=pa["vp_side"],spanmode=pa["vp_span"]))
+    else:
+        for each in list(set(tmp[pa["hue"]])):
+            fig.add_trace(go.Violin(y=tmp[pa["y_val"]],x=tmp[pa["x_val"]]==each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
+            bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+            hoverlabel=hoverlabel,fillcolor=vp_color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
+            side=pa["vp_side"],spanmode=pa["vp_span"]))
+
+
+
 
     #UPDATE LAYOUT OF PLOTS
     #Figure size
