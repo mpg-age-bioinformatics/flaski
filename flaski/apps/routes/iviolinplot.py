@@ -11,20 +11,15 @@ from flaski.apps.main.iviolinplot import make_figure, figure_defaults
 from flaski.models import User, UserLogging
 from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file
 from flaski.email import send_exception_email
+from pandas.api.types import is_numeric_dtype
+import plotly
+import plotly.io as pio
 
 import os
 import io
 import sys
 import random
 import json
-
-import matplotlib
-matplotlib.use('agg')
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.backends.backend_svg import FigureCanvasSVG
-from pandas.api.types import is_numeric_dtype
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 
 import pandas as pd
 
@@ -125,35 +120,10 @@ def iviolinplot(download=None):
                 flash(sometext,'info')
                 return render_template('/apps/iviolinplot.html' , filename=filename, apps=apps,**plot_arguments)
             
-                # #IF THE USER HAS CHANGED THE COLUMNS TO PLOT
-                # if vals+["None"] != plot_arguments["vals"]:
-                #     plot_arguments=figure_defaults()
-                #     cols=df.columns.tolist()                   
-                #     plot_arguments["vals"]=vals+["None"]
-                #     plot_arguments["cols"]=cols
-                #     session["plot_arguments"]=plot_arguments 
-                #     sometext="Please tweak the arguments of your violin plot"
-                #     flash(sometext,'info')
-                #     return render_template('/apps/iviolinplot.html' , filename=filename, apps=apps,**plot_arguments)
-
             session["plot_arguments"]=plot_arguments
-
-
-            # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
-            #filename=session["filename"]
-            #plot_arguments=session["plot_arguments"]
-            #plot_arguments["vals"]=vals
-            #session["plot_arguments"]["vals"]=vals+["None"]
-
-
+            #CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
-
-            #TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-            figfile = io.BytesIO()
-            plt.savefig(figfile, format='png')
-            plt.close()
-            figfile.seek(0)  # rewind to beginning of file
-            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+            figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
             return render_template('/apps/iviolinplot.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
         except Exception as e:
