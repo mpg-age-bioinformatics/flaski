@@ -46,7 +46,8 @@ def make_figure(df,pa):
     floats=["x","y","axis_line_width","ticks_line_width","opacity",\
         "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
-        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","vp_pointpos","vp_jitter","vp_meanline_width"]
+        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","vp_pointpos","vp_jitter","vp_meanline_width","vp_marker_opacity",\
+        "vp_marker_size","vp_marker_line_width","vp_marker_line_outlierwidth"]
 
     for a in floats:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
@@ -67,7 +68,8 @@ def make_figure(df,pa):
     possible_nones=["title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
     "paper_bgcolor","plot_bgcolor","grid_color","legend_bgcolor","legend_bordercolor","legend_fontcolor","legend_title_fontcolor",\
     "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily","vp_hover_bgcolor","vp_hover_bordercolor",\
-    "vp_hover_fontfamily","vp_hover_fontcolor","vp_linecolor","vp_meanline_color"]
+    "vp_hover_fontfamily","vp_hover_fontcolor","vp_linecolor","vp_meanline_color","vp_marker_outliercolor","vp_marker_fillcolor",\
+    "vp_marker_line_color","vp_marker_line_outliercolor"]
     for p in possible_nones:
         if pa[p] == "None" or pa[p]=="Default" :
             pab[p]=None
@@ -92,22 +94,29 @@ def make_figure(df,pa):
         font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
         align=pa["vp_hover_align"])
     line=dict(color=pab["vp_linecolor"],width=pab["vp_linewidth"])
+    marker=dict(outliercolor=pab["vp_marker_outliercolor"],symbol=pa["vp_marker_symbol"],opacity=pab["vp_marker_opacity"],\
+    size=pab["vp_marker_size"],color=pab["vp_marker_fillcolor"],line=dict(color=pab["vp_marker_line_color"],\
+    width=pab["vp_marker_line_width"],outliercolor=pab["vp_marker_line_outliercolor"],outlierwidth=pab["vp_marker_line_outlierwidth"]))
+
     if pab["vp_meanline_color"]!=None:
         meanline=dict(visible=True,color=pab["vp_meanline_color"],width=pab["vp_meanline_width"])
     else:
         meanline=dict(visible=False)
 
-    if pa["hue"]!=None:
+    if pa["hue"]=="None":
         fig.add_trace(go.Violin(y=tmp[pa["y_val"]],x=tmp[pa["x_val"]],text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
         bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
         hoverlabel=hoverlabel,fillcolor=vp_color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
-        side=pa["vp_side"],spanmode=pa["vp_span"]))
+        side=pa["vp_side"],spanmode=pa["vp_span"],marker=marker))
     else:
-        for each in list(set(tmp[pa["hue"]])):
-            fig.add_trace(go.Violin(y=tmp[pa["y_val"]],x=tmp[pa["x_val"]]==each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
+        for each,side in zip(list(set(tmp[pa["hue"]])),["negative","positive"]):
+            fig.add_trace(go.Violin(y=tmp[pa["y_val"]][tmp[pa["hue"]] == each ],x=tmp[pa["x_val"]][tmp[pa["hue"]] == each ],\
+            legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
             bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
             hoverlabel=hoverlabel,fillcolor=vp_color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
-            side=pa["vp_side"],spanmode=pa["vp_span"]))
+            side=side,spanmode=pa["vp_span"],marker=marker))
+        fig.update_layout(violingap=0, violinmode='overlay')
+
 
 
 
@@ -292,6 +301,33 @@ STANDARD_TRACEORDERS=["reversed", "grouped", "reversed+grouped", "normal"]
 STANDARD_SIDES=["top","left","top left"]
 STANDARD_SPIKEMODES=["toaxis", "across", "marker","toaxis+across","toaxis+marker","across+marker","toaxis+across+marker"]
 STANDARD_SCALEMODES=["width","count"]
+STANDARD_SYMBOLS=["0","circle","100","circle-open","200","circle-dot","300","circle-open-dot","1","square",\
+    "101","square-open","201","square-dot","301","square-open-dot","2","diamond","102","diamond-open","202",\
+    "diamond-dot","302","diamond-open-dot","3","cross","103","cross-open","203","cross-dot","303","cross-open-dot",\
+    "4","x","104","x-open","204","x-dot","304","x-open-dot","5","triangle-up","105","triangle-up-open","205",\
+    "triangle-up-dot","305","triangle-up-open-dot","6","triangle-down","106","triangle-down-open","206","triangle-down-dot",\
+    "306","triangle-down-open-dot","7","triangle-left","107","triangle-left-open","207","triangle-left-dot","307",\
+    "triangle-left-open-dot","8","triangle-right","108","triangle-right-open","208","triangle-right-dot","308",\
+    "triangle-right-open-dot","9","triangle-ne","109","triangle-ne-open","209","triangle-ne-dot","309",\
+    "triangle-ne-open-dot","10","triangle-se","110","triangle-se-open","210","triangle-se-dot","310","triangle-se-open-dot",\
+    "11","triangle-sw","111","triangle-sw-open","211","triangle-sw-dot","311","triangle-sw-open-dot","12","triangle-nw",\
+    "112","triangle-nw-open","212","triangle-nw-dot","312","triangle-nw-open-dot","13","pentagon","113","pentagon-open",\
+    "213","pentagon-dot","313","pentagon-open-dot","14","hexagon","114","hexagon-open","214","hexagon-dot","314","hexagon-open-dot",\
+    "15","hexagon2","115","hexagon2-open","215","hexagon2-dot","315","hexagon2-open-dot","16","octagon","116","octagon-open",\
+    "216","octagon-dot","316","octagon-open-dot","17","star","117","star-open","217","star-dot","317","star-open-dot","18",\
+    "hexagram","118","hexagram-open","218","hexagram-dot","318","hexagram-open-dot","19","star-triangle-up","119",\
+    "star-triangle-up-open","219","star-triangle-up-dot","319","star-triangle-up-open-dot","20","star-triangle-down","120",\
+    "star-triangle-down-open","220","star-triangle-down-dot","320","star-triangle-down-open-dot","21","star-square","121",\
+    "star-square-open","221","star-square-dot","321","star-square-open-dot","22","star-diamond","122","star-diamond-open",\
+    "222","star-diamond-dot","322","star-diamond-open-dot","23","diamond-tall","123","diamond-tall-open","223",\
+    "diamond-tall-dot","323","diamond-tall-open-dot","24","diamond-wide","124","diamond-wide-open","224","diamond-wide-dot",\
+    "324","diamond-wide-open-dot","25","hourglass","125","hourglass-open","26","bowtie","126","bowtie-open","27","circle-cross",\
+    "127","circle-cross-open","28","circle-x","128","circle-x-open","29","square-cross","129","square-cross-open","30",\
+    "square-x","130","square-x-open","31","diamond-cross","131","diamond-cross-open","32","diamond-x","132","diamond-x-open",\
+    "33","cross-thin","133","cross-thin-open","34","x-thin","134","x-thin-open","35","asterisk","135","asterisk-open","36",\
+    "hash","136","hash-open","236","hash-dot","336","hash-open-dot","37","y-up","137","y-up-open","38","y-down","138",\
+    "y-down-open","39","y-left","139","y-left-open","40","y-right","140","y-right-open","41","line-ew","141","line-ew-open",\
+    "42","line-ns","142","line-ns-open","43","line-ne","143","line-ne-open","44","line-nw","144","line-nw-open"]
 
 def figure_defaults():
 
@@ -355,6 +391,16 @@ def figure_defaults():
         "vp_side":"both",\
         "vp_sides":["both","positive","negative"],\
         "scalemodes":STANDARD_SCALEMODES,\
+        "vp_marker_symbol":"circle",\
+        "marker_symbols":STANDARD_SYMBOLS,\
+        "vp_marker_outliercolor":"None",\
+        "vp_marker_opacity":"1",\
+        "vp_marker_size":"6",\
+        "vp_marker_fillcolor":"None",\
+        "vp_marker_line_color":"None",\
+        "vp_marker_line_width":"0",\
+        "vp_marker_line_outlierwidth":"1",\
+        "vp_marker_line_outliercolor":"None",\
         "xref":"container",\
         "yref":"container",\
         "x":"0.5",\

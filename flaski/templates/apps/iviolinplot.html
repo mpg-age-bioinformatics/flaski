@@ -131,12 +131,13 @@
                                         {% endfor %}
                                     </select></label>
 
-                                    <label style="padding-left: 16px;" >Barmode: <select name=barmode
-                                        val= "barmode"  method="GET" action="/" style="width:70px;">
-                                        {% for barmode_ in barmodes %}
-                                            <option value="{{barmode_}}" {% if barmode_==barmode %} selected {% endif %}>{{barmode_}}</option>
-                                         {% endfor %}
-                                    </select></label>
+                                    <div class="row arg">
+                                        <label style="padding-left: 39px">Style: <select name=style method="GET" action="/" style="width:70px">
+                                            {% for style_ in styles %}
+                                            <option value="{{style_}}" {% if style_==style %} selected {% endif %}>{{style_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                    </div>
 
                                     <div class="row arg">
                                         <label style="padding-left:7px;">BKG Color: <select  name=plot_bgcolor value="{{plot_bgcolor}}" method="GET" action="/" style="width:70px;">
@@ -144,14 +145,6 @@
                                             <option value="{{plot_bgcolor_}}" {% if plot_bgcolor_==plot_bgcolor %} selected {% endif %}>{{plot_bgcolor_}}</option>
                                             {% endfor %}
                                         </select></label>                           
-                                    </div>
-
-                                    <div class="row arg">
-                                        <label style="padding-left: 42px">Style: <select name=style method="GET" action="/" style="width:70px">
-                                            {% for style_ in styles %}
-                                            <option value="{{style_}}" {% if style_==style %} selected {% endif %}>{{style_}}</option>
-                                            {% endfor %}
-                                        </select></label>
                                     </div>
 
                                     <div class="row arg">
@@ -230,9 +223,9 @@
                                     <div class="row arguments">
                                         
                                         <div class="row arg">
-                                            <label style="padding-left: 34px;"> Text: <input type="text" name=vp_text value="{{vp_text}}" style="width:230px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 0px;"> Text: <input type="text" name=vp_text value="{{vp_text}}" style="width:300px;height:22px;padding-left:4px;"></label>
 
-                                            <label style="padding-left:20px;">Fill color: <select  name=vp_color_value value="{{vp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
+                                            <label style="padding-left:25px;">Fill color: <select  name=vp_color_value value="{{vp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                                 {% for vp_color_value_ in colors %}
                                                 <option value="{{vp_color_value_}}" {% if vp_color_value_==vp_color_value %} selected {% endif %}>{{vp_color_value_}}</option>
                                                 {% endfor %}
@@ -240,11 +233,11 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 15px;"> ..or write: <input type="text" name=vp_color_rgb value="{{vp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                            <label style="padding-left: 18px;"> ..or write: <input type="text" name=vp_color_rgb value="{{vp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
-                                            <label style="padding-left:38px;"> Scale: <select name=vp_scalemode val="{{vp_scalemode}}"  method="GET" action="/" style="width:80px;padding-left:10px">
+                                            <label style="padding-left:43px;"> Scale: <select name=vp_scalemode val="{{vp_scalemode}}"  method="GET" action="/" style="width:80px;padding-left:10px">
                                                 {% for vp_scalemode_ in scalemodes %}
                                                 <option value="{{vp_scalemode_}}" {% if vp_scalemode_==vp_scalemode %} selected {% endif %}>{{vp_scalemode_}}</option>
                                                 {% endfor %}
@@ -254,7 +247,7 @@
                                     
                                         
                                         <div class="row arg">
-                                            <label style="padding-left: 1px;"> Orientation: <select name=vp_orient val= "{{vp_orient}}" method="GET" action="/" style="width:80px;">
+                                            <label style="padding-left: 5px;"> Orientation: <select name=vp_orient val= "{{vp_orient}}" method="GET" action="/" style="width:80px;">
                                                 {% for vp_orient_ in orientations %}
                                                 <option value="{{vp_orient_}}" {% if vp_orient_==vp_orient %} selected {% endif %}>{{vp_orient_}}</option>
                                                 {% endfor %}
@@ -263,13 +256,13 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left:43px;">Side:  <select name=vp_side val= "{{vp_side}}"  method="GET" action="/" style="width:80px;">
+                                            <label style="padding-left:48px;">Side:  <select name=vp_side val= "{{vp_side}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_side_ in vp_sides %}
                                                 <option value="{{vp_side_}}" {% if vp_side_==vp_side %} selected {% endif %}>{{vp_side_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                             <label style="padding-left: 21px;"> Point pos: <input type="text" name=vp_pointpos value="{{vp_pointpos}}" style="width:50px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left:39px;">Span:  <select name=vp_span val= "{{vp_span}}"  method="GET" action="/" style="width:80px;">
+                                            <label style="padding-left:44px;">Span:  <select name=vp_span val= "{{vp_span}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_span_ in spans %}
                                                 <option value="{{vp_span_}}" {% if vp_span_==vp_span %} selected {% endif %}>{{vp_span_}}</option>
                                                 {% endfor %}
@@ -279,27 +272,63 @@
 
                                         
                                         <div class="row arg">
-                                            </label style="width:250px;padding-left:10px;">Border:</label>
-                                            <label style="padding-left:135px;">color:  <select name=vp_linecolor val= "{{vp_linecolor}}"  method="GET" action="/" style="width:80px;">
+                                            <label style="width:300px;">Border: </label>
+                                            <label style="padding-left:46px;">color:  <select name=vp_linecolor val= "{{vp_linecolor}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_linecolor_ in colors %}
                                                 <option value="{{vp_linecolor_}}" {% if vp_linecolor_==vp_linecolor %} selected {% endif %}>{{vp_linecolor_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 27px;">width: <input type="text" name=vp_linewidth value="{{vp_linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 42px;">width: <input type="text" name=vp_linewidth value="{{vp_linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                         </div>   
                                         
                                         <div class="row arg">
-                                            </label style="width:250px;padding-left:10px;">Mean:</label>
-                                            <label style="padding-left:135px;">color:  <select name=vp_meanline_color val= "{{vp_meanline_color}}"  method="GET" action="/" style="width:80px;">
+                                            <label style="width:300px;">Meanline: </label>
+                                            <label style="padding-left:46px;">color:  <select name=vp_meanline_color val= "{{vp_meanline_color}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_meanline_color_ in colors %}
                                                 <option value="{{vp_meanline_color_}}" {% if vp_meanline_color_==vp_meanline_color %} selected {% endif %}>{{vp_meanline_color_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 34px;">width: <input type="text" name=vp_meanline_width value="{{vp_meanline_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 41px;">width: <input type="text" name=vp_meanline_width value="{{vp_meanline_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                         </div>   
                             
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Marker</label>
+                                        <label style="padding-left:3px;">Outliercolor: <select  name=vp_marker_outliercolor value="{{vp_marker_outliercolor }}" method="GET" action="/" style="width:80px;">
+                                            {% for vp_marker_outliercolor_ in colors %}
+                                            <option value="{{vp_marker_outliercolor_}}" {% if vp_marker_outliercolor_==vp_marker_outliercolor %} selected {% endif %}>{{vp_marker_outliercolor_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left: 27px;">Opacity: <input type="text" name=vp_marker_opacity value="{{vp_marker_opacity}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                        <label style="padding-left:28px;">Symbol: <select  name=vp_marker_symbol value="{{vp_marker_symbol }}" method="GET" action="/" style="width:80px;">
+                                            {% for vp_marker_symbol_ in marker_symbols %}
+                                            <option value="{{vp_marker_symbol_}}" {% if vp_marker_symbol_==vp_marker_symbol %} selected {% endif %}>{{vp_marker_symbol_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left: 50px;">Size: <input type="text" name=vp_marker_size value="{{vp_marker_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                        <label style="padding-left:23px;">Fill color: <select  name=vp_marker_fillcolor value="{{vp_marker_fillcolor }}" method="GET" action="/" style="width:80px;">
+                                            {% for vp_marker_fillcolor_ in colors %}
+                                            <option value="{{vp_marker_fillcolor_}}" {% if vp_marker_fillcolor_==vp_marker_fillcolor %} selected {% endif %}>{{vp_marker_fillcolor_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+
+                                        <div class="row arg">
+                                            <label style="width:300px;">Line: </label>
+                                            <label style="padding-left:43px;">Color: <select  name=vp_marker_line_color value="{{vp_marker_line_color }}" method="GET" action="/" style="width:80px;">
+                                                {% for vp_marker_line_color_ in colors %}
+                                                <option value="{{vp_marker_line_color_}}" {% if vp_marker_line_color_==vp_marker_line_color %} selected {% endif %}>{{vp_marker_line_color_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                            <label style="padding-left: 37px;">Width: <input type="text" name=vp_marker_line_width value="{{vp_marker_line_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left:2px;">Outliercolor: <select  name=vp_marker_line_outliercolor value="{{vp_marker_line_outliercolor }}" method="GET" action="/" style="width:80px;">
+                                                {% for vp_marker_line_outliercolor_ in colors %}
+                                                <option value="{{vp_marker_line_outliercolor_}}" {% if vp_marker_line_outliercolor_==vp_marker_line_outliercolor %} selected {% endif %}>{{vp_marker_line_outliercolor_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                            <label style="padding-left: 0px;">Outlierwidth: <input type="text" name=vp_marker_line_outlierwidth value="{{vp_marker_line_outlierwidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
+    
+                                        </div>   
+
+
 
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
