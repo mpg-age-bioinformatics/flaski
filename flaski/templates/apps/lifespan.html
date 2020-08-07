@@ -74,16 +74,16 @@
                     </div>
                 </div>
 
-                <!-- <div class="column">
+                <div class="column">
                     <div class="sidebar-heading">Select groups:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;padding-bottom:15px;" >
                         <select name=groups_value method="GET" action="/" style="width:365px">
                             {% for groups_ in groups %}
-                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>
+                                <option value="{{groups_}}" {% if groups_ in groups_value %} selected {% endif %}>{{groups_}}</option>
                             {% endfor %}
                         </select>
                     </div>
-                </div> -->
+                </div>
 
 
 
@@ -112,7 +112,6 @@
                             <div class="row arg">
                                 <label style="width:60px">Estimate:</label>
                                 <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="Conf_Interval" {% if Conf_Interval=="on" %} checked {% elif Conf_Interval==".on" %} checked {% endif %}/> Show Confidence Intervals </label>
-                                <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="at_risk_counts" {% if at_risk_counts=="on" %} checked {% elif at_risk_counts==".on" %} checked {% endif %}/> Show at_risk counts </label>
                                 <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="show_censors" {% if show_censors=="on" %} checked {% elif show_censors==".on" %} checked {% endif %}/> Show censors </label>
                                 <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_legend" {% if ci_legend=="on" %} checked {% elif ci_legend==".on" %} checked {% endif %}/> Show legend </label>
                                 <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_force_lines" {% if ci_force_lines=="on" %} checked {% elif ci_force_lines==".on" %} checked {% endif %}/> Plot conf_int lines</label>
@@ -165,13 +164,13 @@
                                 <label>Linewidth: <input type="text" name="linewidth" value='{{ linewidth }}' style="width:98px;height:22px;padding-left: 4px"></label>
                             </div>
 
-                            <div class="row arg">
+                            <!-- <div class="row arg">
                                 <label>Color: <select name=line_color_value method="GET" action="/" style="width:115px;padding-left:4px">
                                     {% for lc_ in line_color %}
                                         <option value="{{lc_}}" {% if censors_==line_color_value %} selected {% endif %}>{{lc_}}</option>
                                     {% endfor %}
                                 </select>
-                            </div>
+                            </div> -->
                         
                         </div>
                     </div>
@@ -255,10 +254,10 @@
                                 <label style="padding-left:25px;"> upper: <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                             </div>
 
-                            <div class="row arg">
+                            <!-- <div class="row arg">
                                 <label>N ticks <label style="padding-left:10px;">x-axis: <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
                                 <label style="padding-left:25px;"> y-axis: <input type="text" name="maxyticks" value='{{ maxyticks }}' style="width:65px;height:22px;padding-left:4px;"></label></label>
-                            </div>
+                            </div> -->
 
                             <div class="row arg">
                                 <label>Grid: <label style="padding-left:2px;"><select name=grid_value method="GET" action="/" style="width:97px">

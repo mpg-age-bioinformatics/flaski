@@ -94,6 +94,9 @@ def lifespan(download=None):
                     df=read_tables(inputfile) 
                     cols=df.columns.tolist()
 
+                    if session["plot_arguments"]["groups"] not in cols:
+                        session["plot_arguments"]["groups"] = ["None"]+cols
+
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                     if (session["plot_arguments"]["yvals"] not in cols):
 
@@ -133,6 +136,10 @@ def lifespan(download=None):
 
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
+            # groups=df[request.form["groups_value"]]
+            # groups=list(set(groups))
+            # groups.sort()
+            # plot_arguments["list_of_groups"]=groups
 
             # CALL FIGURE FUNCTION
             # try:
