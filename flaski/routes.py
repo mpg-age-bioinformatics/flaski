@@ -45,8 +45,8 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A histogram."}] #,\
 
 if app.config['INSTANCE'] != "latest" :
-    DEVAPPS=[{ "name":"Violin plot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violin plot app."},\
-            { "name":"iHistogram", "id":'ihistogram_more',"link":'ihistogram' ,"java":"javascript:ReverseDisplay('iHistogram_more')", "description":"An interactive Histogram app."},\
+    DEVAPPS=[{ "name":"iHistogram", "id":'ihistogram_more',"link":'ihistogram' ,"java":"javascript:ReverseDisplay('iHistogram_more')", "description":"An interactive Histogram app."},\
+            {"name":"Violin plot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violin plot app."},\
             { "name":"iViolinplot", "id":'iviolinplot_more',"link":'iviolinplot' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"An interactive violinplot."}, \
             { "name":"MDS", "id":'mds_more',"link":'mds' ,"java":"javascript:ReverseDisplay('mds_more')", "description":"A MultiDimensional Scaling app."},\
             { "name":"tSNE", "id":'tsne_more',"link":'tsne' ,"java":"javascript:ReverseDisplay('tsne_more')", "description":"A tSNE app."},\
