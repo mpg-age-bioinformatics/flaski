@@ -113,7 +113,7 @@ services:
    - 80:80
    - 443:443
   volumes:
-   - ./services/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+   - ./services/nginx/dev.conf:/etc/nginx/conf.d/default.conf:rw
    - ~/flaski_data/certificates/cert.pem:/certs/cert.pem:ro 
    - ~/flaski_data/certificates/key.pem:/certs/key.pem:ro
    - ~/flaski_data/certificates/dhparam.pem:/certs/dhparam.pem:ro
