@@ -103,7 +103,7 @@ def make_figure(df,pa,fig=None,ax=None):
 
     floats=[ "framealpha", "labelspacing", "columnspacing","handletextpad",\
         "handlelength","borderaxespad","borderpad","cut","bw_float","vp_width","vp_linewidth","vp_saturation",\
-        "sp_size","sp_linewidth","bp_width","bp_saturation","bp_fliersize","bp_linewidth",\
+        "sp_size","sp_linewidth","sp_saturation","bp_width","bp_saturation","bp_fliersize","bp_linewidth",\
         "bp_whis","group_width"]
     for a in floats:
         if pa[a] == "":
@@ -119,7 +119,7 @@ def make_figure(df,pa,fig=None,ax=None):
             pab[a]=int(pa[a])
             
     if pa["sp_color_rgb"] != "":
-        sp_color=GET_COLOR(pa["sp_color_rgb"])
+        sp_color=GET_COLOR(pa["sp_color_rgb"]).split(",")
     else:
         if pa["sp_color_value"]=="None":
             sp_color=None
@@ -127,7 +127,7 @@ def make_figure(df,pa,fig=None,ax=None):
             sp_color=pa["sp_color_value"]
               
     if pa["vp_color_rgb"] != "":
-        vp_color=GET_COLOR(pa["vp_color_rgb"])
+        vp_color=GET_COLOR(pa["vp_color_rgb"]).split(",")
     else:
         if pa["vp_color_value"]=="None":
             vp_color=None
@@ -135,7 +135,7 @@ def make_figure(df,pa,fig=None,ax=None):
             vp_color=pa["vp_color_value"]  
     
     if pa["bp_color_rgb"] != "":
-        bp_color=GET_COLOR(pa["bp_color_rgb"])
+        bp_color=GET_COLOR(pa["bp_color_rgb"]).split(",")
     else:
         if pa["bp_color_value"]=="None":
             bp_color=None
@@ -155,19 +155,47 @@ def make_figure(df,pa,fig=None,ax=None):
     
     scale=pa["scale"]
 
+    #Define color, palette or user input
+    categories=list(set(tmp[pa["hue"]]))
+
+    if type(sp_color)==list:
+        sp_palette=dict()
+        for each,color in zip(categories,sp_color):
+            sp_palette[each]=color
+        sp_color=None
+    else:
+        sp_palette=pa["sp_palette"]
+    
+    if type(vp_color)==list:
+        vp_palette=dict()
+        for each,color in zip(categories,vp_color):
+            vp_palette[each]=color
+        vp_color=None
+
+    else:
+        vp_palette=pa["vp_palette"]
+
+    if type(bp_color)==list:
+        bp_palette=dict()
+        for each,color in zip(categories,bp_color):
+            bp_palette[each]=color
+        bp_color=None
+    else:
+        bp_palette=pa["bp_palette"]
+
 
     #PLOT MAIN FIGURE
 
     if "Violinplot" in pa["style"]:
         sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
         scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["vp_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=pab["vp_orient"],\
-        linewidth=pab["vp_linewidth"],color=vp_color,palette=pa["vp_palette"],saturation=pab["vp_saturation"])
+        linewidth=pab["vp_linewidth"],color=vp_color,palette=vp_palette,saturation=pab["vp_saturation"])
     if "Boxplot" in pa["style"]:
-        sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=pa["bp_palette"],saturation=pab["bp_saturation"],\
+        sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=bp_palette,saturation=pab["bp_saturation"],\
         width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
     if "Swarmplot" in pa["style"]:
-        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=pa["sp_palette"],\
-        size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"])       
+        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=sp_palette,\
+        size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"], alpha=pab["sp_saturation"])       
     
     #Set group distance
     if pa["hue"]!=None:
@@ -360,6 +388,7 @@ def figure_defaults():
         "sp_size":"5",\
         "vp_saturation":"0.75",\
         "bp_saturation":"0.75",\
+        "sp_saturation":"0.75",\
         "axis_line_width":1.0,\
         "xlabel_size":STANDARD_SIZES,\
         "ylabel_size":STANDARD_SIZES,\
