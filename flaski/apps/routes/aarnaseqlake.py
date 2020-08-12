@@ -173,6 +173,9 @@ def get_tables(plot_arguments):
         emsg="You need to select at least one data set. Alternatively, you can select 'all'"
         flash(emsg,'error')
 
+    if len(plot_arguments["selected_data_sets"]):
+        plot_arguments["selected_data_sets"]=["all"]
+
     if (ngroups == 2) & ( nsets == 1 ) & ( plot_arguments["selected_data_sets"][0] != "all" ):
         groups_to_files=pd.read_csv(plot_arguments["path_to_files"]+"metadata.tsv",sep="\t")
 
