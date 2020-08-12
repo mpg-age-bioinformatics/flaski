@@ -5,6 +5,16 @@ import plotly.figure_factory as ff
 from collections import OrderedDict
 import numpy as np
 
+
+def GET_COLOR(x):
+    if str(x)[:3].lower() == "rgb":
+        vals=x.split("rgb(")[-1].split(")")[0].split(",")
+        vals=[ float(s.strip(" ")) for s in vals ]
+        #vals=tuple(vals)
+        return vals
+    else:
+        return str(x)
+
 def make_figure(df,pa):
     """Generates figure.
 
@@ -78,7 +88,7 @@ def make_figure(df,pa):
                 else:
                     colors.append(h["color_value"])
             else:
-                colors.append(GET_COLOR( h["color_rgb"] ))
+                colors.append(GET_COLOR(h["color_rgb"]))
         
         hist_data=[]
         for col in tmp.columns:
@@ -143,7 +153,6 @@ def make_figure(df,pa):
             else:
                 line_color = GET_COLOR( h["line_rgb"] )
 
-
             if h["histnorm"] == "None":
                 histnorm = ""
             else:
@@ -161,7 +170,7 @@ def make_figure(df,pa):
                 font=dict(family=h_["hover_fontfamily"],size=h_["hover_fontsize"],color=h_["hover_fontcolor"]))
             
             if pab["errorbar"]==True:
-                    errorbar=True
+                errorbar=True
 
             if h["orientation_value"]=="vertical":
 
@@ -171,8 +180,8 @@ def make_figure(df,pa):
                 else:
                     error_y=dict(visible=False)
 
-                trace=fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
-                    opacity=h_["opacity"],nbinsx=h_["bins_number"],name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel))
+                fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
+                    opacity=h_["opacity"],nbinsx=h_["bins_number"],name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel,histnorm=histnorm))
             
 
             elif h["orientation_value"]=="horizontal":
@@ -184,7 +193,7 @@ def make_figure(df,pa):
                     error_x=dict(visible=False)
                 
                 fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
-                opacity=h_["opacity"],nbinsy=h_["bins_number"],name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel))
+                opacity=h_["opacity"],nbinsy=h_["bins_number"],name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel,histnorm=histnorm))
 
 
 
@@ -301,8 +310,6 @@ def make_figure(df,pa):
 
     #UPDATE LEGEND PROPERTIES
     if pab["show_legend"]==True:
-
-        labels=[x["label"] for x in pa["groups_settings"].values()]
 
         if pa["legend_orientation"]=="vertical":
             legend_orientation="v"

@@ -114,7 +114,6 @@ def ihistogram(download=None):
                     kde=True
                 
                 if session["plot_arguments"]["groups_settings"] == dict() or kde or session["plot_arguments"]["vals"]!=request.form.getlist("vals"):
-
                     if "kde" not in request.form.keys():
                         plot_arguments=session["plot_arguments"]
                         plot_arguments["vals"]=request.form.getlist("vals")
@@ -128,7 +127,7 @@ def ihistogram(download=None):
                                 "color_value":"None",\
                                 "color_rgb":"",\
                                 "histnorm":"",\
-                                "orientation_value":"v",\
+                                "orientation_value":"vertical",\
                                 "linewidth":0.5,\
                                 "linestyle_value":"solid",\
                                 "line_color":"lightgrey",\
@@ -148,7 +147,7 @@ def ihistogram(download=None):
                                 "cumulative_direction":"increasing",\
                                 "cumulative":".off"}
                         
-                        plot_arguments=read_request(request)       
+                        #plot_arguments=read_request(request)       
                         plot_arguments["groups_settings"]=groups_settings
                         session["plot_arguments"]=plot_arguments
                         filename=session["filename"]
@@ -156,7 +155,6 @@ def ihistogram(download=None):
             
                         # READ INPUT DATA FROM SESSION JSON
                         df=pd.read_json(session["df"])
-
                         #CALL FIGURE FUNCTION
                         fig=make_figure(df,plot_arguments)
                         figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
