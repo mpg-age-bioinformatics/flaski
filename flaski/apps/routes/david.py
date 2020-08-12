@@ -100,14 +100,20 @@ def david(download=None):
                 david_contents.append(list(tmp.loc[i,]))
 
             # david_in_store
-            session["david_in_store"]=True
-            return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
+            if len(david_df)>0:
+                session["david_in_store"]=True
+                return render_template('/apps/david.html', david_in_store=True, apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
+
+            elif "david_in_store" in list(session.keys()):
+                del(session["david_in_store"])
+                return render_template('/apps/david.html', apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="david",session=session)
             flash(tb_str,'traceback')
-            session["david_in_store"]=False
-            return render_template('/apps/david.html', david_in_store=True, apps=apps, **plot_arguments)
+            if "david_in_store" in list(session.keys()):
+                del(session["david_in_store"])
+            return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
     else:
 
