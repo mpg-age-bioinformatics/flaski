@@ -63,21 +63,27 @@ def get_tables(plot_arguments):
                                         ( results_files['Reps'].isin( pa["reps"] ) ) & \
                                         ( results_files['Group'].isin( pa["groups"] ) ) ]
 
-    if "all" not in plot_arguments["selected_data_sets"]:
+    if len(plot_arguments["selected_data_sets"]) == 0:
+        plot_arguments["selected_data_sets"]=["all"]
+    elif "all" not in plot_arguments["selected_data_sets"]:
         selected_data_sets=list(set(selected_results_files['Set'].tolist()))
         selected_data_sets.sort()
         plot_arguments["selected_data_sets"]=selected_data_sets
     else:
         plot_arguments["selected_data_sets"]=["all"]
 
-    if "all" not in plot_arguments["selected_groups"]:
+    if len(plot_arguments["selected_groups"]) == 0:
+        plot_arguments["selected_groups"]=["all"]
+    elif "all" not in plot_arguments["selected_groups"]:
         selected_groups=list(set(selected_results_files['Group'].tolist()))
         selected_groups.sort()
         plot_arguments["selected_groups"]=selected_groups
     else:
         plot_arguments["selected_groups"]=["all"]
 
-    if "all" not in plot_arguments["selected_reps"]:
+    if len(plot_arguments["selected_reps"]) == 0:
+        plot_arguments["selected_reps"]=["all"]
+    elif "all" not in plot_arguments["selected_reps"]:
         selected_reps=list(set(selected_results_files['Reps'].tolist()))
         selected_reps.sort()
         plot_arguments["selected_reps"]=selected_reps
