@@ -126,10 +126,20 @@ def heatmap(download=None):
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
 
+            if len(df) == 1:
+                session["plot_arguments"]["row_cluster"]="off"
+                flash("You only have one row. Row dendrogram is now off.")
+            if len(session["plot_arguments"]["yvals"]) == 1:
+                session["plot_arguments"]["col_cluster"]="off"
+                flash("You only have one column. Columns dendrogram is now off.")
+
             session["plot_arguments"]["xvals_colors_list"]=["select a row.."]+df[request.form["xvals"]].tolist()
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
             plot_arguments=session["plot_arguments"]
+
+          
+
 
             # CALL FIGURE FUNCTION
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)

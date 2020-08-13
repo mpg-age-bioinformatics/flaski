@@ -126,6 +126,13 @@ def iheatmap(download=None):
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
 
+            if len(df) == 1:
+                session["plot_arguments"]["row_cluster"]="off"
+                flash("You only have one row. Row dendrogram is now off.")
+            if len(session["plot_arguments"]["yvals"]) == 1:
+                session["plot_arguments"]["col_cluster"]="off"
+                flash("You only have one column. Columns dendrogram is now off.")
+
             # CALL FIGURE FUNCTION
             # try:
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
