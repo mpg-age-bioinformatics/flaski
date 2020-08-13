@@ -150,15 +150,26 @@ def makedir(p=""):
         flash("`%s` could not be created. %s already exists." %(new_folders,new_folders),'info')
     return redirect( '/storage/'+p )
 
-
 @app.route('/save/',methods=['GET', 'POST'])
 @app.route('/save/<path:p>',methods=['GET', 'POST'])
+@app.route('/save/<path:p>/<string:s>',methods=['GET', 'POST'])
 @login_required
-def save(p=""):
-    filename=secure_filename(request.form["file_name"])
-    ext=request.form['action']
-    session_=session_to_file(session,ext)
-    path = UserFolder(current_user) + "/"+p +"/"+ filename+"."+ext
+def save(p="",s="save_as"):
+    print(p,s)
+    sys.stdout.flush()
+    if s == "save_as":
+        filename=secure_filename(request.form["file_name"])
+        ext=request.form['action']
+        session_=session_to_file(session,ext)
+        path = UserFolder(current_user) + "/"+p +"/"+ filename+"."+ext
+        if ext == "ses":
+            session["session_file"]=path
+    elif "session_file" not in list(session.keys()):
+        return redirect( '/storage/' )
+    else:
+        ext="ses"
+        session_=session_to_file(session,ext)
+        path=session["session_file"]
 
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
@@ -169,7 +180,13 @@ def save(p=""):
         return redirect( '/storage/'+p )
     with open(path,"w") as fout:
         json.dump(session_, fout)
-    return redirect( '/storage/'+p )
+    
+    if s == "save_as":
+        return redirect( '/storage/'+p )
+    elif s == "save":
+        app_redirect=session["app"]
+        flash("`%s` saved." %os.path.basename(path),'info')
+        return redirect(url_for(app_redirect))
 
 @app.route('/load/<path:p>')
 @login_required
@@ -183,6 +200,8 @@ def load(p):
         session[k]=session_[k]
     plot_arguments=session["plot_arguments"]
     app_redirect=session["app"]
+    if path[:-3] == "ses":
+        session["session_file"]=path
     flash("`%s` loaded. Press `Submit` to see results." %os.path.basename(path),'info')
     return redirect(url_for(app_redirect))
 

@@ -110,6 +110,8 @@ def check_session_app(session,app,apps):
         eventlog = UserLogging(email=current_user.email, action="visit %s" %app)
         db.session.add(eventlog)
         db.session.commit()
+        if "session_file" in list(session.keys()):
+            del(session["session_file"])
         message="Could not find data for this App in your current session. Session has been reset."
         return message
     elif session["app"] == app :
@@ -119,6 +121,8 @@ def check_session_app(session,app,apps):
         eventlog = UserLogging(email=current_user.email, action="visit %s" %app)
         db.session.add(eventlog)
         db.session.commit()
+        if "session_file" in list(session.keys()):
+            del(session["session_file"])
         message="Returning from '%s'. Your '%s' session has been reset."  %(appName,appName)
             #Flaski is not yet made for working with multiple Apps nor data simultaneously on one single browser. \
             #If you wish to use multiple Apps or data simultaneously please use one App/data per web browser eg. Safari + Chrome. \
