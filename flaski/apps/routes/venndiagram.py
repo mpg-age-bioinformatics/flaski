@@ -70,10 +70,16 @@ def venndiagram(download=None):
                         i=i+1
             
                 if i < 2:
-                        error_msg="No data to plot, please upload data."
-                        flash(error_msg,'error')
-                        return render_template('/apps/venndiagram.html', apps=apps,  **plot_arguments)
+                    error_msg="No data to plot, please upload data."
+                    flash(error_msg,'error')
+                    return render_template('/apps/venndiagram.html', apps=apps,  **plot_arguments)
     
+            if ( "." in str(session["plot_arguments"]["population_size"]) ) | ( "," in str(session["plot_arguments"]["population_size"]) ):
+                error_msg="Population size needs to be an integer."
+                flash(error_msg,'error')
+                return render_template('/apps/venndiagram.html', apps=apps,  **plot_arguments)
+    
+
             # make sure we have the latest given arguments
             plot_arguments=session["plot_arguments"]
 
