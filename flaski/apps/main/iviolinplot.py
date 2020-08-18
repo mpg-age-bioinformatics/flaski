@@ -13,6 +13,14 @@ def GET_COLOR(x):
     else:
         return str(x)
 
+def CREATE_COLOR_COLUMN(df,xvals,colors):
+    unique_vals=df[xvals].unique()
+    dummie=dict()
+    for col,val in zip(colors,unique_vals):
+        dummie[val]=col
+    df['color_col']= df['day'].map(dummie)
+    return df
+
 def make_figure(df,pa):
     """Generates figure.
 
@@ -36,18 +44,29 @@ def make_figure(df,pa):
     #Load checkboxes
     pab={}
     for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis",\
-        "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis"]:
+        "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis","bp_notched"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
             pab[arg]=True
+    
+    #Load booleans
+    booleans=["bp_boxmean","bp_boxpoints"]
+    for arg in booleans:
+        if pa[arg]=="False":
+            pab[arg]=False
+        elif pa[arg]=="True":
+            pab[arg]=True
+        else:
+            pab[arg]=pa[arg]
 
     #Load floats
     floats=["x","y","axis_line_width","ticks_line_width","opacity",\
         "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
         "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","vp_pointpos","vp_jitter","vp_meanline_width","vp_marker_opacity",\
-        "vp_marker_size","vp_marker_line_width","vp_marker_line_outlierwidth"]
+        "vp_marker_size","vp_marker_line_width","vp_marker_line_outlierwidth","bp_opacity","bp_width","bp_pointpos","bp_jitter","bp_linewidth",\
+        "bp_whiskerwidth","bp_notchwidth"]
 
     for a in floats:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
@@ -57,7 +76,7 @@ def make_figure(df,pa):
 
     #Load integers
     integers=["label_fontsize","legend_fontsize","legend_title_fontsize","title_fontsize","maxxticks","maxyticks",\
-        "vp_hover_fontsize"]
+        "vp_hover_fontsize","bp_hover_fontsize"]
     for a in integers:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
             pab[a]=None
@@ -65,11 +84,11 @@ def make_figure(df,pa):
             pab[a]=int(pa[a])
 
     #Load Nones
-    possible_nones=["title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
+    possible_nones=["x_val","y_val","hue","title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
     "paper_bgcolor","plot_bgcolor","grid_color","legend_bgcolor","legend_bordercolor","legend_fontcolor","legend_title_fontcolor",\
     "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily","vp_hover_bgcolor","vp_hover_bordercolor",\
     "vp_hover_fontfamily","vp_hover_fontcolor","vp_linecolor","vp_meanline_color","vp_marker_outliercolor","vp_marker_fillcolor",\
-    "vp_marker_line_color","vp_marker_line_outliercolor"]
+    "vp_marker_line_color","vp_marker_line_outliercolor","bp_linecolor","bp_hover_bgcolor","bp_hover_bordercolor","bp_hover_fontfamily","bp_hover_fontcolor",]
     for p in possible_nones:
         if pa[p] == "None" or pa[p]=="Default" :
             pab[p]=None
@@ -82,43 +101,84 @@ def make_figure(df,pa):
         pab["vp_orient"]="v"
 
     if pa["vp_color_rgb"] != "":
-        vp_color=GET_COLOR(pa["vp_color_rgb"])
+        vp_color=GET_COLOR(pa["vp_color_rgb"]).split(",")
     else:
         if pa["vp_color_value"]=="None":
-            vp_color=None
+            if pab["hue"]==None:
+                vp_color=[None]*len(tmp[pab["x_val"]].unique())
+            else:
+                vp_color=[None]*2
         else:
-            vp_color=pa["vp_color_value"]  
+            if pab["hue"]==None:
+                vp_color=[pa["vp_color_value"]]*len(tmp[pab["x_val"]].unique())
+            else:
+                vp_color=[pa["vp_color_value"]]*2
+
+    if pa["bp_color_rgb"] != "":
+        bp_color=GET_COLOR(pa["bp_color_rgb"]).split(",")
+
+    else:
+        if pa["bp_color_value"]=="None":
+            if pab["hue"]==None:
+                bp_color=[None]*len(tmp[pab["x_val"]].unique())
+            else:
+                bp_color=[None]*2
+
+        else:
+            if pab["hue"]==None:
+                bp_color=[pa["bp_color_value"]]*len(tmp[pab["x_val"]].unique())
+            else:
+                bp_color=[pa["bp_color_value"]]*2
+
+    if pa["bp_orient"]=="horizontal":
+        pab["bp_orient"]="h"
+    else:
+        pab["bp_orient"]="v"
 
     #MAIN BODY
-    hoverlabel=dict(bgcolor=pab["vp_hover_bgcolor"],bordercolor=pab["vp_hover_bordercolor"],\
-        font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
-        align=pa["vp_hover_align"])
-    line=dict(color=pab["vp_linecolor"],width=pab["vp_linewidth"])
-    marker=dict(outliercolor=pab["vp_marker_outliercolor"],symbol=pa["vp_marker_symbol"],opacity=pab["vp_marker_opacity"],\
-    size=pab["vp_marker_size"],color=pab["vp_marker_fillcolor"],line=dict(color=pab["vp_marker_line_color"],\
-    width=pab["vp_marker_line_width"],outliercolor=pab["vp_marker_line_outliercolor"],outlierwidth=pab["vp_marker_line_outlierwidth"]))
+    if pa["style"]=="Violinplot + Swarmplot" or pa["style"]=="Violinplot":
+        hoverlabel=dict(bgcolor=pab["vp_hover_bgcolor"],bordercolor=pab["vp_hover_bordercolor"],\
+            font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
+            align=pa["vp_hover_align"])
+        line=dict(color=pab["vp_linecolor"],width=pab["vp_linewidth"])
+        marker=dict(outliercolor=pab["vp_marker_outliercolor"],symbol=pa["vp_marker_symbol"],opacity=pab["vp_marker_opacity"],\
+        size=pab["vp_marker_size"],color=pab["vp_marker_fillcolor"],line=dict(color=pab["vp_marker_line_color"],\
+        width=pab["vp_marker_line_width"],outliercolor=pab["vp_marker_line_outliercolor"],outlierwidth=pab["vp_marker_line_outlierwidth"]))
 
-    if pab["vp_meanline_color"]!=None:
-        meanline=dict(visible=True,color=pab["vp_meanline_color"],width=pab["vp_meanline_width"])
-    else:
-        meanline=dict(visible=False)
+        if pab["vp_meanline_color"]!=None:
+            meanline=dict(visible=True,color=pab["vp_meanline_color"],width=pab["vp_meanline_width"])
+        else:
+            meanline=dict(visible=False)
 
-    if pa["hue"]=="None":
-        fig.add_trace(go.Violin(y=tmp[pa["y_val"]],x=tmp[pa["x_val"]],text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
-        hoverlabel=hoverlabel,fillcolor=vp_color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
-        side=pa["vp_side"],spanmode=pa["vp_span"],marker=marker))
-    else:
-        for each,side in zip(list(set(tmp[pa["hue"]])),["negative","positive"]):
-            fig.add_trace(go.Violin(y=tmp[pa["y_val"]][tmp[pa["hue"]] == each ],x=tmp[pa["x_val"]][tmp[pa["hue"]] == each ],\
-            legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-            bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
-            hoverlabel=hoverlabel,fillcolor=vp_color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
-            side=side,spanmode=pa["vp_span"],marker=marker))
-        fig.update_layout(violingap=0, violinmode='overlay')
+        if pab["hue"]==None:
+            for each,color in zip(tmp[pab["x_val"]].unique(),vp_color):
+                fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
+                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                hoverlabel=hoverlabel,marker_color=color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
+                side=pa["vp_side"],spanmode=pa["vp_span"],marker=marker))
+
+        else:
+            for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
+                fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
+                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                hoverlabel=hoverlabel,marker_color=color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
+                side=side,spanmode=pa["vp_span"],marker=marker))
+            fig.update_layout(violingap=0, violinmode='overlay')
+
+    elif pa["style"]=="Boxplot + Swarmplot" or pa["style"]=="Boxplot":
+        hoverlabel=dict(bgcolor=pab["bp_hover_bgcolor"],bordercolor=pab["bp_hover_bordercolor"],
+        font=dict(family=pab["bp_hover_fontfamily"],size=pab["bp_hover_fontsize"],color=pab["bp_hover_fontcolor"]),\
+        align=pa["bp_hover_align"])
+        
+        print(pa["bp_hovertext"])
 
 
-
+        for each,color in zip(tmp[pab["x_val"]].unique(),bp_color):
+            fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],marker_color=color,orientation=pab["bp_orient"],\
+            hovertext=pa["bp_hovertext"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],width=pab["bp_width"],pointpos=pab["bp_pointpos"],\
+            jitter=pab["bp_jitter"],line=dict(color=pab["bp_linecolor"],width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],boxpoints=pab["bp_boxpoints"],\
+            quartilemethod=pa["bp_quartilemethod"],text=pa["bp_text"],hoverlabel=hoverlabel,notched=pab["bp_notched"]))
 
 
     #UPDATE LAYOUT OF PLOTS
@@ -127,7 +187,7 @@ def make_figure(df,pa):
 
     #Update title
     title=dict(text=pa["title"],font=dict(family=pab["title_fontfamily"],size=pab["title_fontsize"],color=pab["title_fontcolor"]),\
-        xref=pa["xref"],yref=pa["yref"],x=pab["x"],y=pab["y"],xanchor=pa["title_xanchor"],yanchor=pa["title_yanchor"])
+    xref=pa["xref"],yref=pa["yref"],x=pab["x"],y=pab["y"],xanchor=pa["title_xanchor"],yanchor=pa["title_yanchor"])
 
     fig.update_layout(title=title)
 
@@ -328,7 +388,8 @@ STANDARD_SYMBOLS=["0","circle","100","circle-open","200","circle-dot","300","cir
     "hash","136","hash-open","236","hash-dot","336","hash-open-dot","37","y-up","137","y-up-open","38","y-down","138",\
     "y-down-open","39","y-left","139","y-left-open","40","y-right","140","y-right-open","41","line-ew","141","line-ew-open",\
     "42","line-ns","142","line-ns-open","43","line-ne","143","line-ne-open","44","line-nw","144","line-nw-open"]
-
+STANDARD_BOXMEANS=["True","sd","False"]
+STANDARD_BOXPOINTS=["all","outliers","suspectedoutliers","False"]
 def figure_defaults():
 
     """Generates default figure arguments.
@@ -348,14 +409,14 @@ def figure_defaults():
     # "fig_size_x"="6"
     # "fig_size_y"="6"
 
-    plot_arguments={"fig_width":"600",\
-        "fig_height":"600",\
+    plot_arguments={"fig_width":"600.0",\
+        "fig_height":"600.0",\
         "title":'iViolinplot',\
-        "title_fontsize":"20",\
+        "title_fontsize":"20.0",\
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
-        "titles":"20",\
-        "opacity":"1",\
+        "titles":"20.0",\
+        "opacity":"1.0",\
         "style":"violinplot",\
         "styles":STANDARD_STYLES,\
         "paper_bgcolor":"white",\
@@ -364,7 +425,7 @@ def figure_defaults():
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "references":STANDARD_REFERENCES,\
         "vp_text":"",\
-        "vp_width":"0",\
+        "vp_width":"0.0",\
         "vp_orient":"vertical",\
         "vp_color_rgb":"",\
         "vp_color_value":"None",\
@@ -380,10 +441,10 @@ def figure_defaults():
         "vp_hover_fontcolor":"None",\
         "vp_hover_align":"auto",\
         "vp_linecolor":"None",\
-        "vp_linewidth":"2",\
-        "vp_pointpos":"0",\
+        "vp_linewidth":"2.0",\
+        "vp_pointpos":"0.0",\
         "vp_jitter":"0.5",\
-        "vp_meanline_width":"0",\
+        "vp_meanline_width":"0.0",\
         "vp_meanline_color":"None",\
         "vp_scalemode":"width",\
         "vp_span":"soft",\
@@ -394,13 +455,42 @@ def figure_defaults():
         "vp_marker_symbol":"circle",\
         "marker_symbols":STANDARD_SYMBOLS,\
         "vp_marker_outliercolor":"None",\
-        "vp_marker_opacity":"1",\
-        "vp_marker_size":"6",\
+        "vp_marker_opacity":"1.0",\
+        "vp_marker_size":"6.0",\
         "vp_marker_fillcolor":"None",\
         "vp_marker_line_color":"None",\
-        "vp_marker_line_width":"0",\
-        "vp_marker_line_outlierwidth":"1",\
+        "vp_marker_line_width":"0.0",\
+        "vp_marker_line_outlierwidth":"1.0",\
         "vp_marker_line_outliercolor":"None",\
+        "bp_text":"",\
+        "bp_opacity":"1.0",\
+        "bp_color_rgb":"",\
+        "bp_color_value":"None",\
+        "bp_orient":"vertical",\
+        "bp_width":"0.0",\
+        "bp_jitter":"0.5",\
+        "bp_pointpos":"0.0",\
+        "bp_notched":"off",\
+        "bp_whiskerwidth":"0.5",\
+        "bp_notchwidth":"0.25",\
+        "bp_linewidth":"2.0",\
+        "bp_linecolor":"None",\
+        "bp_boxmean":"False",\
+        "boxmeans":STANDARD_BOXMEANS,\
+        "boxpoints":STANDARD_BOXPOINTS,\
+        "bp_boxpoints":"outliers",\
+        "quartilemethods":["linear","exclusive","inclusive"],\
+        "bp_quartilemethod":"linear",\
+        "bp_hovertext":"",\
+        "bp_hoverinfo":"all",\
+        "bp_hoveron":"boxes+points",\
+        "bp_hoverons":["boxes","points","boxes+points"],\
+        "bp_hover_bgcolor":"None",\
+        "bp_hover_bordercolor":"None",\
+        "bp_hover_fontfamily":"Default",\
+        "bp_hover_fontsize":"12",\
+        "bp_hover_fontcolor":"None",\
+        "bp_hover_align":"auto",\
         "xref":"container",\
         "yref":"container",\
         "x":"0.5",\

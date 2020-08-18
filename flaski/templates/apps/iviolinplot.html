@@ -148,7 +148,7 @@
                                     </div>
 
                                     <div class="row arg">
-                                        <label style="padding-left: 80px;">Legend: </label>
+                                        <label style="padding-left: 83px;">Legend: </label>
                                         <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_legend {% if show_legend == "on"%} checked {% elif show_legend==".on" %} checked {% endif %}/></label>
                                     </div>
                                     
@@ -214,7 +214,7 @@
                         <li class="nav-item" style="padding-top: 0px;">
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseViolinplotArguments" aria-expanded="true" aria-controls="collapseViolinplotArguments" style="padding-top: 0px;">
                                 <i class="fas fa-fw fa-cog"></i>
-                                <span>Violin plot arguments </span>
+                                <span>Violin plot </span>
                             </a>
                             
                             
@@ -225,7 +225,7 @@
                                         <div class="row arg">
                                             <label style="padding-left: 0px;"> Text: <input type="text" name=vp_text value="{{vp_text}}" style="width:300px;height:22px;padding-left:4px;"></label>
 
-                                            <label style="padding-left:25px;">Fill color: <select  name=vp_color_value value="{{vp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
+                                            <label style="padding-left:23px;">Fill color: <select  name=vp_color_value value="{{vp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                                 {% for vp_color_value_ in colors %}
                                                 <option value="{{vp_color_value_}}" {% if vp_color_value_==vp_color_value %} selected {% endif %}>{{vp_color_value_}}</option>
                                                 {% endfor %}
@@ -267,7 +267,7 @@
                                                 <option value="{{vp_span_}}" {% if vp_span_==vp_span %} selected {% endif %}>{{vp_span_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 48px;"> Jitter: <input type="text" name=vp_jitter value="{{vp_jitter}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 50px;"> Jitter: <input type="text" name=vp_jitter value="{{vp_jitter}}" style="width:50px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         
@@ -328,8 +328,6 @@
     
                                         </div>   
 
-
-
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
                                         <label>Text: <input type="text" name={{vp_hovertext}} value= "{{vp_hovertext}}" style="width:265px;height:22px;padding-left:4px;"></label>
@@ -378,9 +376,6 @@
                                             {% endfor %}
                                         </select></label>
 
-
-
-
                                     </div>
                                 </div>
                             </div>
@@ -393,7 +388,7 @@
                         <li class="nav-item" style="padding-top: 0px;">
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBoxplotArguments" aria-expanded="true" aria-controls="collapseBoxplotArguments" style="padding-top: 0px;">
                                 <i class="fas fa-fw fa-cog"></i>
-                                <span>Box plot arguments </span>
+                                <span>Box plot </span>
                             </a>
                             
                             
@@ -402,22 +397,16 @@
                                     <div class="row arguments">
                                         
                                         <div class="row arg">
-                                            <label style="padding-left:20px;">Fill color: <select  name=bp_color_value value="{{bp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
+                                            <label style="padding-left: 0px;"> Text: <input type="text" name=bp_text value="{{bp_text}}" style="width:300px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left:18px;">Fill color: <select  name=bp_color_value value="{{bp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                                 {% for bp_color_value_ in colors %}
                                                 <option value="{{bp_color_value_}}" {% if bp_color_value_==bp_color_value %} selected {% endif %}>{{bp_color_value_}}</option>
                                                 {% endfor %}
                                             </select></label>
                                         </div>
-                                        <div class="row arg">
-                                            <label style="padding-left:28px;">Palette: <select name=bp_palette value="{{bp_palette}}" method="GET" action="/" style="width:80px;">
-                                                {% for bp_palette_ in palettes %}
-                                                <option value="{{bp_palette_}}" {% if bp_palette_==bp_palette %} selected {% endif%}>{{bp_palette_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                        </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 15px;"> ..or write: <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:223px;height:22px;padding-left: 4px;">
+                                            <label style="padding-left: 0px;"> ..or write: <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:300px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
@@ -430,22 +419,85 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 5px;"> Saturation: <input type="text" name=bp_saturation value="{{bp_saturation}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 22px;"> Whis: <input type="text" name=bp_whis value="{{bp_whis}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            Line:
+                                            <label style="padding-left: 8px;">Color: <select name=bp_linecolor val= "{{bp_linecolor}}" method="GET" action="/" style="width:80px;">
+                                                {% for bp_linecolor_ in colors %}
+                                                <option value="{{bp_linecolor_}}" {% if bp_linecolor_==bp_linecolor %} selected {% endif %}>{{bp_linecolor_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                            <label style="padding-left: 15px;">Width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 4px;"> Line width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 4px;"> Fliersize: <input type="text" name=bp_fliersize value="{{bp_fliersize}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 8px;">Boxmean: <select name=bp_boxmean val= "{{bp_boxmean}}" method="GET" action="/" style="width:80px;">
+                                                {% for bp_boxmean_ in boxmeans %}
+                                                <option value="{{bp_boxmean_}}" {% if bp_boxmean_==bp_boxmean %} selected {% endif %}>{{bp_boxmean_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                            <label style="padding-left: 9px;"> Opacity: <input type="text" name=bp_opacity value="{{bp_opacity}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 5px;">Boxpoints: <select name=bp_boxpoints val= "{{bp_boxpoints}}" method="GET" action="/" style="width:80px;">
+                                                {% for bp_boxpoints_ in boxpoints %}
+                                                <option value="{{bp_boxpoints_}}" {% if bp_boxpoints_ == bp_boxpoints %} selected {% endif %}>{{bp_boxpoints_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                            <label style="padding-left: 26px;"> Jitter: <input type="text" name=bp_jitter value="{{bp_jitter}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <div class="row arg">
+                                            Notch:
+                                                <label style="padding-left: 60px;">Draw: </label>
+                                                <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= bp_notched {% if bp_notched == "on"%} checked {% elif bp_notched==".on" %} checked {% endif %}/></label>
+                                            </div>
+                                            <label style="padding-left: 26px;"> Width: <input type="text" name=bp_notchwidth value="{{bp_notchwidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 117px;"> Whisker width: <input type="text" name=bp_whiskerwidth value="{{bp_whiskerwidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 152px;"> Point pos: <input type="text" name=bp_pointpos value="{{bp_pointpos}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
-                                        <div class="row arg">
-                                            <label style="padding-left: 5px;"> Hue width: <input type="text" name=group_width value="{{group_width}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 78px;">Dodge: </label><label  style="width:5px;padding-left:5px;"><input type="checkbox" name= bp_dodge {% if bp_dodge == "on"%} checked {% elif bp_dodge==".on" %} checked {% endif %}/></label>
-                                        </div>
+                                        <hr class="black">
+                                        <label style="width:250px;padding-left:130px;">Hover</label>
+                                        <label>Text: <input type="text" name={{bp_hovertext}} value= "{{bp_hovertext}}" style="width:265px;height:22px;padding-left:4px;"></label>
+                                        <label style="padding-left:16px;">Hover on: <select  name=bp_hoveron value="{{bp_hoveron }}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hoveron_ in bp_hoverons %}
+                                            <option value="{{bp_hoveron_}}" {% if bp_hoveron_==bp_hoveron %} selected {% endif %}>{{bp_hoveron_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left:5px;">Hover Info: <select  name=bp_hoverinfo value="{{bp_hoverinfo }}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hoverinfo_ in hoverinfos %}
+                                            <option value="{{bp_hoverinfo_}}" {% if bp_hoverinfo_==bp_hoverinfo %} selected {% endif %}>{{bp_hoverinfo_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="width:200px;">Color:</label>
+                                        <label style="padding-left:0px;">Background: <select  name=bp_hover_bgcolor value="{{bp_hover_bgcolor}}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hover_bgcolor_ in colors %}
+                                            <option value="{{bp_hover_bgcolor_}}" {% if bp_hover_bgcolor_==bp_hover_bgcolor %} selected {% endif %}>{{bp_hover_bgcolor_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left:27px;">Border: <select  name=hover_bordercolor value="{{bp_hover_bordercolor }}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hover_bordercolor_ in colors %}
+                                            <option value="{{bp_hover_bordercolor_}}" {% if bp_hover_bordercolor_==bp_hover_bordercolor %} selected {% endif %}>{{bp_hover_bordercolor_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left:10px;">Alignment: <select  name=bp_hover_align value="{{bp_hover_align }}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hover_align_ in hover_alignments %}
+                                            <option value="{{bp_hover_align_}}" {% if hover_align_==bp_hover_align %} selected {% endif %}>{{bp_hover_align_}}</option>
+                                            {% endfor %}
+                                        </select></label>
 
+                                        <label style="width:300px;">Font: </label>
 
-
+                                        <label style="padding-left:35px;">Family: <select  name=bp_hover_fontfamily value="{{bp_hover_fontfamily }}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hover_fontfamily_ in fonts %}
+                                            <option value="{{bp_hover_fontfamily_}}" {% if bp_hover_fontfamily_==bp_hover_fontfamily %} selected {% endif %}>{{bp_hover_fontfamily_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left:35px;">Color: <select  name=bp_hover_fontcolor value="{{bp_hover_fontcolor }}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hover_fontcolor_ in colors %}
+                                            <option value="{{bp_hover_fontcolor_}}" {% if bp_hover_fontcolor_==bp_hover_fontcolor %} selected {% endif %}>{{bp_hover_fontcolor_}}</option>
+                                            {% endfor %}
+                                        </select></label>
+                                        <label style="padding-left:49px;">Size: <select  name=bp_hover_fontsize value="{{bp_hover_fontsize}}" method="GET" action="/" style="width:70px;">
+                                            {% for bp_hover_fontsize_ in fontsizes %}
+                                            <option value="{{bp_hover_fontsize_}}" {% if bp_hover_fontsize_ ==bp_hover_fontsize  %} selected {% endif %}>{{bp_hover_fontsize_}}</option>
+                                            {% endfor %}
+                                        </select></label>
                                     </div>
                                 </div>
                             </div>
