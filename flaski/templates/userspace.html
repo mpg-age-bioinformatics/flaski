@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="generator" content="Bootstrap Listr">
+  <title>FLASKI</title>
+
+  <script src="https://kit.fontawesome.com/609ed3ec10.js" crossorigin="anonymous"></script>
+
+  <!-- Custom fonts for this template-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" type="text/css">
+
+  <link rel="icon" href="{{ url_for('static', filename='dog-solid.png') }}">
+
+    <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/custom.css')}}">
+    <!--link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/listr.pack.css')}}"-->
+    <link rel="stylesheet" href="{{url_for('static', filename='fileserver/css/jquery.filer.css')}}">
+
+<style>
+.error{
+    background-color:coral
+}
+.info{
+    background-color:rgb(148,224,153)
+}
+
+</style>
+
+</head>
+
+{% block app_title %}
+
+<div class="col-xs-12" style="width:3000000px;padding-top:18px;">
+
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app in apps %}
+<a class="dropdown-item" href="/{{app.link}}">{{ app.name }}</a>
+{% endfor %}
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Begin Page Content -->
+<section>
+    <div class="container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            {% if category == "error" %}
+            <div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div>
+            {% else %}
+            <div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+    </div>
+    <!-- End of Page Content -->
+</section>
+
+{% endblock %}
+
+
+
+{% block in_page_footer %}
+
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;position: absolute;bottom: 0;width: 100%;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+            <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+
+{% endblock %}
+
+ 
+
+    <!--div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="login">
+                    <div class="modal-body">
+                        <div class="md-form">
+                            <i class="fa fa-envelope prefix grey-text"> </i><label>Username</label>
+                            <input type="text" id="username" class="form-control">
+                        </div>
+                        <div class="md-form">
+                            <i class="fa fa-lock prefix grey-text"> </i>
+                            <label>Password</label>
+                            <input type="password" id="password" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pull-xs-right">
+                            <button type="button" id="close-login" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" id="send-login" class="btn btn-secondary">Login</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div-->
+
+<!-- Bootstrap core JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+
+<!-- Page level plugins -->
+<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
+<script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
+
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/tether.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/listr.pack.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.filer.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/jquery.base64.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='fileserver/js/custom.js')}}"></script>
+
+  
+<!--/body-->
+</html>
+
+
