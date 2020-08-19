@@ -261,13 +261,11 @@
                                                 <option value="{{vp_side_}}" {% if vp_side_==vp_side %} selected {% endif %}>{{vp_side_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 21px;"> Point pos: <input type="text" name=vp_pointpos value="{{vp_pointpos}}" style="width:50px;height:22px;padding-left: 4px;"></label>
                                             <label style="padding-left:44px;">Span:  <select name=vp_span val= "{{vp_span}}"  method="GET" action="/" style="width:80px;">
                                                 {% for vp_span_ in spans %}
                                                 <option value="{{vp_span_}}" {% if vp_span_==vp_span %} selected {% endif %}>{{vp_span_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 50px;"> Jitter: <input type="text" name=vp_jitter value="{{vp_jitter}}" style="width:50px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         
@@ -290,49 +288,11 @@
                                             </select></label>
                                             <label style="padding-left: 41px;">width: <input type="text" name=vp_meanline_width value="{{vp_meanline_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                         </div>   
-                            
-                                        <hr class="black">
-                                        <label style="width:250px;padding-left:130px;">Marker</label>
-                                        <label style="padding-left:3px;">Outliercolor: <select  name=vp_marker_outliercolor value="{{vp_marker_outliercolor }}" method="GET" action="/" style="width:80px;">
-                                            {% for vp_marker_outliercolor_ in colors %}
-                                            <option value="{{vp_marker_outliercolor_}}" {% if vp_marker_outliercolor_==vp_marker_outliercolor %} selected {% endif %}>{{vp_marker_outliercolor_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-                                        <label style="padding-left: 27px;">Opacity: <input type="text" name=vp_marker_opacity value="{{vp_marker_opacity}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                        <label style="padding-left:28px;">Symbol: <select  name=vp_marker_symbol value="{{vp_marker_symbol }}" method="GET" action="/" style="width:80px;">
-                                            {% for vp_marker_symbol_ in marker_symbols %}
-                                            <option value="{{vp_marker_symbol_}}" {% if vp_marker_symbol_==vp_marker_symbol %} selected {% endif %}>{{vp_marker_symbol_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-                                        <label style="padding-left: 50px;">Size: <input type="text" name=vp_marker_size value="{{vp_marker_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                        <label style="padding-left:23px;">Fill color: <select  name=vp_marker_fillcolor value="{{vp_marker_fillcolor }}" method="GET" action="/" style="width:80px;">
-                                            {% for vp_marker_fillcolor_ in colors %}
-                                            <option value="{{vp_marker_fillcolor_}}" {% if vp_marker_fillcolor_==vp_marker_fillcolor %} selected {% endif %}>{{vp_marker_fillcolor_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-
-                                        <div class="row arg">
-                                            <label style="width:300px;">Line: </label>
-                                            <label style="padding-left:43px;">Color: <select  name=vp_marker_line_color value="{{vp_marker_line_color }}" method="GET" action="/" style="width:80px;">
-                                                {% for vp_marker_line_color_ in colors %}
-                                                <option value="{{vp_marker_line_color_}}" {% if vp_marker_line_color_==vp_marker_line_color %} selected {% endif %}>{{vp_marker_line_color_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left: 37px;">Width: <input type="text" name=vp_marker_line_width value="{{vp_marker_line_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left:2px;">Outliercolor: <select  name=vp_marker_line_outliercolor value="{{vp_marker_line_outliercolor }}" method="GET" action="/" style="width:80px;">
-                                                {% for vp_marker_line_outliercolor_ in colors %}
-                                                <option value="{{vp_marker_line_outliercolor_}}" {% if vp_marker_line_outliercolor_==vp_marker_line_outliercolor %} selected {% endif %}>{{vp_marker_line_outliercolor_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left: 0px;">Outlierwidth: <input type="text" name=vp_marker_line_outlierwidth value="{{vp_marker_line_outlierwidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
-    
-                                        </div>   
-
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
                                         <label>Text: <input type="text" name={{vp_hovertext}} value= "{{vp_hovertext}}" style="width:265px;height:22px;padding-left:4px;"></label>
                                         <label style="padding-left:16px;">Hover on: <select  name=vp_hoveron value="{{vp_hoveron }}" method="GET" action="/" style="width:70px;">
-                                            {% for vp_hoveron_ in hoverons %}
+                                            {% for vp_hoveron_ in vp_hoverons %}
                                             <option value="{{vp_hoveron_}}" {% if vp_hoveron_==vp_hoveron %} selected {% endif %}>{{vp_hoveron_}}</option>
                                             {% endfor %}
                                         </select></label>
@@ -381,6 +341,7 @@
                             </div>
                         </li>
                     {% endif %}
+
                     {% if style=="Boxplot" or style=="Boxplot and Swarmplot" %}           
                         <!------------ SELECT BOXPLOT ARGUMENTS -------------------->
                         
@@ -425,7 +386,7 @@
                                                 <option value="{{bp_linecolor_}}" {% if bp_linecolor_==bp_linecolor %} selected {% endif %}>{{bp_linecolor_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 15px;">Width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 13px;">Width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         <div class="row arg">
@@ -434,21 +395,13 @@
                                                 <option value="{{bp_boxmean_}}" {% if bp_boxmean_==bp_boxmean %} selected {% endif %}>{{bp_boxmean_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 9px;"> Opacity: <input type="text" name=bp_opacity value="{{bp_opacity}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 5px;">Boxpoints: <select name=bp_boxpoints val= "{{bp_boxpoints}}" method="GET" action="/" style="width:80px;">
-                                                {% for bp_boxpoints_ in boxpoints %}
-                                                <option value="{{bp_boxpoints_}}" {% if bp_boxpoints_ == bp_boxpoints %} selected {% endif %}>{{bp_boxpoints_}}</option>
-                                                {% endfor %}
-                                            </select></label>
-                                            <label style="padding-left: 26px;"> Jitter: <input type="text" name=bp_jitter value="{{bp_jitter}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                             <div class="row arg">
-                                            Notch:
-                                                <label style="padding-left: 60px;">Draw: </label>
+                                            <label style="padding-left: 25px;">Notch: </label>
+                                                <label style="padding-left: 38px;">Draw: </label>
                                                 <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= bp_notched {% if bp_notched == "on"%} checked {% elif bp_notched==".on" %} checked {% endif %}/></label>
                                             </div>
-                                            <label style="padding-left: 26px;"> Width: <input type="text" name=bp_notchwidth value="{{bp_notchwidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 25px;"> Width: <input type="text" name=bp_notchwidth value="{{bp_notchwidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                             <label style="padding-left: 117px;"> Whisker width: <input type="text" name=bp_whiskerwidth value="{{bp_whiskerwidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
-                                            <label style="padding-left: 152px;"> Point pos: <input type="text" name=bp_pointpos value="{{bp_pointpos}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         <hr class="black">
@@ -502,6 +455,69 @@
                                 </div>
                             </div>
                         </li>
+                    {% endif %}
+
+                    {% if "Swarmplot" in style %}
+                    <!------------ SELECT SWARMPLOT ARGUMENTS -------------------->
+
+                    <li class="nav-item" style="padding-top: 0px;">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSwarmplotArguments" aria-expanded="true" aria-controls="collapseSwarmplotArguments" style="padding-top: 0px;">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Swarm plot </span>
+                        </a>
+                        
+                        
+                        <div id="collapseSwarmplotArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded openmenu">
+                                <div class="row arguments">
+
+                                <label style="padding-left: 28px;">Display: <select name=points val= "{{points}}" method="GET" action="/" style="width:80px;">
+                                {% for points_ in display_points %}
+                                    <option value="{{points_}}" {% if points_ == points %} selected {% endif %}>{{points_}}</option>
+                                {% endfor %}
+                                </select></label>
+                                <label style="padding-left: 48px;"> Jitter: <input type="text" name=jitter value="{{jitter}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+
+                                <label style="padding-left:3px;">Outliercolor: <select  name=marker_outliercolor value="{{marker_outliercolor }}" method="GET" action="/" style="width:80px;">
+                                    {% for marker_outliercolor_ in colors %}
+                                    <option value="{{marker_outliercolor_}}" {% if marker_outliercolor_==marker_outliercolor %} selected {% endif %}>{{marker_outliercolor_}}</option>
+                                    {% endfor %}
+                                </select></label>
+                                <label style="padding-left: 27px;">Opacity: <input type="text" name=marker_opacity value="{{marker_opacity}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left:28px;">Symbol: <select  name=marker_symbol value="{{marker_symbol }}" method="GET" action="/" style="width:80px;">
+                                    {% for marker_symbol_ in marker_symbols %}
+                                    <option value="{{marker_symbol_}}" {% if marker_symbol_==marker_symbol %} selected {% endif %}>{{marker_symbol_}}</option>
+                                    {% endfor %}
+                                </select></label>
+                                <label style="padding-left: 50px;">Size: <input type="text" name=marker_size value="{{marker_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left:23px;">Fill color: <select  name=marker_fillcolor value="{{marker_fillcolor }}" method="GET" action="/" style="width:80px;">
+                                    {% for marker_fillcolor_ in colors %}
+                                    <option value="{{marker_fillcolor_}}" {% if marker_fillcolor_==marker_fillcolor %} selected {% endif %}>{{marker_fillcolor_}}</option>
+                                    {% endfor %}
+                                </select></label>
+                                <label style="padding-left: 26px;">Position: <input type="text" name=pointpos value="{{pointpos}}" style="width:50px;height:22px;padding-left:4px;"></label>
+
+
+                                <div class="row arg">
+                                    <label style="width:300px;">Line: </label>
+                                    <label style="padding-left:40px;">Color: <select  name=marker_line_color value="{{marker_line_color }}" method="GET" action="/" style="width:80px;">
+                                        {% for marker_line_color_ in colors %}
+                                        <option value="{{marker_line_color_}}" {% if marker_line_color_==marker_line_color %} selected {% endif %}>{{marker_line_color_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left: 40px;">Width: <input type="text" name=marker_line_width value="{{marker_line_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                    <label style="padding-left:2px;">Outliercolor: <select  name=marker_line_outliercolor value="{{marker_line_outliercolor }}" method="GET" action="/" style="width:80px;">
+                                        {% for marker_line_outliercolor_ in colors %}
+                                            <option value="{{marker_line_outliercolor_}}" {% if marker_line_outliercolor_==marker_line_outliercolor %} selected {% endif %}>{{marker_line_outliercolor_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                    <label style="padding-left: 0px;">Outlierwidth: <input type="text" name=marker_line_outlierwidth value="{{marker_line_outlierwidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
+
+                                </div>   
+                            </div>
+                        </div>
+                    </li>
+
                     {% endif %}
 
                     <!-- -------------------- AXES ARGUMENTS ---------------------- -->
