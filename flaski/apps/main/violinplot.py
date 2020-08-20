@@ -160,7 +160,6 @@ def make_figure(df,pa,fig=None,ax=None):
         categories=list(set(tmp[pa["hue"]]))
     else:
         categories=list(set(tmp[pa["x_val"]]))
-        print(categories)
 
     if type(sp_color)==list:
         sp_palette=dict()
@@ -191,21 +190,30 @@ def make_figure(df,pa,fig=None,ax=None):
     #PLOT MAIN FIGURE
 
     if "Violinplot" in pa["style"]:
-        sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
+
+        violinplot=sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
         scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["vp_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=pab["vp_orient"],\
         linewidth=pab["vp_linewidth"],color=vp_color,palette=vp_palette,saturation=pab["vp_saturation"])
+        
+        if "Swarmplot" in pa["style"]:
+            violinplot.get_legend().set_visible(False)
+
     if "Boxplot" in pa["style"]:
-        sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=bp_palette,saturation=pab["bp_saturation"],\
+
+        boxplot=sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=bp_palette,saturation=pab["bp_saturation"],\
         width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
+        
+        if "Swarmplot" in pa["style"]:
+            boxplot.get_legend().set_visible(False)
+
     if "Swarmplot" in pa["style"]:
-        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=sp_palette,\
+        swarmplot=sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=sp_palette,\
         size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"], alpha=pab["sp_saturation"])       
     
     #Set group distance
     if pa["hue"]!=None:
         adjust_box_widths(fig, pab["group_width"])
 
-    
     #SET LEGEND OPTIONS
     facecolor= pa["facecolor"]
     edgecolor=pa["edgecolor"]
@@ -222,16 +230,14 @@ def make_figure(df,pa,fig=None,ax=None):
         legend_body_fontsize=float(pa["legend_body_fontsize_value"])
     else:
         legend_body_fontsize=pa["legend_body_fontsize"]
-
     
-    plt.legend(loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
+    
+    plt.legend(handles=handles,loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
         markerfirst=pab["markerfirst"],fancybox=pab["fancybox"],shadow=pab["shadow"],framealpha=pab["framealpha"], \
         facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
         title_fontsize=legend_title_fontsize,borderpad=pab["borderpad"],labelspacing=pab["labelspacing"],\
         handlelength=pab["handlelength"],handletextpad=pab["handletextpad"],\
         borderaxespad=pab["borderaxespad"],columnspacing=pab["columnspacing"])
-
-
 
     #SET GRID, AXIS AND TICKS
     for axis in ['top','bottom','left','right']:
