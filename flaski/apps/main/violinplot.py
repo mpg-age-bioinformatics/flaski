@@ -191,25 +191,19 @@ def make_figure(df,pa,fig=None,ax=None):
 
     if "Violinplot" in pa["style"]:
 
-        violinplot=sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
+        sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
         scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["vp_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=pab["vp_orient"],\
         linewidth=pab["vp_linewidth"],color=vp_color,palette=vp_palette,saturation=pab["vp_saturation"])
-        
-        if "Swarmplot" in pa["style"]:
-            violinplot.get_legend().set_visible(False)
 
     if "Boxplot" in pa["style"]:
 
-        boxplot=sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=bp_palette,saturation=pab["bp_saturation"],\
+        sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=bp_palette,saturation=pab["bp_saturation"],\
         width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
-        
-        if "Swarmplot" in pa["style"]:
-            boxplot.get_legend().set_visible(False)
 
     if "Swarmplot" in pa["style"]:
-        swarmplot=sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=sp_palette,\
+        sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=sp_palette,\
         size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"], alpha=pab["sp_saturation"])       
-    
+        
     #Set group distance
     if pa["hue"]!=None:
         adjust_box_widths(fig, pab["group_width"])
@@ -231,13 +225,19 @@ def make_figure(df,pa,fig=None,ax=None):
     else:
         legend_body_fontsize=pa["legend_body_fontsize"]
     
-    
-    plt.legend(handles=handles,loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
+    if pa["hue"]!=None:
+        handles,labels=axes.get_legend_handles_labels()
+        handles=handles[0:2]
+        labels=labels[0:2]
+
+        plt.legend(handles=handles,labels=labels,loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
         markerfirst=pab["markerfirst"],fancybox=pab["fancybox"],shadow=pab["shadow"],framealpha=pab["framealpha"], \
         facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
         title_fontsize=legend_title_fontsize,borderpad=pab["borderpad"],labelspacing=pab["labelspacing"],\
         handlelength=pab["handlelength"],handletextpad=pab["handletextpad"],\
         borderaxespad=pab["borderaxespad"],columnspacing=pab["columnspacing"])
+    
+
 
     #SET GRID, AXIS AND TICKS
     for axis in ['top','bottom','left','right']:
