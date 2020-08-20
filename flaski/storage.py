@@ -32,6 +32,8 @@ def add_header(r):
     r.headers["Pragma"] = "no-cache"
     r.headers["Expires"] = "0"
     r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
+
 
 def UserFolder(u):
     if u.is_authenticated:
