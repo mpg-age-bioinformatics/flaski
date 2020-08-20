@@ -140,17 +140,20 @@ def make_figure(df,pa):
         else:
             meanline=dict(visible=False)
 
+        hovertext=pa["vp_hovertext"].split(",")
+
+
         if pab["hue"]==None:
             for each,color in zip(tmp[pab["x_val"]].unique(),vp_color):
                 fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=hovertext,hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                 hoverlabel=hoverlabel,marker_color=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"]))
 
         else:
             for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
                 fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
                 legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=hovertext,hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                 hoverlabel=hoverlabel,marker_color=color,line=line,meanline=meanline,\
                 side=side,spanmode=pa["vp_span"]))
             fig.update_layout(violingap=0, violinmode='overlay')
@@ -159,10 +162,11 @@ def make_figure(df,pa):
         hoverlabel=dict(bgcolor=pab["bp_hover_bgcolor"],bordercolor=pab["bp_hover_bordercolor"],
         font=dict(family=pab["bp_hover_fontfamily"],size=pab["bp_hover_fontsize"],color=pab["bp_hover_fontcolor"]),\
         align=pa["bp_hover_align"])
+        hovertext=pa["bp_hovertext"].split(",")
 
         for each,color in zip(tmp[pab["x_val"]].unique(),bp_color):
             fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],marker_color=color,orientation=pab["bp_orient"],\
-            hovertext=pa["bp_hovertext"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],width=pab["bp_width"],\
+            hovertext=hovertext,hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],width=pab["bp_width"],\
             line=dict(color=pab["bp_linecolor"],width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
             quartilemethod=pa["bp_quartilemethod"],text=pa["bp_text"],hoverlabel=hoverlabel,notched=pab["bp_notched"]))
     
@@ -172,9 +176,9 @@ def make_figure(df,pa):
         outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
         if "Boxplot" in pa["style"]:
-            fig.update_traces(boxpoints="all",marker=marker,pointpos=pab["pointpos"])
+            fig.update_traces(boxpoints=pa["points"],marker=marker,pointpos=pab["pointpos"])
         if "Violinplot" in pa["style"]:
-            fig.update_traces(points="all",marker=marker,pointpos=pab["pointpos"])
+            fig.update_traces(points=pa["points"],marker=marker,pointpos=pab["pointpos"])
 
     #UPDATE LAYOUT OF PLOTS
     #Figure size
