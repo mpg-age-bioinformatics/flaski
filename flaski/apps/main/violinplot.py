@@ -24,7 +24,7 @@ def GET_COLOR(x):
         vals=[ s.split("rgb(")[-1].split(")")[0].replace(" ","").split(",") for s in vals ]
         vals_=[ ]
         for v in vals:
-           v=[ int(s) for s in v ]
+           v=[ float(s) for s in v ]
            vals_.append(v)
         return vals_
     else:
@@ -173,11 +173,14 @@ def make_figure(df,pa,fig=None,ax=None):
     else:
         categories=list(OrderedDict.fromkeys(tmp[pa["x_val"]].tolist()))
 
-    if type(sp_color)==list:
+    if (type(sp_color)==list) and ( len(categories) == len(sp_color) ):
         sp_palette=dict()
         for each,color in zip(categories,sp_color):
             sp_palette[each]=color
         sp_color=None
+    elif type(sp_color)==list :
+        sp_color=sp_color[0]
+        sp_palette=None
     else:
         sp_palette=pa["sp_palette"]
     
