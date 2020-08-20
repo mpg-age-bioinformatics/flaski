@@ -156,7 +156,11 @@ def make_figure(df,pa,fig=None,ax=None):
     scale=pa["scale"]
 
     #Define color, palette or user input
-    categories=list(set(tmp[pa["hue"]]))
+    if pa["hue"]!=None:
+        categories=list(set(tmp[pa["hue"]]))
+    else:
+        categories=list(set(tmp[pa["x_val"]]))
+        print(categories)
 
     if type(sp_color)==list:
         sp_palette=dict()
