@@ -470,7 +470,19 @@
                         <div id="collapseSwarmplotArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                             <div class="bg-white py-2 collapse-inner rounded openmenu">
                                 <div class="row arguments">
+                                
+                                <div class="row arg">
+                                    <label style="padding-left:23px;">Fill color: <select  name=marker_fillcolor value="{{marker_fillcolor}}" method="GET" action="/" style="width:80px;padding-right:10px;">
+                                        {% for marker_fillcolor_ in colors %}
+                                        <option value="{{marker_fillcolor_}}" {% if marker_fillcolor_==marker_fillcolor %} selected {% endif %}>{{marker_fillcolor_}}</option>
+                                        {% endfor %}
+                                    </select></label>
+                                </div>
 
+                                <div class="row arg">
+                                    <label style="padding-left: 18px;"> ..or write: <input type="text" name=marker_color_rgb value="{{marker_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                </div>
+                                
                                 <label style="padding-left: 28px;">Display: <select name=points val= "{{points}}" method="GET" action="/" style="width:80px;">
                                 {% for points_ in display_points %}
                                     <option value="{{points_}}" {% if points_ == points %} selected {% endif %}>{{points_}}</option>
@@ -490,12 +502,7 @@
                                     {% endfor %}
                                 </select></label>
                                 <label style="padding-left: 50px;">Size: <input type="text" name=marker_size value="{{marker_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                <label style="padding-left:23px;">Fill color: <select  name=marker_fillcolor value="{{marker_fillcolor }}" method="GET" action="/" style="width:80px;">
-                                    {% for marker_fillcolor_ in colors %}
-                                    <option value="{{marker_fillcolor_}}" {% if marker_fillcolor_==marker_fillcolor %} selected {% endif %}>{{marker_fillcolor_}}</option>
-                                    {% endfor %}
-                                </select></label>
-                                <label style="padding-left: 26px;">Position: <input type="text" name=pointpos value="{{pointpos}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 188px;">Position: <input type="text" name=pointpos value="{{pointpos}}" style="width:50px;height:22px;padding-left:4px;"></label>
 
 
                                 <div class="row arg">
