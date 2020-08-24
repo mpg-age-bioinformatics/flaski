@@ -223,7 +223,6 @@
                                     <div class="row arguments">
                                         
                                         <div class="row arg">
-                                            <label style="padding-left: 0px;"> Text: <input type="text" name=vp_text value="{{vp_text}}" style="width:300px;height:22px;padding-left:4px;"></label>
 
                                             <label style="padding-left:23px;">Fill color: <select  name=vp_color_value value="{{vp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                                 {% for vp_color_value_ in colors %}
@@ -290,7 +289,7 @@
                                         </div>   
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
-                                        <label>Text: <input type="text" name={{vp_hovertext}} value= "{{vp_hovertext}}" style="width:265px;height:22px;padding-left:4px;"></label>
+                                        <label>Text: <input type="text" name={{vp_text}} value= "{{vp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
                                         <label style="padding-left:16px;">Hover on: <select  name=vp_hoveron value="{{vp_hoveron }}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hoveron_ in vp_hoverons %}
                                             <option value="{{vp_hoveron_}}" {% if vp_hoveron_==vp_hoveron %} selected {% endif %}>{{vp_hoveron_}}</option>
@@ -358,7 +357,6 @@
                                     <div class="row arguments">
                                         
                                         <div class="row arg">
-                                            <label style="padding-left: 0px;"> Text: <input type="text" name=bp_text value="{{bp_text}}" style="width:300px;height:22px;padding-left:4px;"></label>
                                             <label style="padding-left:18px;">Fill color: <select  name=bp_color_value value="{{bp_color_value}}" method="GET" action="/" style="width:80px;padding-right:10px;">
                                                 {% for bp_color_value_ in colors %}
                                                 <option value="{{bp_color_value_}}" {% if bp_color_value_==bp_color_value %} selected {% endif %}>{{bp_color_value_}}</option>
@@ -406,7 +404,7 @@
 
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
-                                        <label>Text: <input type="text" name={{bp_hovertext}} value= "{{bp_hovertext}}" style="width:265px;height:22px;padding-left:4px;"></label>
+                                        <label>Text: <input type="text" name={{bp_text}} value= "{{bp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
                                         <label style="padding-left:16px;">Hover on: <select  name=bp_hoveron value="{{bp_hoveron }}" method="GET" action="/" style="width:70px;">
                                             {% for bp_hoveron_ in bp_hoverons %}
                                             <option value="{{bp_hoveron_}}" {% if bp_hoveron_==bp_hoveron %} selected {% endif %}>{{bp_hoveron_}}</option>

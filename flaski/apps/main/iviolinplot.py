@@ -145,6 +145,10 @@ def make_figure(df,pa):
     #MAIN BODY
 
     if "Violinplot" in pa["style"]:
+        if "," in pa["vp_text"]:
+            vp_text=pa["vp_text"].split(",")
+        else:
+            vp_text=pa["vp_text"]
         hoverlabel=dict(bgcolor=pab["vp_hover_bgcolor"],bordercolor=pab["vp_hover_bordercolor"],\
             font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
             align=pa["vp_hover_align"])
@@ -155,8 +159,6 @@ def make_figure(df,pa):
         else:
             meanline=dict(visible=False)
 
-        hovertext=pa["vp_hovertext"].split(",")
-
 
         if pab["hue"]==None:
 
@@ -166,14 +168,14 @@ def make_figure(df,pa):
                     size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
                     outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
-                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=hovertext,hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"],\
                     points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
             else:
                 for each,color in zip(tmp[pab["x_val"]].unique(),vp_color):
-                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=hovertext,hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"]))
 
         else:
@@ -185,23 +187,27 @@ def make_figure(df,pa):
                     outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
                     fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
-                    legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=hovertext,hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                    legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"],
                     points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
             else:
                 for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
                     fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
-                    legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=hovertext,hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                    legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"]))
             fig.update_layout(violingap=0, violinmode='overlay')
 
     if "Boxplot" in pa["style"]:
+        if "," in pa["bp_text"]:
+            bp_text=pa["bp_text"].split(",")
+        else:
+            bp_text=pa["bp_text"]
+
         hoverlabel=dict(bgcolor=pab["bp_hover_bgcolor"],bordercolor=pab["bp_hover_bordercolor"],
         font=dict(family=pab["bp_hover_fontfamily"],size=pab["bp_hover_fontsize"],color=pab["bp_hover_fontcolor"]),\
         align=pa["bp_hover_align"])
-        hovertext=pa["bp_hovertext"].split(",")
 
         if "Swarmplot" in pa["style"]:
 
@@ -211,9 +217,9 @@ def make_figure(df,pa):
                 outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
                 fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],fillcolor=color,\
-                orientation=pab["bp_orient"],hovertext=hovertext,hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],\
+                orientation=pab["bp_orient"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],\
                 width=pab["bp_width"],line=dict(color=pab["bp_linecolor"],width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
-                quartilemethod=pa["bp_quartilemethod"],text=pa["bp_text"],hoverlabel=hoverlabel,notched=pab["bp_notched"],\
+                quartilemethod=pa["bp_quartilemethod"],text=bp_text,hoverlabel=hoverlabel,notched=pab["bp_notched"],\
                 boxpoints=pa["points"],marker=marker,pointpos=pab["pointpos"]))
 
 
@@ -467,7 +473,6 @@ def figure_defaults():
         "vp_color_rgb":"",\
         "vp_color_value":"None",\
         "vp_bw":"",\
-        "vp_hovertext":"",\
         "vp_hoverinfo":"all",\
         "vp_hoveron":"violins+points+kde",\
         "vp_hoverons":STANDARD_VP_HOVERONS,\
@@ -517,7 +522,6 @@ def figure_defaults():
         "display_points":STANDARD_POINTS,\
         "quartilemethods":["linear","exclusive","inclusive"],\
         "bp_quartilemethod":"linear",\
-        "bp_hovertext":"",\
         "bp_hoverinfo":"all",\
         "bp_hoveron":"boxes+points",\
         "bp_hoverons":STANDARD_BP_HOVERONS,\
