@@ -408,9 +408,9 @@ def figure_defaults():
         "curve_types":STANDARD_CURVETYPES,\
         "kde_histnorm":"probability density",\
         "kde_histnorms":["probability density","probability"],\
-        "show_hist":"on",\
-        "show_curve":"on",\
-        "show_rug":"on",\
+        "show_hist":".on",\
+        "show_curve":".on",\
+        "show_rug":".on",\
         "rug_text":"",\
         "bin_size":"1",\
         "opacity":0.8,\
