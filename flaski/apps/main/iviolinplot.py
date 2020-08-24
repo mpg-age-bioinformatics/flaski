@@ -454,7 +454,7 @@ def figure_defaults():
 
     plot_arguments={"fig_width":"600.0",\
         "fig_height":"600.0",\
-        "title":'iViolinplot',\
+        "title":'iViolin plot',\
         "title_fontsize":"20",\
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
