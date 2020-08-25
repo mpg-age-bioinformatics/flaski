@@ -90,7 +90,7 @@ def scatterplot(download=None):
                         error_msg="Your table needs to have at least 2 columns. One for the x- and one for the y-value."
                         flash(error_msg,'error')
                         return render_template('/apps/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
-                        
+
                     session["filename"]=filename
 
                     if session["plot_arguments"]["groups"] not in cols:
@@ -136,7 +136,10 @@ def scatterplot(download=None):
                 # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments = session["plot_arguments"]
 
-                if plot_arguments["groups_value"]!=request.form["groups_value"]:
+                if request.form["groups_value"] == "None":
+                    plot_arguments["groups_value"]="None"
+
+                if plot_arguments["groups_value"]!=request.form["groups_value"] :
                     df=pd.read_json(session["df"])
                     df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
                     df=df.astype(str)

@@ -85,8 +85,13 @@ def iscatterplot(download=None):
                 filename = secure_filename(inputfile.filename)
                 if allowed_file(inputfile.filename):
                     df=read_tables(inputfile)
-                   
+                    
                     cols=df.columns.tolist()
+
+                    if len(cols) < 2 :
+                        error_msg="Your table needs to have at least 2 columns. One for the x- and one for the y-value."
+                        flash(error_msg,'error')
+                        return render_template('/apps/iscatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
                     if session["plot_arguments"]["groups"] not in cols:
                         session["plot_arguments"]["groups"]=["None"]+cols
@@ -129,6 +134,9 @@ def iscatterplot(download=None):
                 # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
                 # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments = session["plot_arguments"]
+
+                if request.form["groups_value"] == "None":
+                    plot_arguments["groups_value"]="None"
 
                 if plot_arguments["groups_value"]!=request.form["groups_value"]:
                     if request.form["groups_value"]  != "None":
