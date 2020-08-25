@@ -86,11 +86,18 @@ def scatterplot(download=None):
                     
                     cols=df.columns.tolist()
 
+                    if len(cols) < 2 :
+                        error_msg="Your table needs to have at least 2 columns. One for the x- and one for the y-value."
+                        flash(error_msg,'error')
+                        return render_template('/apps/scatterplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
+                        
+                    session["filename"]=filename
+
                     if session["plot_arguments"]["groups"] not in cols:
                         session["plot_arguments"]["groups"]=["None"]+cols
 
                     columns_select=["markerstyles_cols", "markerc_cols", "markersizes_cols","markeralpha_col",\
-                        "labels_col","edgecolor_cols","edge_linewidth_cols",]
+                        "labels_col","edgecolor_cols","edge_linewidth_cols"]
                     for parg in columns_select:
                         if session["plot_arguments"]["markerstyles_cols"] not in cols:
                             session["plot_arguments"][parg]=["select a column.."]+cols
