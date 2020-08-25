@@ -56,8 +56,8 @@ def make_figure(df,pa):
     floats=["x","y","axis_line_width","ticks_line_width","opacity",\
         "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
-        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","pointpos","jitter","vp_meanline_width","marker_opacity",\
-        "marker_size","marker_line_width","marker_line_outlierwidth","bp_opacity","bp_width","bp_linewidth",\
+        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","pointpos","jitter","vp_meanline_width","vp_gap","vp_groupgap",\
+        "marker_opacity","marker_size","marker_line_width","marker_line_outlierwidth","bp_opacity","bp_width","bp_linewidth",\
         "bp_whiskerwidth","bp_notchwidth"]
 
     for a in floats:
@@ -179,25 +179,47 @@ def make_figure(df,pa):
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"]))
 
         else:
-            if "Swarmplot" in pa["style"]:
-                for each,side,color,mcolor in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color,marker_color):
-                
-                    marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
-                    size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
-                    outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+            if "Swarmplot" in pa["style"]:    
+                if pa["vp_mode"]=="group":
+                    for each,color,mcolor in zip(list(set(tmp[pab["hue"]])),vp_color,marker_color):
 
-                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
-                    legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
-                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
-                    hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"],
-                    points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
+                        marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
+                        size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                        outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,spanmode=pa["vp_span"],
+                        points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
+
+                else:
+                    for each,side,color,mcolor in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color,marker_color):
+                        
+                        marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
+                        size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                        outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"],
+                        points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
             else:
-                for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
-                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
-                    legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
-                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
-                    hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"]))
-            fig.update_layout(violingap=0, violinmode='overlay')
+                if pa["vp_mode"]=="group":
+                    for each,color in zip(list(set(tmp[pab["hue"]])),vp_color):
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,spanmode=pa["vp_span"]))
+                else:
+                    for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"]))
+                        
+            fig.update_layout(violingap=pab["vp_gap"], violingroupgap=pab["vp_groupgap"],violinmode=pa["vp_mode"])
 
     if "Boxplot" in pa["style"]:
         if "," in pa["bp_text"]:
@@ -337,8 +359,6 @@ def make_figure(df,pa):
     #UPDATE LEGEND PROPERTIES
     if pab["show_legend"]==True:
 
-        labels=[x["label"] for x in pa["groups_settings"].values()]
-
         if pa["legend_orientation"]=="vertical":
             legend_orientation="v"
         elif pa["legend_orientation"]=="horizontal":
@@ -433,6 +453,7 @@ STANDARD_SYMBOLS=["0","circle","100","circle-open","200","circle-dot","300","cir
     "42","line-ns","142","line-ns-open","43","line-ne","143","line-ne-open","44","line-nw","144","line-nw-open"]
 STANDARD_BOXMEANS=["True","sd","False"]
 STANDARD_POINTS=["all","outliers","suspectedoutliers"]
+STANDARD_VIOLINMODES=["group","overlay"]
 def figure_defaults():
 
     """Generates default figure arguments.
@@ -491,6 +512,10 @@ def figure_defaults():
         "spans":["soft","hard"],\
         "vp_side":"both",\
         "vp_sides":["both","positive","negative"],\
+        "violinmodes":STANDARD_VIOLINMODES,\
+        "vp_mode":"overlay",\
+        "vp_groupgap":"0.3",\
+        "vp_gap":"0.3",\
         "scalemodes":STANDARD_SCALEMODES,\
         "pointpos":"0.0",\
         "jitter":"0.5",\

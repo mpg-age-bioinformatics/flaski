@@ -287,6 +287,20 @@
                                             </select></label>
                                             <label style="padding-left: 41px;">width: <input type="text" name=vp_meanline_width value="{{vp_meanline_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                         </div>   
+
+                                        {% if hue != None %}
+                                        <div class="row arg">
+                                            <label style="width:300px;">Layout: </label>
+                                            <label style="padding-left:46px;">Mode:  <select name=vp_mode val= "{{vp_mode}}"  method="GET" action="/" style="width:80px;">
+                                                {% for vp_mode_ in violinmodes %}
+                                                <option value="{{vp_mode_}}" {% if vp_mode_==vp_mode %} selected {% endif %}>{{vp_mode_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                            <label style="padding-left: 47px;">Gap: <input type="text" name=vp_gap value="{{vp_gap}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 178px;">Groupgap: <input type="text" name=vp_groupgap value="{{vp_groupgap}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                        </div>  
+                                        {% endif %}
+
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
                                         <label>Text: <input type="text" name={{vp_text}} value= "{{vp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>

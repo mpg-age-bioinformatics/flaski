@@ -112,25 +112,14 @@ def iviolinplot(download=None):
             filename=session["filename"]
 
 
-            #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE iviolinplot
-            if  vals == []:
-                sometext="Please select at least one numeric column from which we will plot your iviolinplot"
+            #IN CASE THE USER HAS NOT SELECTED X_VAL or Y_VAL
+            if  plot_arguments["x_val"] == "None" or plot_arguments["y_val"]=="None":
+                sometext="Please a valid value to plot in your X and Y axes"
                 plot_arguments=session["plot_arguments"]
                 plot_arguments["vals"]=vals
                 flash(sometext,'info')
                 return render_template('/apps/iviolinplot.html' , filename=filename, apps=apps,**plot_arguments)
-                
-            #VERIFY THERE IS AT LEAST ONE NUMERIC COLUMN SELECTED BY THE USER
-            vals_copy=vals.copy()
-            vals_copy.remove(None)
-            if not any(df[vals_copy].dtypes.apply(is_numeric_dtype)):
-                sometext="Remember that at least one of the columns you select has to be numeric"
-                session["plot_arguments"]["vals"]=[None]+vals
-                plot_arguments=session["plot_arguments"]
-                plot_arguments["vals"]=vals
-                flash(sometext,'info')
-                return render_template('/apps/iviolinplot.html' , filename=filename, apps=apps,**plot_arguments)
-            
+                            
             session["plot_arguments"]=plot_arguments
             #CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
