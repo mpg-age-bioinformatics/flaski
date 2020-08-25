@@ -25,9 +25,11 @@ from flaski import app, sess
 def cleanP(p):
     p=str(p)
     if len(p) > 0:
-        if ".." in p:
-            p=p.replace("..","")
-        while p[0] in ["/",".","\\"]:
+        bads=["..","\\","*","?","&","$","#","%"]
+        for bad in bads:
+            if bad in p:
+                p=p.replace(bad,"")
+        while p[0] in ["/","."]:
             p=p[1:]
     return p
 
