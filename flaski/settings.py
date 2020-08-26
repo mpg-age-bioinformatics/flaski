@@ -32,9 +32,9 @@ def add_header(r):
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
 
-@app.route('/userspace', methods=['GET', 'POST'])
+@app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def userspace():
     apps=current_user.user_apps
-    return render_template('/userspace.html', apps=apps)
+    return render_template('/settings.html', apps=apps)
 

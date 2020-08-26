@@ -38,10 +38,9 @@
 
 {% block app_title %}
 
-<div class="col-xs-12" style="width:3000000px;padding-top:18px;">
-
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">Settings</h1>
 </div>
-
 {% endblock %}
 
 {% block apps_dropdown %}
@@ -53,22 +52,67 @@
 
 {% block content %}
 
-<!-- Begin Page Content -->
 <section>
     <div class="container">
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            {% if category == "error" %}
-            <div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div>
-            {% else %}
-            <div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div>
-            {% endif %}
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+        <div id=""  style="overflow-y:auto;height:calc(100vh - 170px);overflow-x:auto;">
 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                {% if category == "error" %}
+                <!-- ATTENTION CARD -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3", >
+                        <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+                    </div>
+                    <div class="card-body">
+                        {{ message }} 
+                    </div>
+                </div>
+                <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+                {% elif category == "traceback" %}
+                <!-- ATTENTION CARD -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3", >
+                        <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+                    </div>
+                    <div class="card-body">
+                        {% autoescape false %}
+                        {{ message }}
+                        <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+                        If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                        <br>
+                        {% endautoescape %}
+            
+                        <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                            <div class="pull-xs-right" style="float:right;">
+                                <div class="btn-group" style="float:right;">
+                                    <button type="submit" class="btn btn-primary" style="float:right;">
+                                        <i></i> Ice cream
+                                    </button>
+                                </div>
+            
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <!-- INFORMATION CARD -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3", >
+                        <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+                    </div>
+                    <div class="card-body">
+                        {{ message }} 
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            
+        </div>
     </div>
     <!-- End of Page Content -->
 </section>

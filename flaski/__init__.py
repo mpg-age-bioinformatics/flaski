@@ -28,7 +28,7 @@ from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, ven
 
 if app.config['INSTANCE'] != "latest" :
     from flaski.apps.routes import ihistogram, mds, tsne, lifespan, iviolinplot
-    from flaski import userspace
+    from flaski import settings
 
 if not app.debug:
     if app.config['MAIL_SERVER']:
