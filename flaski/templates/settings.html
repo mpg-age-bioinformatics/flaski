@@ -53,9 +53,9 @@
 {% block content %}
 
 <section>
-    <div class="container">
+    <div class="container" style="overflow-y:auto;height:calc(100vh - 170px);overflow-x:auto;">
 
-        <div id=""  style="overflow-y:auto;height:calc(100vh - 170px);overflow-x:auto;">
+        <!-- <div id=""  style="overflow-y:auto;height:calc(100vh - 170px);overflow-x:auto;"> -->
 
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -111,8 +111,34 @@
                 {% endfor %}
             {% endif %}
             {% endwith %}
-            
-        </div>
+
+
+            <form class="user" action="" method="post">
+                {{ form.hidden_tag() }}
+                <div><h1 class="h4 text-gray-900 mb-4">Multiple Apps per session:</h1></div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox small">
+                    {{ form.multipleapps() }}
+                    <input type="checkbox" class="custom-control-input" id="multipleapps" >
+                    <label class="custom-control-label" for="multipleapps">Enable multiple Apps per session.<br>Enabling multiple Apps per session will allow you to work on multiple Apps at the same time 
+                        at the costs of peformance.</label>
+                    </div>
+                </div>
+
+                <div><h1 class="h4 text-gray-900 mb-4">Notifications:</h1></div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox small">
+                        {{ form.notifyme() }}
+                        <input type="checkbox" class="custom-control-input" id="notifyme" >
+                        <label class="custom-control-label" for="notifyme">Send me emails on Flaski. 
+                        </label>
+                    </div>
+                </div>
+
+                {{ form.submit() }}
+            </form>
+
+        <!-- </div> -->
     </div>
     <!-- End of Page Content -->
 </section>
