@@ -112,7 +112,6 @@
             {% endif %}
             {% endwith %}
 
-
             <form class="user" action="" method="post">
                 {{ form.hidden_tag() }}
                 <div><h1 class="h4 text-gray-900 mb-4">Multiple Apps per session:</h1></div>
@@ -125,6 +124,9 @@
                     </div>
                 </div>
 
+                <p><br></p>
+
+
                 <div><h1 class="h4 text-gray-900 mb-4">Notifications:</h1></div>
                 <div class="form-group">
                     <div class="custom-control custom-checkbox small">
@@ -134,6 +136,8 @@
                         </label>
                     </div>
                 </div>
+
+                <p><br></p>
 
                 {{ form.submit() }}
             </form>
