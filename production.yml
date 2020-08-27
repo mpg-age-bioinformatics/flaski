@@ -93,7 +93,7 @@ services:
 
  mariadb:
   container_name: mariadb
-  image: mariadb:10.4
+  image: mariadb:10.5
   restart: always
   volumes:
    - db:/var/lib/mysql
