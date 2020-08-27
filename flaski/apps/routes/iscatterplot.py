@@ -135,8 +135,8 @@ def iscatterplot(download=None):
                 # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments = session["plot_arguments"]
 
-                if request.form["groups_value"] == "None":
-                    plot_arguments["groups_value"]="None"
+                # if request.form["groups_value"] == "None":
+                #     plot_arguments["groups_value"]="None"
 
                 if plot_arguments["groups_value"]!=request.form["groups_value"]:
                     if request.form["groups_value"]  != "None":

@@ -136,43 +136,48 @@ def scatterplot(download=None):
                 # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments = session["plot_arguments"]
 
-                if request.form["groups_value"] == "None":
-                    plot_arguments["groups_value"]="None"
+                # if request.form["groups_value"] == "None":
+                #     plot_arguments["groups_value"]="None"
 
                 if plot_arguments["groups_value"]!=request.form["groups_value"] :
-                    df=pd.read_json(session["df"])
-                    df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
-                    df=df.astype(str)
-                    session["df"]=df.to_json()
-                    groups=df[request.form["groups_value"]]
-                    groups=list(set(groups))
-                    groups.sort()
-                    plot_arguments["list_of_groups"]=groups
-                    groups_settings=[]
-                    group_dic={}
-                    for group in groups:
-                        group_dic={"name":group,\
-                            "markers":plot_arguments["markers"],\
-                            "markersizes_col":"select a column..",\
-                            "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
-                            "markerc_col":"select a column..",\
-                            "markerc_write":plot_arguments["markerc_write"],\
-                            "edge_linewidth":plot_arguments["edge_linewidth"],\
-                            "edge_linewidth_col":"select a column..",\
-                            "edgecolor":plot_arguments["edgecolor"],\
-                            "edgecolor_col":"select a column..",\
-                            "edgecolor_write":"",\
-                            "marker":random.choice(plot_arguments["markerstyles"]),\
-                            "markerstyles_col":"select a column..",\
-                            "marker_alpha":plot_arguments["marker_alpha"],\
-                            "markeralpha_col_value":"select a column.."}
-                        groups_settings.append(group_dic)
-                        # for k in list( group_dic[group].keys() ):
-                        #     plot_arguments[k+"_"+group]=group_dic[group][k]
-                    plot_arguments["groups_settings"]=groups_settings
+
+                    if request.form["groups_value"] != "None":
+
+                        df=pd.read_json(session["df"])
+                        df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
+                        df=df.astype(str)
+                        session["df"]=df.to_json()
+                        groups=df[request.form["groups_value"]]
+                        groups=list(set(groups))
+                        groups.sort()
+                        plot_arguments["list_of_groups"]=groups
+                        groups_settings=[]
+                        for group in groups:
+                            group_dic={"name":group,\
+                                "markers":plot_arguments["markers"],\
+                                "markersizes_col":"select a column..",\
+                                "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
+                                "markerc_col":"select a column..",\
+                                "markerc_write":plot_arguments["markerc_write"],\
+                                "edge_linewidth":plot_arguments["edge_linewidth"],\
+                                "edge_linewidth_col":"select a column..",\
+                                "edgecolor":plot_arguments["edgecolor"],\
+                                "edgecolor_col":"select a column..",\
+                                "edgecolor_write":"",\
+                                "marker":random.choice(plot_arguments["markerstyles"]),\
+                                "markerstyles_col":"select a column..",\
+                                "marker_alpha":plot_arguments["marker_alpha"],\
+                                "markeralpha_col_value":"select a column.."}
+                            groups_settings.append(group_dic)
+                            # for k in list( group_dic[group].keys() ):
+                            #     plot_arguments[k+"_"+group]=group_dic[group][k]
+                        plot_arguments["groups_settings"]=groups_settings
+
+                    else:
+                        groups_settings=[]
+
                 elif plot_arguments["groups_value"] != "None":
                     groups_settings=[]
-                    group_dic={}
                     for group in plot_arguments["list_of_groups"]:
                         group_dic={"name":group,\
                             "markers":request.form["%s.markers" %group],\
