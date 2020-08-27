@@ -14,8 +14,6 @@ from pathlib2 import Path
 from copy import copy
 import shutil
 import io
-from flaski.routes import FREEAPPS
-
 
 from flaski.routines import session_to_file
 from flaski import app, sess
@@ -248,9 +246,8 @@ def get_size(start_path = '.'):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             # skip if it is symbolic link
-            if not os.path.islink(fp):
+            if ( not os.path.islink(fp) ) & ( ".sessions" not in str(fp)  ) :
                 total_size += os.path.getsize(fp)
-
     return total_size
 
 class PathView(MethodView):

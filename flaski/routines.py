@@ -7,6 +7,9 @@ import io
 from flaski import db
 from flask_login import current_user
 from flaski.models import UserLogging
+import os
+from flaski import app as app_
+
 
 
 
@@ -47,7 +50,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def read_tables(inputfile,session_key="df", file_field="filename"):
+def read_tables(inputfile, session_key="df", file_field="filename"):
     filename=secure_filename(inputfile.filename)
     session[file_field]=filename
     fileread = inputfile.read()
@@ -106,16 +109,65 @@ def reset_all(session):
             del(session[k])
 
 def check_session_app(session,app,apps):
-    if "app" not in list(session.keys()):
+    multipleapps=current_user.multipleapps
+
+    if ("app" in list( session.keys() ) ):
+        if session["app"] == app :
+            return None
+
+    if ( "app" not in list(session.keys()) ) & ( not multipleapps ):
         eventlog = UserLogging(email=current_user.email, action="visit %s" %app)
         db.session.add(eventlog)
         db.session.commit()
-        if "session_file" in list(session.keys()):
-            del(session["session_file"])
+        reset_all(session)
+        # if "session_file" in list(session.keys()):
+        #     del(session["session_file"])
         message="Could not find data for this App in your current session. Session has been reset."
         return message
-    elif session["app"] == app :
-        return None
+
+    elif ("app" not in list(session.keys())) & ( multipleapps ):
+        reset_all(session)
+        ufolder=app_.config['USERS_DATA']+str(current_user.id)+"/.sessions/"
+        insession=ufolder+app+".ses"
+        if os.path.isfile(insession):
+            with open(insession, "r") as infile:
+                session_=json.load(infile)
+            for k in ["ftype","COMMIT"]:  
+                if k in list( session_.keys() ):
+                    del( session_[k] )
+            for k in list(session_.keys()):
+                session[k]=session_[k]
+        else:
+            message="Could not find data for this App neither in your current session neither on disk. App data has been reset."
+            return message
+
+    elif ( session["app"] != app ) & ( multipleapps ):
+
+        ufolder=app_.config['USERS_DATA']+str(current_user.id)+"/.sessions/"
+
+        if not os.path.isdir( ufolder ):
+            os.makedirs( ufolder )
+
+        outsession=ufolder+session["app"]+".ses"
+        session_=session_to_file(session,"ses")
+        with open(outsession,"w") as fout:
+                json.dump(session_, fout)
+
+        reset_all(session)
+
+        insession=app_.config['USERS_DATA']+str(current_user.id)+"/.sessions/"+app+".ses"
+        if os.path.isfile(insession):
+            with open(insession, "r") as infile:
+                session_=json.load(infile)
+            for k in ["ftype","COMMIT"]:  
+                if k in list( session_.keys() ):
+                    del( session_[k] )
+            for k in list(session_.keys()):
+                session[k]=session_[k]
+        else:
+            message="Could not find data for this App neither in your current session neither on disk. App data has been reset."
+            return message
+
     else:
         appName=[ s for s in apps if s["link"] == session["app"] ][0]["name"]
         eventlog = UserLogging(email=current_user.email, action="visit %s" %app)

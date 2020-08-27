@@ -208,6 +208,21 @@ def reset():
     #session["app"]='reset'
     return redirect(url_for(page))
 
+@app.route('/resetall')
+@login_required
+def resetall():
+    if 'app' in list(session.keys()):
+        page=session["app"]
+    else:
+        page="index"
+    reset_all(session)
+    ufolder=app.config['USERS_DATA']+str(current_user.id)+"/.sessions/"
+    files=os.listdir(ufolder)
+    for f in files:
+        os.remove(ufolder+f)
+    #session["app"]='reset'
+    return redirect( url_for(page) )
+
 @app.route('/download/<json_type>', methods=['GET','POST'])
 @login_required
 def download(json_type="arg"):
