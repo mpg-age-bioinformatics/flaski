@@ -81,20 +81,6 @@ def lifespan(download=None):
                     flash(msg,'error')
                     return render_template('/apps/lifespan.html' , filename=session["filename"], apps=apps, **plot_arguments)
                 flash(msg,"info")
-
-            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-                plot_arguments=read_request(request)
-
-                if "df" in list(session.keys()):
-                    available_rows=pd.read_json(session["df"])
-                    if plot_arguments["xvals"] in available_rows.columns.tolist():
-                        available_rows=available_rows[plot_arguments["xvals"]].tolist()
-                        available_rows=list(set(available_rows))
-                        available_rows.sort()
-                        plot_arguments["available_rows"]=available_rows
-
-                # UPDATE SESSION VALUES
-                session["plot_arguments"]=plot_arguments
             
             # IF THE UPLOADS A NEW FILE 
             # THAN UPDATE THE SESSION FILE
@@ -124,12 +110,12 @@ def lifespan(download=None):
                         session["plot_arguments"]["ycols"]=cols
                         session["plot_arguments"]["yvals"]=cols[1:]
 
-                        available_rows=pd.read_json(session["df"])
-                        if plot_arguments["xvals"] in available_rows.columns.tolist():
-                            available_rows=available_rows[plot_arguments["xvals"]].tolist()
-                            available_rows=list(set(available_rows))
-                            available_rows.sort()
-                            session["plot_arguments"]["available_rows"]=available_rows
+                        # available_rows=pd.read_json(session["df"])
+                        # if plot_arguments["xvals"] in available_rows.columns.tolist():
+                        #     available_rows=available_rows[plot_arguments["xvals"]].tolist()
+                        #     available_rows=list(set(available_rows))
+                        #     available_rows.sort()
+                        #     session["plot_arguments"]["available_rows"]=available_rows
                                     
                         sometext="Please select which columns should be used for plotting."
                         plot_arguments=session["plot_arguments"]
@@ -144,6 +130,14 @@ def lifespan(download=None):
                     return render_template('/apps/lifespan.html' , filename="Select file..", apps=apps, **plot_arguments)
 
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
+
+                # if "df" in list(session.keys()):
+                #     available_rows=pd.read_json(session["df"])
+                #     if plot_arguments["xvals"] in available_rows.columns.tolist():
+                #         available_rows=available_rows[plot_arguments["xvals"]].tolist()
+                #         available_rows=list(set(available_rows))
+                #         available_rows.sort()
+                #         plot_arguments["available_rows"]=available_rows
                 # SELECTION LISTS DO NOT GET UPDATED 
                 # lists=session["lists"]
 
@@ -211,11 +205,12 @@ def lifespan(download=None):
 
                 session["plot_arguments"]=plot_arguments
                 plot_arguments=read_request(request)
+
     
             if "df" not in list(session.keys()):
-                    error_message="No data to plot, please upload a data or session  file."
-                    flash(error_message,'error')
-                    return render_template('/apps/lifespan.html' , filename="Select file..", apps=apps,  **plot_arguments)
+                error_message="No data to plot, please upload a data or session  file."
+                flash(error_message,'error')
+                return render_template('/apps/lifespan.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
