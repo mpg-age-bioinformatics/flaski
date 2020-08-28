@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from lifelines import KaplanMeierFitter
 import math
-import patsy
 import seaborn as sns
 from functools import reduce
 from lifelines import CoxPHFitter
