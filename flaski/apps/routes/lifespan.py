@@ -94,8 +94,14 @@ def lifespan(download=None):
                     df=read_tables(inputfile) 
                     cols=df.columns.tolist()
 
+                    if session["plot_arguments"]["censors_col"] not in cols:
+                        session["plot_arguments"]["censors_col"] = ["None"]+cols
+
                     if session["plot_arguments"]["groups"] not in cols:
                         session["plot_arguments"]["groups"] = ["None"]+cols
+
+                    if session["plot_arguments"]["linecolor_cols"] not in cols:
+                        session["plot_arguments"]["linecolor_cols"]=["select a column.."]+cols
 
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                     if (session["plot_arguments"]["yvals"] not in cols):
@@ -124,11 +130,81 @@ def lifespan(download=None):
                     has the correct format and respective extension and try uploadling it again." %filename
                     flash(error_msg,'error')
                     return render_template('/apps/lifespan.html' , filename="Select file..", apps=apps, **plot_arguments)
-            
+
+            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
+                # SELECTION LISTS DO NOT GET UPDATED 
+                # lists=session["lists"]
+
+                # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
+                # WITH THE EXCEPTION OF SELECTION LISTS
+                plot_arguments = session["plot_arguments"]
+
+                if plot_arguments["groups_value"]!=request.form["groups_value"]:
+                    if request.form["groups_value"]  != "None":
+                        df=pd.read_json(session["df"])
+                        df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
+                        df=df.astype(str)
+                        session["df"]=df.to_json()
+                        groups=df[request.form["groups_value"]]
+                        groups=list(set(groups))
+                        groups.sort()
+                        plot_arguments["list_of_groups"]=groups
+                        groups_settings=[]
+                        group_dic={}
+                        for group in groups:
+                            group_dic={"name":group,\
+                                # "markers":plot_arguments["markers"],\
+                                # "markersizes_col":"select a column..",\
+                                # "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
+                                # "markerc_col":"select a column..",\
+                                # "markerc_write":plot_arguments["markerc_write"],\
+                                # "edge_linewidth":plot_arguments["edge_linewidth"],\
+                                # "edge_linewidth_col":"select a column..",\
+                                "line_color_value":plot_arguments["line_color_value"],\
+                                "linecolor_col":"select a column..",\
+                                "linecolor_write":""}
+                                # "marker":random.choice(plot_arguments["markerstyles"]),\
+                                # "markerstyles_col":"select a column..",\
+                                # "marker_alpha":plot_arguments["marker_alpha"],\
+                                # "markeralpha_col_value":"select a column.."}
+                            groups_settings.append(group_dic)
+                        plot_arguments["groups_settings"]=groups_settings
+                    elif request.form["groups_value"] == "None" :
+                        plot_arguments["groups_settings"]=[]
+                        plot_arguments["list_of_groups"]=[]
+                        
+
+                elif plot_arguments["groups_value"] != "None":
+                    groups_settings=[]
+                    group_dic={}
+                    for group in plot_arguments["list_of_groups"]:
+                        group_dic={"name":group,\
+                            # "markers":request.form["%s.markers" %group],\
+                            # "markersizes_col":request.form["%s.markersizes_col" %group],\
+                            # "markerc":request.form["%s.markerc" %group],\
+                            # "markerc_col":request.form["%s.markerc_col" %group],\
+                            # "markerc_write":request.form["%s.markerc_write" %group],\
+                            # "edge_linewidth":request.form["%s.edge_linewidth" %group],\
+                            # "edge_linewidth_col":request.form["%s.edge_linewidth_col" %group],\
+                            "line_color_value":request.form["%s.line_color_value" %group],\
+                            "linecolor_col":request.form["%s.linecolor_col" %group],\
+                            "linecolor_write":request.form["%s.linecolor_write" %group]
+                            # "marker":request.form["%s.marker" %group],\
+                            # "markerstyles_col":request.form["%s.markerstyles_col" %group],\
+                            # "marker_alpha":request.form["%s.marker_alpha" %group],\
+                            # "markeralpha_col_value":request.form["%s.markeralpha_col_value" %group]
+                            }   
+                        groups_settings.append(group_dic)
+                    plot_arguments["groups_settings"]=groups_settings
+
+                session["plot_arguments"]=plot_arguments
+                plot_arguments=read_request(request)
+    
             if "df" not in list(session.keys()):
                     error_message="No data to plot, please upload a data or session  file."
                     flash(error_message,'error')
                     return render_template('/apps/lifespan.html' , filename="Select file..", apps=apps,  **plot_arguments)
+
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
@@ -136,34 +212,72 @@ def lifespan(download=None):
 
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
-            # groups=df[request.form["groups_value"]]
-            # groups=list(set(groups))
-            # groups.sort()
-            # plot_arguments["list_of_groups"]=groups
-
+            
             # CALL FIGURE FUNCTION
             # try:
-            df_ls, fig=make_figure(df,plot_arguments)
+            if str(plot_arguments["groups_value"]) == "None":
+                df_ls, fig=make_figure(df,plot_arguments)
 
-            df_ls=df_ls.astype(str)
-            session["df_ls"]=df_ls.to_json()
+                df_ls=df_ls.astype(str)
+                session["df_ls"]=df_ls.to_json()
 
-            # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
-            figfile = io.BytesIO()
-            plt.savefig(figfile, format='png')
-            plt.close()
-            figfile.seek(0)  # rewind to beginning of file
-            figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+                # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+                figfile = io.BytesIO()
+                plt.savefig(figfile, format='png')
+                plt.close()
+                figfile.seek(0)  # rewind to beginning of file
+                figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
 
-            #return render_template('/apps/lifespan.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+                #return render_template('/apps/lifespan.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-            df_selected=df_ls[:50]
-            cols_to_format=df_selected.columns.tolist()
-            table_headers=cols_to_format
-            df_selected=list(df_selected.values)
-            df_selected=[ list(s) for s in df_selected ]
+                df_selected=df_ls[:50]
+                cols_to_format=df_selected.columns.tolist()
+                table_headers=cols_to_format
+                df_selected=list(df_selected.values)
+                df_selected=[ list(s) for s in df_selected ]
 
-            return render_template('/apps/lifespan.html', figure_url=figure_url, table_headers=table_headers, table_contents=df_selected, filename=filename, apps=apps, **plot_arguments)
+                return render_template('/apps/lifespan.html', figure_url=figure_url, table_headers=table_headers, table_contents=df_selected, filename=filename, apps=apps, **plot_arguments)
+
+            elif str(plot_arguments["groups_value"]) != "None":
+                df_ls, fig, cph_stats, cph_coeffs=make_figure(df,plot_arguments)
+
+                df_ls=df_ls.astype(str)
+                session["df_ls"]=df_ls.to_json()
+
+                cph_stats=cph_stats.astype(str)
+                session["cph_stats"]=cph_stats.to_json()
+
+                cph_coeffs=cph_coeffs.astype(str)
+                session["cph_coeffs"]=cph_coeffs.to_json()
+
+                # TRANSFORM FIGURE TO BYTES AND BASE64 STRING
+                figfile = io.BytesIO()
+                plt.savefig(figfile, format='png')
+                plt.close()
+                figfile.seek(0)  # rewind to beginning of file
+                figure_url = base64.b64encode(figfile.getvalue()).decode('utf-8')
+
+                df_selected=df_ls[:50]
+                cols_to_format=df_selected.columns.tolist()
+                table_headers=cols_to_format
+                df_selected=list(df_selected.values)
+                df_selected=[ list(s) for s in df_selected ]
+
+                df_coeffs=cph_coeffs[:50]
+                cols_to_format_coeffs=df_coeffs.columns.tolist()
+                table_headers_coeffs=cols_to_format_coeffs
+                df_coeffs=list(df_coeffs.values)
+                df_coeffs=[ list(s) for s in df_coeffs ]
+
+                df_stats=cph_stats[:50]
+                cols_to_format_stats=df_stats.columns.tolist()
+                table_headers_stats=cols_to_format_stats
+                df_stats=list(df_stats.values)
+                df_stats=[ list(s) for s in df_stats ]
+
+
+                return render_template('/apps/lifespan.html', figure_url=figure_url, table_headers=table_headers, table_contents=df_selected, table_headers_coeffs=table_headers_coeffs, table_contents_coeff=df_coeffs, table_headers_stats=table_headers_stats, table_contents_stats=df_stats,  filename=filename, apps=apps, **plot_arguments)
+
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="lifespan",session=session)
@@ -178,8 +292,13 @@ def lifespan(download=None):
             df=pd.read_json(session["df"])
             plot_arguments=session["plot_arguments"]
 
-            # CALL FIGURE FUNCTION
-            df_ls, fig=make_figure(df,plot_arguments)
+            if str(plot_arguments["groups_value"]) == "None":
+                # CALL FIGURE FUNCTION
+                df_ls, fig=make_figure(df,plot_arguments)
+
+            elif str(plot_arguments["groups_value"]) != "None":
+                # CALL FIGURE FUNCTION
+                df_ls, fig, cph_coeff, cph_stats=make_figure(df,plot_arguments)
 
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
@@ -193,15 +312,23 @@ def lifespan(download=None):
 
             return send_file(figfile, mimetype=mimetypes[plot_arguments["download_fig"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["download_fig"] )
 
+            
+
         if download == "results":
 
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
             plot_arguments=session["plot_arguments"]
 
-            # CALL FIGURE FUNCTION
-            df_ls, fig=make_figure(df,plot_arguments)
+            if str(plot_arguments["groups_value"]) == "None":
+                # CALL FIGURE FUNCTION
+                df_ls, fig=make_figure(df,plot_arguments)
 
+            elif str(plot_arguments["groups_value"]) != "None":
+                # CALL FIGURE FUNCTION
+                df_ls, fig, cph_coeff, cph_stats=make_figure(df,plot_arguments)
+
+            
             eventlog = UserLogging(email=current_user.email,action="download table survival analysis")
             db.session.add(eventlog)
             db.session.commit()
@@ -216,6 +343,32 @@ def lifespan(download=None):
 
             elif plot_arguments["downloadf"] == "tsv":               
                 return Response(df_ls.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["downloadn"]})
+
+        if download == "cph":
+
+            # READ INPUT DATA FROM SESSION JSON
+            df=pd.read_json(session["df"])
+            plot_arguments=session["plot_arguments"]
+
+            if str(plot_arguments["groups_value"]) != "None":
+                # CALL FIGURE FUNCTION
+                df_ls, fig, cph_coeff, cph_stats=make_figure(df,plot_arguments)
+
+            eventlog = UserLogging(email=current_user.email,action="download table cox proportional hazard")
+            db.session.add(eventlog)
+            db.session.commit()
+
+            if plot_arguments["downloadf"] == "xlsx":
+                excelfile = io.BytesIO()
+                EXC=pd.ExcelWriter(excelfile)
+                cph_stats.to_excel(EXC,sheet_name="Statistics", index=None)
+                cph_coeff.to_excel(EXC,sheet_name="CoxProportionalHazard_coeff", index=None)
+                EXC.save()
+                excelfile.seek(0)
+                return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx",as_attachment=True)
+
+            elif plot_arguments["downloadf"] == "tsv":               
+                return Response(cph_coeff.to_csv(sep="\t",mode='a'), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["downloadn"]})
         
             
         return render_template('apps/lifespan.html',  filename=session["filename"], apps=apps, **session["plot_arguments"])            

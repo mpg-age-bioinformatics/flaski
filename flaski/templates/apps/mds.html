@@ -90,17 +90,17 @@
             <li class="nav-item" style="padding-bottom: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Reduction</span>
+                    <span>Scaling</span>
                 </a>
                 <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
 
                             <div class="row arg">
-                                <label>Number of components: <input type="text" name="ncomponents" value='{{ ncomponents }}' style="width:145px;height:22px;padding-left: 4px"></label>
+                                <label>Number of dimensions: <input type="text" name="ncomponents" value='{{ ncomponents }}' style="width:145px;height:22px;padding-left: 4px"></label>
                                 <label>Top % most variable rows: <input type="text" name="percvar" value='{{ percvar }}' style="width:131px;height:22px;padding-left: 4px"></label>
                                 <!-- <label style="padding-left:0x;width:150px;"><input type="checkbox" name="scale" {% if scale=="on" %} checked {% elif scale==".on" %} checked {% endif %}/> Scale </label> -->
-                                <label>Scaling: <select name=scale_value method="GET" action="/" style="width:115px;padding-left:4px">
+                                <label>Type: <select name=scale_value method="GET" action="/" style="width:115px;padding-left:4px">
                                     {% for scale_ in scale %}
                                         <option value="{{scale_}}" {% if scale_==scale_value %} selected {% endif %}>{{scale_}}</option>
                                     {% endfor %}

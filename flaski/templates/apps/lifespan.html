@@ -75,6 +75,17 @@
                 </div>
 
                 <div class="column">
+                    <div class="sidebar-heading">Select censors:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;padding-bottom:15px;" >
+                        <select title=censors_col name=censors_val method="GET" action="/" style="width:365px">
+                            {% for censorCol in censors_col %}
+                                <option value="{{censorCol}}" {% if censorCol in censors_val %} selected {% endif %}>{{censorCol}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="column">
                     <div class="sidebar-heading">Select groups:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right:6px;padding-left:15px;padding-bottom:15px;" >
                         <select name=groups_value method="GET" action="/" style="width:365px">
@@ -114,17 +125,58 @@
                                 <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="Conf_Interval" {% if Conf_Interval=="on" %} checked {% elif Conf_Interval==".on" %} checked {% endif %}/> Show Confidence Intervals </label>
                                 <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="show_censors" {% if show_censors=="on" %} checked {% elif show_censors==".on" %} checked {% endif %}/> Show censors </label>
                                 <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_legend" {% if ci_legend=="on" %} checked {% elif ci_legend==".on" %} checked {% endif %}/> Show legend </label>
-                                <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_force_lines" {% if ci_force_lines=="on" %} checked {% elif ci_force_lines==".on" %} checked {% endif %}/> Plot conf_int lines</label>
+                                <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="ci_force_lines" {% if ci_force_lines=="on" %} checked {% elif ci_force_lines==".on" %} checked {% endif %}/> Plot Confidence Interval lines</label>
                             </div>
 
                             <div class="row arg">
-                                <label>conf_int alpha: <input type="text" name="ci_alpha" value='{{ ci_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
+                                <label>Confidence Interval alpha: <input type="text" name="ci_alpha" value='{{ ci_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
                             </div>
 
                         </div>
                     </div>
                 </div>
             </li>
+
+            {% if groups_value != "None" %}
+                {% for group_h in groups_settings %}
+
+                    <li class="nav-item" style="padding-top: 0px;">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group_h.name}}" aria-expanded="true" aria-controls="collapse{{group_h.name}}" style="padding-top: 0px;">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Line: {{group_h.name}}</span>
+                        </a>
+                        <div id="collapse{{group_h.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded openmenu"> 
+                                <div class="row arguments">
+                                    
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label> line color: <select name={{group_h.name}}.line_color_value method="GET" action="/" style="width:80px">
+                                                {% for linecolor_ in line_colors %}
+                                                    <option value="{{linecolor_}}" {% if linecolor_==group_h.line_color_value %} selected {% endif %}>{{linecolor_}}</option>"
+                                                {% endfor %}
+                                            </select>
+
+                                            <label> ..or, <select name={{group_h.name}}.linecolor_col method="GET" action="/" style="width:128px">
+                                                {% for linecolor_col_ in linecolor_cols %}
+                                                    <option value="{{linecolor_col_}}" {% if linecolor_col_==group_h.linecolor_col %} selected {% endif %}>{{linecolor_col_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="row arg" style="padding-bottom:6px;">
+                                            <label> ..or, write a color name <input type="text" name={{group_h.name}}.linecolor_write value="{{group_h.linecolor_write}}" style="width:155px;height:22px;padding-left: 4px">
+                                        
+                                        
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </li>
+
+                {% endfor %}
+            {% endif %}
 
             <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
 
@@ -608,6 +660,9 @@
     <div class="tab">
         <button class="tablinks" onclick="openCity(event, 'LifeSpan Curve')" id="defaultOpen">LifeSpan Curve</button>
         <button class="tablinks" onclick="openCity(event, 'Survival Analysis Table')">Survival Analysis Table</button>
+        {% if groups_value != "None" %}
+        <button class="tablinks" onclick="openCity(event, 'Cox Proportional Hazard Table')">Cox Proportional Hazard Table</button>
+        {% endif %}
     </div>
 
     <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);"> 
@@ -678,10 +733,82 @@
 
             <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
-                <div style="padding-left:2px;padding-right:2px;">
+                <div style="padding-right: 2px;">
                     <form action="{{ url_for('lifespan', download='results') }}" method="get">
                         <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
-                            <i class="far fa-file-excel fa-sm text-white-50"></i> Results
+                            <i class="fas fa-download fa-sm text-white-50"></i> Results
+                        </button>
+                    </form>
+                </div>
+    
+                <div style="padding-left: 2px;padding-right: 2px;">
+                    <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                        </button>
+                    </form>
+                </div>
+    
+                <div style="padding-left: 2px;">
+                    <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas fa-th fa-sm text-white-50"></i> Session
+                        </button>
+                    </form>
+                </div>
+    
+            </div>
+
+        </div>
+
+        {% if groups_value != "None" %}
+        <div id="Cox Proportional Hazard Table" class="tabcontent">
+            <h2><br>Cox Proportional Hazard Table</h2>
+    
+            <table id="listr-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        {% for entry in table_headers_coeffs %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for entry in table_contents_coeff %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            
+                <thead>
+                    <tr>
+                        {% for entry in table_headers_stats %}
+                        <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for entry in table_contents_stats %}
+                    <tr>
+                        {% for col in entry %}
+                        <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+                <div style="padding-left:2px;padding-right:2px;">
+                    <form action="{{ url_for('lifespan', download='cph') }}" method="get">
+                        <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                            <i class="far fa-file-excel fa-sm text-white-50"></i> Regression
                         </button>
                     </form>
                 </div>
@@ -701,8 +828,11 @@
                         </button>
                     </form>
                 </div>
+
+            </div>
             
         </div>
+        {% endif %}
     </div>
 
     <!-- </div> -->

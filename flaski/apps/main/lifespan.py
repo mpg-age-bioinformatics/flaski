@@ -3,8 +3,11 @@ import numpy as np
 import pandas as pd
 from lifelines import KaplanMeierFitter
 import math
+import patsy
 import seaborn as sns
 from functools import reduce
+from lifelines import CoxPHFitter
+from lifelines.statistics import logrank_test
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
@@ -39,6 +42,7 @@ def make_figure(df,pa):
 
     km = KaplanMeierFitter() ## instantiate the class to create an object
 
+    pl=None
     fig = plt.figure(frameon=False, figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
     ## Fit the data into the model
@@ -86,7 +90,8 @@ def make_figure(df,pa):
                ci_show=pa_["Conf_Interval"], \
                ci_legend=pa_["ci_legend"], \
                linestyle=pa["linestyle_value"], \
-               linewidth=float(pa["linewidth"]))
+               linewidth=float(pa["linewidth"]), \
+               color=pa["line_color_value"])
 
         pl.spines['right'].set_visible(pa_["right_axis"])
         pl.spines['top'].set_visible(pa_["upper_axis"])
@@ -121,11 +126,70 @@ def make_figure(df,pa):
         return df, pl
 
     elif str(pa["groups_value"]) != "None":
-        groups = df_ls[pa["groups_value"]]
+
+        df_long=pd.DataFrame(columns=['day','status',str(pa["groups_value"])])
+
+        for row in range (0, len(df_ls)):
+
+            if int(df_ls.loc[row, pa["yvals"]]) >= 1:
+                dead=int(df_ls.loc[row, pa["yvals"]])
+                #print(dead)
+                for i in range (0,dead):
+                    #print(i)
+                    df_long=df_long.append({'day':int(df_ls.loc[row,pa["xvals"]]), 'status':1, str(pa["groups_value"]):str(df_ls.loc[row,pa["groups_value"]])}, ignore_index=True)
+                    i=i+1    
+
+            elif int(df_ls.loc[row, pa["censors_val"]]) >= 1:
+                censored=int(df_ls.loc[row, pa["censors_val"]])
+                #print(censored)
+                for c in range (0,censored):
+                    #print(c)
+                    df_long=df_long.append({'day':int(df_ls.loc[row,pa["xvals"]]), 'status':0, str(pa["groups_value"]):str(df_ls.loc[row,pa["groups_value"]])}, ignore_index=True)
+                    c=c+1
+
+        df_dummy=pd.get_dummies(df_long, drop_first=True, columns=[pa["groups_value"]])
+
+        results = logrank_test(df_dummy.loc[df_dummy['status'] == 1,'day'].tolist(),
+                       df_dummy.loc[df_dummy['status'] == 0,'day'].tolist(),
+                       df_dummy.loc[df_dummy['status'] == 1,'status'].tolist(),
+                       df_dummy.loc[df_dummy['status'] == 0,'status'].tolist(), alpha=.99)
+
+
+        cph = CoxPHFitter()
+        cph.fit(df_dummy, duration_col='day', event_col='status')
+        
+        cph_coeff=cph.summary
+
+        df_info={}
+        df_info['model']='lifelines.CoxPHFitter'
+        df_info['duration col']=cph.duration_col
+        df_info['event col']=cph.event_col
+        df_info['baseline estimation']='breslow'
+        df_info['number of observations']=cph._n_examples
+        df_info['number of events observed']=len(df_dummy.loc[df_dummy['status']==1,])
+        df_info['partial log-likelihood']=cph.log_likelihood_
+        df_info['Concordance']=cph.concordance_index_
+        df_info['Partial AIC']=cph.AIC_partial_
+        df_info['log-likelihood ratio test']=cph.log_likelihood_ratio_test().test_statistic
+        df_info['P.value(log-likelihood ratio test)']=cph.log_likelihood_ratio_test().p_value
+        df_info['log rank test']=results.test_statistic
+        df_info['P.value(log rank test)']=results.p_value
+
+        cph_stats=pd.DataFrame(df_info.items())
+        cph_stats=cph_stats.rename(columns={0:'Statistic',1:'Value'})
+        #cph_stats
+
+        #groups = df_ls[pa["groups_value"]]
         tmp=[]
-        for cond in list(set(df_ls[pa["groups_value"]].tolist())):
-            ix = (groups == cond)
-            km.fit(durations[ix], event_observed[ix], label=cond)
+        #for cond in list(set(df_ls[pa["groups_value"]].tolist())):
+        
+        for cond in pa["list_of_groups"]:
+            #ix = (groups == cond)
+            df_tmp=df_ls.loc[df_ls[pa["groups_value"]] == cond]
+
+            km.fit(df_tmp[pa["xvals"]], df_tmp[pa["yvals"]], label=cond)
+
+            #km.fit(durations[ix], event_observed[ix], label=cond)
 
             df_survival=km.survival_function_
             df_conf=km.confidence_interval_
@@ -142,7 +206,14 @@ def make_figure(df,pa):
                                  "censored":cond+"_censored",
                                  "entrance":cond+"_entrance",
                                  cond:cond+"_KMestimate"})
+            # df=df.rename(columns={"at_risk":group+"_at_risk",
+            #                      "removed":group+"_removed",
+            #                      "observed":group+"_observed",
+            #                      "censored":group+"_censored",
+            #                      "entrance":group+"_entrance",
+            #                      group:group+"_KMestimate"})
             df=df[["time",cond+"_at_risk",cond+"_removed",cond+"_observed",cond+"_censored",cond+"_entrance",cond+"_KMestimate",cond+"_lower_0.95",cond+"_upper_0.95"]]
+            #df=df[["time",group+"_at_risk",group+"_removed",group+"_observed",group+"_censored",group+"_entrance",group+"_KMestimate",group+"_lower_0.95",group+"_upper_0.95"]]
             tmp.append(df)
 
             df=reduce(lambda df1,df2: pd.merge(df1,df2,on='time'), tmp)
@@ -169,14 +240,26 @@ def make_figure(df,pa):
                 else:
                     pa_["grid_color_write"]=pa["grid_color_value"]
 
+            PA_=[ g for g in pa["groups_settings"] if g["name"]==cond ][0]
+
+            #tmp_df=df_ls[df_ls[pa["groups_value"]]==cond]
+
+            if PA_["linecolor_col"] != "select a column..":
+                linecolor=[ i for i in df_tmp[[PA_["linecolor_col"]]].dropna()[PA_["linecolor_col"]].tolist() ][0]
+            if str(pa_["linecolor_write"]) != "":
+                linecolor=PA_["linecolor_write"]
+            else:
+                linecolor=PA_["line_color_value"]
+            
             pl=km.plot(show_censors=pa_["show_censors"], \
                 censor_styles={"marker":marker_dict[pa["censor_marker_value"]], "markersize":float(pa["censor_marker_size_val"]), "markeredgecolor":pa_["marker_ec"], "markerfacecolor":pa_["marker_fc"], "alpha":float(pa["marker_alpha"])}, \
-               ci_alpha=float(pa["ci_alpha"]), \
-               ci_force_lines=pa_["ci_force_lines"], \
-               ci_show=pa_["Conf_Interval"], \
-               ci_legend=pa_["ci_legend"], \
-               linestyle=pa["linestyle_value"], \
-               linewidth=float(pa["linewidth"]))
+                ci_alpha=float(pa["ci_alpha"]), \
+                ci_force_lines=pa_["ci_force_lines"], \
+                ci_show=pa_["Conf_Interval"], \
+                ci_legend=pa_["ci_legend"], \
+                linestyle=pa["linestyle_value"], \
+                linewidth=float(pa["linewidth"]), \
+                color=linecolor)
 
             pl.spines['right'].set_visible(pa_["right_axis"])
             pl.spines['top'].set_visible(pa_["upper_axis"])
@@ -208,33 +291,9 @@ def make_figure(df,pa):
             pl.set_xlabel(pa["xlabel"], fontdict={'fontsize':float(pa['xlabels'])})
             pl.set_ylabel(pa["ylabel"], fontdict={'fontsize':float(pa['ylabels'])})
 
-        return df, pl
+        return df, pl, cph_coeff, cph_stats
+        
 
-# ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'square', 'square-open', 
-# 'square-dot', 'square-open-dot', 'diamond', 'diamond-open', 'diamond-dot', 'diamond-open-dot', 
-# 'cross', 'cross-open', 'cross-dot', 'cross-open-dot', 'x', 'x-open', 'x-dot', 'x-open-dot', 
-# 'triangle-up', 'triangle-up-open', 'triangle-up-dot', 'triangle-up-open-dot', 'triangle-down', 
-# 'triangle-down-open', 'triangle-down-dot', 'triangle-down-open-dot', 'triangle-left', 'triangle-left-open', 
-# 'triangle-left-dot', 'triangle-left-open-dot', 'triangle-right', 'triangle-right-open', 'triangle-right-dot', 
-# 'triangle-right-open-dot', 'triangle-ne', 'triangle-ne-open', 'triangle-ne-dot', 'triangle-ne-open-dot', 
-# 'triangle-se', 'triangle-se-open', 'triangle-se-dot', 'triangle-se-open-dot', 'triangle-sw', 
-# 'triangle-sw-open', 'triangle-sw-dot', 'triangle-sw-open-dot', 'triangle-nw', 'triangle-nw-open',
-# 'triangle-nw-dot', 'triangle-nw-open-dot', 'pentagon', 'pentagon-open', 'pentagon-dot', 'pentagon-open-dot', 
-# 'hexagon', 'hexagon-open', 'hexagon-dot', 'hexagon-open-dot', 'hexagon2', 'hexagon2-open', 'hexagon2-dot',
-# 'hexagon2-open-dot', 'octagon', 'octagon-open', 'octagon-dot', 'octagon-open-dot', 'star', 'star-open', 
-# 'star-dot', 'star-open-dot', 'hexagram', 'hexagram-open', 'hexagram-dot', 'hexagram-open-dot', 
-# 'star-triangle-up', 'star-triangle-up-open', 'star-triangle-up-dot', 'star-triangle-up-open-dot', 
-# 'star-triangle-down', 'star-triangle-down-open', 'star-triangle-down-dot', 'star-triangle-down-open-dot', 
-# 'star-square', 'star-square-open', 'star-square-dot', 'star-square-open-dot', 'star-diamond', 
-# 'star-diamond-open', 'star-diamond-dot', 'star-diamond-open-dot', 'diamond-tall', 'diamond-tall-open', 
-# 'diamond-tall-dot', 'diamond-tall-open-dot', 'diamond-wide', 'diamond-wide-open', 'diamond-wide-dot', 
-# 'diamond-wide-open-dot', 'hourglass', 'hourglass-open', 'bowtie', 'bowtie-open', 'circle-cross', 
-# 'circle-cross-open', 'circle-x', 'circle-x-open', 'square-cross', 'square-cross-open', 'square-x', 
-# 'square-x-open', 'diamond-cross', 'diamond-cross-open', 'diamond-x', 'diamond-x-open', 'cross-thin', 
-# 'cross-thin-open', 'x-thin', 'x-thin-open', 'asterisk', 'asterisk-open', 'hash', 'hash-open', 
-# 'hash-dot', 'hash-open-dot', 'y-up', 'y-up-open', 'y-down', 'y-down-open', 'y-left', 'y-left-open', 
-# 'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
-# 'line-ne-open', 'line-nw', 'line-nw-open']
 ALLOWED_MARKERS=['point','pixel','circle','triangle_down','triangle_up','triangle_left','triangle_right','tri_down','tri_up',
 'tri_left','tri_right','square','pentagon','star','hexagon1','hexagon2','plus','x','diamond','thin_diamond','vline','hline']
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
@@ -268,7 +327,10 @@ def figure_defaults():
         "groups":["None"],\
         "groups_value":"",\
         "list_of_groups":[],\
-        "Conf_Interval":".on",\
+        "groups_settings":[],\
+        "censors_col":["None"],\
+        "censors_val":"",\
+        "Conf_Interval":".ff",\
         "show_censors":".off",\
         "ci_legend":".off",\
         "ci_force_lines":".off",\
@@ -284,18 +346,21 @@ def figure_defaults():
         "linestyles":LINE_STYLES,\
         "linestyle_value":"solid",\
         "linewidth":"1.0",\
-        "line_color":STANDARD_COLORS,\
+        "line_colors":STANDARD_COLORS,\
         "line_color_value":"blue",\
+        "linecolor_cols":["select a column.."],\
+        "linecolor_col":"select a column..",\
+        "linecolor_write":"",\
         "edge_linewidths":STANDARD_SIZES,\
         "edge_linewidth":"0",\
         "edge_colors":STANDARD_COLORS,\
         "edgecolor":"black",\
         "edgecolor_write":"",\
         "marker_alpha":"1",\
-        "xlabel":"x",\
+        "xlabel":"Time",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
-        "ylabel":"y",\
+        "ylabel":"Survival Probability",\
         "ylabel_size":STANDARD_SIZES,\
         "ylabels":"14",\
         "axis_line_width":"1.0",\
