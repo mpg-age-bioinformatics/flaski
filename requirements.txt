@@ -129,3 +129,4 @@ WTForms==2.2.1
 xlrd==1.2.0
 zipp==2.1.0
 lifelines==0.25.0
+patsy==0.1.0
