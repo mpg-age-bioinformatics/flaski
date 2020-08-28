@@ -245,7 +245,7 @@ def make_figure(df,pa):
 
             if PA_["linecolor_col"] != "select a column..":
                 linecolor=[ i for i in df_tmp[[PA_["linecolor_col"]]].dropna()[PA_["linecolor_col"]].tolist() ][0]
-            if str(pa_["linecolor_write"]) != "":
+            if str(PA_["linecolor_write"]) != "":
                 linecolor=PA_["linecolor_write"]
             else:
                 linecolor=PA_["line_color_value"]
