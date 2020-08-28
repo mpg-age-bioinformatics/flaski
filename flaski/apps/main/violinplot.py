@@ -5,6 +5,8 @@ from collections import OrderedDict
 import numpy as np
 import seaborn as sns
 import inspect
+import sys
+
 
 from adjustText import adjust_text
 
@@ -16,11 +18,21 @@ matplotlib.use('agg')
 
 def GET_COLOR(x):
     if str(x)[:3].lower() == "rgb":
-        vals=x.split("rgb(")[-1].split(")")[0].split(",")
-        vals=[ float(s.strip(" ")) for s in vals ]
-        return vals
+        vals=x.split(";")
+        # vals=[ s.strip(" ") for s in vals ]
+        # return vals
+        vals=[ s.split("rgb(")[-1].split(")")[0].replace(" ","").split(",") for s in vals ]
+        vals_=[ ]
+        for v in vals:
+           v=[ float(s) for s in v ]
+           vals_.append(v)
+        return vals_
     else:
-        return str(x)
+        vals=x.split(" ")
+        vals=[ s.split(",") for s in vals ]
+        vals = [item for sublist in vals for item in sublist]
+        vals = [ s for s in vals if len(s) > 0 ]
+        return vals
 
 from matplotlib.patches import PathPatch
 
@@ -87,7 +99,7 @@ def make_figure(df,pa,fig=None,ax=None):
             pa[p]=None
 
     #Set Dodge to True by default if user selected Hue
-    if pa["hue"]!=None:
+    if pa["hue"]:
         pa["sp_dodge"]="on"
         pa["vp_dodge"]="on"
         pa["bp_dodge"]="on"
@@ -119,7 +131,7 @@ def make_figure(df,pa,fig=None,ax=None):
             pab[a]=int(pa[a])
             
     if pa["sp_color_rgb"] != "":
-        sp_color=GET_COLOR(pa["sp_color_rgb"]).split(",")
+        sp_color=GET_COLOR(pa["sp_color_rgb"])
     else:
         if pa["sp_color_value"]=="None":
             sp_color=None
@@ -127,7 +139,7 @@ def make_figure(df,pa,fig=None,ax=None):
             sp_color=pa["sp_color_value"]
               
     if pa["vp_color_rgb"] != "":
-        vp_color=GET_COLOR(pa["vp_color_rgb"]).split(",")
+        vp_color=GET_COLOR(pa["vp_color_rgb"])
     else:
         if pa["vp_color_value"]=="None":
             vp_color=None
@@ -135,7 +147,7 @@ def make_figure(df,pa,fig=None,ax=None):
             vp_color=pa["vp_color_value"]  
     
     if pa["bp_color_rgb"] != "":
-        bp_color=GET_COLOR(pa["bp_color_rgb"]).split(",")
+        bp_color=GET_COLOR(pa["bp_color_rgb"])
     else:
         if pa["bp_color_value"]=="None":
             bp_color=None
@@ -156,13 +168,19 @@ def make_figure(df,pa,fig=None,ax=None):
     scale=pa["scale"]
 
     #Define color, palette or user input
-    categories=list(set(tmp[pa["hue"]]))
+    if pa["hue"]!=None:
+        categories=list(OrderedDict.fromkeys(tmp[pa["hue"]].tolist()))
+    else:
+        categories=list(OrderedDict.fromkeys(tmp[pa["x_val"]].tolist()))
 
-    if type(sp_color)==list:
+    if (type(sp_color)==list) and ( len(categories) == len(sp_color) ):
         sp_palette=dict()
         for each,color in zip(categories,sp_color):
             sp_palette[each]=color
         sp_color=None
+    elif type(sp_color)==list :
+        sp_color=sp_color[0]
+        sp_palette=None
     else:
         sp_palette=pa["sp_palette"]
     
@@ -187,21 +205,25 @@ def make_figure(df,pa,fig=None,ax=None):
     #PLOT MAIN FIGURE
 
     if "Violinplot" in pa["style"]:
+
         sns.violinplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,order=pa["order"],hue_order=pa["hue_order"],bw=bw,cut=pab["cut"],scale=scale,\
         scale_hue=pab["scale_hue"],gridsize=pab["gridsize"],width=pab["vp_width"],inner=pa["inner"],split=pab["split"],dodge=pab["vp_dodge"],orient=pab["vp_orient"],\
         linewidth=pab["vp_linewidth"],color=vp_color,palette=vp_palette,saturation=pab["vp_saturation"])
+
     if "Boxplot" in pa["style"]:
+
         sns.boxplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,orient=pab["bp_orient"],color=bp_color,palette=bp_palette,saturation=pab["bp_saturation"],\
         width=pab["bp_width"], dodge=pab["bp_dodge"], fliersize=pab["bp_fliersize"], linewidth=pab["bp_linewidth"], whis=pab["bp_whis"])
+
     if "Swarmplot" in pa["style"]:
+
         sns.swarmplot(x=pa["x_val"],y=pa["y_val"],hue=pa["hue"],data=df,dodge=pab["sp_dodge"], orient=pab["sp_orient"], color=sp_color, palette=sp_palette,\
         size=pab["sp_size"], edgecolor=pa["sp_edgecolor"], linewidth=pab["sp_linewidth"], alpha=pab["sp_saturation"])       
-    
+        
     #Set group distance
     if pa["hue"]!=None:
         adjust_box_widths(fig, pab["group_width"])
 
-    
     #SET LEGEND OPTIONS
     facecolor= pa["facecolor"]
     edgecolor=pa["edgecolor"]
@@ -218,15 +240,19 @@ def make_figure(df,pa,fig=None,ax=None):
         legend_body_fontsize=float(pa["legend_body_fontsize_value"])
     else:
         legend_body_fontsize=pa["legend_body_fontsize"]
-
     
-    plt.legend(loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
+    if pa["hue"]!=None:
+        handles,labels=axes.get_legend_handles_labels()
+        handles=handles[0:2]
+        labels=labels[0:2]
+
+        plt.legend(handles=handles,labels=labels,loc=loc,ncol=pab["legend_ncol"],fontsize=legend_body_fontsize,\
         markerfirst=pab["markerfirst"],fancybox=pab["fancybox"],shadow=pab["shadow"],framealpha=pab["framealpha"], \
         facecolor=facecolor, edgecolor=edgecolor,mode=mode,title=legend_title,\
         title_fontsize=legend_title_fontsize,borderpad=pab["borderpad"],labelspacing=pab["labelspacing"],\
         handlelength=pab["handlelength"],handletextpad=pab["handletextpad"],\
         borderaxespad=pab["borderaxespad"],columnspacing=pab["columnspacing"])
-
+    
 
 
     #SET GRID, AXIS AND TICKS

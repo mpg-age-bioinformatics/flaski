@@ -13,14 +13,6 @@ def GET_COLOR(x):
     else:
         return str(x)
 
-def CREATE_COLOR_COLUMN(df,xvals,colors):
-    unique_vals=df[xvals].unique()
-    dummie=dict()
-    for col,val in zip(colors,unique_vals):
-        dummie[val]=col
-    df['color_col']= df['day'].map(dummie)
-    return df
-
 def make_figure(df,pa):
     """Generates figure.
 
@@ -51,7 +43,7 @@ def make_figure(df,pa):
             pab[arg]=True
     
     #Load booleans
-    booleans=["bp_boxmean","bp_boxpoints"]
+    booleans=["bp_boxmean","display_points"]
     for arg in booleans:
         if pa[arg]=="False":
             pab[arg]=False
@@ -64,8 +56,8 @@ def make_figure(df,pa):
     floats=["x","y","axis_line_width","ticks_line_width","opacity",\
         "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
-        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","vp_pointpos","vp_jitter","vp_meanline_width","vp_marker_opacity",\
-        "vp_marker_size","vp_marker_line_width","vp_marker_line_outlierwidth","bp_opacity","bp_width","bp_pointpos","bp_jitter","bp_linewidth",\
+        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","pointpos","jitter","vp_meanline_width","vp_gap","vp_groupgap",\
+        "marker_opacity","marker_size","marker_line_width","marker_line_outlierwidth","bp_opacity","bp_width","bp_linewidth",\
         "bp_whiskerwidth","bp_notchwidth"]
 
     for a in floats:
@@ -87,8 +79,8 @@ def make_figure(df,pa):
     possible_nones=["x_val","y_val","hue","title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
     "paper_bgcolor","plot_bgcolor","grid_color","legend_bgcolor","legend_bordercolor","legend_fontcolor","legend_title_fontcolor",\
     "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily","vp_hover_bgcolor","vp_hover_bordercolor",\
-    "vp_hover_fontfamily","vp_hover_fontcolor","vp_linecolor","vp_meanline_color","vp_marker_outliercolor","vp_marker_fillcolor",\
-    "vp_marker_line_color","vp_marker_line_outliercolor","bp_linecolor","bp_hover_bgcolor","bp_hover_bordercolor","bp_hover_fontfamily","bp_hover_fontcolor",]
+    "vp_hover_fontfamily","vp_hover_fontcolor","vp_linecolor","vp_meanline_color","marker_outliercolor","marker_fillcolor",\
+    "marker_line_color","marker_line_outliercolor","bp_linecolor","bp_hover_bgcolor","bp_hover_bordercolor","bp_hover_fontfamily","bp_hover_fontcolor",]
     for p in possible_nones:
         if pa[p] == "None" or pa[p]=="Default" :
             pab[p]=None
@@ -129,56 +121,128 @@ def make_figure(df,pa):
                 bp_color=[pa["bp_color_value"]]*len(tmp[pab["x_val"]].unique())
             else:
                 bp_color=[pa["bp_color_value"]]*2
+    
+    if pa["marker_color_rgb"] != "":
+        marker_color=GET_COLOR(pa["marker_color_rgb"]).split(",")
+    else:
+        if pa["marker_fillcolor"]=="None":
+            if pab["hue"]==None:
+                marker_color=[None]*len(tmp[pab["x_val"]].unique())
+            else:
+                marker_color=[None]*2
+        else:
+            if pab["hue"]==None:
+                marker_color=[pa["marker_fillcolor"]]*len(tmp[pab["x_val"]].unique())
+            else:
+                marker_color=[pa["marker_fillcolor"]]*2
 
     if pa["bp_orient"]=="horizontal":
         pab["bp_orient"]="h"
     else:
         pab["bp_orient"]="v"
+    
 
     #MAIN BODY
-    if pa["style"]=="Violinplot + Swarmplot" or pa["style"]=="Violinplot":
+
+    if "Violinplot" in pa["style"]:
+        if "," in pa["vp_text"]:
+            vp_text=pa["vp_text"].split(",")
+        else:
+            vp_text=pa["vp_text"]
         hoverlabel=dict(bgcolor=pab["vp_hover_bgcolor"],bordercolor=pab["vp_hover_bordercolor"],\
             font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
             align=pa["vp_hover_align"])
         line=dict(color=pab["vp_linecolor"],width=pab["vp_linewidth"])
-        marker=dict(outliercolor=pab["vp_marker_outliercolor"],symbol=pa["vp_marker_symbol"],opacity=pab["vp_marker_opacity"],\
-        size=pab["vp_marker_size"],color=pab["vp_marker_fillcolor"],line=dict(color=pab["vp_marker_line_color"],\
-        width=pab["vp_marker_line_width"],outliercolor=pab["vp_marker_line_outliercolor"],outlierwidth=pab["vp_marker_line_outlierwidth"]))
 
-        if pab["vp_meanline_color"]!=None:
+        if pab["vp_meanline_width"]!=float(0):
             meanline=dict(visible=True,color=pab["vp_meanline_color"],width=pab["vp_meanline_width"])
         else:
             meanline=dict(visible=False)
 
+
         if pab["hue"]==None:
-            for each,color in zip(tmp[pab["x_val"]].unique(),vp_color):
-                fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
-                hoverlabel=hoverlabel,marker_color=color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
-                side=pa["vp_side"],spanmode=pa["vp_span"],marker=marker))
+
+            if "Swarmplot" in pa["style"]:
+                for each,color,mcolor in zip(tmp[pab["x_val"]].unique(),vp_color,marker_color):
+                    marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
+                    size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                    outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+
+                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                    hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"],\
+                    points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
+            else:
+                for each,color in zip(tmp[pab["x_val"]].unique(),vp_color):
+                    fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                    bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                    hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"]))
 
         else:
-            for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
-                fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
-                legendgroup=each,name=each,scalegroup=each,text=pa["vp_text"],width=pab["vp_width"],orientation=pab["vp_orient"],\
-                bandwidth=pab["vp_bw"],opacity=pab["opacity"],hovertext=pa["vp_hovertext"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
-                hoverlabel=hoverlabel,marker_color=color,line=line,pointpos=pab["vp_pointpos"],jitter=pab["vp_jitter"],meanline=meanline,\
-                side=side,spanmode=pa["vp_span"],marker=marker))
-            fig.update_layout(violingap=0, violinmode='overlay')
+            if "Swarmplot" in pa["style"]:    
+                if pa["vp_mode"]=="group":
+                    for each,color,mcolor in zip(list(set(tmp[pab["hue"]])),vp_color,marker_color):
 
-    elif pa["style"]=="Boxplot + Swarmplot" or pa["style"]=="Boxplot":
+                        marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
+                        size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                        outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,spanmode=pa["vp_span"],
+                        points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
+
+                else:
+                    for each,side,color,mcolor in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color,marker_color):
+                        
+                        marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
+                        size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                        outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"],
+                        points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
+            else:
+                if pa["vp_mode"]=="group":
+                    for each,color in zip(list(set(tmp[pab["hue"]])),vp_color):
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,spanmode=pa["vp_span"]))
+                else:
+                    for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
+                        fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
+                        legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
+                        bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
+                        hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=side,spanmode=pa["vp_span"]))
+                        
+            fig.update_layout(violingap=pab["vp_gap"], violingroupgap=pab["vp_groupgap"],violinmode=pa["vp_mode"])
+
+    if "Boxplot" in pa["style"]:
+        if "," in pa["bp_text"]:
+            bp_text=pa["bp_text"].split(",")
+        else:
+            bp_text=pa["bp_text"]
+
         hoverlabel=dict(bgcolor=pab["bp_hover_bgcolor"],bordercolor=pab["bp_hover_bordercolor"],
         font=dict(family=pab["bp_hover_fontfamily"],size=pab["bp_hover_fontsize"],color=pab["bp_hover_fontcolor"]),\
         align=pa["bp_hover_align"])
-        
-        print(pa["bp_hovertext"])
 
+        if "Swarmplot" in pa["style"]:
 
-        for each,color in zip(tmp[pab["x_val"]].unique(),bp_color):
-            fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],marker_color=color,orientation=pab["bp_orient"],\
-            hovertext=pa["bp_hovertext"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],width=pab["bp_width"],pointpos=pab["bp_pointpos"],\
-            jitter=pab["bp_jitter"],line=dict(color=pab["bp_linecolor"],width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],boxpoints=pab["bp_boxpoints"],\
-            quartilemethod=pa["bp_quartilemethod"],text=pa["bp_text"],hoverlabel=hoverlabel,notched=pab["bp_notched"]))
+            for each,color,mcolor in zip(tmp[pab["x_val"]].unique(),bp_color,marker_color):
+                marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
+                size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
+
+                fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],fillcolor=color,\
+                orientation=pab["bp_orient"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],\
+                width=pab["bp_width"],line=dict(color=pab["bp_linecolor"],width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
+                quartilemethod=pa["bp_quartilemethod"],text=bp_text,hoverlabel=hoverlabel,notched=pab["bp_notched"],\
+                boxpoints=pa["points"],marker=marker,pointpos=pab["pointpos"]))
 
 
     #UPDATE LAYOUT OF PLOTS
@@ -295,8 +359,6 @@ def make_figure(df,pa):
     #UPDATE LEGEND PROPERTIES
     if pab["show_legend"]==True:
 
-        labels=[x["label"] for x in pa["groups_settings"].values()]
-
         if pa["legend_orientation"]=="vertical":
             legend_orientation="v"
         elif pa["legend_orientation"]=="horizontal":
@@ -316,7 +378,7 @@ def make_figure(df,pa):
     return fig
 
 STANDARD_SIZES=[str(i) for i in list(range(1,101))]
-STANDARD_STYLES=["Violinplot","Swarmplot","Boxplot","Violinplot and Swarmplot","Boxplot and Swarmplot"]
+STANDARD_STYLES=["Violinplot","Boxplot","Violinplot and Swarmplot","Boxplot and Swarmplot"]
 STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
     "bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood",\
     "cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk",\
@@ -350,7 +412,8 @@ LEGEND_LOCATIONS=['best','upper right','upper left','lower left','lower right','
 MODES=["expand",None]
 STANDARD_HOVERINFO=["x", "y", "z", "text", "name","all","none","skip","x+y","x+text","x+name",\
                     "y+text","y+name","text+name","x+y+name","x+y+text","x+text+name","y+text+name"]
-STANDARD_HOVERONS=["violins", "points", "kde","violins+points", "violins+kde","points+kde","violins+points+kde", "all" ]
+STANDARD_VP_HOVERONS=["violins", "points", "kde","violins+points", "violins+kde","points+kde","violins+points+kde", "all" ]
+STANDARD_BP_HOVERONS=["boxes","points","boxes+points"]
 STANDARD_ERRORBAR_TYPES=["percent","constant","sqrt"]
 STANDARD_REFERENCES=["container","paper"]
 STANDARD_TITLE_XANCHORS=["auto","left","center","right"]
@@ -389,7 +452,8 @@ STANDARD_SYMBOLS=["0","circle","100","circle-open","200","circle-dot","300","cir
     "y-down-open","39","y-left","139","y-left-open","40","y-right","140","y-right-open","41","line-ew","141","line-ew-open",\
     "42","line-ns","142","line-ns-open","43","line-ne","143","line-ne-open","44","line-nw","144","line-nw-open"]
 STANDARD_BOXMEANS=["True","sd","False"]
-STANDARD_BOXPOINTS=["all","outliers","suspectedoutliers","False"]
+STANDARD_POINTS=["all","outliers","suspectedoutliers"]
+STANDARD_VIOLINMODES=["group","overlay"]
 def figure_defaults():
 
     """Generates default figure arguments.
@@ -411,8 +475,8 @@ def figure_defaults():
 
     plot_arguments={"fig_width":"600.0",\
         "fig_height":"600.0",\
-        "title":'iViolinplot',\
-        "title_fontsize":"20.0",\
+        "title":'iViolin plot',\
+        "title_fontsize":"20",\
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
         "titles":"20.0",\
@@ -430,10 +494,9 @@ def figure_defaults():
         "vp_color_rgb":"",\
         "vp_color_value":"None",\
         "vp_bw":"",\
-        "vp_hovertext":"",\
         "vp_hoverinfo":"all",\
         "vp_hoveron":"violins+points+kde",\
-        "hoverons":STANDARD_HOVERONS,\
+        "vp_hoverons":STANDARD_VP_HOVERONS,\
         "vp_hover_bgcolor":"None",\
         "vp_hover_bordercolor":"None",\
         "vp_hover_fontfamily":"Default",\
@@ -442,8 +505,6 @@ def figure_defaults():
         "vp_hover_align":"auto",\
         "vp_linecolor":"None",\
         "vp_linewidth":"2.0",\
-        "vp_pointpos":"0.0",\
-        "vp_jitter":"0.5",\
         "vp_meanline_width":"0.0",\
         "vp_meanline_color":"None",\
         "vp_scalemode":"width",\
@@ -451,25 +512,30 @@ def figure_defaults():
         "spans":["soft","hard"],\
         "vp_side":"both",\
         "vp_sides":["both","positive","negative"],\
+        "violinmodes":STANDARD_VIOLINMODES,\
+        "vp_mode":"overlay",\
+        "vp_groupgap":"0.3",\
+        "vp_gap":"0.3",\
         "scalemodes":STANDARD_SCALEMODES,\
-        "vp_marker_symbol":"circle",\
+        "pointpos":"0.0",\
+        "jitter":"0.5",\
+        "marker_symbol":"circle",\
         "marker_symbols":STANDARD_SYMBOLS,\
-        "vp_marker_outliercolor":"None",\
-        "vp_marker_opacity":"1.0",\
-        "vp_marker_size":"6.0",\
-        "vp_marker_fillcolor":"None",\
-        "vp_marker_line_color":"None",\
-        "vp_marker_line_width":"0.0",\
-        "vp_marker_line_outlierwidth":"1.0",\
-        "vp_marker_line_outliercolor":"None",\
+        "marker_outliercolor":"None",\
+        "marker_opacity":"1.0",\
+        "marker_size":"6.0",\
+        "marker_color_rgb":"",\
+        "marker_fillcolor":"None",\
+        "marker_line_color":"None",\
+        "marker_line_width":"0.0",\
+        "marker_line_outlierwidth":"1.0",\
+        "marker_line_outliercolor":"None",\
         "bp_text":"",\
         "bp_opacity":"1.0",\
         "bp_color_rgb":"",\
         "bp_color_value":"None",\
         "bp_orient":"vertical",\
         "bp_width":"0.0",\
-        "bp_jitter":"0.5",\
-        "bp_pointpos":"0.0",\
         "bp_notched":"off",\
         "bp_whiskerwidth":"0.5",\
         "bp_notchwidth":"0.25",\
@@ -477,14 +543,13 @@ def figure_defaults():
         "bp_linecolor":"None",\
         "bp_boxmean":"False",\
         "boxmeans":STANDARD_BOXMEANS,\
-        "boxpoints":STANDARD_BOXPOINTS,\
-        "bp_boxpoints":"outliers",\
+        "points":"all",\
+        "display_points":STANDARD_POINTS,\
         "quartilemethods":["linear","exclusive","inclusive"],\
         "bp_quartilemethod":"linear",\
-        "bp_hovertext":"",\
         "bp_hoverinfo":"all",\
         "bp_hoveron":"boxes+points",\
-        "bp_hoverons":["boxes","points","boxes+points"],\
+        "bp_hoverons":STANDARD_BP_HOVERONS,\
         "bp_hover_bgcolor":"None",\
         "bp_hover_bordercolor":"None",\
         "bp_hover_fontfamily":"Default",\

@@ -14,13 +14,35 @@ from pathlib2 import Path
 from copy import copy
 import shutil
 import io
-from flaski.routes import FREEAPPS
-
 
 from flaski.routines import session_to_file
 from flaski import app, sess
 
 # root = "/tmp/"
+
+def cleanP(p):
+    p=str(p)
+    if len(p) > 0:
+        bads=["..","\\","*","?","&","$","#","%"]
+        for bad in bads:
+            if bad in p:
+                p=p.replace(bad,"")
+        while p[0] in ["/","."]:
+            p=p[1:]
+    return p
+
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
+
 
 def UserFolder(u):
     if u.is_authenticated:
@@ -128,6 +150,7 @@ def get_range(request):
 @app.route('/delete/<path:p>')
 @login_required
 def delete(p):
+    p=cleanP(p)
     p="/"+p
     path = UserFolder(current_user) + p 
     if os.path.isdir(path):
@@ -141,6 +164,7 @@ def delete(p):
 @app.route('/makedir/<path:p>',methods=['GET', 'POST'])
 @login_required
 def makedir(p=""):
+    p=cleanP(p)
     new_folders=request.form["folder_name"]
     path = UserFolder(current_user) + "/"+p +"/"+ new_folders
     if not os.path.isdir(path):
@@ -155,8 +179,9 @@ def makedir(p=""):
 @app.route('/save/<path:p>/<string:s>',methods=['GET', 'POST'])
 @login_required
 def save(p="",s="save_as"):
-    print(p,s)
-    sys.stdout.flush()
+    # print(p,s)
+    # sys.stdout.flush()
+    p=cleanP(p)
     if s == "save_as":
         filename=secure_filename(request.form["file_name"])
         ext=request.form['action']
@@ -191,6 +216,7 @@ def save(p="",s="save_as"):
 @app.route('/load/<path:p>')
 @login_required
 def load(p):
+    p=cleanP(p)
     path = UserFolder(current_user) + "/" + p
     with open(path,"r") as json_in:
         session_=json.load(json_in)
@@ -208,6 +234,7 @@ def load(p):
 @app.route('/getfile/<path:p>')
 @login_required
 def getfile(p):
+    p=cleanP(p)
     path = UserFolder(current_user) + "/" + p
     res = send_file(path)
     res.headers.add('Content-Disposition', 'attachment')
@@ -219,9 +246,8 @@ def get_size(start_path = '.'):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             # skip if it is symbolic link
-            if not os.path.islink(fp):
+            if ( not os.path.islink(fp) ) & ( ".sessions" not in str(fp)  ) :
                 total_size += os.path.getsize(fp)
-
     return total_size
 
 class PathView(MethodView):
@@ -231,6 +257,8 @@ class PathView(MethodView):
         """
         downloading files
         """
+
+        p=cleanP(p)
         
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'yes'))
 
@@ -300,6 +328,8 @@ class PathView(MethodView):
         root=UserFolder(current_user)
 
         #p="/"+p
+
+        p=cleanP(p)
 
         path = UserFolder(current_user)+ "/"+p
         #print(p, path, UserFolder(current_user))
