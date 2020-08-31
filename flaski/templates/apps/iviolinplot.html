@@ -393,18 +393,18 @@
                                         </div>
 
                                         <div class="row arg">
-                                            Line:
-                                            <label style="padding-left: 8px;">Color: <select name=bp_linecolor val= "{{bp_linecolor}}" method="GET" action="/" style="width:80px;">
+                                            <b>Line:</b>
+                                            <label style="padding-left: 5px;">width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 8px;"></b>color: <select name=bp_linecolor val= "{{bp_linecolor}}" method="GET" action="/" style="width:80px;">
                                                 {% for bp_linecolor_ in colors %}
                                                 <option value="{{bp_linecolor_}}" {% if bp_linecolor_==bp_linecolor %} selected {% endif %}>{{bp_linecolor_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 18px;"> ..or write: <input type="bp_linecolor_rgb" name=bp_linecolor_rgb value="{{bp_linecolor_rgb}}" style="width:218px;height:22px;padding-left:4px;"></label>
-                                            <label style="padding-left: 170px;">Width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 16px;">..or write: <input type="bp_linecolor_rgb" name=bp_linecolor_rgb value="{{bp_linecolor_rgb}}" style="width:222px;height:22px;padding-left:4px;"></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 12px;">Boxmean: <select name=bp_boxmean val= "{{bp_boxmean}}" method="GET" action="/" style="width:80px;">
+                                            <label style="padding-left: 8px;">Box mean: <select name=bp_boxmean val= "{{bp_boxmean}}" method="GET" action="/" style="width:80px;">
                                                 {% for bp_boxmean_ in boxmeans %}
                                                 <option value="{{bp_boxmean_}}" {% if bp_boxmean_==bp_boxmean %} selected {% endif %}>{{bp_boxmean_}}</option>
                                                 {% endfor %}
@@ -419,7 +419,7 @@
                                         </div>
 
                                         <hr class="black">
-                                        <label style="width:250px;padding-left:130px;">Hover</label>
+                                        <label style="width:250px;padding-left:136px;">Hover</label>
                                         <label>Text: <input type="text" name={{bp_text}} value= "{{bp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
                                         <label style="padding-left:16px;">Hover on: <select  name=bp_hoveron value="{{bp_hoveron }}" method="GET" action="/" style="width:70px;">
                                             {% for bp_hoveron_ in bp_hoverons %}
