@@ -234,6 +234,12 @@ def make_figure(df,pa):
                 width=pab["bp_width"],line=dict(color=lcolor,width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
                 quartilemethod=pa["bp_quartilemethod"],text=bp_text,hoverlabel=hoverlabel,notched=pab["bp_notched"],\
                 boxpoints=pa["points"],marker=marker,pointpos=pab["pointpos"]))
+        else:
+            for each,color,lcolor in zip(tmp[pab["x_val"]].unique(),bp_color,bp_linecolor):
+                fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],fillcolor=color,\
+                orientation=pab["bp_orient"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],\
+                width=pab["bp_width"],line=dict(color=lcolor,width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
+                quartilemethod=pa["bp_quartilemethod"],text=bp_text,hoverlabel=hoverlabel,notched=pab["bp_notched"]))
 
 
     #UPDATE LAYOUT OF PLOTS
