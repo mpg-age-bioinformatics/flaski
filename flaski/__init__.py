@@ -22,13 +22,12 @@ sess.init_app(app)
 
 #wsgi_app = app.wsgi_app
 
-from flaski import routes, models, errors, storage
+from flaski import routes, models, errors, storage, settings
 
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot
 
 if app.config['INSTANCE'] != "latest" :
     from flaski.apps.routes import ihistogram, mds, tsne, lifespan, iviolinplot
-    from flaski import userspace
 
 if not app.debug:
     if app.config['MAIL_SERVER']:

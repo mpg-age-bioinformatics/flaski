@@ -34,3 +34,8 @@ class ResetPasswordForm(FlaskForm):
         'Repeat Password', validators=[DataRequired(), EqualTo('password')],\
             render_kw={'class':"form-control form-control-user" ,'placeholder':"Password"})
     submit = SubmitField('Reset Password',render_kw={'class':"btn btn-primary btn-user btn-block"})
+
+class SettingsForm(FlaskForm):
+    multipleapps = BooleanField('Multiple Apps', render_kw={'class': "custom-control-input" } )
+    notifyme = BooleanField('Emails', render_kw={'class': "custom-control-input" } )
+    submit = SubmitField('Save',render_kw={'class':"btn btn-primary btn-user btn-block", "style":"width:100px" })
