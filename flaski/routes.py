@@ -217,6 +217,8 @@ def resetall():
         page="index"
     reset_all(session)
     ufolder=app.config['USERS_DATA']+str(current_user.id)+"/.sessions/"
+    if not os.path.isdir(ufolder):
+        os.makedirs(ufolder)
     files=os.listdir(ufolder)
     for f in files:
         os.remove(ufolder+f)
