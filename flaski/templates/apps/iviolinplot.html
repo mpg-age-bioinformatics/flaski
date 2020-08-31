@@ -232,7 +232,7 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 18px;"> ..or write: <input type="text" name=vp_color_rgb value="{{vp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
+                                            <label style="padding-left: 20px;"> ..or write: <input type="text" name=vp_color_rgb value="{{vp_color_rgb}}" style="width:218px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
@@ -275,7 +275,8 @@
                                                 <option value="{{vp_linecolor_}}" {% if vp_linecolor_==vp_linecolor %} selected {% endif %}>{{vp_linecolor_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 42px;">width: <input type="text" name=vp_linewidth value="{{vp_linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 18px;"> ..or write: <input type="vp_linecolor_rgb" name=vp_linecolor_rgb value="{{vp_linecolor_rgb}}" style="width:218px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 205px;"> width: <input type="text" name=vp_linewidth value="{{vp_linewidth}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                         </div>   
                                         
                                         <div class="row arg">
@@ -379,7 +380,7 @@
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 0px;"> ..or write: <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:300px;height:22px;padding-left: 4px;">
+                                            <label style="padding-left: 16px;"> ..or write: <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:221px;height:22px;padding-left: 4px;">
                                         </div>
                                         
                                         <div class="row arg">
@@ -398,11 +399,12 @@
                                                 <option value="{{bp_linecolor_}}" {% if bp_linecolor_==bp_linecolor %} selected {% endif %}>{{bp_linecolor_}}</option>
                                                 {% endfor %}
                                             </select></label>
-                                            <label style="padding-left: 13px;">Width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
+                                            <label style="padding-left: 18px;"> ..or write: <input type="bp_linecolor_rgb" name=bp_linecolor_rgb value="{{bp_linecolor_rgb}}" style="width:218px;height:22px;padding-left:4px;"></label>
+                                            <label style="padding-left: 160px;">Width: <input type="text" name=bp_linewidth value="{{bp_linewidth}}" style="width:80px;height:22px;padding-left: 4px;"></label>
                                         </div>
 
                                         <div class="row arg">
-                                            <label style="padding-left: 8px;">Boxmean: <select name=bp_boxmean val= "{{bp_boxmean}}" method="GET" action="/" style="width:80px;">
+                                            <label style="padding-left: 12px;">Boxmean: <select name=bp_boxmean val= "{{bp_boxmean}}" method="GET" action="/" style="width:80px;">
                                                 {% for bp_boxmean_ in boxmeans %}
                                                 <option value="{{bp_boxmean_}}" {% if bp_boxmean_==bp_boxmean %} selected {% endif %}>{{bp_boxmean_}}</option>
                                                 {% endfor %}
@@ -500,21 +502,21 @@
                                     <option value="{{points_}}" {% if points_ == points %} selected {% endif %}>{{points_}}</option>
                                 {% endfor %}
                                 </select></label>
-                                <label style="padding-left: 48px;"> Jitter: <input type="text" name=jitter value="{{jitter}}" style="width:50px;height:22px;padding-left: 4px;"></label>
+                                <label style="padding-left: 49px;"> Jitter: <input type="text" name=jitter value="{{jitter}}" style="width:50px;height:22px;padding-left: 4px;"></label>
 
                                 <label style="padding-left:3px;">Outliercolor: <select  name=marker_outliercolor value="{{marker_outliercolor }}" method="GET" action="/" style="width:80px;">
                                     {% for marker_outliercolor_ in colors %}
                                     <option value="{{marker_outliercolor_}}" {% if marker_outliercolor_==marker_outliercolor %} selected {% endif %}>{{marker_outliercolor_}}</option>
                                     {% endfor %}
                                 </select></label>
-                                <label style="padding-left: 27px;">Opacity: <input type="text" name=marker_opacity value="{{marker_opacity}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 29px;">Opacity: <input type="text" name=marker_opacity value="{{marker_opacity}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                 <label style="padding-left:28px;">Symbol: <select  name=marker_symbol value="{{marker_symbol }}" method="GET" action="/" style="width:80px;">
                                     {% for marker_symbol_ in marker_symbols %}
                                     <option value="{{marker_symbol_}}" {% if marker_symbol_==marker_symbol %} selected {% endif %}>{{marker_symbol_}}</option>
                                     {% endfor %}
                                 </select></label>
-                                <label style="padding-left: 50px;">Size: <input type="text" name=marker_size value="{{marker_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
-                                <label style="padding-left: 188px;">Position: <input type="text" name=pointpos value="{{pointpos}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 52px;">Size: <input type="text" name=marker_size value="{{marker_size}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 190px;">Position: <input type="text" name=pointpos value="{{pointpos}}" style="width:50px;height:22px;padding-left:4px;"></label>
 
 
                                 <div class="row arg">
@@ -524,7 +526,8 @@
                                         <option value="{{marker_line_color_}}" {% if marker_line_color_==marker_line_color %} selected {% endif %}>{{marker_line_color_}}</option>
                                         {% endfor %}
                                     </select></label>
-                                    <label style="padding-left: 40px;">Width: <input type="text" name=marker_line_width value="{{marker_line_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
+                                    <label style="padding-left: 18px;"> ..or write: <input type="marker_line_color_rgb" name=marker_line_color_rgb value="{{marker_line_color_rgb}}" style="width:218px;height:22px;padding-left:4px;"></label>
+                                    <label style="padding-left: 200px;">Width: <input type="text" name=marker_line_width value="{{marker_line_width}}" style="width:50px;height:22px;padding-left:4px;"></label>
                                     <label style="padding-left:2px;">Outliercolor: <select  name=marker_line_outliercolor value="{{marker_line_outliercolor }}" method="GET" action="/" style="width:80px;">
                                         {% for marker_line_outliercolor_ in colors %}
                                             <option value="{{marker_line_outliercolor_}}" {% if marker_line_outliercolor_==marker_line_outliercolor %} selected {% endif %}>{{marker_line_outliercolor_}}</option>

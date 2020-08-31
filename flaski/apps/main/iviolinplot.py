@@ -13,6 +13,22 @@ def GET_COLOR(x):
     else:
         return str(x)
 
+def GET_COLORLIST(rgb,fillcolor,tmp,pa,pab):
+    if pa[rgb] != "":
+        color=GET_COLOR(pa[rgb]).split(",")
+    else:
+        if pa[fillcolor]=="None":
+            if pab["hue"]==None:
+                color=[None]*len(tmp[pab["x_val"]].unique())
+            else:
+                color=[None]*2
+        else:
+            if pab["hue"]==None:
+                color=[pa[fillcolor]]*len(tmp[pab["x_val"]].unique())
+            else:
+                color=[pa[fillcolor]]*2
+    return color
+
 def make_figure(df,pa):
     """Generates figure.
 
@@ -92,55 +108,19 @@ def make_figure(df,pa):
     else:
         pab["vp_orient"]="v"
 
-    if pa["vp_color_rgb"] != "":
-        vp_color=GET_COLOR(pa["vp_color_rgb"]).split(",")
-    else:
-        if pa["vp_color_value"]=="None":
-            if pab["hue"]==None:
-                vp_color=[None]*len(tmp[pab["x_val"]].unique())
-            else:
-                vp_color=[None]*2
-        else:
-            if pab["hue"]==None:
-                vp_color=[pa["vp_color_value"]]*len(tmp[pab["x_val"]].unique())
-            else:
-                vp_color=[pa["vp_color_value"]]*2
-
-    if pa["bp_color_rgb"] != "":
-        bp_color=GET_COLOR(pa["bp_color_rgb"]).split(",")
-
-    else:
-        if pa["bp_color_value"]=="None":
-            if pab["hue"]==None:
-                bp_color=[None]*len(tmp[pab["x_val"]].unique())
-            else:
-                bp_color=[None]*2
-
-        else:
-            if pab["hue"]==None:
-                bp_color=[pa["bp_color_value"]]*len(tmp[pab["x_val"]].unique())
-            else:
-                bp_color=[pa["bp_color_value"]]*2
-    
-    if pa["marker_color_rgb"] != "":
-        marker_color=GET_COLOR(pa["marker_color_rgb"]).split(",")
-    else:
-        if pa["marker_fillcolor"]=="None":
-            if pab["hue"]==None:
-                marker_color=[None]*len(tmp[pab["x_val"]].unique())
-            else:
-                marker_color=[None]*2
-        else:
-            if pab["hue"]==None:
-                marker_color=[pa["marker_fillcolor"]]*len(tmp[pab["x_val"]].unique())
-            else:
-                marker_color=[pa["marker_fillcolor"]]*2
-
     if pa["bp_orient"]=="horizontal":
         pab["bp_orient"]="h"
     else:
         pab["bp_orient"]="v"
-    
+
+    vp_color=GET_COLORLIST("vp_color_rgb","vp_color_value",tmp,pa,pab)
+    bp_color=GET_COLORLIST("bp_color_rgb","bp_color_value",tmp,pa,pab)
+    marker_color=GET_COLORLIST("marker_color_rgb","marker_fillcolor",tmp,pa,pab)
+    vp_linecolor=GET_COLORLIST("vp_linecolor_rgb","vp_linecolor",tmp,pa,pab)   
+    bp_linecolor=GET_COLORLIST("bp_linecolor_rgb","bp_linecolor",tmp,pa,pab) 
+    marker_linecolor=GET_COLORLIST("marker_line_color_rgb","marker_line_color",tmp,pa,pab)
+
+
 
     #MAIN BODY
 
@@ -152,7 +132,6 @@ def make_figure(df,pa):
         hoverlabel=dict(bgcolor=pab["vp_hover_bgcolor"],bordercolor=pab["vp_hover_bordercolor"],\
             font=dict(family=pab["vp_hover_fontfamily"],size=pab["vp_hover_fontsize"],color=pab["vp_hover_fontcolor"]),\
             align=pa["vp_hover_align"])
-        line=dict(color=pab["vp_linecolor"],width=pab["vp_linewidth"])
 
         if pab["vp_meanline_width"]!=float(0):
             meanline=dict(visible=True,color=pab["vp_meanline_color"],width=pab["vp_meanline_width"])
@@ -163,9 +142,10 @@ def make_figure(df,pa):
         if pab["hue"]==None:
 
             if "Swarmplot" in pa["style"]:
-                for each,color,mcolor in zip(tmp[pab["x_val"]].unique(),vp_color,marker_color):
+                for each,color,mcolor,lcolor,mlcolor in zip(tmp[pab["x_val"]].unique(),vp_color,marker_color,vp_linecolor,marker_linecolor):
+                    line=dict(color=lcolor,width=pab["vp_linewidth"])
                     marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
-                    size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                    size=pab["marker_size"],color=mcolor,line=dict(color=mlcolor,width=pab["marker_line_width"],\
                     outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
                     fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
@@ -173,7 +153,8 @@ def make_figure(df,pa):
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"],\
                     points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
             else:
-                for each,color in zip(tmp[pab["x_val"]].unique(),vp_color):
+                for each,color,lcolor in zip(tmp[pab["x_val"]].unique(),vp_color,vp_linecolor):
+                    line=dict(color=lcolor,width=pab["vp_linewidth"])
                     fig.add_trace(go.Violin(y=tmp[pab["y_val"]],name=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
                     bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                     hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,side=pa["vp_side"],spanmode=pa["vp_span"]))
@@ -181,10 +162,12 @@ def make_figure(df,pa):
         else:
             if "Swarmplot" in pa["style"]:    
                 if pa["vp_mode"]=="group":
-                    for each,color,mcolor in zip(list(set(tmp[pab["hue"]])),vp_color,marker_color):
+                    for each,color,mcolor,lcolor in zip(list(set(tmp[pab["hue"]])),vp_color,marker_color,vp_linecolor):
+                        
+                        line=dict(color=lcolor,width=pab["vp_linewidth"])
 
                         marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
-                        size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                        size=pab["marker_size"],color=mcolor,line=dict(color=mlcolor,width=pab["marker_line_width"],\
                         outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
                         fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
@@ -194,10 +177,12 @@ def make_figure(df,pa):
                         points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
 
                 else:
-                    for each,side,color,mcolor in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color,marker_color):
+                    for each,side,color,mcolor,lcolor,mlcolor in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color,marker_color,vp_linecolor,marker_linecolor):
                         
+                        line=dict(color=lcolor,width=pab["vp_linewidth"])
+
                         marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
-                        size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                        size=pab["marker_size"],color=mcolor,line=dict(color=mlcolor,width=pab["marker_line_width"],\
                         outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
                         fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
@@ -207,13 +192,19 @@ def make_figure(df,pa):
                         points=pa["points"],marker=marker,pointpos=pab["pointpos"]))
             else:
                 if pa["vp_mode"]=="group":
-                    for each,color in zip(list(set(tmp[pab["hue"]])),vp_color):
+                    for each,color,lcolor in zip(list(set(tmp[pab["hue"]])),vp_color,vp_linecolor):
+                        
+                        line=dict(color=lcolor,width=pab["vp_linewidth"])
+
                         fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
                         legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
                         bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
                         hoverlabel=hoverlabel,fillcolor=color,line=line,meanline=meanline,spanmode=pa["vp_span"]))
                 else:
-                    for each,side,color in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color):
+                    for each,side,color,lcolor in zip(list(set(tmp[pab["hue"]])),["negative","positive"],vp_color,vp_linecolor):
+                        
+                        line=dict(color=lcolor,width=pab["vp_linewidth"])
+
                         fig.add_trace(go.Violin(y=tmp[pab["y_val"]][tmp[pab["hue"]] == each ],x=tmp[pab["x_val"]][tmp[pab["hue"]] == each ],\
                         legendgroup=each,name=each,scalegroup=each,text=vp_text,width=pab["vp_width"],orientation=pab["vp_orient"],\
                         bandwidth=pab["vp_bw"],opacity=pab["opacity"],hoverinfo=pa["vp_hoverinfo"],hoveron=pa["vp_hoveron"],\
@@ -233,14 +224,14 @@ def make_figure(df,pa):
 
         if "Swarmplot" in pa["style"]:
 
-            for each,color,mcolor in zip(tmp[pab["x_val"]].unique(),bp_color,marker_color):
+            for each,color,mcolor,lcolor,mlcolor in zip(tmp[pab["x_val"]].unique(),bp_color,marker_color,bp_linecolor,marker_linecolor):
                 marker=dict(outliercolor=pab["marker_outliercolor"],symbol=pa["marker_symbol"],opacity=pab["marker_opacity"],\
-                size=pab["marker_size"],color=mcolor,line=dict(color=pab["marker_line_color"],width=pab["marker_line_width"],\
+                size=pab["marker_size"],color=mcolor,line=dict(color=mlcolor,width=pab["marker_line_width"],\
                 outliercolor=pab["marker_line_outliercolor"],outlierwidth=pab["marker_line_outlierwidth"]))
 
                 fig.add_trace(go.Box(y=tmp[pab["y_val"]],name=each,opacity=pab["bp_opacity"],fillcolor=color,\
                 orientation=pab["bp_orient"],hoverinfo=pa["bp_hoverinfo"],hoveron=pa["bp_hoveron"],\
-                width=pab["bp_width"],line=dict(color=pab["bp_linecolor"],width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
+                width=pab["bp_width"],line=dict(color=lcolor,width=pab["bp_linewidth"]),boxmean=pab["bp_boxmean"],\
                 quartilemethod=pa["bp_quartilemethod"],text=bp_text,hoverlabel=hoverlabel,notched=pab["bp_notched"],\
                 boxpoints=pa["points"],marker=marker,pointpos=pab["pointpos"]))
 
@@ -504,6 +495,7 @@ def figure_defaults():
         "vp_hover_fontcolor":"None",\
         "vp_hover_align":"auto",\
         "vp_linecolor":"None",\
+        "vp_linecolor_rgb":"",\
         "vp_linewidth":"2.0",\
         "vp_meanline_width":"0.0",\
         "vp_meanline_color":"None",\
@@ -527,7 +519,8 @@ def figure_defaults():
         "marker_color_rgb":"",\
         "marker_fillcolor":"None",\
         "marker_line_color":"None",\
-        "marker_line_width":"0.0",\
+        "marker_line_color_rgb":"",\
+        "marker_line_width":"1.0",\
         "marker_line_outlierwidth":"1.0",\
         "marker_line_outliercolor":"None",\
         "bp_text":"",\
@@ -541,6 +534,7 @@ def figure_defaults():
         "bp_notchwidth":"0.25",\
         "bp_linewidth":"2.0",\
         "bp_linecolor":"None",\
+        "bp_linecolor_rgb":"",\
         "bp_boxmean":"False",\
         "boxmeans":STANDARD_BOXMEANS,\
         "points":"all",\
