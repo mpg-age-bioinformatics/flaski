@@ -24,10 +24,10 @@ sess.init_app(app)
 
 from flaski import routes, models, errors, storage, settings
 
-from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
+from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot, mds, tsne
 
 if app.config['INSTANCE'] != "latest" :
-    from flaski.apps.routes import ihistogram, mds, tsne, lifespan
+    from flaski.apps.routes import ihistogram, lifespan
 
 if not app.debug:
     if app.config['MAIL_SERVER']:
