@@ -10,6 +10,7 @@ Flaski provides:
 
 - interactive data analysis
 - user level authentication
+- Apps as plugins
 - session management 
 - server storage
 - Graphic User Interface to Programmatic Interface
