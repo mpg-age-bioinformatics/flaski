@@ -114,7 +114,7 @@ def iviolinplot(download=None):
 
             #IN CASE THE USER HAS NOT SELECTED X_VAL or Y_VAL
             if  plot_arguments["x_val"] == "None" or plot_arguments["y_val"]=="None":
-                sometext="Please a valid value to plot in your X and Y axes"
+                sometext="Please select a valid value to plot in your X and Y axes"
                 plot_arguments=session["plot_arguments"]
                 plot_arguments["vals"]=vals
                 flash(sometext,'info')
