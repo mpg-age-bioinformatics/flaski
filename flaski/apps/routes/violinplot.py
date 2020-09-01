@@ -107,8 +107,6 @@ def violinplot(download=None):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
                 return render_template('/apps/violinplot.html' , filename="Select file..", apps=apps,  **plot_arguments)
-
-            # if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
             
             # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             plot_arguments=read_request(request)
@@ -116,6 +114,14 @@ def violinplot(download=None):
             vals=plot_arguments["vals"]
             df=pd.read_json(session["df"])
             filename=session["filename"]
+
+            #IN CASE THE USER HAS NOT SELECTED X_VAL or Y_VAL
+            if  plot_arguments["x_val"] == "None" or plot_arguments["y_val"]=="None":
+                sometext="Please select a valid value to plot in your X and Y axes"
+                plot_arguments=session["plot_arguments"]
+                plot_arguments["vals"]=vals
+                flash(sometext,'info')
+                return render_template('/apps/iviolinplot.html' , filename=filename, apps=apps,**plot_arguments)
 
 
             #IN CASE THE USER HAS UNSELECTED ALL THE COLUMNS THAT WE NEED TO PLOT THE VIOLINPLOT
