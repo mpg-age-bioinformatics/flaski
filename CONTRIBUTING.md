@@ -55,11 +55,11 @@ Each app is made of 3 parts, `main`, `routes`, and `templates`:
 .       .
 .       .
 ```
-If adding new apps don't forget to edit `flaski/__init__.py` accordingly:
+If adding new apps don't forget to edit `flaski/apps/base.py` accordingly:
 ```python
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram
 ```
-and to add the app description to `flaski/routes.py`:
+and to add the app description:
 ```python
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
         { "name":"iScatter plot", "id":'iscatterplot_more',"link":'iscatterplot' ,"java":"javascript:ReverseDisplay('iscatterplot_more')", "description":"An intreactive scatterplot app."},\
@@ -67,8 +67,21 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"iHeatmap", "id":'iheatmap_more',"link":'iheatmap' ,"java":"javascript:ReverseDisplay('iheatmap_more')", "description":"An interactive heatmap plotting app."},\
         { "name":"Venn diagram", "id":'venndiagram_more',"link":'venndiagram' ,"java":"javascript:ReverseDisplay('venndiagram_more')", "description":"A venn diagram plotting app."} ]
 ```
-If you're adding private apps to your deployment ie. apps that will only be available to certain users do not edit `flaski/__init__.py` but instead add the app description to `utils/private.apps.tsv`.
+If you're adding private apps to your deployment ie. apps that will only be available to certain users do not edit `flaski/apps/base.py` but instead add the app description to `utils/private.apps.tsv`.
 Use `all` for all logged in users and `#domain.com` if you want to add users from a specific email domain.
+
+If you wish to have your own developed Apps added as plugins to flaski you can do this by adding them to `flaski/apps/external.py` instead of `flaski/apps/base.py`:
+```python
+from flaski.apps.routes import histogram
+EXTERNAL_APPS=[{ "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A histogram."}]
+```
+For convenience you might want to simply edit the `docker-compose.yml` and/or `production.yml` accordingly:
+```
+  volumes:
+   - ~/histogram/route.py:/flaski/flaski/apps/routes/histogram.py
+   - ~/histogram/main.py:/flaski/flaski/apps/main/histogram.py
+   - ~/histogram/external.py:/flaski/flaski/apps/external.py
+```
 
 ### jupyter
 
