@@ -13,5 +13,4 @@
 #    - ~/histogram/external.py:/flaski/flaski/apps/external.py
 #
 ###########################################################################
-from flaski.apps.routes import idendrogram
-EXTERNAL_APPS=[{ "name":"iDendrogram", "id":'idendrogram',"link":'idendrogram' ,"java":"javascript:ReverseDisplay('idendrogram_more')", "description":"An interactive Dendrogram app."}] #,\ #,\]
+EXTERNAL_APPS=[]
