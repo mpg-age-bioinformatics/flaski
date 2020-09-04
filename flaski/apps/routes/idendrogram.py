@@ -78,11 +78,6 @@ def idendrogram(download=None):
                 if allowed_file(inputfile.filename):
 
                     df=read_tables(inputfile)
-                    cols=df.columns.tolist()
-                    vals=[None]+cols
-                                    
-                    session["plot_arguments"]["cols"]=cols
-                    session["plot_arguments"]["vals"]=vals
                     plot_arguments=session["plot_arguments"]
                     # plot_arguments=read_request(request)
 
@@ -106,7 +101,6 @@ def idendrogram(download=None):
             # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             plot_arguments=read_request(request)
             # vals=request.form.getlist("vals")
-            vals=plot_arguments["vals"]
             df=pd.read_json(session["df"])
             filename=session["filename"]
                             

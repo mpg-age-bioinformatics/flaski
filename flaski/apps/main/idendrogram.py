@@ -18,15 +18,9 @@ def GET_COLORLIST(rgb,fillcolor,tmp,pa,pab):
         color=GET_COLOR(pa[rgb]).split(",")
     else:
         if pa[fillcolor]=="None":
-            if pab["hue"]==None:
-                color=[None]*len(tmp[pab["x_val"]].unique())
-            else:
-                color=[None]*2
+            color=[None]
         else:
-            if pab["hue"]==None:
-                color=[pa[fillcolor]]*len(tmp[pab["x_val"]].unique())
-            else:
-                color=[pa[fillcolor]]*2
+            color=[pa[fillcolor]]
     return color
 
 def make_figure(df,pa):
@@ -41,10 +35,7 @@ def make_figure(df,pa):
         
     """
     #UPLOAD ARGUMENTS
-    vals=pa["vals"].copy()
-    vals.remove(None)
     tmp=df.copy()
-    tmp=tmp[vals]
 
     fig = go.Figure( )
 
@@ -52,14 +43,14 @@ def make_figure(df,pa):
     #Load checkboxes
     pab={}
     for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis",\
-        "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis","bp_notched"]:
+        "tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
             pab[arg]=True
     
     #Load booleans
-    booleans=["bp_boxmean","display_points"]
+    booleans=[]
     for arg in booleans:
         if pa[arg]=="False":
             pab[arg]=False
@@ -69,12 +60,9 @@ def make_figure(df,pa):
             pab[arg]=pa[arg]
 
     #Load floats
-    floats=["x","y","axis_line_width","ticks_line_width","opacity",\
-        "ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
+    floats=["color_threshold","x","y","axis_line_width","ticks_line_width","opacity","ticks_length","x_lower_limit","x_upper_limit","y_lower_limit","y_upper_limit","spikes_thickness","xticks_rotation",\
         "yticks_rotation","xticks_fontsize","yticks_fontsize","grid_width","legend_borderwidth","legend_tracegroupgap","legend_x",\
-        "legend_y","fig_width","fig_height","vp_width","vp_bw","vp_linewidth","pointpos","jitter","vp_meanline_width","vp_gap","vp_groupgap",\
-        "marker_opacity","marker_size","marker_line_width","marker_line_outlierwidth","bp_opacity","bp_width","bp_linewidth",\
-        "bp_whiskerwidth","bp_notchwidth"]
+        "legend_y","fig_width","fig_height","marker_opacity","marker_size","marker_line_width","marker_line_outlierwidth"]
 
     for a in floats:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
@@ -83,8 +71,7 @@ def make_figure(df,pa):
             pab[a]=float(pa[a])
 
     #Load integers
-    integers=["label_fontsize","legend_fontsize","legend_title_fontsize","title_fontsize","maxxticks","maxyticks",\
-        "vp_hover_fontsize","bp_hover_fontsize"]
+    integers=["label_fontsize","legend_fontsize","legend_title_fontsize","title_fontsize","maxxticks","maxyticks"]
     for a in integers:
         if pa[a] == "" or pa[a]=="None" or pa[a]==None:
             pab[a]=None
@@ -92,34 +79,23 @@ def make_figure(df,pa):
             pab[a]=int(pa[a])
 
     #Load Nones
-    possible_nones=["x_val","y_val","hue","title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
+    possible_nones=["title_fontcolor","axis_line_color","ticks_color","spikes_color","label_fontcolor",\
     "paper_bgcolor","plot_bgcolor","grid_color","legend_bgcolor","legend_bordercolor","legend_fontcolor","legend_title_fontcolor",\
-    "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily","vp_hover_bgcolor","vp_hover_bordercolor",\
-    "vp_hover_fontfamily","vp_hover_fontcolor","vp_linecolor","vp_meanline_color","marker_outliercolor","marker_fillcolor",\
-    "marker_line_color","marker_line_outliercolor","bp_linecolor","bp_hover_bgcolor","bp_hover_bordercolor","bp_hover_fontfamily","bp_hover_fontcolor",]
+    "title_fontfamily","label_fontfamily","legend_fontfamily","legend_title_fontfamily","marker_outliercolor","marker_fillcolor",\
+    "marker_line_color","marker_line_outliercolor"]
     for p in possible_nones:
         if pa[p] == "None" or pa[p]=="Default" :
             pab[p]=None
         else:
             pab[p]=pa[p]
 
-    if pa["vp_orient"]=="horizontal":
-        pab["vp_orient"]="h"
+    #MAIN BODY
+    color=GET_COLORLIST("color_rgb","color_value",tmp,pa,pab)
+    if pa["labels"]!="":
+        labels=pa["labels"].split(",")
     else:
-        pab["vp_orient"]="v"
-
-    if pa["bp_orient"]=="horizontal":
-        pab["bp_orient"]="h"
-    else:
-        pab["bp_orient"]="v"
-
-    vp_color=GET_COLORLIST("vp_color_rgb","vp_color_value",tmp,pa,pab)
-    bp_color=GET_COLORLIST("bp_color_rgb","bp_color_value",tmp,pa,pab)
-    marker_color=GET_COLORLIST("marker_color_rgb","marker_fillcolor",tmp,pa,pab)
-    vp_linecolor=GET_COLORLIST("vp_linecolor_rgb","vp_linecolor",tmp,pa,pab)   
-    bp_linecolor=GET_COLORLIST("bp_linecolor_rgb","bp_linecolor",tmp,pa,pab) 
-    marker_linecolor=GET_COLORLIST("marker_line_color_rgb","marker_line_color",tmp,pa,pab)
-
+        labels=None
+    fig=ff.create_dendrogram(tmp,orientation=pa["orientation"],colorscale=color,color_threshold=pab["color_threshold"],labels=labels)
 
     #UPDATE LAYOUT OF PLOTS
     #Figure size
@@ -133,11 +109,6 @@ def make_figure(df,pa):
 
 
     #Update axes
-    
-    if pa["log_scale"]==True and pa["orientation"]=="vertical":
-        fig.update_yaxes(type="log")
-    elif pa["log_scale"]==True and pa["orientation"]=="horizontal":
-        fig.update_xaxes(type="log")
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"])
@@ -254,7 +225,6 @@ def make_figure(df,pa):
     return fig
 
 STANDARD_SIZES=[str(i) for i in list(range(1,101))]
-STANDARD_STYLES=["Violinplot","Boxplot","Violinplot and Swarmplot","Boxplot and Swarmplot"]
 STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","beige",\
     "bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood",\
     "cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk",\
@@ -278,7 +248,7 @@ STANDARD_COLORS=["None","aliceblue","antiquewhite","aqua","aquamarine","azure","
     "whitesmoke","yellow","yellowgreen"]
 LINE_STYLES=["solid", "dot", "dash", "longdash", "dashdot","longdashdot"]
 STANDARD_BARMODES=["stack", "group","overlay","relative"]
-STANDARD_ORIENTATIONS=['vertical','horizontal']
+STANDARD_ORIENTATIONS=['top','right','bottom','left']
 STANDARD_ALIGNMENTS=["left","right","auto"]
 STANDARD_VERTICAL_ALIGNMENTS=["top", "middle","bottom"]
 STANDARD_FONTS=["Arial", "Balto", "Courier New", "Default", "Droid Sans", "Droid Serif", "Droid Sans Mono",\
@@ -288,8 +258,6 @@ LEGEND_LOCATIONS=['best','upper right','upper left','lower left','lower right','
 MODES=["expand",None]
 STANDARD_HOVERINFO=["x", "y", "z", "text", "name","all","none","skip","x+y","x+text","x+name",\
                     "y+text","y+name","text+name","x+y+name","x+y+text","x+text+name","y+text+name"]
-STANDARD_VP_HOVERONS=["violins", "points", "kde","violins+points", "violins+kde","points+kde","violins+points+kde", "all" ]
-STANDARD_BP_HOVERONS=["boxes","points","boxes+points"]
 STANDARD_ERRORBAR_TYPES=["percent","constant","sqrt"]
 STANDARD_REFERENCES=["container","paper"]
 STANDARD_TITLE_XANCHORS=["auto","left","center","right"]
@@ -351,51 +319,23 @@ def figure_defaults():
 
     plot_arguments={"fig_width":"600.0",\
         "fig_height":"600.0",\
-        "title":'iViolin plot',\
+        "title":'iDendrogram plot',\
         "title_fontsize":"20",\
         "title_fontfamily":"Default",\
         "title_fontcolor":"None",\
         "titles":"20.0",\
         "opacity":"1.0",\
-        "style":"violinplot",\
-        "styles":STANDARD_STYLES,\
         "paper_bgcolor":"white",\
         "plot_bgcolor":"white",\
+        "color_value":"None",\
+        "color_rgb":"",\
+        "hover_text":"",\
+        "color_threshold":"",\
+        "labels":"",\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "references":STANDARD_REFERENCES,\
-        "vp_text":"",\
-        "vp_width":"0.0",\
-        "vp_orient":"vertical",\
-        "vp_color_rgb":"",\
-        "vp_color_value":"None",\
-        "vp_bw":"",\
-        "vp_hoverinfo":"all",\
-        "vp_hoveron":"violins+points+kde",\
-        "vp_hoverons":STANDARD_VP_HOVERONS,\
-        "vp_hover_bgcolor":"None",\
-        "vp_hover_bordercolor":"None",\
-        "vp_hover_fontfamily":"Default",\
-        "vp_hover_fontsize":"12",\
-        "vp_hover_fontcolor":"None",\
-        "vp_hover_align":"auto",\
-        "vp_linecolor":"None",\
-        "vp_linecolor_rgb":"",\
-        "vp_linewidth":"2.0",\
-        "vp_meanline_width":"0.0",\
-        "vp_meanline_color":"None",\
-        "vp_scalemode":"width",\
-        "vp_span":"soft",\
-        "spans":["soft","hard"],\
-        "vp_side":"both",\
-        "vp_sides":["both","positive","negative"],\
-        "violinmodes":STANDARD_VIOLINMODES,\
-        "vp_mode":"overlay",\
-        "vp_groupgap":"0.3",\
-        "vp_gap":"0.3",\
         "scalemodes":STANDARD_SCALEMODES,\
-        "pointpos":"0.0",\
-        "jitter":"0.5",\
         "marker_symbol":"circle",\
         "marker_symbols":STANDARD_SYMBOLS,\
         "marker_outliercolor":"None",\
@@ -408,33 +348,6 @@ def figure_defaults():
         "marker_line_width":"1.0",\
         "marker_line_outlierwidth":"1.0",\
         "marker_line_outliercolor":"None",\
-        "bp_text":"",\
-        "bp_opacity":"1.0",\
-        "bp_color_rgb":"",\
-        "bp_color_value":"None",\
-        "bp_orient":"vertical",\
-        "bp_width":"0.0",\
-        "bp_notched":"off",\
-        "bp_whiskerwidth":"0.5",\
-        "bp_notchwidth":"0.25",\
-        "bp_linewidth":"2.0",\
-        "bp_linecolor":"None",\
-        "bp_linecolor_rgb":"",\
-        "bp_boxmean":"False",\
-        "boxmeans":STANDARD_BOXMEANS,\
-        "points":"all",\
-        "display_points":STANDARD_POINTS,\
-        "quartilemethods":["linear","exclusive","inclusive"],\
-        "bp_quartilemethod":"linear",\
-        "bp_hoverinfo":"all",\
-        "bp_hoveron":"boxes+points",\
-        "bp_hoverons":STANDARD_BP_HOVERONS,\
-        "bp_hover_bgcolor":"None",\
-        "bp_hover_bordercolor":"None",\
-        "bp_hover_fontfamily":"Default",\
-        "bp_hover_fontsize":"12",\
-        "bp_hover_fontcolor":"None",\
-        "bp_hover_align":"auto",\
         "xref":"container",\
         "yref":"container",\
         "x":"0.5",\
@@ -448,19 +361,15 @@ def figure_defaults():
         "axis_line_color":"lightgrey",\
         "ticks_line_width":1.0,\
         "ticks_color":"lightgrey",\
-        "cols":[],\
         "groups":[],\
-        "vals":[],\
-        "hue":None,\
-        "x_val":None,\
-        "y_val":None,\
         "groups_settings":dict(),\
         "log_scale":".off",\
         "fonts":STANDARD_FONTS,\
         "colors":STANDARD_COLORS,\
         "linestyles":LINE_STYLES,\
         "linestyle_value":"",\
-        "orientations":STANDARD_ORIENTATIONS, \
+        "orientations":STANDARD_ORIENTATIONS,\
+        "orientation":"bottom",\
         "fontsizes":STANDARD_SIZES,\
         "xlabel_size":STANDARD_SIZES,\
         "ylabel_size":STANDARD_SIZES,\
@@ -515,6 +424,7 @@ def figure_defaults():
         "legend_title_fontsize":"12",\
         "legend_title_fontcolor":"None",\
         "legend_orientation":"vertical",\
+        "legend_orientations":["vertical","horizontal"],\
         "traceorders":STANDARD_TRACEORDERS,\
         "legend_traceorder":"normal",\
         "legend_tracegroupgap":"10",\
@@ -530,10 +440,10 @@ def figure_defaults():
         "legend_side":"left",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
-        "downloadn":"iviolinplot",\
-        "session_downloadn":"MySession.iviolinplot.plot",\
+        "downloadn":"idendrogram",\
+        "session_downloadn":"MySession.idendrogram.plot",\
         "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.iviolinplot.plot",\
+        "session_argumentsn":"MyArguments.idendrogram.plot",\
         "inputargumentsfile":"Select file.."
     }
     return plot_arguments
