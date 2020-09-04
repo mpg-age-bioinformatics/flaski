@@ -79,7 +79,7 @@ def idendrogram(download=None):
 
                     df=read_tables(inputfile)
                     plot_arguments=session["plot_arguments"]
-                    # plot_arguments=read_request(request)
+                    plot_arguments=read_request(request)
 
                     # flash(sometext,'info')
                     return render_template('/apps/idendrogram.html' , filename=filename, apps=apps,**plot_arguments)

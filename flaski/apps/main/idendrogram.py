@@ -2,6 +2,8 @@
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
+from scipy.spatial.distance import pdist
+import scipy.cluster.hierarchy as sch
 from collections import OrderedDict
 import numpy as np
 
@@ -95,7 +97,9 @@ def make_figure(df,pa):
         labels=pa["labels"].split(",")
     else:
         labels=None
-    fig=ff.create_dendrogram(tmp,orientation=pa["orientation"],colorscale=color,color_threshold=pab["color_threshold"],labels=labels)
+
+    fig=ff.create_dendrogram(tmp,orientation=pa["orientation"],colorscale=color,color_threshold=pab["color_threshold"],labels=labels,\
+        distfun=lambda x: pdist(x, pa["dist_func"]),linkagefun=lambda x: sch.linkage(x, pa["link_func"]))
 
     #UPDATE LAYOUT OF PLOTS
     #Figure size
@@ -295,9 +299,10 @@ STANDARD_SYMBOLS=["0","circle","100","circle-open","200","circle-dot","300","cir
     "hash","136","hash-open","236","hash-dot","336","hash-open-dot","37","y-up","137","y-up-open","38","y-down","138",\
     "y-down-open","39","y-left","139","y-left-open","40","y-right","140","y-right-open","41","line-ew","141","line-ew-open",\
     "42","line-ns","142","line-ns-open","43","line-ne","143","line-ne-open","44","line-nw","144","line-nw-open"]
-STANDARD_BOXMEANS=["True","sd","False"]
-STANDARD_POINTS=["all","outliers","suspectedoutliers"]
-STANDARD_VIOLINMODES=["group","overlay"]
+STANDARD_DISTFUNCS=['braycurtis','canberra','chebyshev','cityblock','correlation','cosine','dice','euclidean','hamming','jaccard', \
+    'jensenshannon','kulsinski', 'mahalanobis','matching','minkowski', 'rogerstanimoto', 'russellrao','seuclidean', \
+    'sokalmichener','sokalsneath', 'sqeuclidean','yule']
+STANDARD_LINKAGE=["single","complete","average","weighted","centroid","median","ward"]
 def figure_defaults():
 
     """Generates default figure arguments.
@@ -332,6 +337,10 @@ def figure_defaults():
         "hover_text":"",\
         "color_threshold":"",\
         "labels":"",\
+        "dist_func":"euclidean",\
+        "dist_funcs":STANDARD_DISTFUNCS,\
+        "link_func":"single",\
+        "link_funcs":STANDARD_LINKAGE,\
         "hoverinfos":STANDARD_HOVERINFO,\
         "hover_alignments":STANDARD_ALIGNMENTS,\
         "references":STANDARD_REFERENCES,\
