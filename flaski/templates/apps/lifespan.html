@@ -111,6 +111,8 @@
             <!-- -------------------- ANALYSIS SETTING ARGUMENTS ---------------------- -->
 
             <!-- Nav Item - Pages Collapse Menu -->
+
+            {% if groups_value == "None" %}
             <li class="nav-item" style="padding-bottom: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSettings" aria-expanded="true" aria-controls="collapseSettings">
                     <i class="fas fa-fw fa-cog"></i>
@@ -137,37 +139,173 @@
                 </div>
             </li>
 
+            {% endif %}
+
             {% if groups_value != "None" %}
                 {% for group_h in groups_settings %}
 
                     <li class="nav-item" style="padding-top: 0px;">
                         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group_h.name}}" aria-expanded="true" aria-controls="collapse{{group_h.name}}" style="padding-top: 0px;">
                             <i class="fas fa-fw fa-cog"></i>
-                            <span>Line: {{group_h.name}}</span>
+                            <span>Model Settings: {{group_h.name}}</span>
                         </a>
                         <div id="collapse{{group_h.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                             <div class="bg-white py-2 collapse-inner rounded openmenu"> 
                                 <div class="row arguments">
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label style="width:60px">Estimate:</label>
+                                            <label style="padding-left:0x;padding-right:4px;"><input type="checkbox" name="{{group_h.name}}.Conf_Interval" {% if group_h.Conf_Interval=="on" %} checked {% elif group_h.Conf_Interval==".on" %} checked {% endif %}/> Show Confidence Intervals </label>
+                                            <label style="padding-left:19px;padding-right:4px;"><input type="checkbox" name="{{group_h.name}}.show_censors" {% if group_h.show_censors=="on" %} checked {% elif group_h.show_censors==".on" %} checked {% endif %}/> Show censors </label>
+                                            <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="{{group_h.name}}.ci_legend" {% if group_h.ci_legend=="on" %} checked {% elif group_h.ci_legend==".on" %} checked {% endif %}/> Show legend </label>
+                                            <label style="padding-left:19px;padding-right:0px;"><input type="checkbox" name="{{group_h.name}}.ci_force_lines" {% if group_h.ci_force_lines=="on" %} checked {% elif group_h.ci_force_lines==".on" %} checked {% endif %}/> Plot Confidence Interval lines</label>
+                                        </div>
+                                    </div>
+        
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label>Confidence Interval alpha: <input type="text" name="{{group_h.name}}.ci_alpha" value='{{ group_h.ci_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row arg">
+                                        <div class="row arg"></div>
+                                            <label>Marker shape: <select name={{group_h.name}}.censor_marker_value method="GET" action="/" style="width:50px">
+                                                {% for markerstyles_ in censor_marker %}
+                                                    <option value="{{markerstyles_}}" {% if markerstyles_==group_h.censor_marker_value %} selected {% endif %}>{{markerstyles_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label> Marker size: <select name={{group_h.name}}.censor_marker_size_val method="GET" action="/" style="width:50px">
+                                                {% for marker_size_ in censor_marker_size %}
+                                                    <option value="{{marker_size_}}" {% if marker_size_==group_h.censor_marker_size_val %} selected {% endif %}>{{marker_size_}}</option>
+                                                {% endfor %}
+                                            </select>
+            
+                                            <label>..or <select name={{group_h.name}}.censor_marker_size_col method="GET" action="/" style="width:120px">
+                                                {% for markersizes_cols_ in censor_marker_size_cols %}
+                                                    <option value="{{markersizes_cols_}}" {% if markersizes_cols_==group_h.censor_marker_size_col %} selected {% endif %}>{{markersizes_cols_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
                                     
                                     <div class="row arg">
                                         <div class="row arg">
-                                            <label> line color: <select name={{group_h.name}}.line_color_value method="GET" action="/" style="width:80px">
+                                            <label> Marker edge width: <select name={{group_h.name}}.edge_linewidth method="GET" action="/" style="width:50px">
+                                                {% for edge_linewidth_ in edge_linewidths %}
+                                                    <option value="{{edge_linewidth_}}" {% if edge_linewidth_==group_h.edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
+                                                {% endfor %}
+                                            </select>
+            
+                                            <label> ..or <select name={{group_h.name}}.edge_linewidth_col method="GET" action="/" style="width:120px">
+                                                {% for edge_linewidth_col_ in edge_linewidth_cols %}
+                                                    <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==group_h.edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label> Marker face color: <select name={{group_h.name}}.markerc method="GET" action="/" style="width:60px">
+                                                {% for markerc_ in marker_color %}
+                                                    <option value="{{markerc_}}" {% if markerc_==group_h.markerc %} selected {% endif %}>{{markerc_}}</option>"
+                                                {% endfor %}
+                                            </select>
+                                            <label> ..or <select name={{group_h.name}}.markerc_col method="GET" action="/" style="width:120px">
+                                                {% for markerc_col_ in markerc_cols %}
+                                                    <option value="{{markerc_col_}}" {% if markerc_col_==group_h.markerc_col %} selected {% endif %}>{{markerc_col_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="row arg" style="padding-bottom:6px;">
+                                            <label style="padding-left:8px;"> ..or write a color name <input type="text" name={{group_h.name}}.markerc_write value="{{group_h.markerc_write}}" style="width:155px;height:22px;padding-left: 4px">
+                                    </div>
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label> Marker edge color: <select name={{group_h.name}}.edgecolor method="GET" action="/" style="width:60px">
+                                                {% for edgecolor_ in edge_colors %}
+                                                    <option value="{{edgecolor_}}" {% if edgecolor_==group_h.edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
+                                                {% endfor %}
+                                            </select>
+                                            <label> ..or <select name={{group_h.name}}.edgecolor_col method="GET" action="/" style="width:120px">
+                                                {% for edgecolor_col_ in edgecolor_cols %}
+                                                    <option value="{{edgecolor_col_}}" {% if edgecolor_col_==group_h.edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="row arg" style="padding-bottom:6px;">
+                                            <label style="padding-left:8px;"> ..or write a color name <input type="text" name={{group_h.name}}.edgecolor_write value="{{group_h.edgecolor_write}}" style="width:155px;height:22px;padding-left: 4px">
+                                    </div>
+
+                                    <div class="row arg">   
+                                        <div class="row arg">
+                                            <label>Marker alpha: <input type="text" name="{{group_h.name}}.marker_alpha" value='{{ group_h.marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label> 
+            
+                                            <!-- <label style="padding-left:1px;">&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px">
+                                                {% for markeralpha_col_ in markeralpha_col %}
+                                                    <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
+                                                {% endfor %}
+                                            </select></label> -->
+                                        </div>
+            
+                                    </div>
+
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label> Line style: <select name={{group_h.name}}.linestyle_value method="GET" action="/" style="width:80px">
+                                                {% for linestyle_ in linestyles %}
+                                                    <option value="{{linestyle_}}" {% if linestyle_==group_h.linestyle_value %} selected {% endif %}>{{linestyle_}}</option>"
+                                                {% endfor %}
+                                            </select>
+                                            <label> ..or <select name={{group_h.name}}.linestyle_col method="GET" action="/" style="width:128px">
+                                                {% for linestyle_col_ in linestyle_cols %}
+                                                    <option value="{{linestyle_col_}}" {% if linestyle_col_==group_h.linestyle_col %} selected {% endif %}>{{linestyle_col_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="row arg" style="padding-bottom:6px;">
+                                            <label> ..or write a linestyle name <input type="text" name={{group_h.name}}.linestyle_write value="{{group_h.linestyle_write}}" style="width:155px;height:22px;padding-left: 4px">
+                                    </div>
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <label> Line color: <select name={{group_h.name}}.line_color_value method="GET" action="/" style="width:80px">
                                                 {% for linecolor_ in line_colors %}
                                                     <option value="{{linecolor_}}" {% if linecolor_==group_h.line_color_value %} selected {% endif %}>{{linecolor_}}</option>"
                                                 {% endfor %}
                                             </select>
-
-                                            <label> ..or, <select name={{group_h.name}}.linecolor_col method="GET" action="/" style="width:128px">
+                                            <label> ..or <select name={{group_h.name}}.linecolor_col method="GET" action="/" style="width:128px">
                                                 {% for linecolor_col_ in linecolor_cols %}
                                                     <option value="{{linecolor_col_}}" {% if linecolor_col_==group_h.linecolor_col %} selected {% endif %}>{{linecolor_col_}}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                         <div class="row arg" style="padding-bottom:6px;">
-                                            <label> ..or, write a color name <input type="text" name={{group_h.name}}.linecolor_write value="{{group_h.linecolor_write}}" style="width:155px;height:22px;padding-left: 4px">
-                                        
-                                        
+                                            <label> ..or write a color name <input type="text" name={{group_h.name}}.linecolor_write value="{{group_h.linecolor_write}}" style="width:155px;height:22px;padding-left: 4px">
                                     </div>
+
+                                    <div class="row arg">
+                                        <div class="row arg">
+                                            <div class="row arg" style="padding-bottom:6px;">
+                                                <label> Line width <input type="text" name={{group_h.name}}.linewidth_write value="{{group_h.linewidth_write}}" style="width:80px;height:22px;padding-left: 4px">
+                                            <label> ..or <select name={{group_h.name}}.linewidth_col method="GET" action="/" style="width:128px">
+                                                {% for linewidth_col_ in linewidth_cols %}
+                                                    <option value="{{linewidth_col_}}" {% if linewidth_col_==group_h.linewidth_col %} selected {% endif %}>{{linewidth_col_}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div> 
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -204,7 +342,7 @@
                                 </select></label>
                             </div>
 
-                            <div class="row arg">
+                            <!-- <div class="row arg">
                                 <label>Linestyle: <select name=linestyle_value method="GET" action="/" style="width:115px;padding-left:4px">
                                     {% for ls_ in linestyles %}
                                         <option value="{{ls_}}" {% if ls_==linestyle_value %} selected {% endif %}>{{ls_}}</option>
@@ -214,16 +352,8 @@
 
                             <div class="row arg">
                                 <label>Linewidth: <input type="text" name="linewidth" value='{{ linewidth }}' style="width:98px;height:22px;padding-left: 4px"></label>
-                            </div>
-
-                            <!-- <div class="row arg">
-                                <label>Color: <select name=line_color_value method="GET" action="/" style="width:115px;padding-left:4px">
-                                    {% for lc_ in line_color %}
-                                        <option value="{{lc_}}" {% if censors_==line_color_value %} selected {% endif %}>{{lc_}}</option>
-                                    {% endfor %}
-                                </select>
                             </div> -->
-                        
+
                         </div>
                     </div>
                 </div>
@@ -346,7 +476,7 @@
 
             <!-- -------------------- MARKER ARGUMENTS ---------------------- -->
 
-            <li class="nav-item" style="padding-top: 0px;">
+            <!-- <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMarker" aria-expanded="true" aria-controls="collapseMarker" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Censor Marker</span>
@@ -362,11 +492,11 @@
                                     {% endfor %}
                                 </select>
 
-                                <!-- <label> ..or, <select name=markersizes_col method="GET" action="/" style="width:189px">
+                                <label> ..or, <select name=markersizes_col method="GET" action="/" style="width:189px">
                                     {% for markersizes_cols_ in markersizes_cols %}
                                         <option value="{{markersizes_cols_}}" {% if markersizes_cols_==markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
                                     {% endfor %}
-                                </select> -->
+                                </select>
                             </div>
 
                             <div class="row arg">
@@ -376,11 +506,11 @@
                                     {% endfor %}
                                 </select>
 
-                                <!-- <label> ..or, <select name=markerc_col method="GET" action="/" style="width:153px">
+                                <label> ..or, <select name=markerc_col method="GET" action="/" style="width:153px">
                                     {% for markerc_cols_ in markerc_cols %}
                                         <option value="{{markerc_cols_}}" {% if markerc_cols_==markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
                                     {% endfor %}
-                                </select> -->
+                                </select>
                             </div>
 
                             <div class="row arg" style="padding-bottom:6px;">
@@ -394,11 +524,11 @@
                                     {% endfor %}
                                 </select>
 
-                                <!-- <label> ..or, <select name=edge_linewidth_col method="GET" action="/" style="width:152px">
+                                <label> ..or, <select name=edge_linewidth_col method="GET" action="/" style="width:152px">
                                     {% for edge_linewidth_col_ in edge_linewidth_cols %}
                                         <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
                                     {% endfor %}
-                                </select> -->
+                                </select>
                             </div>
 
                             <div class="row arg">
@@ -409,11 +539,11 @@
                                         {% endfor %}
                                     </select>
     
-                                    <!-- <label> ..or, <select name=edgecolor_col method="GET" action="/" style="width:128px">
+                                    <label> ..or, <select name=edgecolor_col method="GET" action="/" style="width:128px">
                                         {% for edgecolor_col_ in edgecolor_cols %}
                                             <option value="{{edgecolor_col_}}" {% if edgecolor_col_==edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
                                         {% endfor %}
-                                    </select> -->
+                                    </select>
                                 </div>
     
                                 <div class="row arg" style="padding-bottom:6px;">
@@ -427,30 +557,30 @@
                                     {% endfor %}
                                 </select>
 
-                                <!-- <label>&nbsp;..or, <select name=markerstyles_col method="GET" action="/" style="width:172px">
+                                <label>&nbsp;..or, <select name=markerstyles_col method="GET" action="/" style="width:172px">
                                     {% for markerstyles_cols_ in markerstyles_cols %}
                                         <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
                                     {% endfor %}
-                                </select> -->
+                                </select>
 
                             </div>
 
                             <div class="row arg">
                                 <label>marker alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label> 
 
-                                <!-- <label style="padding-left:1px;">&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px">
+                                <label style="padding-left:1px;">&nbsp;..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px">
                                     {% for markeralpha_col_ in markeralpha_col %}
                                         <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
                                     {% endfor %}
-                                </select></label> -->
+                                </select></label>
                             </div>
 
                         </div>
                     </div>
                 </div>
-            </li>
+            </li> -->
 
-            {% endif %}
+            <!-- {% endif %} -->
 
             <!-- Divider -->
             <hr class="sidebar-divider">
