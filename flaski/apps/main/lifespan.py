@@ -158,6 +158,7 @@ def make_figure(df,pa):
         cph.fit(df_dummy, duration_col='day', event_col='status')
         
         cph_coeff=cph.summary
+        cph_coeff=cph_coeff.reset_index()
 
         df_info={}
         df_info['model']='lifelines.CoxPHFitter'
@@ -178,17 +179,12 @@ def make_figure(df,pa):
         cph_stats=cph_stats.rename(columns={0:'Statistic',1:'Value'})
         #cph_stats
 
-        #groups = df_ls[pa["groups_value"]]
         tmp=[]
-        #for cond in list(set(df_ls[pa["groups_value"]].tolist())):
         
         for cond in pa["list_of_groups"]:
-            #ix = (groups == cond)
             df_tmp=df_ls.loc[df_ls[pa["groups_value"]] == cond]
 
             km.fit(df_tmp[pa["xvals"]], df_tmp[pa["yvals"]], label=cond)
-
-            #km.fit(durations[ix], event_observed[ix], label=cond)
 
             df_survival=km.survival_function_
             df_conf=km.confidence_interval_
@@ -205,59 +201,103 @@ def make_figure(df,pa):
                                  "censored":cond+"_censored",
                                  "entrance":cond+"_entrance",
                                  cond:cond+"_KMestimate"})
-            # df=df.rename(columns={"at_risk":group+"_at_risk",
-            #                      "removed":group+"_removed",
-            #                      "observed":group+"_observed",
-            #                      "censored":group+"_censored",
-            #                      "entrance":group+"_entrance",
-            #                      group:group+"_KMestimate"})
+            
             df=df[["time",cond+"_at_risk",cond+"_removed",cond+"_observed",cond+"_censored",cond+"_entrance",cond+"_KMestimate",cond+"_lower_0.95",cond+"_upper_0.95"]]
-            #df=df[["time",group+"_at_risk",group+"_removed",group+"_observed",group+"_censored",group+"_entrance",group+"_KMestimate",group+"_lower_0.95",group+"_upper_0.95"]]
             tmp.append(df)
 
             df=reduce(lambda df1,df2: pd.merge(df1,df2,on='time'), tmp)
 
+
+            PA_=[ g for g in pa["groups_settings"] if g["name"]==cond ][0]
+
+            if PA_["linecolor_col"] != "select a column..":
+                linecolor=[ i for i in df_tmp[[PA_["linecolor_col"]]].dropna()[PA_["linecolor_col"]].tolist() ][0]
+            elif str(PA_["linecolor_write"]) != "":
+                linecolor=PA_["linecolor_write"]
+            else:
+                linecolor=PA_["line_color_value"]
+
+            if PA_["linestyle_col"] != "select a column..":
+                linestyle=[ i for i in df_tmp[[PA_["linestyle_col"]]].dropna()[PA_["linestyle_col"]].tolist() ][0]
+            elif str(PA_["linestyle_write"]) != "":
+                linestyle=PA_["linestyle_write"]
+            else:
+                linestyle=PA_["linestyle_value"]
+
+            if PA_["linewidth_col"] != "select a column..":
+                linewidth=[ i for i in df_tmp[[PA_["linewidth_col"]]].dropna()[PA_["linewidth_col"]].tolist() ][0]
+            else:
+                #str(PA_["linewidth_write"]) != "":
+                linewidth=PA_["linewidth_write"]
+
+            if PA_["markerc_col"] != "select a column..":
+                markerColor=[ i for i in df_tmp[[PA_["markerc_col"]]].dropna()[PA_["markerc_col"]].tolist() ][0]
+            elif str(PA_["markerc_write"]) != "":
+                markerColor=PA_["markerc_write"]
+            else:
+                markerColor=PA_["markerc"]
+
+            if PA_["edgecolor_col"] != "select a column..":
+                edgeColor=[ i for i in df_tmp[[PA_["edgecolor_col"]]].dropna()[PA_["edgecolor_col"]].tolist() ][0]
+            elif str(PA_["edgecolor_write"]) != "":
+                edgeColor=PA_["edgecolor_write"]
+            else:
+                edgeColor=PA_["edgecolor"]
+
+            if PA_["edge_linewidth_col"] != "select a column..":
+                edgeLineWidth=[ i for i in df_tmp[[PA_["edge_linewidth_col"]]].dropna()[PA_["edge_linewidth_col"]].tolist() ][0]
+            else:
+                edgeLineWidth=PA_["edge_linewidth"]
+
+            if PA_["censor_marker_size_col"] != "select a column..":
+                markerSize=[ i for i in df_tmp[[PA_["censor_marker_size_col"]]].dropna()[PA_["censor_marker_size_col"]].tolist() ][0]
+            else:
+                markerSize=PA_["censor_marker_size_val"]
+
+            if PA_["show_censors"] in ["off", ".off"]:
+                showCensors=False
+            else:
+                showCensors=True
+
+            if PA_["Conf_Interval"] in ["off", ".off"]:
+                ConfidenceInterval=False
+            else:
+                ConfidenceInterval=True
+
+            if PA_["ci_legend"] in ["off", ".off"]:
+                CI_legend=False
+            else:
+                CI_legend=True
+
+            if PA_["ci_force_lines"] in ["off", ".off"]:
+                CI_lines=False
+            else:
+                CI_lines=True
+
+            markerAlpha=PA_["marker_alpha"]
+            CI_alpha=PA_["ci_alpha"]
+            markerVal=PA_["censor_marker_value"]
+
             pa_={}
-            for arg in ["Conf_Interval","show_censors","ci_legend","ci_force_lines", "left_axis", "right_axis" , "upper_axis", "lower_axis","tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis"]:
+            for arg in ["left_axis", "right_axis" , "upper_axis", "lower_axis","tick_left_axis","tick_right_axis","tick_upper_axis","tick_lower_axis"]:
                 if pa[arg] in ["off", ".off"]:
                     pa_[arg]=False
                 else:
                     pa_[arg]=True
 
-                if str(pa["markerc_write"]) != "":
-                    pa_["marker_fc"]=pa["markerc_write"]
-                else:
-                    pa_["marker_fc"]=pa["markerc"]
-
-                if str(pa["edgecolor_write"]) != "":
-                    pa_["marker_ec"]=pa["edgecolor_write"]
-                else:
-                    pa_["marker_ec"]=pa["edgecolor"]
-
-                if str(pa["grid_color_text"]) != "":
-                    pa_["grid_color_write"]=pa["grid_color_text"]
-                else:
-                    pa_["grid_color_write"]=pa["grid_color_value"]
-
-            PA_=[ g for g in pa["groups_settings"] if g["name"]==cond ][0]
-
-            #tmp_df=df_ls[df_ls[pa["groups_value"]]==cond]
-
-            if PA_["linecolor_col"] != "select a column..":
-                linecolor=[ i for i in df_tmp[[PA_["linecolor_col"]]].dropna()[PA_["linecolor_col"]].tolist() ][0]
-            if str(PA_["linecolor_write"]) != "":
-                linecolor=PA_["linecolor_write"]
+            if str(pa["grid_color_text"]) != "":
+                pa_["grid_color_write"]=pa["grid_color_text"]
             else:
-                linecolor=PA_["line_color_value"]
-            
-            pl=km.plot(show_censors=pa_["show_censors"], \
-                censor_styles={"marker":marker_dict[pa["censor_marker_value"]], "markersize":float(pa["censor_marker_size_val"]), "markeredgecolor":pa_["marker_ec"], "markerfacecolor":pa_["marker_fc"], "alpha":float(pa["marker_alpha"])}, \
-                ci_alpha=float(pa["ci_alpha"]), \
-                ci_force_lines=pa_["ci_force_lines"], \
-                ci_show=pa_["Conf_Interval"], \
-                ci_legend=pa_["ci_legend"], \
-                linestyle=pa["linestyle_value"], \
-                linewidth=float(pa["linewidth"]), \
+                pa_["grid_color_write"]=pa["grid_color_value"]
+        
+            pl=km.plot(show_censors=showCensors, \
+                censor_styles={"marker":marker_dict[markerVal], "markersize":float(markerSize), "markeredgecolor":edgeColor, "markerfacecolor":markerColor, "alpha":float(markerAlpha), "mew":float(edgeLineWidth)}, \
+                ci_alpha=float(CI_alpha), \
+                ci_force_lines=CI_lines, \
+                ci_show=ConfidenceInterval, \
+                ci_legend=CI_legend, \
+                linestyle=linestyle, \
+                linewidth=float(linewidth), \
                 color=linecolor)
 
             pl.spines['right'].set_visible(pa_["right_axis"])
@@ -329,7 +369,7 @@ def figure_defaults():
         "groups_settings":[],\
         "censors_col":["None"],\
         "censors_val":"",\
-        "Conf_Interval":".ff",\
+        "Conf_Interval":".off",\
         "show_censors":".off",\
         "ci_legend":".off",\
         "ci_force_lines":".off",\
@@ -337,23 +377,36 @@ def figure_defaults():
         "censor_marker_value":"x",\
         "censor_marker_size":STANDARD_SIZES,\
         "censor_marker_size_val":"4",\
+        "censor_marker_size_cols":["select a column.."], \
+        "censor_marker_size_col":"select a column..", \
         "marker_color":STANDARD_COLORS,\
         "markerc":"black",\
+        "markerc_cols":["select a column.."], \
+        "markerc_col":"select a column..", \
         "markerc_write":"",\
         "ci_alpha":"0.3",\
         "colors":STANDARD_COLORS,\
         "linestyles":LINE_STYLES,\
         "linestyle_value":"solid",\
-        "linewidth":"1.0",\
+        "linestyle_cols":["select a column.."],\
+        "linestyle_col":"select a column..",\
+        "linestyle_write":"", \
+        "linewidth_cols":["select a column.."],\
+        "linewidth_col":"select a column..",\
+        "linewidth_write":"1.0",\
         "line_colors":STANDARD_COLORS,\
         "line_color_value":"blue",\
         "linecolor_cols":["select a column.."],\
         "linecolor_col":"select a column..",\
         "linecolor_write":"",\
         "edge_linewidths":STANDARD_SIZES,\
-        "edge_linewidth":"0",\
+        "edge_linewidth":"1",\
+        "edge_linewidth_cols":["select a column.."],\
+        "edge_linewidth_col":"select a column..",\
         "edge_colors":STANDARD_COLORS,\
         "edgecolor":"black",\
+        "edgecolor_cols":["select a column.."], \
+        "edgecolor_col":"select a column..", \
         "edgecolor_write":"",\
         "marker_alpha":"1",\
         "xlabel":"Time",\
