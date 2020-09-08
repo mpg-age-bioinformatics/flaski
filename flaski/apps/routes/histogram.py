@@ -171,13 +171,14 @@ def histogram(download=None):
                 
                 #IF THE USER HAS SELECTED NEW COLUMNS TO BE PLOTTED
                 # if plot_arguments["vals"]!=request.form.getlist("vals"):
-                plot_arguments=read_request(request)
-                groups=plot_arguments["vals"]
+                
+                #groups=plot_arguments["vals"]
+                groups=request.form.getlist("vals")
                 groups.sort()
                 groups_settings=dict()
                                     
                 for group in groups:
-                    if group not in plot_arguments["groups_settings"].keys():
+                    if group not in list(plot_arguments["groups_settings"].keys()):
                         groups_settings[group]={"name":group,\
                                 "label":group,\
                                 "color_value":None,\
@@ -211,18 +212,19 @@ def histogram(download=None):
                         
                         #If the user does not tick the options the arguments do not appear as keys in request.form
                         if "%s.density"%group in request.form.keys():
-                            groups_settings[group]["density"]=request.form["%s.density" %group]
+                            groups_settings[group]["density"]="on" #request.form["%s.density" %group]
                         else:
                             groups_settings[group]["density"]="off"
                         
                         if "%s.cumulative"%group in request.form.keys():
-                            groups_settings[group]["cumulative"]=request.form["%s.cumulative" %group]
+                            groups_settings[group]["cumulative"]="on" #request.form["%s.cumulative" %group]
                         else:
                             groups_settings[group]["cumulative"]="off"
 
-                    plot_arguments["groups_settings"]=groups_settings
+                plot_arguments["groups_settings"]=groups_settings
 
-                session["plot_arguments"]=plot_arguments           
+                plot_arguments=read_request(request)
+                #session["plot_arguments"]=plot_arguments           
 
           
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
