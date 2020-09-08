@@ -1,4 +1,4 @@
-#from matplotlib.figure import Figure
+T#from matplotlib.figure import Figure
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -365,7 +365,7 @@ def figure_defaults():
         "title_yanchors":STANDARD_TITLE_YANCHORS,\
         "title_xanchor":"auto",\
         "title_yanchor":"auto",\
-        "show_legend":"on",\
+es        "show_legend":".off",\
         "axis_line_width":1.0,\
         "axis_line_color":"lightgrey",\
         "ticks_line_width":1.0,\
