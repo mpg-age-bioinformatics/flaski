@@ -194,19 +194,19 @@
                                     </select></label>
                                 </div>
 
-                                <label style="padding-left: 35px;">Labels: <input type="text" name={{labels}} value= "{{labels}}" style="width:216px;height:22px;padding-left:4px;"></label>
-                                <label style="padding-left: 10px;">Hover text: <input type="text" name={{hover_text}} value= "{{hover_text}}" style="width:216px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 35px;">Labels: <input type="text" name=labels value= "{{labels}}" style="width:216px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 10px;">Hover text: <input type="text" name=hover_text value= "{{hover_text}}" style="width:216px;height:22px;padding-left:4px;"></label>
                                 
                                 <div class="row arg">
-                                    <label style="padding-left: 10px;"> Distance: <select name=dist_func val= "{{dist_func}}" method="GET" action="/" style="width:80px;">
+                                    <label style="padding-left: 20px;"> Distance: <select name=dist_func val= "{{dist_func}}" method="GET" action="/" style="width:80px;">
                                         {% for dist_func_ in dist_funcs %}
                                         <option value="{{dist_func_}}" {% if dist_func_==dist_func %} selected {% endif %}>{{dist_func_}}</option>
                                         {% endfor %}
                                     </select></label>
                                 </div>
-                                <label style="padding-left: 12px;">Threshold: <input type="text" name={{color_threshold}} value= "{{color_threshold}}" style="width:80px;height:22px;padding-left:4px;"></label>
+                                <label style="padding-left: 6px;">Threshold: <input type="text" name=color_threshold value= "{{color_threshold}}" style="width:60px;height:22px;padding-left:4px;"></label>
                                 <div class="row arg">
-                                    <label style="padding-left: 10px;"> Linkage: <select name=link_func val= "{{link_func}}" method="GET" action="/" style="width:80px;">
+                                    <label style="padding-left: 24px;"> Linkage: <select name=link_func val= "{{link_func}}" method="GET" action="/" style="width:80px;">
                                         {% for link_func_ in link_funcs %}
                                         <option value="{{link_func_}}" {% if link_func_==link_func %} selected {% endif %}>{{link_func_}}</option>
                                         {% endfor %}
@@ -385,7 +385,7 @@
 
 
                                     <label style="width:280px;padding-left:130px;">Title</label>
-                                    <label style="padding-left:0px;">Text: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:300px;height:22px;padding-left:4px"></label>
+                                    <label style="padding-left:0px;">Text: <input type="text" name="legend_title" value='{{ legend_title }}' style="width:265px;height:22px;padding-left:4px"></label>
                                     <label style="padding-left:24px;">Location: <select name="legend_side" value="{{legend_side}}"  method="GET" action="/" style="width:70px;">
                                         {% for legend_side_ in sides %}
                                         <option value="{{legend_side_}}" {% if legend_side_==legend_side %} selected {% endif %}>{{legend_side_}}</option>                                                    

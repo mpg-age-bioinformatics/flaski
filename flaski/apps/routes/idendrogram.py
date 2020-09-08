@@ -79,10 +79,11 @@ def idendrogram(download=None):
 
                     df=read_tables(inputfile)
                     plot_arguments=session["plot_arguments"]
-                    plot_arguments=read_request(request)
-
-                    # flash(sometext,'info')
-                    return render_template('/apps/idendrogram.html' , filename=filename, apps=apps,**plot_arguments)
+                    filename=session["filename"]                                 
+                    #CALL FIGURE FUNCTION
+                    fig=make_figure(df,plot_arguments)
+                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                    return render_template('/apps/idendrogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
                     
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
@@ -100,10 +101,8 @@ def idendrogram(download=None):
             
             # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             plot_arguments=read_request(request)
-            # vals=request.form.getlist("vals")
             df=pd.read_json(session["df"])
             filename=session["filename"]
-                            
             session["plot_arguments"]=plot_arguments
             #CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
