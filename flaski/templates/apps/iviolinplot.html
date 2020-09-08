@@ -304,7 +304,7 @@
 
                                         <hr class="black">
                                         <label style="width:250px;padding-left:130px;">Hover</label>
-                                        <label>Text: <input type="text" name={{vp_text}} value= "{{vp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
+                                        <label>Text: <input type="text" name=vp_text value= "{{vp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
                                         <label style="padding-left:16px;">Hover on: <select  name=vp_hoveron value="{{vp_hoveron }}" method="GET" action="/" style="width:70px;">
                                             {% for vp_hoveron_ in vp_hoverons %}
                                             <option value="{{vp_hoveron_}}" {% if vp_hoveron_==vp_hoveron %} selected {% endif %}>{{vp_hoveron_}}</option>
@@ -420,7 +420,7 @@
 
                                         <hr class="black">
                                         <label style="width:250px;padding-left:136px;">Hover</label>
-                                        <label>Text: <input type="text" name={{bp_text}} value= "{{bp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
+                                        <label>Text: <input type="text" name=bp_text value= "{{bp_text}}" style="width:265px;height:22px;padding-left:4px;"></label>
                                         <label style="padding-left:16px;">Hover on: <select  name=bp_hoveron value="{{bp_hoveron }}" method="GET" action="/" style="width:70px;">
                                             {% for bp_hoveron_ in bp_hoverons %}
                                             <option value="{{bp_hoveron_}}" {% if bp_hoveron_==bp_hoveron %} selected {% endif %}>{{bp_hoveron_}}</option>
@@ -777,7 +777,7 @@
                                             {% endfor %}
                                         </select></label>
 
-                                        <label style="padding-left:5px;">BKG color: <select name="legend_bgcolor" value="{{legend_bgcolor}}" method="GET" action="/" style="width:70px;height:22px;padding-left:2px;">
+                                        <label style="padding-left:3px;">BKG color: <select name="legend_bgcolor" value="{{legend_bgcolor}}" method="GET" action="/" style="width:70px;height:22px;padding-left:2px;">
                                             {% for legend_bgcolor_ in colors %}
                                                 <option value="{{legend_bgcolor_}}" {% if legend_bgcolor_==legend_bgcolor %} selected {% endif %}>{{legend_bgcolor_}}</option>
                                             {% endfor %}
