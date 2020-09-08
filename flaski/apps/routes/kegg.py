@@ -95,11 +95,11 @@ def david(download=None):
             # david_in_store
             if len(df)>0:
                 session["kegg_in_store"]=True
-                return render_template('/apps/kegg.html', kegg_in_store=True, apps=apps, table_headers=table_headers, kegg_contents=david_contents, **plot_arguments)
+                return render_template('/apps/kegg.html', kegg_in_store=True, apps=apps, table_headers=table_headers, kegg_contents=kegg_contents, **plot_arguments)
 
             elif "kegg_in_store" in list(session.keys()):
                 del(session["kegg_in_store"])
-                return render_template('/apps/kegg.html', apps=apps, table_headers=table_headers, david_contents=kegg_contents, **plot_arguments)
+                return render_template('/apps/kegg.html', apps=apps, table_headers=table_headers, kegg_contents=kegg_contents, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="kegg",session=session)
