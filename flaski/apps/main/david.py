@@ -70,7 +70,7 @@ def debug_david(user,DEBUG_GENES=DEBUG_GENES, ids=None):
     return report
 
 
-def run_david(pa, path_to_ensembl_maps="/flaski/data"):
+def run_david(pa, path_to_ensembl_maps="/flaski/data/david"):
 
 
     #database, categories, user, ids, ids_bg = None, name = '', name_bg = '', verbose = False, p = 0.1, n = 2):
