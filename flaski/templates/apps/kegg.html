@@ -50,9 +50,9 @@
                 <div class="column" >
                     <div class="sidebar-heading">Species:</div>
                     <div style="padding-left:15px;">
-                        <select title=species name=specie method="GET" action="/" style="width:365px">
-                            {% for sp in species %}
-                                <option value="{{sp}}" {% if sp==specie %} selected {% endif %}>{{sp}}</option>
+                        <select title=species name=species method="GET" action="/" style="width:365px">
+                            {% for sp in species_options %}
+                                <option value="{{sp}}" {% if sp==species %} selected {% endif %}>{{sp}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -111,11 +111,9 @@
                                     </div>
                             </div> 
 
-                            {% if filename != "Select file.." %}
                             <div class="row arg">
                                 <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
                             </div>
-                            {% endif %}
 
                         </div>
                     </div>
@@ -142,11 +140,9 @@
                                     </div>
                             </div> 
 
-                            {% if filename != "Select file.." %}
                             <div class="row arg">
                                 <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_download_name" value='{{ session_download_name }}'>
                             </div>
-                            {% endif %}
 
                         </div>
 
@@ -187,7 +183,9 @@
     {% if kegg_contents %}
 
     <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
-        <table id="listr-table" class="table table-hover">
+        <table id="listr-table" class="table table-hover" style="width: 100%">
+
+
             <thead>
                 <tr>
                     {% for entry in table_headers %}
@@ -207,11 +205,20 @@
                 {% for entry in kegg_contents %}
                 <tr>
                     {% for col in entry %}
-                    <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                    <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}"><div style="word-wrap:break-word;word-break:break-all;">{{col}}</div></td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
                 </tbody>
+
+
+            <colgroup>
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 2%;">
+                <col span="1" style="width: 29%;">
+                <col span="1" style="width: 29%;">
+            </colgroup>
             </table>
         </div>
     {% endif %}
@@ -276,13 +283,13 @@
     {% endif %}
     {% endwith %}
 
-    {% if david_in_store %}
+    {% if kegg_in_store %}
         <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
 
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-                <form action="{{ url_for('david', download='download') }}" method="get">
+                <form action="{{ url_for('kegg', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Results
                     </button>

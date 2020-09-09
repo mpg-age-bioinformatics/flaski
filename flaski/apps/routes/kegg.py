@@ -45,13 +45,21 @@ def kegg(download=None):
 
     apps=current_user.user_apps
 
-    return render_template('/index.html' ,apps=apps)
+    # pa={}
+    # pa["ids"]="HMDB00001\tred\nHMDB0004935\tred"
+    # pa["species"]="mmu"
+
+    # make_figure(pa)
+
+    # return render_template('/index.html' ,apps=apps)
 
     reset_info=check_session_app(session,"kegg",apps)
     if reset_info:
         flash(reset_info,'error')
         # INITIATE SESSION
         plot_arguments=figure_defaults()
+
+        print(plot_arguments)
 
         session["plot_arguments"]=plot_arguments
         session["COMMIT"]=app.config['COMMIT']
@@ -61,7 +69,7 @@ def kegg(download=None):
 
         try:
             if request.files["inputsessionfile"] :
-                msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"david")
+                msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"kegg")
                 if error:
                     flash(msg,'error')
                     return render_template('/apps/kegg.html' ,apps=apps, **plot_arguments)
@@ -78,7 +86,7 @@ def kegg(download=None):
                 plot_arguments=read_request(request)
 
             # CALL FIGURE FUNCTION
-            df, msg=run_kegg(plot_arguments)
+            df, msg=make_figure(plot_arguments)
 
             ## get this into json like in former apps
             df=df.astype(str)
@@ -87,13 +95,24 @@ def kegg(download=None):
             session["df"]=df.to_json()
             # session["mapped"]=mapped.to_json()
 
-            table_headers=df.columns.tolist()
+            # print(df.head())
+
             tmp=df[:50]
+            table_headers=tmp.columns.tolist()
+
+            def break_text(s,w=20):
+               r=[s[i:i + w] for i in range(0, len(s), w)]
+               r="".join(r)
+               return r
+
+            for c in ["ref_link","species_link"]:
+               tmp[c]=tmp[c].apply(lambda x: break_text(x) )
 
             kegg_contents=[]
             for i in tmp.index.tolist():
                 kegg_contents.append(list(tmp.loc[i,]))
 
+            #print(kegg_contents[:2])
             # david_in_store
             if len(df)>0:
                 session["kegg_in_store"]=True
@@ -118,6 +137,7 @@ def kegg(download=None):
 
             # READ INPUT DATA FROM SESSION JSON
             df=pd.read_json(session["df"])
+            
             # mapped=pd.read_json(session["mapped"])
             # mapped=mapped.replace("nan",np.nan)
 
@@ -135,8 +155,8 @@ def kegg(download=None):
                 outfile.seek(0)
                 return send_file(outfile, attachment_filename=plot_arguments["download_name"]+ "." + plot_arguments["download_format_value"],as_attachment=True )
 
-            elif plot_arguments["download_format_value"] == "tsv":               
-                return Response(david_df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
+            elif plot_arguments["download_format_value"] == "tsv":  
+                return Response(df.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["download_name"]})
                 #outfile.seek(0)
         
         return render_template('apps/kegg.html',  apps=apps, **session["plot_arguments"])
