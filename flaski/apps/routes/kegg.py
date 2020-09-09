@@ -38,12 +38,14 @@ def add_header(r):
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
 
-@app.route('/david/<download>', methods=['GET', 'POST'])
-@app.route('/david', methods=['GET', 'POST'])
+@app.route('/kegg/<download>', methods=['GET', 'POST'])
+@app.route('/kegg', methods=['GET', 'POST'])
 @login_required
-def david(download=None):
+def kegg(download=None):
 
     apps=current_user.user_apps
+
+    return render_template('/index.html' ,apps=apps)
 
     reset_info=check_session_app(session,"kegg",apps)
     if reset_info:
@@ -54,7 +56,7 @@ def david(download=None):
         session["plot_arguments"]=plot_arguments
         session["COMMIT"]=app.config['COMMIT']
         session["app"]="kegg"
-
+  
     if request.method == 'POST' :
 
         try:
