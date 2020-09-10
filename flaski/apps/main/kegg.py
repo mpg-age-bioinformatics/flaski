@@ -17,18 +17,19 @@ def make_figure(pa, path_to_data="/flaski/data/kegg"):
     ids=[ s for s in ids if len(s) > 0 ]
     ids=[ s.split("\t") for s in ids ]
     idsdf=pd.DataFrame(ids)
-    #print(idsdf)
 
     if len(idsdf.columns.tolist()) > 2:
+        ancols=idsdf.columns.tolist()[2:]
         for i in idsdf.index.tolist():
             hmdbid=idsdf.loc[i,0]+":"
-            for c in idsdf.columns.tolist()[2:]:
+            for c in ancols:
                 text=str(idsdf.loc[i,c])
                 hmdbid=hmdbid+" "+text+","
+            hmdbid=hmdbid[:-1]
             idsdf.loc[i,"___annotations___"]=hmdbid
     else:
         idsdf["___annotations___"]=idsdf[0]
-        
+            
     hmdb2kegg=pd.merge(idsdf,hmdb2kegg,left_on=[0],right_on=["HMDB ID"],how='left')
     hmdb2kegg=hmdb2kegg.dropna(subset=["KEGG ID"])
     hmdb2kegg=hmdb2kegg.drop([0],axis=1)
