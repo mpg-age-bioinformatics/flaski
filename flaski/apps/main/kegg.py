@@ -22,7 +22,7 @@ def make_figure(pa, path_to_data="/flaski/data/kegg"):
     if len(idsdf.columns.tolist()) > 2:
         for i in idsdf.index.tolist():
             hmdbid=idsdf.loc[i,0]+":"
-            for c in idsdf_.columns.tolist()[2:]:
+            for c in idsdf.columns.tolist()[2:]:
                 text=str(idsdf.loc[i,c])
                 hmdbid=hmdbid+" "+text+","
             idsdf.loc[i,"___annotations___"]=hmdbid
