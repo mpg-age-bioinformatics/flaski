@@ -92,7 +92,7 @@ def make_figure(df,pa):
         
         hist_data=[]
         for col in tmp.columns:
-            hist_data.append(tmp[col])
+            hist_data.append(tmp[col].dropna())
 
         fig=ff.create_distplot(hist_data=hist_data,group_labels=pa["vals"],curve_type=pa["curve_type"],show_hist=pab["show_hist"],\
             show_curve=pab["show_curve"],show_rug=pab["show_rug"],bin_size=pab["bin_size"],rug_text=rug_text,colors=colors, histnorm=pa["kde_histnorm"])
@@ -180,7 +180,7 @@ def make_figure(df,pa):
                 else:
                     error_y=dict(visible=False)
 
-                fig.add_trace(go.Histogram(x=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
+                fig.add_trace(go.Histogram(x=tmp[h["name"]].dropna(),text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
                     opacity=h_["opacity"],nbinsx=h_["bins_number"],name=name,marker=marker,error_y=error_y,hoverlabel=hoverlabel,histnorm=histnorm))
             
 
@@ -192,7 +192,7 @@ def make_figure(df,pa):
                 else:
                     error_x=dict(visible=False)
                 
-                fig.add_trace(go.Histogram(y=tmp[h["name"]],text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
+                fig.add_trace(go.Histogram(y=tmp[h["name"]].dropna(),text=text,hoverinfo=h["hoverinfo"],histfunc=h["histfunc"],cumulative=cumulative,\
                 opacity=h_["opacity"],nbinsy=h_["bins_number"],name=name,marker=marker,error_x=error_x,hoverlabel=hoverlabel,histnorm=histnorm))
 
 
@@ -408,7 +408,7 @@ def figure_defaults():
         "curve_types":STANDARD_CURVETYPES,\
         "kde_histnorm":"probability density",\
         "kde_histnorms":["probability density","probability"],\
-        "show_hist":".on",\
+        "show_hist":".off",\
         "show_curve":".on",\
         "show_rug":".on",\
         "rug_text":"",\
