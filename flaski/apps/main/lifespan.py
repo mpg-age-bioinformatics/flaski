@@ -210,49 +210,25 @@ def make_figure(df,pa):
 
             PA_=[ g for g in pa["groups_settings"] if g["name"]==cond ][0]
 
-            if PA_["linecolor_col"] != "select a column..":
-                linecolor=[ i for i in df_tmp[[PA_["linecolor_col"]]].dropna()[PA_["linecolor_col"]].tolist() ][0]
-            elif str(PA_["linecolor_write"]) != "":
+            if str(PA_["linecolor_write"]) != "":
                 linecolor=PA_["linecolor_write"]
             else:
                 linecolor=PA_["line_color_value"]
 
-            if PA_["linestyle_col"] != "select a column..":
-                linestyle=[ i for i in df_tmp[[PA_["linestyle_col"]]].dropna()[PA_["linestyle_col"]].tolist() ][0]
-            elif str(PA_["linestyle_write"]) != "":
+            if str(PA_["linestyle_write"]) != "":
                 linestyle=PA_["linestyle_write"]
             else:
                 linestyle=PA_["linestyle_value"]
-
-            if PA_["linewidth_col"] != "select a column..":
-                linewidth=[ i for i in df_tmp[[PA_["linewidth_col"]]].dropna()[PA_["linewidth_col"]].tolist() ][0]
-            else:
-                #str(PA_["linewidth_write"]) != "":
-                linewidth=PA_["linewidth_write"]
-
-            if PA_["markerc_col"] != "select a column..":
-                markerColor=[ i for i in df_tmp[[PA_["markerc_col"]]].dropna()[PA_["markerc_col"]].tolist() ][0]
-            elif str(PA_["markerc_write"]) != "":
+            
+            if str(PA_["markerc_write"]) != "":
                 markerColor=PA_["markerc_write"]
             else:
                 markerColor=PA_["markerc"]
 
-            if PA_["edgecolor_col"] != "select a column..":
-                edgeColor=[ i for i in df_tmp[[PA_["edgecolor_col"]]].dropna()[PA_["edgecolor_col"]].tolist() ][0]
-            elif str(PA_["edgecolor_write"]) != "":
+            if str(PA_["edgecolor_write"]) != "":
                 edgeColor=PA_["edgecolor_write"]
             else:
                 edgeColor=PA_["edgecolor"]
-
-            if PA_["edge_linewidth_col"] != "select a column..":
-                edgeLineWidth=[ i for i in df_tmp[[PA_["edge_linewidth_col"]]].dropna()[PA_["edge_linewidth_col"]].tolist() ][0]
-            else:
-                edgeLineWidth=PA_["edge_linewidth"]
-
-            if PA_["censor_marker_size_col"] != "select a column..":
-                markerSize=[ i for i in df_tmp[[PA_["censor_marker_size_col"]]].dropna()[PA_["censor_marker_size_col"]].tolist() ][0]
-            else:
-                markerSize=PA_["censor_marker_size_val"]
 
             if PA_["show_censors"] in ["off", ".off"]:
                 showCensors=False
@@ -273,6 +249,10 @@ def make_figure(df,pa):
                 CI_lines=False
             else:
                 CI_lines=True
+
+            linewidth=PA_["linewidth_write"]
+            edgeLineWidth=PA_["edge_linewidth"]
+            markerSize=PA_["censor_marker_size_val"]
 
             markerAlpha=PA_["marker_alpha"]
             CI_alpha=PA_["ci_alpha"]

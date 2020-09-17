@@ -98,11 +98,6 @@ def lifespan(download=None):
                     if session["plot_arguments"]["groups"] not in cols:
                         session["plot_arguments"]["groups"] = ["None"]+cols
 
-                    prop=["censor_marker_size_cols","linecolor_cols","linestyle_cols","linewidth_cols","edge_linewidth_cols","edgecolor_cols","markerc_cols"]
-                    for prop_ in prop:
-                        if session["plot_arguments"][prop_] not in cols:
-                            session["plot_arguments"][prop_]=["select a column.."]+cols
-
                     # IF THE USER HAS NOT YET CHOOSEN X AND Y VALUES THAN PLEASE SELECT
                     if (session["plot_arguments"]["yvals"] not in cols):
 
@@ -161,42 +156,24 @@ def lifespan(download=None):
                         group_dic={}
                         for group in groups:
                             group_dic={"name":group,\
-                                # "markers":plot_arguments["markers"],\
-                                # "markersizes_col":"select a column..",\
-                                # "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
-                                # "markerc_col":"select a column..",\
-                                # "markerc_write":plot_arguments["markerc_write"],\
-                                # "edge_linewidth":plot_arguments["edge_linewidth"],\
-                                # "edge_linewidth_col":"select a column..",\
                                 "censor_marker_value":plot_arguments["censor_marker_value"], \
                                 "censor_marker_size_val":plot_arguments["censor_marker_size_val"], \
-                                "censor_marker_size_col":"select a column..", \
                                 "edgecolor":plot_arguments["edgecolor"], \
-                                "edgecolor_col":"select a column..", \
                                 "edgecolor_write":"", \
                                 "edge_linewidth":plot_arguments["edge_linewidth"], \
-                                "edge_linewidth_col":"select a column..", \
                                 "markerc":plot_arguments["markerc"], \
-                                "markerc_col":"select a column..", \
                                 "markerc_write":"", \
                                 "marker_alpha":plot_arguments["marker_alpha"], \
                                 "ci_alpha":plot_arguments["ci_alpha"], \
-                                "linestyle_col":"select a column..",\
                                 "linestyle_value":plot_arguments["linestyle_value"], \
                                 "linestyle_write":"", \
-                                "linewidth_col":"select a column..",\
                                 "linewidth_write":plot_arguments["linewidth_write"], \
                                 "line_color_value":plot_arguments["line_color_value"],\
-                                "linecolor_col":"select a column..",\
                                 "linecolor_write":"", \
                                 "show_censors":plot_arguments["show_censors"], \
                                 "Conf_Interval":plot_arguments["Conf_Interval"], \
                                 "ci_legend":plot_arguments["ci_legend"], \
-                                "ci_force_lines":plot_arguments["ci_force_lines"]}
-                                # "marker":random.choice(plot_arguments["markerstyles"]),\
-                                # "markerstyles_col":"select a column..",\
-                                # "marker_alpha":plot_arguments["marker_alpha"],\
-                                # "markeralpha_col_value":"select a column.."}
+                                "ci_force_lines":plot_arguments["ci_force_lines"]}  
                             groups_settings.append(group_dic)
                         plot_arguments["groups_settings"]=groups_settings
                     elif request.form["groups_value"] == "None" :
@@ -209,38 +186,20 @@ def lifespan(download=None):
                     group_dic={}
                     for group in plot_arguments["list_of_groups"]:
                         group_dic={"name":group,\
-                            # "markers":request.form["%s.markers" %group],\
-                            # "markersizes_col":request.form["%s.markersizes_col" %group],\
-                            # "markerc":request.form["%s.markerc" %group],\
-                            # "markerc_col":request.form["%s.markerc_col" %group],\
-                            # "markerc_write":request.form["%s.markerc_write" %group],\
-                            # "edge_linewidth":request.form["%s.edge_linewidth" %group],\
-                            # "edge_linewidth_col":request.form["%s.edge_linewidth_col" %group],\
                             "censor_marker_value":request.form["%s.censor_marker_value" %group], \
                             "censor_marker_size_val":request.form["%s.censor_marker_size_val" %group], \
-                            "censor_marker_size_col":request.form["%s.censor_marker_size_col" %group], \
                             "edgecolor":request.form["%s.edgecolor" %group], \
-                            "edgecolor_col":request.form["%s.edgecolor_col" %group], \
                             "edgecolor_write":request.form["%s.edgecolor_write" %group], \
                             "edge_linewidth":request.form["%s.edge_linewidth" %group], \
-                            "edge_linewidth_col":request.form["%s.edge_linewidth_col" %group], \
                             "markerc":request.form["%s.markerc" %group], \
-                            "markerc_col":request.form["%s.markerc_col" %group], \
                             "markerc_write":request.form["%s.markerc_write" %group], \
                             "marker_alpha":request.form["%s.marker_alpha" %group], \
                             "ci_alpha":request.form["%s.ci_alpha" %group], \
-                            "linestyle_col":request.form["%s.linestyle_col" %group],\
                             "linestyle_value":request.form["%s.linestyle_value" %group], \
                             "linestyle_write":request.form["%s.linestyle_write" %group], \
-                            "linewidth_col":request.form["%s.linewidth_col" %group],\
                             "linewidth_write":request.form["%s.linewidth_write" %group], \
                             "line_color_value":request.form["%s.line_color_value" %group],\
-                            "linecolor_col":request.form["%s.linecolor_col" %group],\
-                            "linecolor_write":request.form["%s.linecolor_write" %group], \
-                            # "marker":request.form["%s.marker" %group],\
-                            # "markerstyles_col":request.form["%s.markerstyles_col" %group],\
-                            # "marker_alpha":request.form["%s.marker_alpha" %group],\
-                            # "markeralpha_col_value":request.form["%s.markeralpha_col_value" %group]
+                            "linecolor_write":request.form["%s.linecolor_write" %group]
                         }
                         
                         if request.form.get("%s.show_censors" %group) == 'on':
@@ -259,7 +218,6 @@ def lifespan(download=None):
                             group_dic["ci_force_lines"]='on'
                         else:
                             group_dic["ci_force_lines"]='off'
-
 
                         groups_settings.append(group_dic)
                     plot_arguments["groups_settings"]=groups_settings
