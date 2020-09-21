@@ -78,12 +78,16 @@ def idendrogram(download=None):
                 if allowed_file(inputfile.filename):
 
                     df=read_tables(inputfile)
+                    cols=list(df.columns)
+                    labelcols=cols+[None]
                     plot_arguments=session["plot_arguments"]
-                    filename=session["filename"]                                 
-                    #CALL FIGURE FUNCTION
-                    fig=make_figure(df,plot_arguments)
-                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-                    return render_template('/apps/idendrogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+                    plot_arguments["cols"]=cols
+                    plot_arguments["labelcols"]=labelcols
+                    filename=session["filename"]  
+                    error_msg="Please select the data columns to construct your iDendrogram"
+                    flash(error_msg,'error')
+                               
+                    return render_template('/apps/idendrogram.html', filename=filename, apps=apps, **plot_arguments)
                     
                 else:
                     # IF UPLOADED FILE DOES NOT CONTAIN A VALID EXTENSION PLEASE UPDATE
@@ -96,11 +100,17 @@ def idendrogram(download=None):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
                 return render_template('/apps/idendrogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
-
-            # if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
             
-            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             plot_arguments=read_request(request)
+            #IF USER HAS NOT SELECTED DATA COLUMNS AND/OR LABELS   
+            if plot_arguments["datacols"] == []:
+                error_msg="You must select your data columns to construct your iDendrogram"
+                flash(error_msg,'error')
+                return render_template('/apps/idendrogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
+
+
+
+            # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
             df=pd.read_json(session["df"])
             filename=session["filename"]
             session["plot_arguments"]=plot_arguments

@@ -93,14 +93,17 @@ def make_figure(df,pa):
 
     #MAIN BODY
     color=GET_COLORLIST("color_rgb","color_value",tmp,pa,pab)
+
     if pa["labels"]!="":
         labels=pa["labels"].split(",")
     else:
-        labels=None
-
-    fig=ff.create_dendrogram(tmp,orientation=pa["orientation"],colorscale=color,color_threshold=pab["color_threshold"],labels=labels,\
-        distfun=lambda x: pdist(x, pa["dist_func"]),linkagefun=lambda x: sch.linkage(x, pa["link_func"]))
-
+        if pa["labelcol"]=="None":
+            labels=[""]*tmp.shape[0]
+        else:
+            labels=list(tmp[pa["labelcol"]])
+    
+    fig=ff.create_dendrogram(tmp[pa["datacols"]],orientation=pa["orientation"],colorscale=color,color_threshold=pab["color_threshold"],\
+        distfun=lambda x: pdist(x, pa["dist_func"]),linkagefun=lambda x: sch.linkage(x, pa["link_func"]),labels=labels)
     #UPDATE LAYOUT OF PLOTS
     #Figure size
     fig.update_layout( width=pab["fig_width"], height=pab["fig_height"] ) #  autosize=False,
@@ -336,7 +339,11 @@ def figure_defaults():
         "color_rgb":"",\
         "hover_text":"",\
         "color_threshold":"",\
+        "labelcol":"",\
+        "labelcols":[],\
         "labels":"",\
+        "cols":[],\
+        "datacols":[],\
         "dist_func":"euclidean",\
         "dist_funcs":STANDARD_DISTFUNCS,\
         "link_func":"single",\
