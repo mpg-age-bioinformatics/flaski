@@ -134,8 +134,12 @@ def david(download=None):
             plot_arguments=session["plot_arguments"]
 
             # READ INPUT DATA FROM SESSION JSON
-            david_df=pd.read_json(session["david_df"])
-            report_stats=pd.read_json(session["report_stats"])
+            try:
+                david_df=pd.read_json(session["david_df"])
+                report_stats=pd.read_json(session["report_stats"])
+            except:
+                flash("No DAVID table in memory.",'error')
+                return render_template('/apps/david.html', apps=apps, **plot_arguments)
             # mapped=pd.read_json(session["mapped"])
             # mapped=mapped.replace("nan",np.nan)
 
