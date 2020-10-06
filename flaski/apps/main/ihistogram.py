@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from collections import OrderedDict
 import numpy as np
+import sys
 
 
 def GET_COLOR(x):
@@ -42,6 +43,8 @@ def make_figure(df,pa):
             pab[arg]=False
         else:
             pab[arg]=True
+        # if arg in ["upper_axis","lower_axis","left_axis","right_axis"]:
+            # print(arg, pa[arg], pab[arg])
 
     #Load floats
     floats=["bin_size","errorbar_value","errorbar_thickness","errorbar_width","x","y","axis_line_width","ticks_line_width",\
@@ -75,6 +78,7 @@ def make_figure(df,pa):
 
     #KDE (KERNEL DENSITY ESTIMATION) plot
     if pab["kde"]==True:
+
         colors=list()
         if pa["rug_text"]!="":
             rug_text=pa["rug_text"].split(",")
@@ -94,7 +98,11 @@ def make_figure(df,pa):
         for col in tmp.columns:
             hist_data.append(tmp[col].dropna())
 
-        fig=ff.create_distplot(hist_data=hist_data,group_labels=pa["vals"],curve_type=pa["curve_type"],show_hist=pab["show_hist"],\
+        if (not pab["show_hist"]) & (not pab["show_curve"]):
+            pa["show_curve"]="on"
+            pab["show_curve"]=True
+
+        fig=ff.create_distplot(hist_data=hist_data, group_labels=pa["vals"],curve_type=pa["curve_type"],show_hist=pab["show_hist"],\
             show_curve=pab["show_curve"],show_rug=pab["show_rug"],bin_size=pab["bin_size"],rug_text=rug_text,colors=colors, histnorm=pa["kde_histnorm"])
 
     else:
@@ -215,8 +223,9 @@ def make_figure(df,pa):
     elif pa["log_scale"]==True and pa["orientation"]=="horizontal":
         fig.update_xaxes(type="log")
 
-    fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"])
-    fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"])
+    # print(pab["lower_axis"],pab["axis_line_width"],pab["axis_line_color"],pab["upper_axis"])
+    fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"], mirror=pab["upper_axis"])
+    fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=pab["axis_line_width"], linecolor=pab["axis_line_color"],mirror=pab["right_axis"])
 
     #Update ticks
 
@@ -233,20 +242,22 @@ def make_figure(df,pa):
     #Determines if the axis lines or/and ticks are mirrored to the opposite side of the plotting area. 
     # If "True", the axis lines are mirrored. If "ticks", the axis lines and ticks are mirrored. If "False", mirroring is disable. 
     # If "all", axis lines are mirrored on all shared-axes subplots. If "allticks", axis lines and ticks are mirrored on all shared-axes subplots.
-    if pab["upper_axis"]==True and pab["tick_upper_axis"]==True:
+    if pab["tick_upper_axis"] :
         fig.update_xaxes(mirror="ticks")
-    elif pab["upper_axis"]==True and pab["tick_upper_axis"]==False:
-        fig.update_xaxes(mirror=True)
-    else:
-        fig.update_xaxes(mirror=False)
+    # elif pab["upper_axis"] :
+    #     fig.update_xaxes(mirror=True)
+    # else:
+    #     fig.update_xaxes(mirror=False)
     
     
-    if pab["right_axis"]==True and pab["tick_right_axis"]==True:
+    if pab["tick_right_axis"]:
         fig.update_yaxes(mirror="ticks")
-    elif pab["right_axis"]==True and pab["tick_right_axis"]==False:
-        fig.update_yaxes(mirror=True)
-    else:
-        fig.update_xaxes(mirror=False)
+    # elif pab["right_axis"]:
+    #     fig.update_yaxes(mirror=True)
+    # else:
+    #     fig.update_yaxes(mirror=False)
+
+    # fig.update_yaxes(mirror=True)
 
     if (pa["x_lower_limit"]!="") and (pa["x_upper_limit"]!="") :
         xmin=pab["x_lower_limit"]
@@ -410,7 +421,7 @@ def figure_defaults():
         "kde_histnorms":["probability density","probability"],\
         "show_hist":".off",\
         "show_curve":".on",\
-        "show_rug":".on",\
+        "show_rug":".off",\
         "rug_text":"",\
         "bin_size":"1",\
         "opacity":0.8,\
