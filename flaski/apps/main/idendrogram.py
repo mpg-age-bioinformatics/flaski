@@ -6,6 +6,7 @@ from scipy.spatial.distance import pdist
 import scipy.cluster.hierarchy as sch
 from collections import OrderedDict
 import numpy as np
+import sys
 
 def GET_COLOR(x):
     if str(x)[:3].lower() == "rgb":
@@ -37,6 +38,13 @@ def make_figure(df,pa):
         
     """
     #UPLOAD ARGUMENTS
+
+    # for large datasets one needs to increase the recursion limit from 3000 to 10000.
+    # the problem here is that this 
+    #limit = sys.getrecursionlimit()
+    #print(limit)
+    #sys.setrecursionlimit(3000)  
+
     tmp=df.copy()
 
     fig = go.Figure( )
