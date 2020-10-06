@@ -124,7 +124,7 @@ Collecting usage entries:
 docker-compose run --entrypoint="python3 /flaski/flaski.py stats /backup/stats" init
 ```
 
-If you need to re-iniate your database
+If you need to re-initiate your database
 ```bash
 rm -rf migrations && flask db init && flask db migrate -m "users table" && flask db upgrade 
 ```
