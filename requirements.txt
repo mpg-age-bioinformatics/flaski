@@ -73,7 +73,7 @@ pexpect==4.8.0
 phantomjs==1.1.4
 pickleshare==0.7.5
 Pillow==7.1.0
-plotly==4.5.0
+plotly==4.11.0
 prometheus-client==0.7.1
 prompt-toolkit==3.0.3
 psutil==5.7.0

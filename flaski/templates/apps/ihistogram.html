@@ -542,14 +542,10 @@
                             <div class="bg-white py-2 collapse-inner rounded openmenu">
                                 <div class="row arguments">
 
-                                    <div class="row arg">
-                                        <label style="padding-left: 0px;">Histogram: </label>
-                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_hist {% if show_hist == "on"%} checked {% elif show_hist==".on" %} checked {% endif %}/></label>
-                                        <label style="width:86;padding-left:65px;">Rug:</label>
-                                        <label style="width:5px;padding-left:5px;"><input type="checkbox" name= show_rug {% if show_rug == "on" %} checked {% elif show_rug == ".on" %} checked {% endif %}/></label>
-                                        <label style="padding-left:69px;">Curve: </label>
-                                        <label  style="width:5px;padding-left:3px;"><input type="checkbox" name= show_curve {% if show_curve == "on"%} checked {% elif show_curve ==".on" %} checked {% endif %}/></label>
-                                    </div>
+                                        <label>Histogram: <input type="checkbox" name= show_hist {% if show_hist == "on"%} checked {% elif show_hist==".on" %} checked {% endif %}/></label>
+                                        <label style="padding-left:57px;">Rug: <input type="checkbox" name= show_rug {% if show_rug == "on" %} checked {% elif show_rug == ".on" %} checked {% endif %}/></label>
+                                        <label  style="padding-left:57px;">Curve: <input type="checkbox" name= show_curve {% if show_curve == "on"%} checked {% elif show_curve ==".on" %} checked {% endif %}/></label>
+
 
                                     <label style="padding-left:20px;">Curve type: <select  name=curve_type value="{{curve_type}}" method="GET" action="/" style="width:80px;">
                                         {% for curve_type_ in curve_types %}
