@@ -40,7 +40,6 @@ def make_figure(df,pa,fig=None,ax=None):
 
     #fig=plt.figure(figsize=(float(pa["fig_width"]),float(pa["fig_height"])))
 
-
     # if we have groups
     # the user can decide how the diferent groups should look like 
     # by unchecking the groups_autogenerate check box
