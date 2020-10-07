@@ -38,15 +38,16 @@ def add_header(r):
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
 
-# def nFormat(x):
-#     if str(x) == "nan":
-#         return ""
-#     elif float(x) == 0:
-#         return str(x)
-#     elif ( float(x) < 0.01 ) & ( float(x) > -0.01 ) :
-#         return str('{:.3e}'.format(float(x)))
-#     else:
-#         return str('{:.3f}'.format(float(x)))
+def nFormat(x):
+    try:
+        if float(x) == 0:
+            return str(x)
+        elif ( float(x) < 0.01 ) & ( float(x) > -0.01 ) :
+            return str('{:.3e}'.format(float(x)))
+        else:
+            return str('{:.3f}'.format(float(x)))
+    except ValueError:
+        return str(x)
 
 @app.route('/lifespan/<download>', methods=['GET', 'POST'])
 @app.route('/lifespan', methods=['GET', 'POST'])
@@ -106,14 +107,7 @@ def lifespan(download=None):
 
                         session["plot_arguments"]["ycols"]=cols
                         session["plot_arguments"]["yvals"]=cols[1:]
-
-                        # available_rows=pd.read_json(session["df"])
-                        # if plot_arguments["xvals"] in available_rows.columns.tolist():
-                        #     available_rows=available_rows[plot_arguments["xvals"]].tolist()
-                        #     available_rows=list(set(available_rows))
-                        #     available_rows.sort()
-                        #     session["plot_arguments"]["available_rows"]=available_rows
-                                    
+                                  
                         sometext="Please select which columns should be used for plotting."
                         plot_arguments=session["plot_arguments"]
                         flash(sometext,'info')
@@ -127,16 +121,6 @@ def lifespan(download=None):
                     return render_template('/apps/lifespan.html' , filename="Select file..", apps=apps, **plot_arguments)
 
             if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-
-                # if "df" in list(session.keys()):
-                #     available_rows=pd.read_json(session["df"])
-                #     if plot_arguments["xvals"] in available_rows.columns.tolist():
-                #         available_rows=available_rows[plot_arguments["xvals"]].tolist()
-                #         available_rows=list(set(available_rows))
-                #         available_rows.sort()
-                #         plot_arguments["available_rows"]=available_rows
-                # SELECTION LISTS DO NOT GET UPDATED 
-                # lists=session["lists"]
 
                 # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
                 # WITH THE EXCEPTION OF SELECTION LISTS
@@ -259,6 +243,10 @@ def lifespan(download=None):
                 df_selected=df_ls[:50]
                 cols_to_format=df_selected.columns.tolist()
                 table_headers=cols_to_format
+
+                for c in cols_to_format:
+                    df_selected[c]=df_selected[c].apply(lambda x: nFormat(x) )
+
                 df_selected=list(df_selected.values)
                 df_selected=[ list(s) for s in df_selected ]
 
@@ -286,18 +274,31 @@ def lifespan(download=None):
                 df_selected=df_ls[:50]
                 cols_to_format=df_selected.columns.tolist()
                 table_headers=cols_to_format
+
+                for c in cols_to_format:
+                    df_selected[c]=df_selected[c].apply(lambda x: nFormat(x) )
+
                 df_selected=list(df_selected.values)
                 df_selected=[ list(s) for s in df_selected ]
+
 
                 df_coeffs=cph_coeffs[:50]
                 cols_to_format_coeffs=df_coeffs.columns.tolist()
                 table_headers_coeffs=cols_to_format_coeffs
+
+                for c in cols_to_format_coeffs:
+                    df_coeffs[c]=df_coeffs[c].apply(lambda x: nFormat(x) )
+
                 df_coeffs=list(df_coeffs.values)
                 df_coeffs=[ list(s) for s in df_coeffs ]
 
                 df_stats=cph_stats[:50]
                 cols_to_format_stats=df_stats.columns.tolist()
                 table_headers_stats=cols_to_format_stats
+
+                for c in cols_to_format_stats:
+                    df_stats[c]=df_stats[c].apply(lambda x: nFormat(x) )
+
                 df_stats=list(df_stats.values)
                 df_stats=[ list(s) for s in df_stats ]
 

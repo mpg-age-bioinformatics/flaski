@@ -89,7 +89,7 @@ def make_figure(df,pa):
                ci_show=pa_["Conf_Interval"], \
                ci_legend=pa_["ci_legend"], \
                linestyle=pa["linestyle_value"], \
-               linewidth=float(pa["linewidth"]), \
+               linewidth=float(pa["linewidth_write"]), \
                color=pa["line_color_value"])
 
         pl.spines['right'].set_visible(pa_["right_axis"])
