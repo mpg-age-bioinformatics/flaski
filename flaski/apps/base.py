@@ -14,6 +14,7 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"Histogram", "id":'histogram_more',"link":'histogram' ,"java":"javascript:ReverseDisplay('histogram_more')", "description":"A histogram."},\
         {"name":"Violin plot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violin plot app. including box and swarm plots."},\
         { "name":"iViolin plot", "id":'iviolinplot_more',"link":'iviolinplot' ,"java":"javascript:ReverseDisplay('iviolinplot_more')", "description":"An interactive violin plot including box and swarm plots."},\
-        {"name":"KEGG", "id":'kegg_more',"link":'kegg' ,"java":"javascript:ReverseDisplay('kegg_more')", "description":"A KEGG mapping and plotting app."} ] #,\
+        {"name":"KEGG", "id":'kegg_more',"link":'kegg' ,"java":"javascript:ReverseDisplay('kegg_more')", "description":"A KEGG mapping and plotting app."} ,\
+        { "name":"LifeSpan", "id":'lifespan_more',"link":'lifespan' ,"java":"javascript:ReverseDisplay('lifespan_more')", "description":"A Survival Analysis app."}] #,\
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
