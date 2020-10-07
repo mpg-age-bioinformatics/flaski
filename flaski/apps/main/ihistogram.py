@@ -36,6 +36,7 @@ def make_figure(df,pa):
     # MAIN FIGURE
     #Load checkboxes
     pab={}
+    # print("Main", pa["kde"])
     for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","errorbar",\
         "errorbar_symmetric","tick_left_axis","tick_lower_axis","tick_upper_axis","tick_right_axis",\
         "kde","show_hist","show_curve","show_rug"]:

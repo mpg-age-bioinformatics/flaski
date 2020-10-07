@@ -118,87 +118,134 @@ def ihistogram(download=None):
                     return render_template('/apps/ihistogram.html' , filename=filename, apps=apps,**plot_arguments)
                     
                 #IF THE USER SELECTED THE COLUMNS TO BE PLOTTED FOR THE FIRST TIME OR IF THE USER CHANGES FROM KDE TO HIST OR FROM HIST TO KDE
-                if "kde" in request.form.keys() and session["plot_arguments"]["kde"]=="on":
-                    kde=False
-                elif "kde" not in request.form.keys() and session["plot_arguments"]["kde"] in [".off","off"]:
-                    kde=False
-                else:
-                    kde=True
                 
-                if session["plot_arguments"]["groups_settings"] == dict() or kde or session["plot_arguments"]["vals"]!=request.form.getlist("vals"):
-                    if "kde" not in request.form.keys():
-                        plot_arguments=session["plot_arguments"]
-                        plot_arguments["vals"]=request.form.getlist("vals")
-                        groups=plot_arguments["vals"]
-                        groups.sort()
-                        groups_settings=dict()
-                        for group in groups:
-                            groups_settings[group]={"name":group,\
-                                "values":df[group],\
-                                "label":group,\
-                                "color_value":"None",\
-                                "color_rgb":"",\
-                                "histnorm":"",\
-                                "orientation_value":"vertical",\
-                                "linewidth":0.5,\
-                                "linestyle_value":"solid",\
-                                "line_color":"lightgrey",\
-                                "line_rgb":"",\
-                                "opacity":"0.8",\
-                                "text":"",\
-                                "bins_number":"",\
-                                "hoverinfo":"all",\
-                                "hover_bgcolor":"None",\
-                                "hover_bordercolor":"None",\
-                                "hover_align":"auto",\
-                                "hover_fontfamily":"Default",\
-                                "hover_fontsize":"12",\
-                                "hover_fontcolor":"None",\
-                                "histfunc":"count",\
-                                "density":".off",\
-                                "cumulative_direction":"increasing",\
-                                "cumulative":".off"}
-                        
-                        #plot_arguments=read_request(request)       
-                        plot_arguments["groups_settings"]=groups_settings
-                        session["plot_arguments"]=plot_arguments
-                        filename=session["filename"]
-                        plot_arguments=session["plot_arguments"]
-            
-                        # READ INPUT DATA FROM SESSION JSON
-                        df=pd.read_json(session["df"])
-                        #CALL FIGURE FUNCTION
-                        fig=make_figure(df,plot_arguments)
-                        figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                # if "kde" in request.form.keys():
+                #     kde=True
+                # else:
+                #     kde=False
 
-                        return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
-                    else:
-                        plot_arguments=session["plot_arguments"]
-                        plot_arguments["vals"]=request.form.getlist("vals")
-                        groups=plot_arguments["vals"]
-                        groups.sort()
-                        groups_settings=dict()
-                        for group in groups:
-                            groups_settings[group]={
-                                "label":group,\
-                                "color_value":"None",\
-                                "color_rgb":"",\
-                                }
-                        plot_arguments=read_request(request)
-                        plot_arguments["groups_settings"]=groups_settings
-                        session["plot_arguments"]=plot_arguments
-                        filename=session["filename"]
-                        plot_arguments=session["plot_arguments"]
-            
-                        # READ INPUT DATA FROM SESSION JSON
-                        df=pd.read_json(session["df"])
+                # if "kde" in request.form.keys() and session["plot_arguments"]["kde"]=="on":
+                #     kde=False
+                # elif "kde" not in request.form.keys() and session["plot_arguments"]["kde"] in [".off","off"]:
+                #     kde=False
+                # else:
+                #     kde=True
 
-                        #CALL FIGURE FUNCTION
-                        fig=make_figure(df,plot_arguments)
-                        figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                # if "kde" in request.form.keys():
+                #     print("route!!!", session["plot_arguments"]["kde"])
+                # else:
+                #     print("NO ROUTE", session["plot_arguments"]["kde"])
 
-                        return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+                # set_histogram_groups
+                # set_kde_groups
+                # if (session["plot_arguments"]["vals"]!=request.form.getlist("vals")):
+                if ("kde" in request.form.keys()) and (session["plot_arguments"]["groups_settings"] == dict()):
+                    # kde and have no groups settings
+                    set_kde_groups=True
+                    set_histogram_groups=False
+                    session["plot_arguments"]["kde"]="on"
+                elif ("kde" not in request.form.keys()) and (session["plot_arguments"]["groups_settings"] == dict()):
+                    # histogram and no groups settings
+                    set_kde_groups=False
+                    set_histogram_groups=True
+                    session["plot_arguments"]["kde"]="off"
+                elif ( "kde" in request.form.keys() ) and ( session["plot_arguments"]["kde"] in [".off","off"] ):
+                    # coming from histogram to kde
+                    set_kde_groups=True
+                    set_histogram_groups=False
+                    session["plot_arguments"]["kde"]="on"
+                elif ( "kde" not in request.form.keys() ) and ( session["plot_arguments"]["kde"] in [".on","on"] ):
+                    # coming from kde to histogram
+                    set_kde_groups=False
+                    set_histogram_groups=True  
+                    session["plot_arguments"]["kde"]="off"                  
+                else:
+                    set_kde_groups=False
+                    set_histogram_groups=False
+                    session["plot_arguments"]["kde"]="off"  
+                # else:
+
+                #     set_kde_groups=False
+                #     set_histogram_groups=True
+
+                # print(set_kde_groups, set_histogram_groups)
+
+                # if (session["plot_arguments"]["vals"]!=request.form.getlist("vals")):# or (session["plot_arguments"]["groups_settings"] == dict()):
+                # # if session["plot_arguments"]["groups_settings"] == dict() or kde or session["plot_arguments"]["vals"]!=request.form.getlist("vals"):
+                if set_histogram_groups :
+                    plot_arguments=session["plot_arguments"]
+                    plot_arguments["vals"]=request.form.getlist("vals")
+                    groups=plot_arguments["vals"]
+                    groups.sort()
+                    groups_settings=dict()
+                    for group in groups:
+                        groups_settings[group]={"name":group,\
+                            "values":df[group],\
+                            "label":group,\
+                            "color_value":"None",\
+                            "color_rgb":"",\
+                            "histnorm":"",\
+                            "orientation_value":"vertical",\
+                            "linewidth":0.5,\
+                            "linestyle_value":"solid",\
+                            "line_color":"lightgrey",\
+                            "line_rgb":"",\
+                            "opacity":"0.8",\
+                            "text":"",\
+                            "bins_number":"",\
+                            "hoverinfo":"all",\
+                            "hover_bgcolor":"None",\
+                            "hover_bordercolor":"None",\
+                            "hover_align":"auto",\
+                            "hover_fontfamily":"Default",\
+                            "hover_fontsize":"12",\
+                            "hover_fontcolor":"None",\
+                            "histfunc":"count",\
+                            "density":".off",\
+                            "cumulative_direction":"increasing",\
+                            "cumulative":".off"}
+                    
+                    #plot_arguments=read_request(request)       
+                    plot_arguments["groups_settings"]=groups_settings
+                    session["plot_arguments"]=plot_arguments
+                    filename=session["filename"]
+                    plot_arguments=session["plot_arguments"]
+        
+                    # READ INPUT DATA FROM SESSION JSON
+                    df=pd.read_json(session["df"])
+                    #CALL FIGURE FUNCTION
+                    fig=make_figure(df,plot_arguments)
+                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+                    return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
+
+                elif set_kde_groups:
+                    plot_arguments=session["plot_arguments"]
+                    plot_arguments["vals"]=request.form.getlist("vals")
+                    groups=plot_arguments["vals"]
+                    groups.sort()
+                    groups_settings=dict()
+                    for group in groups:
+                        groups_settings[group]={
+                            "label":group,\
+                            "color_value":"None",\
+                            "color_rgb":"",\
+                            }
+                    plot_arguments=read_request(request)
+                    plot_arguments["groups_settings"]=groups_settings
+                    session["plot_arguments"]=plot_arguments
+                    filename=session["filename"]
+                    plot_arguments=session["plot_arguments"]
+        
+                    # READ INPUT DATA FROM SESSION JSON
+                    df=pd.read_json(session["df"])
+
+                    #CALL FIGURE FUNCTION
+                    fig=make_figure(df,plot_arguments)
+                    figure_url = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+                    return render_template('/apps/ihistogram.html', figure_url=figure_url, filename=filename, apps=apps, **plot_arguments)
 
             if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
@@ -216,7 +263,6 @@ def ihistogram(download=None):
             groups.sort()
             #IF THE USER WANTS TO PLOT A REGULAR HISTOGRAM  
             if plot_arguments["kde"]!="on":
-
                 #FOR COLUMNS ALREADY SELECTED BY USER
                 for group in groups:
                     if group not in plot_arguments["groups_settings"].keys():          
