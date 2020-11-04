@@ -189,7 +189,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     fig.update_xaxes(showline=pa_["xaxis_line"], linewidth=float(pa["xaxis_linewidth"]), linecolor='black', mirror=pa_["topxaxis_line"])
     fig.update_yaxes(showline=pa_["yaxis_line"], linewidth=float(pa["yaxis_linewidth"]), linecolor='black', mirror=pa_["rightyaxis_line"])
     fig.update_xaxes(ticks="outside", tickwidth=float(pa["xaxis_tickwidth"]), tickcolor='black', ticklen=float(pa["xaxis_ticklen"]) )
-    fig.update_layout(xaxis_showgrid=pa_["grid"])
+    fig.update_layout(xaxis_showgrid=pa_["grid"], font_color="black")
 
     return fig
 
