@@ -168,7 +168,10 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
 
     if pa["xaxis_label"]!="":
         fig.update_layout(xaxis_title=pa["xaxis_label"])
-
+    fig.update_layout(xaxis_title={ "font.size":int(pa["xaxis_label_size"])} )
+    if pa["yaxis_label"]!="":
+        fig.update_layout(yaxis_title=pa["yaxis_label"])
+    fig.update_layout(yaxis_title={ "font.size":int(pa["yaxis_label_size"])} )
 
     fig.update_layout({"yaxis":{"tickfont":{"size": float(pa["yaxis_font_size"]) }}, "xaxis":{"tickfont":{"size":float(pa["xaxis_font_size"])}} })
 
@@ -244,6 +247,9 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "upper_color":"",\
         "title":"Cell plot",\
         "xaxis_label":"",\
+        "xaxis_label_size":"14",\
+        "yaxis_label":"",\
+        "yaxis_label_size":"14",\
         "yaxis_font_size":"10",\
         "xaxis_font_size":"10",\
         "title_font_size":"20",\
