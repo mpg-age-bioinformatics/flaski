@@ -294,13 +294,21 @@
                             <label style="padding-left:4px;">length: <input type="text" name="color_bar_ticklen" value='{{ color_bar_ticklen }}' style="width:38px;height:22px;padding-left:4px"></label>
 
                             <label style="padding-left:0px;padding-right:5px;">Y-Axis line: </label><label><input type="checkbox" name="yaxis_line" {% if yaxis_line=="on" %} checked {% elif yaxis_line==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:27px;padding-right:4px;">right side: </label><label><input type="checkbox" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:28px;">width: <input type="text" name="yaxis_linewidth" value='{{ yaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            <label style="padding-left:130px;padding-right:4px;">mirror line: </label><label><input type="checkbox" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/></label>
                             
                             <label style="padding-left:0px;padding-right:4px;">X-Axis line: </label><label><input type="checkbox" name="xaxis_line" {% if xaxis_line=="on" %} checked {% elif xaxis_line==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:35px;padding-right:4px;">top side: </label><label><input type="checkbox" name="topxaxis_line" {% if topxaxis_line=="on" %} checked {% elif topxaxis_line==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:28px;">width: <input type="text" name="xaxis_linewidth" value='{{ xaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label>
-                            
+                            <label style="padding-left:8px;">positon: <select name=xaxis_side method="GET" action="/" style="width:60px;"> 
+                                {% for xaxis_side_ in xaxis_side_opt %}
+                                    <option value="{{xaxis_side_}}" {% if xaxis_side_==xaxis_side %} selected {% endif %}>{{xaxis_side_}}</option>
+                                {% endfor %}
+                            </select></label>
+                            <label style="padding-left:9px;padding-right:4px;">mirror line: </label><label><input type="checkbox" name="topxaxis_line" {% if topxaxis_line=="on" %} checked {% elif topxaxis_line==".on" %} checked {% endif %}/></label>
+
+
+                            <label style="padding-left:0px;">Lines width:  <input type="text" name="yaxis_linewidth" value='{{ yaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label>
+                            <!-- <label style="padding-left:28px;">width: <input type="text" name="xaxis_linewidth" value='{{ xaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label> -->
+
+
                             <label>X-Axis label: <input type="text" name="xaxis_label" value='{{ xaxis_label }}' style="width:218px;height:22px;padding-left: 4px"></label>
                             <label>Y-Axis label: <input type="text" name="yaxis_label" value='{{ yaxis_label }}' style="width:218px;height:22px;padding-left: 4px"></label>
 

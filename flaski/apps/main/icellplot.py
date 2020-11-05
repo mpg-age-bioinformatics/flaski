@@ -189,9 +189,15 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     fig["data"][0]['hovertemplate']='<b>%{hovertext}</b><br>'+pa["expression_values"]+'=%{marker.color}<br><br>term: %{y}<br>term p value=%{customdata[1]}<br>n genes=%{customdata[2]}'
     fig.update_layout(template='plotly_white')
 
-    fig.update_xaxes(showline=pa_["xaxis_line"], linewidth=float(pa["xaxis_linewidth"]), linecolor='black', mirror=pa_["topxaxis_line"])
+    fig.update_xaxes(showline=pa_["xaxis_line"], linewidth=float(pa["yaxis_linewidth"]), linecolor='black', mirror=pa_["topxaxis_line"])
     fig.update_yaxes(showline=pa_["yaxis_line"], linewidth=float(pa["yaxis_linewidth"]), linecolor='black', mirror=pa_["rightyaxis_line"])
     fig.update_xaxes(ticks="outside", tickwidth=float(pa["xaxis_tickwidth"]), tickcolor='black', ticklen=float(pa["xaxis_ticklen"]) )
+    print("!!", pa["xaxis_side"])
+    import sys
+    sys.stdout.flush()
+    fig.update_xaxes( side=pa["xaxis_side"] )
+    # 'layout': {'xaxis': {'range': [40, 0], 'side': 'top'}
+
     fig.update_layout(xaxis_showgrid=pa_["grid"], font_color="black")
 
     return fig
@@ -261,6 +267,8 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "xaxis_line":".on",\
         "xaxis_linewidth":"2",\
         "topxaxis_line":".on",\
+        "xaxis_side_opt":["bottom","top"],\
+        "xaxis_side":"bottom",\
         "yaxis_line":".on",\
         "yaxis_linewidth":"2",\
         "rightyaxis_line":".on",\
