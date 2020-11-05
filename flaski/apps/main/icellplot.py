@@ -192,11 +192,10 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     fig.update_xaxes(showline=pa_["xaxis_line"], linewidth=float(pa["yaxis_linewidth"]), linecolor='black', mirror=pa_["topxaxis_line"])
     fig.update_yaxes(showline=pa_["yaxis_line"], linewidth=float(pa["yaxis_linewidth"]), linecolor='black', mirror=pa_["rightyaxis_line"])
     fig.update_xaxes(ticks="outside", tickwidth=float(pa["xaxis_tickwidth"]), tickcolor='black', ticklen=float(pa["xaxis_ticklen"]) )
-    print("!!", pa["xaxis_side"])
-    import sys
-    sys.stdout.flush()
     fig.update_xaxes( side=pa["xaxis_side"] )
-    # 'layout': {'xaxis': {'range': [40, 0], 'side': 'top'}
+
+    # setting the range of the x-axis
+    # fig.layout.xaxis.update(range=[0, 25])
 
     fig.update_layout(xaxis_showgrid=pa_["grid"], font_color="black")
 
