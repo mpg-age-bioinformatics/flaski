@@ -254,6 +254,9 @@
                 <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
+                            <label style="padding-left:0px;padding-right:4px;">Annotation bars with n. terms: </label><label><input type="checkbox" name="write_n_terms" {% if write_n_terms=="on" %} checked {% elif write_n_terms==".on" %} checked {% endif %}/></label>
+                            <label style="padding-left:23px;"> size: <input type="text" name="annotation_size" value='{{ annotation_size }}' style="width:40px;height:22px;padding-left:4px"></label>
+
                             <label style="padding-left:0px;padding-right:4px;">Reverse rows order: </label><label><input type="checkbox" name="reverse_y_order" {% if reverse_y_order=="on" %} checked {% elif reverse_y_order==".on" %} checked {% endif %}/></label>
 
                             <label>CMAP: <select name=color_scale_value method="GET" action="/" style="width:180px;"> 

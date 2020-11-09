@@ -3,7 +3,7 @@ import plotly.express as px
 import numpy as np
 
 
-CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyaxis_line","grid","reverse_color_scale","reverse_y_order"]
+CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyaxis_line","grid","reverse_color_scale","reverse_y_order","write_n_terms"]
 
 
 def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
@@ -100,6 +100,12 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         plotdf=pd.concat([plotdf,tmp])
     plotdf.reset_index(inplace=True, drop=True)
 
+    for term in list(set(plotdf["term"].tolist())):
+        index_values=plotdf[plotdf["term"]==term].index.tolist()
+        if pa_["write_n_terms"]:
+            index_values=index_values[:-1]
+        plotdf.loc[index_values,"n_genes"]=np.nan
+
     expression=plotdf["expression"].tolist()
 
     if pa["lower_expression_percentile"]=="":
@@ -145,10 +151,6 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
             range_diff=float(pa["upper_value"]) - float(pa["lower_value"])
             center=float(pa["center_value"]) - float(pa["lower_value"])
             center=center/range_diff
-
-            # color_continuous_scale=[ [0, pa["lower_color"]],\
-            #     [center, pa["center_color"]],\
-            #     [1, pa["upper_color"] ]]
             
         else:
             range_diff=high - low
@@ -158,14 +160,15 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         color_continuous_scale=[ [0, pa["lower_color"]],\
             [center, pa["center_color"]],\
             [1, pa["upper_color"] ]]
-
+    
         fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
                 color_continuous_scale=color_continuous_scale, \
                 hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
                 range_color=[low,high],\
                 title=pa["title"],\
                 width=pa_["width"],\
-                height=pa_["height"] )
+                height=pa_["height"],\
+                text="n_genes")
  
     else:
         color_continuous_scale=pa_["color_scale_value"]
@@ -176,7 +179,8 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
                     title=pa["title"],\
                     color_continuous_midpoint=pa_["color_continuous_midpoint"],
                     width=pa_["width"],\
-                    height=pa_["height"] )
+                    height=pa_["height"] ,\
+                    text="n_genes")
         else:
             fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
                     color_continuous_scale=color_continuous_scale, \
@@ -184,10 +188,13 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
                     title=pa["title"],\
                     range_color=[low,high],\
                     width=pa_["width"],\
-                    height=pa_["height"] )
+                    height=pa_["height"],\
+                    text="n_genes")
 
     # fig.update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
     #                 marker_line_width=1.5, opacity=0.6)
+
+    fig.update_traces(textposition='outside', textfont_size=int(pa["annotation_size"]) )
 
     fig.update_traces(marker_line_width=0)
 
@@ -283,6 +290,8 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "yaxis_font_size":"10",\
         "xaxis_font_size":"10",\
         "title_font_size":"20",\
+        "annotation_size":"12",\
+        "write_n_terms":".off",\
         "color_bar_title":"color bar",\
         "color_bar_title_font_size":"10",\
         "color_bar_tickwidth":"2",\
