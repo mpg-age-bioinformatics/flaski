@@ -127,14 +127,33 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
    
 
     selfdefined_cmap=True
-    for value in ["lower_value","center_value","upper_value","lower_color","center_color","upper_color"]:
+    for value in ["lower_color","center_color","upper_color"]:
         if pa[value]=="":
             selfdefined_cmap=False
             break
     if selfdefined_cmap:
-        range_diff=float(pa["upper_value"]) - float(pa["lower_value"])
-        center=float(pa["center_value"]) - float(pa["lower_value"])
-        center=center/range_diff
+        given_values=True
+        for value in ["lower_value","center_value","upper_value"]:
+            if pa[value]=="":
+                given_values=False
+                break
+        
+        if given_values:
+            low=float(pa["lower_value"])
+            high=float(pa["upper_value"])
+
+            range_diff=float(pa["upper_value"]) - float(pa["lower_value"])
+            center=float(pa["center_value"]) - float(pa["lower_value"])
+            center=center/range_diff
+
+            # color_continuous_scale=[ [0, pa["lower_color"]],\
+            #     [center, pa["center_color"]],\
+            #     [1, pa["upper_color"] ]]
+            
+        else:
+            range_diff=high - low
+            center=( (high-low)/2+low ) - low
+            center=center/range_diff
 
         color_continuous_scale=[ [0, pa["lower_color"]],\
             [center, pa["center_color"]],\
@@ -143,7 +162,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
                 color_continuous_scale=color_continuous_scale, \
                 hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
-                range_color=[float(pa["lower_value"]),float(pa["upper_value"])],\
+                range_color=[low,high],\
                 title=pa["title"],\
                 width=pa_["width"],\
                 height=pa_["height"] )
