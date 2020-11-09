@@ -3,7 +3,7 @@ import plotly.express as px
 import numpy as np
 
 
-CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyaxis_line","grid","reverse_color_scale"]
+CHECKBOXES=["log10transform","xaxis_line","topxaxis_line","yaxis_line","rightyaxis_line","grid","reverse_color_scale","reverse_y_order"]
 
 
 def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
@@ -37,6 +37,12 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     david_df=david_df[ david_df[ pa["categories_column"] ].isin( pa["categories_to_plot_value"] ) ]
 
     david_df=david_df[0: int(pa["number_of_terms"]) ]
+    david_df.reset_index(inplace=True, drop=True)
+
+    if pa_["reverse_y_order"]:
+        david_df["____order____"]=david_df.index.tolist()
+        david_df=david_df.sort_values(by=["____order____"], ascending=False)
+        david_df=david_df.drop(["____order____"],axis=1)
 
     if pa["annotation_column_value"]=="none":
         gedic=ge_df[[ pa["gene_identifier"] , pa["expression_values"] ]]
@@ -263,6 +269,7 @@ def figure_defaults(checkboxes=CHECKBOXES):
         "color_bar_tickwidth":"2",\
         "color_bar_tickfont":"10",\
         "color_bar_ticklen":"5",\
+        "reverse_y_order":".off",\
         "xaxis_line":".on",\
         "xaxis_linewidth":"2",\
         "topxaxis_line":".on",\

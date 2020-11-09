@@ -254,6 +254,7 @@
                 <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
                         <div class="row arguments">
+                            <label style="padding-left:0px;padding-right:4px;">Reverse rows order: </label><label><input type="checkbox" name="reverse_y_order" {% if reverse_y_order=="on" %} checked {% elif reverse_y_order==".on" %} checked {% endif %}/></label>
 
                             <label>CMAP: <select name=color_scale_value method="GET" action="/" style="width:180px;"> 
                                 {% for colorscale_ in color_scale %}
