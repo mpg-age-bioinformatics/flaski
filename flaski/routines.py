@@ -209,13 +209,16 @@ def read_private_apps(useremail,app):
         for entry in list(dic.keys()):
             private_app=dic[entry]
             allowed=private_app["allowed"].split(",")
+            added=False
             if "all" in allowed:
                 del(private_app["allowed"])
                 PRIVATE_APPS.append(private_app)
+                added=True
             elif useremail in allowed:
                 del(private_app["allowed"])
                 PRIVATE_APPS.append(private_app)
-            if len([ s for s in allowed if s[0] == "#" ]) > 0 :
+                added=True
+            if ( not added) and  ( len([ s for s in allowed if s[0] == "#" ]) > 0 ):
                 for domain in [ s for s in allowed if s[0] == "#" ]:
                     if domain[1:] in useremail:
                         del(private_app["allowed"])
