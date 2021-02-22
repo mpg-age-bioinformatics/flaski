@@ -6,7 +6,7 @@ services:
   container_name: init
   build:
     context: ./
-    dockerfile: Dockerfile
+    dockerfile: services/server/dockerfiles/Dockerfile
   user: root
   volumes:
     - data:/flaski_data/users
@@ -38,7 +38,7 @@ services:
     - 8887:8888 #jupyterhub
   build:
     context: ./
-    dockerfile: Dockerfile
+    dockerfile: services/server/dockerfiles/Dockerfile
   restart: always
   volumes:
    - data:/flaski_data/users
