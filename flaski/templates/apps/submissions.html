@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block app_title %}
+
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">DAVID</h1>
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block side_bar_content %}
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+        <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+        <!-- /div -->
+        <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+            </div>
+        <!--/div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
+
+        <form action="{{ url_for('david') }}" method="post" enctype="multipart/form-data">
+
+            <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
+            <!-- Heading -->
+            <div class="sidebar-heading">Target genes</div>
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
+                <textarea rows = "5" cols = "60" name = "ids" id="ids">{{ids}}
+                </textarea>
+            </div>
+            
+            <div class="sidebar-heading">Background genes</div>
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
+                <textarea rows = "5" cols = "60" name = "ids_bg" id="ids_bg">{{ids_bg}}
+                </textarea>
+            </div>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+            Arguments:
+            </div>
+
+            <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item" style="padding-bottom: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Categories</span>
+                </a>
+                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Gene ontology:</label>
+                                <select multiple name=categories_gene_ontology_value method="GET" action="/" style="width:302px;">
+                                    {% for category in categories_gene_ontology %}
+                                        <option value="{{category}}" {% if category in categories_gene_ontology_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Gene domains:</label>
+                                <select multiple name=categories_gene_domains_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_gene_domains %}
+                                        <option value="{{category}}" {% if category in categories_gene_domains_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Pathways:</label>
+                                <select multiple name=categories_pathways_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_pathways %}
+                                        <option value="{{category}}" {% if category in categories_pathways_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>General annotations:</label>
+                                <select multiple name=categories_general_annotations_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_general_annotations %}
+                                        <option value="{{category}}" {% if category in categories_general_annotations_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Functional categories:</label>
+                                <select multiple name=categories_functional_categories_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_functional_categories %}
+                                        <option value="{{category}}" {% if category in categories_functional_categories_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Protein-protein interactions:</label>
+                                <select multiple name=categories_protein_protein_interactions_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_protein_protein_interactions %}
+                                        <option value="{{category}}" {% if category in categories_protein_protein_interactions_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Literature:</label>
+                                <select multiple name=categories_literature_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_literature %}
+                                        <option value="{{category}}" {% if category in categories_literature_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row arg" style="padding-bottom:10px;">
+                                <label>Disease:</label>
+                                <select multiple name=categories_disease_value method="GET" action="/" style="width:302px">
+                                    {% for category in categories_disease %}
+                                        <option value="{{category}}" {% if category in categories_disease_value %} selected {% endif %}>{{category}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- Input ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseClustering" aria-expanded="true" aria-controls="collapseClustering" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Input</span>
+                </a>
+                <div id="collapseClustering" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label>Database: <select name=database_value method="GET" action="/" style="width:233px">
+                                {% for db in database %}
+                                    <option value="{{db}}" {% if db==database_value %} selected {% endif %}>{{db}}</option>
+                                {% endfor %}
+                            </select></label>
+
+                            <label style="padding-left:0x;padding-right:4px;">DAVID registered email: <input type="text" name="user" value='{{ user }}' style="width:142px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0x;padding-right:4px;">Target list name: <input type="text" name="name" value='{{ name }}' style="width:189px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:0x;padding-right:4px;">Background list name: <input type="text" name="name_bg" value='{{ name_bg }}' style="width:154px;height:22px;padding-left: 4px"></label>
+
+                        </div>
+        
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- CUT-OFFS ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePlot" aria-expanded="true" aria-controls="collapsePlot" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Cut-offs</span>
+                </a>
+                <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <label style="padding-left:0px;padding-right:4px;">number of genes per term: <input type="text" name="n" value='{{ n }}' style="width:97px;height:22px;padding-left: 4px"></label>
+                            <label style="padding-left:118px;padding-right:4px;">p value: <input type="text" name="p" value='{{ p }}' style="width:97px;height:22px;padding-left: 4px"></label>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom:12px;">Management:</div>
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-download"></i>
+                    <span>Output</span>
+                </a>
+                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="download_name" value='{{ download_name }}' style="width:298px;height:30px;padding-left: 4px">
+                            </div>   
+                            <div class="row arg">
+                                <label> format: <select name=download_format_value method="GET" action="/" style="width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==download_format_value %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Arguments</span>
+                </a>
+                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload arguments file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
+                    <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                    <span>Session</span>
+                </a>
+                <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu">
+                        <div class="row arguments">
+
+                            <div class="row arg">
+                                <label>Upload session file:
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
+                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg">
+                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_download_name" value='{{ session_download_name }}'>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+
+            <!-- -------------------- SUBMIT ---------------------- -->
+
+            <div style="padding-right: 15px; padding-left: 15px;" >
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" onclick="loading();" />
+            </div>
+        </form>
+
+                <!-- Divider -->
+        <!--hr class="sidebar-divider d-none d-md-block"-->
+    </div>
+    
+      <!-- Sidebar Toggler (Sidebar) -->
+      <!-- div class="text-center d-none d-md-inline" -->
+        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
+      <!-- /div -->
+
+</ul>
+
+{% endblock %}
+
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
+{% block content %}
+<div style="margin-left:150px;" id="loading"></div>
+<div id="contentready" class="container-fluid">
+
+    {% if david_contents %}
+
+    <div class="table-responsive" style="overflow-y:auto;height:calc(100vh - 260px);">
+        <table id="listr-table" class="table table-hover">
+            <thead>
+                <tr>
+                    {% for entry in table_headers %}
+                    <th class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort="string">{{entry}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <td colspan="5">
+                    <small class="pull-xs-left text-muted" dir="ltr">Showing top 50 results. Download table to see the complete list of results.</small>
+                </td>
+            </tr>
+            </tfoot>
+            <tbody>
+
+                {% for entry in david_contents %}
+                <tr>
+                    {% for col in entry %}
+                    <td class="text-xs-left" style="padding-left:0px;padding-right:8px;" data-sort-value="{{col}}" title="{{col}}">{{col}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+
+    <!--div style="margin-left:150px;" id="loader"></div-->
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        {% elif category == "traceback" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+            </div>
+            <div class="card-body">
+                {% autoescape false %}
+                {{ message }}
+                <br>Something went wrong. Review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+                If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                <br>
+                {% endautoescape %}
+
+                <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                    <div class="pull-xs-right" style="float:right;">
+                        <div class="btn-group" style="float:right;">
+                            <button type="submit" class="btn btn-primary" style="float:right;">
+                                <i></i> Ice cream
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <!-- INFORMATION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if david_in_store %}
+        <div id=""  style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+
+        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('david', download='download') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Results
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('david', download='cellplot') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="far fa-chart-bar"></i> iCellplot
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+                <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-th fa-sm text-white-50"></i> Session
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+                <form action="https://github.com/mpg-age-bioinformatics/flaski/wiki/DAVID#citing">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-scroll fa-sm text-white-50"></i> Citing
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        </div>
+
+    {% endif %}  
+
+</div>
+
+{% endblock %}
+
+
+
+{% block in_app_footer %}
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+        <span>Copyright &copy; Flaski, The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}
