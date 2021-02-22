@@ -12,10 +12,6 @@ RUN mkdir -p /var/log/flaski /flaski/.git /flaski/data /flaski/flaski /flaski/mi
 RUN touch /mysql_backup.log && touch /rsync.log
 RUN chown -R flaski:flaski /flaski_data /flaski_data/users /flaski/migrations /var/log/flaski /mysql_backup.log /rsync.log
 
-RUN apt-get update && apt-get -yq dist-upgrade && \
-apt-get install -yq sudo && \
-apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # comment during development
 COPY requirements.txt /flaski/
 RUN pip3 install -r /flaski/requirements.txt
