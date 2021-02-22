@@ -215,7 +215,7 @@ def read_private_apps(useremail,app):
             elif useremail in allowed:
                 del(private_app["allowed"])
                 PRIVATE_APPS.append(private_app)
-            elif len([ s for s in allowed if s[0] == "#" ]) > 0 :
+            if len([ s for s in allowed if s[0] == "#" ]) > 0 :
                 for domain in [ s for s in allowed if s[0] == "#" ]:
                     if domain[1:] in useremail:
                         del(private_app["allowed"])
