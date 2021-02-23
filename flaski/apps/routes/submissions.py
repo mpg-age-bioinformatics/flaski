@@ -83,12 +83,12 @@ def submissions():
             ## get this into json like in former apps
             submission_df=submission_df.astype(str)
 
-            session["submission_df"]=david_df.to_json()
+            session["submission_df"]=submission_df.to_json()
             # session["mapped"]=mapped.to_json()
 
 
 
-            return render_template('/apps/submissions.html', apps=apps, table_headers=table_headers, david_contents=david_contents, **plot_arguments)
+            return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="submissions",session=session)
