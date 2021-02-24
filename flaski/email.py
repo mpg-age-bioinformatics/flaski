@@ -10,14 +10,14 @@ def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
 
-def send_email(subject, sender, recipients, text_body, html_body, reply_to, attatchment=None):
+def send_email(subject, sender, recipients, text_body, html_body, reply_to, attatchment=None, attatchment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
     msg = Message(subject, sender=sender, recipients=recipients, reply_to = reply_to)
     msg.body = text_body
     msg.html = html_body
     if attatchment:
         msg.attach(
             secure_filename(attatchment.filename),
-            'application/octect-stream',
+            attatchment_type,
             attatchment.read())
         
     Thread(target=send_async_email, args=(app, msg)).start()
