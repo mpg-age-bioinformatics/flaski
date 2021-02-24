@@ -7,7 +7,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from datetime import datetime
 from flaski import db
 from werkzeug.urls import url_parse
-from flaski.apps.main.submission import submission_check, submission_defaults
+from flaski.apps.main.submission import submission_check #, submission_defaults
 from flaski.models import User, UserLogging
 from flaski.email import send_exception_email
 from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file
@@ -48,53 +48,56 @@ def submissions():
         # INITIATE SESSION
         session["filename"]="Select file.."
 
-        submission_arguments=submission_defaults()
+        # submission_arguments=submission_defaults()
 
-        session["plot_arguments"]=submission_arguments
+        # session["plot_arguments"]=submission_arguments
         session["COMMIT"]=app.config['COMMIT']
         session["app"]="submissions"
 
     if request.method == 'POST' :
 
         try:
-            if request.files["inputsessionfile"] :
-                msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"david")
-                if error:
-                    flash(msg,'error')
-                    return render_template('/apps/submissions.html' , filename=session["filename"],apps=apps, **plot_arguments)
-                flash(msg,"info")
+            # if request.files["inputsessionfile"] :
+            #     msg, plot_arguments, error=read_session_file(request.files["inputsessionfile"],"submissions")
+            #     if error:
+            #         flash(msg,'error')
+            #         return render_template('/apps/submissions.html' , filename=session["filename"],apps=apps, **plot_arguments)
+            #     flash(msg,"info")
 
-            if request.files["inputargumentsfile"] :
-                msg, plot_arguments, error=read_argument_file(request.files["inputargumentsfile"],"david")
-                if error:
-                    flash(msg,'error')
-                    return render_template('/apps/submissions.html' , filename=session["filename"], apps=apps, **plot_arguments)
-                flash(msg,"info")
+            # if request.files["inputargumentsfile"] :
+            #     msg, plot_arguments, error=read_argument_file(request.files["inputargumentsfile"],"david")
+            #     if error:
+            #         flash(msg,'error')
+            #         return render_template('/apps/submissions.html' , filename=session["filename"], apps=apps, **plot_arguments)
+            #     flash(msg,"info")
 
-            if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-                plot_arguments=read_request(request)
+            # if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
+            plot_arguments=read_request(request)
+
+            inputfile = request.files["inputfile"]
+            if inputfile:
+                filename = secure_filename(inputfile.filename)
+                if allowed_file(inputfile.filename):
+                    df=read_tables(inputfile)
 
             # CALL FIGURE FUNCTION
-            status, msg=submission_check(plot_arguments)
-            if msg:
+            status, msg=submission_check(df)
+            if not status:
                 flash(msg,"error")
-                return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
+                return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
-            ## get this into json like in former apps
-            submission_df=submission_df.astype(str)
-
-            session["submission_df"]=submission_df.to_json()
-            # session["mapped"]=mapped.to_json()
+            if status:
+                flash(msg)
+                return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
 
-
-            return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
+            # return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
 
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="submissions",session=session)
             flash(tb_str,'traceback')
-            return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
+            return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
     else:
 
-        return render_template('apps/submissions.html',  apps=apps, **session["plot_arguments"])
+        return render_template('apps/submissions.html',  apps=apps) #, **session["plot_arguments"])

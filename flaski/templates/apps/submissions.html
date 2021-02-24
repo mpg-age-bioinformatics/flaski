@@ -40,17 +40,16 @@
 
             <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
             <!-- Heading -->
-            <div class="sidebar-heading">Target genes</div>
-            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;" >
-                <textarea rows = "5" cols = "60" name = "ids" id="ids">{{ids}}
-                </textarea>
-            </div>
-            
-            <div class="sidebar-heading">Background genes</div>
-            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
-                <textarea rows = "5" cols = "60" name = "ids_bg" id="ids_bg">{{ids_bg}}
-                </textarea>
-            </div>
+            <div class="sidebar-heading">Submission file</div>
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
+                    <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
+                    <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
+                </div>
+                <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
+                <!--input class="form-control" type="text" placeholder="input file"-->
+            </div> 
 
             <!-- Divider -->
             <hr class="sidebar-divider">

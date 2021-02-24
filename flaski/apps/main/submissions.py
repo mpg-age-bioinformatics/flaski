@@ -7,8 +7,3 @@ def submission_check(df, submission_type="RNAseq"):
   if submission_type=="RNAseq":
     status, msg=check_rnaseq(df)
   return status, msg
-
-def submission_defaults():
-  submissions_types=["RNAseq"]
-  submissions_type="RNAseq"
-  return plot_arguments
