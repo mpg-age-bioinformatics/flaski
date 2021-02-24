@@ -3,15 +3,23 @@ from flask import render_template
 from flaski import app
 from flask_mail import Message
 from flaski import mail
+from werkzeug.utils import secure_filename
+
 
 def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
 
-def send_email(subject, sender, recipients, text_body, html_body, reply_to):
+def send_email(subject, sender, recipients, text_body, html_body, reply_to, attatchment=None):
     msg = Message(subject, sender=sender, recipients=recipients, reply_to = reply_to)
     msg.body = text_body
     msg.html = html_body
+    if attatchment:
+        msg.attach(
+            secure_filename(attatchment.filename),
+            'application/octect-stream',
+            attatchment.read())
+        
     Thread(target=send_async_email, args=(app, msg)).start()
 
 def send_password_reset_email(user):
@@ -80,3 +88,15 @@ def send_help_email(user,eapp,emsg,etime,session_file):
                 html_body=render_template('email/app_help.html',
                                             user=user, eapp=eapp, emsg=emsg_html, etime=etime, session_file=session_file),\
                 reply_to=user.email )                                   
+
+def send_submission_email(user,submission_type,submission_file):
+    with app.app_context():
+        send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[user.email,"bioinformatics@age.mpg.de"],
+                text_body=render_template('email/submissions.txt',
+                                            user=user, submission_type=submission_type),
+                html_body=render_template('email/submissions.html',
+                                            user=user, submission_type=submission_type),\
+                reply_to='bioinformatics@age.mpg.de',\
+                attatchment=submission_file   )

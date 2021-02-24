@@ -1,0 +1,7 @@
+Files have been submitted by {{ user.firstname }} for {{ submission_type }} analysis.
+
+Submission form attached.
+
+Cheers!
+
+Flaski

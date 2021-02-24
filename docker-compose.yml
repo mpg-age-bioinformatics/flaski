@@ -41,10 +41,10 @@ services:
     dockerfile: services/server/dockerfiles/Dockerfile
   restart: always
   volumes:
+   - ./utils/dev.py:/flaski/flaski/apps/external.py # this needs to be the first volume as otherwise it will be overwritten by `- ./:/flaski`
    - data:/flaski_data/users
    - ./:/flaski
    - ~/flaski_private:/flaski_private:ro
-   - ./utils/dev.py:/flaski/flaski/apps/external.py
   environment:
    - LOGS=/var/log/flaski/
    - SECRET_KEY=${SECRET_KEY}

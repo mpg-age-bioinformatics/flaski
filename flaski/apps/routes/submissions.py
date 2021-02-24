@@ -1,4 +1,5 @@
 from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file, flash, jsonify
+from flask import Markup
 from flaski import app
 from werkzeug.utils import secure_filename
 from flask_session import Session
@@ -7,9 +8,9 @@ from flask_login import current_user, login_user, logout_user, login_required
 from datetime import datetime
 from flaski import db
 from werkzeug.urls import url_parse
-from flaski.apps.main.submission import submission_check #, submission_defaults
+from flaski.apps.main.submissions import submission_check #, submission_defaults
 from flaski.models import User, UserLogging
-from flaski.email import send_exception_email
+from flaski.email import send_exception_email, send_submission_email
 from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file
 
 
@@ -45,6 +46,7 @@ def submissions():
     reset_info=check_session_app(session,"submissions",apps)
     if reset_info:
         flash(reset_info,'error')
+
         # INITIATE SESSION
         session["filename"]="Select file.."
 
@@ -72,24 +74,26 @@ def submissions():
             #     flash(msg,"info")
 
             # if not request.files["inputsessionfile"] and not request.files["inputargumentsfile"] :
-            plot_arguments=read_request(request)
+            # plot_arguments=read_request(request)
 
             inputfile = request.files["inputfile"]
             if inputfile:
                 filename = secure_filename(inputfile.filename)
-                if allowed_file(inputfile.filename):
-                    df=read_tables(inputfile)
+                if not allowed_file(inputfile.filename):
+                    msg="This file is not allowed."
+                    flash(msg,"error")
+                    return render_template('/apps/submissions.html', apps=apps)
 
             # CALL FIGURE FUNCTION
-            status, msg=submission_check(df)
+            status, msg=submission_check(inputfile)
             if not status:
                 flash(msg,"error")
                 return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
             if status:
                 flash(msg)
+                send_submission_email(user=current_user, submission_type=status, submission_file=inputfile)
                 return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
-
 
             # return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
 
@@ -99,5 +103,6 @@ def submissions():
             return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
     else:
-
+        initial_message=Markup('For submitting samples please follow the instructions in  <a href="https://github.com/mpg-age-bioinformatics/submissions/blob/main/README.md#submissions" class="alert-link">here</a>.')
+        flash(initial_message)
         return render_template('apps/submissions.html',  apps=apps) #, **session["plot_arguments"])
