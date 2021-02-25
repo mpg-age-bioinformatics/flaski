@@ -5,3 +5,5 @@ Submission form attached.
 Cheers!
 
 Flaski
+
+FLASKI: {{ attachment_path }}

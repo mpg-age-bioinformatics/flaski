@@ -85,14 +85,14 @@ def submissions():
                     return render_template('/apps/submissions.html', apps=apps)
 
             # CALL FIGURE FUNCTION
-            status, msg=submission_check(inputfile)
+            status, msg, attachment_path=submission_check(inputfile)
             if not status:
                 flash(msg,"error")
                 return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
             if status:
                 flash(msg)
-                send_submission_email(user=current_user, submission_type=status, submission_file=inputfile)
+                send_submission_email(user=current_user, submission_type=status, submission_file=inputfile,attachment_path=attachment_path)
                 return render_template('/apps/submissions.html', apps=apps) #, **plot_arguments)
 
             # return render_template('/apps/submissions.html', apps=apps, **plot_arguments)
