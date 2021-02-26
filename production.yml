@@ -40,6 +40,7 @@ services:
   restart: always
   volumes:
    - data:/flaski_data/users
+   - /srv/submissions/:/submissions
    - /srv/private/:/flaski_private:ro
   environment:
    LOGS: /var/log/flaski/

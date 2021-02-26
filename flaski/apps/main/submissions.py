@@ -30,7 +30,7 @@ def check_rnaseq(EXC):
   status="RNAseq"
   msg="Submission successuful. Please check for email confirmation."
 
-  new_file, filename = tempfile.mkstemp(suffix=".xlsx")
+  new_file, filename = tempfile.mkstemp(suffix=".RNAseq.xlsx")
   os.close(new_file)
   filename="/submissions/"+os.path.basename(filename)
 
