@@ -32,6 +32,7 @@ def check_rnaseq(EXC):
 
   new_file, filename = tempfile.mkstemp(suffix=".xlsx")
   os.close(new_file)
+  filename="/submissions/"+os.path.basename(filename)
 
   # print(os.readlink(filename))
 
