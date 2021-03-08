@@ -47,6 +47,7 @@ def icellplot(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
     apps=current_user.user_apps
+    plot_arguments=None  
 
     reset_info=check_session_app(session,"icellplot",apps)
     if reset_info:
@@ -196,6 +197,8 @@ def icellplot(download=None):
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="icellplot",session=session)
             flash(tb_str,'traceback')
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/icellplot.html', filename=session["filename"], ge_filename=session["ge_filename"], apps=apps, **plot_arguments)
 
     else:

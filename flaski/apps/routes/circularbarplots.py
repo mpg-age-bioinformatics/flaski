@@ -53,6 +53,7 @@ def circularbarplots(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
     apps=current_user.user_apps
+    plot_arguments=None
 
     reset_info=check_session_app(session,"circularbarplots",apps)
     if reset_info:
@@ -184,6 +185,8 @@ def circularbarplots(download=None):
             tb_str=handle_exception(e,user=current_user,eapp="circularbarplots",session=session)
             filename=session["filename"]
             flash(tb_str,'traceback')
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/circularbarplots.html', filename=filename, apps=apps, **plot_arguments)
 
     else:

@@ -42,6 +42,8 @@ def add_header(r):
 def ihistogram(download=None):
 
     apps=current_user.user_apps
+    plot_arguments=None  
+
     reset_info=check_session_app(session,"ihistogram",apps)
     
     if reset_info:
@@ -250,6 +252,8 @@ def ihistogram(download=None):
             if "df" not in list(session.keys()):
                 error_msg="No data to plot, please upload a data or session  file."
                 flash(error_msg,'error')
+                if not plot_arguments:
+                    plot_arguments=session["plot_arguments"]
                 return render_template('/apps/ihistogram.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
           

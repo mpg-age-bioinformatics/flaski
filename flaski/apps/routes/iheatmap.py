@@ -46,6 +46,7 @@ def iheatmap(download=None):
     """       
 
     apps=current_user.user_apps
+    plot_arguments=None  
 
     reset_info=check_session_app(session,"iheatmap",apps)
     if reset_info:
@@ -157,6 +158,8 @@ def iheatmap(download=None):
             tb_str=handle_exception(e,user=current_user,eapp="iheatmap",session=session)
             filename=session["filename"]
             flash(tb_str,'traceback')
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/iheatmap.html', filename=filename, apps=apps, **plot_arguments)
 
     else:

@@ -43,6 +43,7 @@ def add_header(r):
 def david(download=None):
 
     apps=current_user.user_apps
+    plot_arguments=None  
 
     reset_info=check_session_app(session,"david",apps)
     if reset_info:
@@ -125,6 +126,8 @@ def david(download=None):
             flash(tb_str,'traceback')
             if "david_in_store" in list(session.keys()):
                 del(session["david_in_store"])
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/david.html', apps=apps, **plot_arguments)
 
     else:

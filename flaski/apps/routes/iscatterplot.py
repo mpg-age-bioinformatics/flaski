@@ -46,6 +46,7 @@ def iscatterplot(download=None):
     https://gist.github.com/illume/1f19a2cf9f26425b1761b63d9506331f
     """       
     apps=current_user.user_apps
+    plot_arguments=None  
 
     reset_info=check_session_app(session,"iscatterplot",apps)
     if reset_info:
@@ -222,7 +223,8 @@ def iscatterplot(download=None):
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="iscatterplot",session=session)
             flash(tb_str,'traceback')
-            plot_arguments=session["plot_arguments"]
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/iscatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
     else:

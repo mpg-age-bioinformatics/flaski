@@ -47,6 +47,8 @@ def add_header(r):
 def scatterplot(download=None):
     
     apps=current_user.user_apps
+    plot_arguments=None  
+
     reset_info=check_session_app(session,"scatterplot",apps)
 
     if reset_info:
@@ -228,6 +230,8 @@ def scatterplot(download=None):
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="scatterplot",session=session)
             flash(tb_str,'traceback')
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/scatterplot.html', filename=session["filename"], apps=apps, **session["plot_arguments"])
 
     else:

@@ -48,6 +48,8 @@ def add_header(r):
 def violinplot(download=None):
     
     apps=current_user.user_apps
+    plot_arguments=None  
+
     reset_info=check_session_app(session,"violinplot",apps)
 
     if reset_info:
@@ -177,6 +179,8 @@ def violinplot(download=None):
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="violinplot",session=session)
             flash(tb_str,'traceback')
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/violinplot.html', filename=session["filename"], apps=apps, **session["plot_arguments"])
 
     else:

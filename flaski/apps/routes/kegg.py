@@ -44,6 +44,7 @@ def add_header(r):
 def kegg(download=None):
 
     apps=current_user.user_apps
+    plot_arguments=None  
 
     # pa={}
     # pa["ids"]="HMDB00001\tred\nHMDB0004935\tred"
@@ -127,6 +128,8 @@ def kegg(download=None):
             flash(tb_str,'traceback')
             if "kegg_in_store" in list(session.keys()):
                 del(session["kegg_in_store"])
+            if not plot_arguments:
+                plot_arguments=session["plot_arguments"]
             return render_template('/apps/kegg.html', apps=apps, **plot_arguments)
 
     else:
