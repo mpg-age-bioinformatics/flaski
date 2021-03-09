@@ -3,7 +3,7 @@ import sys
 from suds.client import Client as sudsclient
 import ssl
 import os
-if os.environ["PYFLASKI"] != "1":
+if "PYFLASKI" in os.environ:
   from flaski.routines import fuzzy_search
 else:
   from pyflaski.routines import fuzzy_search
