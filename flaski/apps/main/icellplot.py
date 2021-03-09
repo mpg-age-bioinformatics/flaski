@@ -45,12 +45,15 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         david_df=david_df.drop(["____order____"],axis=1)
 
     if pa["annotation_column_value"]=="none":
+        ge_df[ pa["gene_identifier"]]=ge_df[ pa["gene_identifier"]].astype(str)
         gedic=ge_df[[ pa["gene_identifier"] , pa["expression_values"] ]]
         gedic.loc[:, pa["gene_identifier"] ]=gedic.loc[:, pa["gene_identifier"] ].apply(lambda x: str(x).upper() )
         gedic.index=gedic[ pa["gene_identifier"] ].tolist()
         gedic=gedic.to_dict()[ pa["expression_values"] ]
     else:
         gedic=david_df[ [ pa["david_gene_ids"], pa["annotation_column_value"] ]]
+        for col in gedic.columns.tolist():
+            gedic[col]=gedic[col].astype(str)
         gedic_keys=gedic[pa["david_gene_ids"]].tolist()
         gedic_value=gedic[pa["annotation_column_value"]].tolist()
         gedic_keys=", ".join(gedic_keys).split(", ")
@@ -68,6 +71,8 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         namesdic=namesdic.to_dict()[ pa["gene_name"] ]
     else:
         namesdic=david_df[ [ pa["david_gene_ids"], pa["annotation2_column_value"] ]]
+        for col in namesdic.columns.tolist():
+            namesdic[col]=namesdic[col].astype(str)
         namesdic_keys=namesdic[pa["david_gene_ids"]].tolist()
         namesdic_value=namesdic[pa["annotation2_column_value"]].tolist()
         namesdic_keys=", ".join(namesdic_keys).split(", ")
