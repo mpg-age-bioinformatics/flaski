@@ -243,7 +243,12 @@ def download(json_type="arg"):
     db.session.add(eventlog)
     db.session.commit()
 
-    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=plot_arguments["session_argumentsn"]+"."+json_type )
+    if json_type == "arg":
+        file_name=plot_arguments["session_argumentsn"]+"."+json_type
+    elif json_type == "ses":
+        file_name=plot_arguments["session_downloadn"]+"."+json_type
+
+    return send_file(session_file, mimetype='application/json', as_attachment=True, attachment_filename=file_name )
 
 @app.route('/help', methods=['GET','POST'])
 @login_required
