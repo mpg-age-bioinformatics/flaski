@@ -1,5 +1,8 @@
 """ Flaski companion package"""
 
+import os
+os.environ["PYFLASKI"] = "1"
+
 import pyflaski.iscatterplot
 import pyflaski.scatterplot
 import pyflaski.heatmap
@@ -8,8 +11,6 @@ import pyflaski.venndiagram
 import pyflaski.david
 import pyflaski.icellplot
 import pyflaski.histogram
-import pyflaski.iHistogram
-
 
 import json
 

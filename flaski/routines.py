@@ -4,14 +4,13 @@ import json
 from werkzeug.utils import secure_filename
 from fuzzywuzzy import process
 import io
-from flaski import db
 from flask_login import current_user
-from flaski.models import UserLogging
 import os
-from flaski import app as app_
 
-
-
+########
+# from flaski import db
+# from flaski.models import UserLogging
+# from flaski import app as app_
 
 def fuzzy_search(query_value,available_values):
     x=query_value.split(",")
@@ -109,6 +108,10 @@ def reset_all(session):
             del(session[k])
 
 def check_session_app(session,app,apps):
+    from flaski import db
+    from flaski.models import UserLogging
+    from flaski import app as app_
+
     multipleapps=current_user.multipleapps
 
     if ("app" in list( session.keys() ) ):

@@ -134,6 +134,13 @@ import pyflaski.venndiagram
 ```
 Please use `jupyter` as described above to test `pyflaski`.
 
+To run `pyflaski` from the on image jupyterhub you will have to install it first:
+```
+docker-compose exec server /bin/bash
+cd pyflaski
+python3 setup.py install --user
+```
+
 ### Dependencies
 
 If new/additional python packages are required please don't forget to add them to `requirements.txt`. Alternatively, run 
