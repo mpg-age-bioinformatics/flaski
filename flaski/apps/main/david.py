@@ -404,7 +404,7 @@ def figure_defaults():
         "download_format":["tsv","xlsx"],\
         "download_format_value":"xlsx",\
         "download_name":"DAVID",\
-        "session_download_name":"MySession.DAVID",\
+        "session_downloadn":"MySession.DAVID",\
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.DAVID",\
         "inputargumentsfile":"Select file.."}

@@ -98,7 +98,7 @@ def figure_defaults():
     "download_format":["tsv","xlsx"],\
     "download_format_value":"xlsx",\
     "download_name":"KEGG",\
-    "session_download_name":"MySession.KEGG",\
+    "session_downloadn":"MySession.KEGG",\
     "inputsessionfile":"Select file..",\
     "session_argumentsn":"MyArguments.KEGG",\
     "inputargumentsfile":"Select file.."}
