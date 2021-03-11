@@ -4,9 +4,9 @@ from suds.client import Client as sudsclient
 import ssl
 import os
 if "PYFLASKI" in os.environ:
-  from flaski.routines import fuzzy_search
-else:
   from pyflaski.routines import fuzzy_search
+else:
+  from flaski.routines import fuzzy_search
 
 david_categories = [
   'GOTERM_BP_FAT', 'GOTERM_CC_FAT', 'GOTERM_MF_FAT', 'KEGG_PATHWAY',

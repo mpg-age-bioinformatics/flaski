@@ -3,14 +3,28 @@
 import os
 os.environ["PYFLASKI"] = "1"
 
-import pyflaski.iscatterplot
-import pyflaski.scatterplot
-import pyflaski.heatmap
-import pyflaski.iheatmap
-import pyflaski.venndiagram
+import pyflaski.__init__
+import pyflaski.circularbarplots
 import pyflaski.david
-import pyflaski.icellplot
+import pyflaski.heatmap
 import pyflaski.histogram
+import pyflaski.icellplot
+import pyflaski.idendrogram
+import pyflaski.iheatmap
+import pyflaski.ihistogram
+# import pyflaski.iscatterplot.bokeh
+import pyflaski.iscatterplot
+import pyflaski.iviolinplot
+import pyflaski.kegg
+import pyflaski.lifespan
+import pyflaski.mds
+import pyflaski.pca
+import pyflaski.routines
+import pyflaski.scatterplot
+# import pyflaski.submissions
+import pyflaski.tsne
+import pyflaski.venndiagram
+import pyflaski.violinplot
 
 import json
 
