@@ -45,7 +45,7 @@ def make_figure(df,pa):
 
     if str(pa["groups_value"])!="None":
 
-        fig.update_layout(legend_title_text=str(pa["groups_value"]), legend=dict( font=dict( size=float(pa["legend_font_size"])) ) )
+        fig.update_layout(legend_title_text=str(pa["groups_value"]), legend=dict( title_font_color="black", font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
         
         for group in pa["list_of_groups"]:
             tmp=df[df[pa["groups_value"]]==group]
@@ -106,6 +106,9 @@ def make_figure(df,pa):
                         )),\
                 showlegend=pab["show_legend"],\
                 name=group) )
+
+        fig.update_layout(legend_title_text=str("test"), legend=dict( font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
+
     
     elif pa["groups_value"]=="None":
 
@@ -194,18 +197,18 @@ def make_figure(df,pa):
             'text': pa['title'],
             'xanchor': 'left',
             'yanchor': 'top' ,
-            "font": {"size": float(pa["titles"]) } } )
+            "font": {"size": float(pa["titles"]), "color":"black"  } } )
 
     fig.update_layout(
         xaxis = dict(
         title_text = pa["xlabel"],
-        title_font = {"size": int(pa["xlabels"])}),
+        title_font = {"size": int(pa["xlabels"]),"color":"black"}),
         yaxis = dict(
         title_text = pa["ylabel"],
-        title_font = {"size": int(pa["xlabels"])} ) )
+        title_font = {"size": int(pa["xlabels"]), "color":"black"} ) )
 
-    fig.update_xaxes(tickangle=float(pa["xticks_rotation"]), tickfont=dict(size=float(pa["xticks_fontsize"])))
-    fig.update_yaxes(tickangle=float(pa["yticks_rotation"]), tickfont=dict(size=float(pa["yticks_fontsize"])))
+    fig.update_xaxes(tickangle=float(pa["xticks_rotation"]), tickfont=dict(size=float(pa["xticks_fontsize"]), color="black" ))
+    fig.update_yaxes(tickangle=float(pa["yticks_rotation"]), tickfont=dict(size=float(pa["yticks_fontsize"]), color="black" ))
 
 
     if pa["grid_value"] != "None":
@@ -264,7 +267,7 @@ def make_figure(df,pa):
                         )
                     )
         #fig.update_traces(textposition='top center')
-    
+
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
