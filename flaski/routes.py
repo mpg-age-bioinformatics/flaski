@@ -233,6 +233,18 @@ def download(json_type="arg"):
     # READ INPUT DATA FROM SESSION JSON
     session_=session_to_file(session,json_type)
 
+    # debug=False
+    # if debug:
+    #     for i in list( session_["plot_arguments"].keys() ):
+    #         try:
+    #             session_file = io.BytesIO()
+    #             session_file.write(json.dumps({i:session_["plot_arguments"][i]}).encode())
+    #             session_file.seek(0)
+    #         except:
+    #             print("FAILED ON:", i)
+    #             print(session_["plot_arguments"][i])
+    #             sys.stdout.flush()
+
     session_file = io.BytesIO()
     session_file.write(json.dumps(session_).encode())
     session_file.seek(0)
