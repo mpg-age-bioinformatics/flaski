@@ -141,7 +141,7 @@ def histogram(download=None):
                     groups_settings=dict()
                     for group in groups:
                         groups_settings[group]={"name":group,\
-                            "values":df[group],\
+                            "values":df[group].tolist(),\
                             "label":group,\
                             "color_value":None,\
                             "color_rgb":"",\
