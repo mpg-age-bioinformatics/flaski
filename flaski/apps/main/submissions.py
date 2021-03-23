@@ -44,11 +44,50 @@ def check_rnaseq(EXC):
 
   return status, msg, filename
 
+
+def check_intronret(EXC):
+  status=False
+  attachment_path=None
+  if "samples" not in EXC.sheet_names:
+    status=False
+    msg="Could not find sample information - 'samples' sheet - in the submission file."
+    return status, msg, attachment_path
+  metadata=EXC.parse("intronRet")
+  email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
+  email=str(email).rstrip().lstrip()
+  email=email.split(",")
+  email=[ re.search("([^@|\s]+@[^@]+\.[^@|\s]+)",e,re.I) for e in email ]
+  email=[ e.group(1) for e in email if e ]
+  if not email :
+    msg="Contact email is not a valid email. Please provide a valid email in the 'email' field of your submission file."
+    return status, msg, attachment_path
+  nas=metadata[metadata["Value"].isna()]["Field"].tolist()
+  if nas:
+    msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
+    return status, msg, attachment_path
+  
+  status="intronRet"
+  msg="Submission successuful. Please check for email confirmation."
+
+  new_file, filename = tempfile.mkstemp(suffix=".intronRet.xlsx")
+  os.close(new_file)
+  filename="/submissions/"+os.path.basename(filename)
+
+  # print(os.readlink(filename))
+
+  EXCout=pd.ExcelWriter(filename)
+  metadata.to_excel(EXCout,"intronRet",index=None)
+  samples=EXC.parse("samples")
+  samples.to_excel(EXCout,"samples",index=None)
+  EXCout.save()
+
+  return status, msg, filename
+
 def submission_check(inputfile):
   status=False
   attachment_path=None
 
-  valid_submissions=["RNAseq"]
+  valid_submissions=["RNAseq", "intronRet" ]
 
   filename = secure_filename(inputfile.filename)
   fileread = inputfile.read()
@@ -71,6 +110,8 @@ def submission_check(inputfile):
 
   if submission_type[0]=="RNAseq":
     status, msg, attachment_path=check_rnaseq(EXC)
+  elif submission_type[0]=="intronRet":
+    status, msg, attachment_path=check_intronret(EXC)
   else:
     msg="Submission failed."
 
