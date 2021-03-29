@@ -80,7 +80,7 @@ psutil==5.7.0
 ptyprocess==0.6.0
 pycairo==1.19.0
 pycrypto==2.6.1
-Pygments==2.5.2
+Pygments==2.7.4
 PyGObject==3.30.4
 PyJWT==1.7.1
 PyMySQL==0.9.3
