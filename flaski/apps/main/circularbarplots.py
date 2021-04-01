@@ -34,6 +34,12 @@ def make_figure(df,pa):
         else:
             pa_[n]=True
 
+    for n in ["barnorm_val", "angular_ticks", "radial_tickside"]:
+        if pa[n] == "None":
+            pa_[n] = ""
+        else:
+            pa_[n] = pa[n]
+
     color_discrete_sequence_=[]
 
     if str(pa["groupval"]) == "None":
@@ -55,7 +61,7 @@ def make_figure(df,pa):
 
     fig = px.bar_polar(df_circ, r=str(r), theta=str(theta), color=colorv,
                    color_discrete_sequence=color_discrete_sequence_, ## Fix according to groups/colors
-                   barnorm=pa["barnorm_val"],  
+                   barnorm=pa_["barnorm_val"],  
                    barmode=pa["barmode_val"], 
                    direction=pa["direction_val"], 
                    start_angle=int(pa["start_angle"]), 
@@ -81,13 +87,13 @@ def make_figure(df,pa):
                   polar_angularaxis=dict(showgrid=pa_["angular_grid"], gridcolor=pa["angular_gridcolor"], gridwidth=float(pa["angular_gridwidth"]),
                                          showline=pa_["angular_line"], linecolor=pa["angular_linecolor"], linewidth=float(pa["angular_linewidth"]),
                                          showticklabels=pa_["angular_ticklabels"], tickcolor=pa["angular_tickcolor"], ticklen=float(pa["angular_ticklen"]), 
-                                         tickangle=float(pa["angular_tickangle"]), tickwidth=float(pa["angular_tickwidth"]), ticks=pa["angular_ticks"]), 
+                                         tickangle=float(pa["angular_tickangle"]), tickwidth=float(pa["angular_tickwidth"]), ticks=pa_["angular_ticks"]), 
 
                   polar_radialaxis=dict(showgrid=pa_["radial_grid"], gridcolor=pa["radial_gridcolor"], gridwidth=float(pa["radial_gridwidth"]), 
                                         showline=pa_["radial_line"], linecolor=pa["radial_linecolor"], visible=pa_["radial_visibility"], 
                                         linewidth=float(pa["radial_linewidth"]), angle=float(pa["radial_angle"]), tickangle=float(pa["radial_tickangle"]), 
                                         ticklen=float(pa["radial_ticklen"]), tickwidth=float(pa["radial_tickwidth"]),tickcolor=pa["radial_tickcolor"],
-                                        showticklabels=pa_["radial_ticklabels"], ticks=pa["radial_tickside"]), 
+                                        showticklabels=pa_["radial_ticklabels"], ticks=pa_["radial_tickside"]), 
                   
                  )
 
@@ -122,7 +128,7 @@ HIST_TYPES=['bar', 'barstacked', 'step',  'stepfilled']
 STANDARD_ORIENTATIONS=['vertical','horizontal']
 STANDARD_ALIGNMENTS=['left','right','mid']
 STANDARD_DIRECTIONS=["counterclockwise","clockwise"]
-TICKS_DIRECTIONS=["outside","inside",""]
+TICKS_DIRECTIONS=["outside","inside","None"]
 
 LEGEND_ORIENTATION=['v','h']
 
@@ -143,7 +149,7 @@ def figure_defaults():
         "title_size":STANDARD_SIZES,\
         "titles":"28",\
         "title_colors":STANDARD_COLORS,\
-        "title_color":"pink",\
+        "title_color":"black",\
         "angcols":[],\
         "angvals":"",\
         "radcols":[],\
@@ -155,15 +161,15 @@ def figure_defaults():
         "bar_colour_val":"blue",\
         "barmode":BAR_MODES,\
         "barmode_val":"relative",\
-        "barnorm":["","fraction","percent"],\
-        "barnorm_val":"",\
+        "barnorm":["None","fraction","percent"],\
+        "barnorm_val":"None",\
         "direction":STANDARD_DIRECTIONS,\
         "direction_val":"clockwise",\
         "start_angle":"90",\
         "plot_font_sizes":STANDARD_SIZES,\
         "plot_font":"10",\
-        "legend_bgcolor":"cyan",\
-        "legend_bordercolor":"black",\
+        "legend_bgcolor":"white",\
+        "legend_bordercolor":"white",\
         "legend_colors":STANDARD_COLORS,\
         "legend_borderwidth":"0.25",\
         "legend_title_sizes":STANDARD_SIZES,\
@@ -177,35 +183,35 @@ def figure_defaults():
         "polar_barmodes":POLAR_BAR_MODES,\
         "polar_barmode":"overlay",\
         "polar_bgcolors":STANDARD_COLORS,\
-        "polar_bgcolor":"lightblue",\
+        "polar_bgcolor":"white",\
         "polar_holes":STANDARD_GAPS,\
         "polar_hole":"0.05",\
         "paper_bgcolors":STANDARD_COLORS,\
-        "paper_bgcolor":"dimgrey",\
+        "paper_bgcolor":"white",\
         "angular_grid":".off",\
         "angular_gridcolors":STANDARD_COLORS,\
         "angular_gridcolor":"black",\
         "angular_gridwidth":"0.5",\
-        "angular_line":".on",\
+        "angular_line":".off",\
         "angular_linecolors":STANDARD_COLORS,\
         "angular_linecolor":"black",\
         "angular_linewidth":"0.5",\
-        "angular_ticklabels":".off",\
+        "angular_ticklabels":".on",\
         "angular_tickcolors":STANDARD_COLORS,\
         "angular_tickcolor":"black",\
         "angular_ticklen":"2.0",\
         "angular_tickwidth":"0",\
-        "angular_tickangle":"0",\
+        "angular_tickangle":"90",\
         "angular_tickDirections":TICKS_DIRECTIONS,\
-        "angular_ticks":"outside",\
+        "angular_ticks":"None",\
         "radial_grid":".off",\
         "radial_gridcolors":STANDARD_COLORS,\
         "radial_gridcolor":"black",\
         "radial_gridwidth":"0.5",\
-        "radial_line":".on",\
+        "radial_line":".off",\
         "radial_linecolors":STANDARD_COLORS,\
         "radial_linecolor":"black",\
-        "radial_visibility":".on",\
+        "radial_visibility":".off",\
         "radial_linewidth":"1.25", 
         "radial_angle":"90",\
         "radial_tickangle":"90",\
@@ -215,7 +221,7 @@ def figure_defaults():
         "radial_tickcolor":"black",\
         "radial_ticklabels":"o.n",\
         "radial_ticksides":TICKS_DIRECTIONS,\
-        "radial_tickside":"inside",\
+        "radial_tickside":"None",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"CircularBarPlot",\
