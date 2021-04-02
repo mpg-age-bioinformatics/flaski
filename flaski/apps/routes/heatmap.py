@@ -222,9 +222,9 @@ def heatmap(download=None):
             excelfile = io.BytesIO()
             EXC=pd.ExcelWriter(excelfile)
             df_.to_excel(EXC,sheet_name="heatmap",index=None)
-            if cols_cluster_numbers:
+            if type(cols_cluster_numbers) != type(None):
                 cols_cluster_numbers.to_excel(EXC,sheet_name="rows",index=None)
-            if index_cluster_numbers:
+            if type(index_cluster_numbers) != type(None):
                 index_cluster_numbers.to_excel(EXC,sheet_name="cols",index=None)
             EXC.save()
 
