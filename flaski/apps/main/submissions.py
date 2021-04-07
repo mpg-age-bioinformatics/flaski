@@ -4,6 +4,19 @@ from werkzeug.utils import secure_filename
 import re
 import tempfile
 import os
+from datetime import datetime
+
+def timestamp():
+  now = datetime.now()
+  dt_string = now.strftime("%Y%m%d.%H%M%S.")
+  return dt_string
+
+def make_submission_file(suffix):
+  dt_string=timestamp()
+  new_file, filename = tempfile.mkstemp(suffix=suffix, prefix=dt_string )
+  os.close(new_file)
+  filename="/submissions/"+os.path.basename(filename)
+  return filename
 
 
 def check_rnaseq(EXC):
@@ -30,9 +43,7 @@ def check_rnaseq(EXC):
   status="RNAseq"
   msg="Submission successuful. Please check for email confirmation."
 
-  new_file, filename = tempfile.mkstemp(suffix=".RNAseq.xlsx")
-  os.close(new_file)
-  filename="/submissions/"+os.path.basename(filename)
+  filename=make_submission_file(".RNAseq.xlsx")
 
   # print(os.readlink(filename))
 
@@ -69,10 +80,7 @@ def check_intronret(EXC):
   status="intronRet"
   msg="Submission successuful. Please check for email confirmation."
 
-  new_file, filename = tempfile.mkstemp(suffix=".intronRet.xlsx")
-  os.close(new_file)
-  filename="/submissions/"+os.path.basename(filename)
-
+  filename=make_submission_file(".intronRet.xlsx")
   # print(os.readlink(filename))
 
   EXCout=pd.ExcelWriter(filename)
