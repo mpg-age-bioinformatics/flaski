@@ -161,19 +161,19 @@
                 </a>
                 <div id="collapseAxes" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                        <div class="row arguments" style="width: 100%; padding-left:13%; padding-right:0%;white-space: nowrap; overflow-x: auto">
                             
-                            <div class="row arg">
-                                <label>x label: <input type="text" name="xlabel" value='{{ xlabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=xlabels method="GET" action="/" style="width:50px">
+                            <div class="row arg" style="width: 100%; padding-left:0%; padding-right:0%;display: inline-block;">
+                                <label style="width:16%">x label:</label><input type="text" name="xlabel" value='{{ xlabel }}' style="width:56%;height:22px;padding-left:1%">
+                                <label style="padding-left: 2%; width:12%"> size:</label><select name=xlabels method="GET" action="/" style="width:16%; height:30px">
                                     {% for xlabel_size_ in xlabel_size %}
                                         <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
                                     {% endfor %}
-                                </select></label>
+                                </select>
                             </div>
 
-                            <div class="row arg">
-                                <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:167px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width: 100%; padding-left:0%; padding-right:0%;display: inline-block;">
+                                <label>y label: <input type="text" name="ylabel" value='{{ ylabel }}' style="width:161px;height:22px;padding-left: 4px"></label>
                                 <label style="padding-left: 4px"> size: <select name=ylabels method="GET" action="/" style="width:50px">
                                     {% for ylabel_size_ in ylabel_size %}
                                         <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>
