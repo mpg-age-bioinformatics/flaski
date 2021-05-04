@@ -183,7 +183,7 @@
                                     <input type="text" name="xlabel" value='{{ xlabel }}' style="width:173px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                                 <label style="padding-left: 4px;"> size:
-                                    <select name=xlabels method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    <select name=xlabels method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for xlabel_size_ in xlabel_size %}
                                         <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
                                     {% endfor %}
@@ -209,7 +209,7 @@
                                     <input type="text" id="ylabel" name="ylabel" value='{{ ylabel }}' style="width:173px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                                 <label style="padding-left:4px;">size:
-                                    <select id="ylabels" name=ylabels method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    <select id="ylabels" name=ylabels method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for ylabel_size_ in ylabel_size %}
                                         <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>
                                     {% endfor %}
@@ -242,7 +242,7 @@
                                         <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:50px;height:22px;padding-left: 4px">
                                     </label>
                                     <label style="padding-left:4px;"> Ticks direction: 
-                                        <select name=ticks_direction_value method="GET" action="/" style="width:64px">
+                                        <select name=ticks_direction_value method="GET" action="/" style="width:64px;height:22px">
                                         {% for ticks_direction_ in ticks_direction %}
                                             <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
                                         {% endfor %}
@@ -284,13 +284,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Grid: <label style="padding-left:2px;"><select name=grid_value method="GET" action="/" style="width:97px">
+                                <label>Grid: <label style="padding-left:2px;"><select name=grid_value method="GET" action="/" style="width:97px;height:22px">
                                     {% for grid_ in grid %}
                                         <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                     {% endfor %}
                                 </select></label></label>
 
-                                <label style="padding-left:4px;">style: <label style="padding-left:2px;"><select name=grid_linestyle_value method="GET" action="/" style="width:97px">
+                                <label style="padding-left:4px;">style: <label style="padding-left:2px;"><select name=grid_linestyle_value method="GET" action="/" style="width:97px;height:22px">
                                     {% for grid_linestyle_ in grid_linestyle %}
                                         <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
                                     {% endfor %}
@@ -320,13 +320,13 @@
                         <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> size: <select name={{group.name}}.markers method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                <label> size: <select name={{group.name}}.markers method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for marker_size_ in marker_size %}
                                         <option value="{{marker_size_}}" {% if marker_size_==group.markers %} selected {% endif %}>{{marker_size_}}</option>
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.markersizes_col method="GET" action="/" style="width:189px;vertical-align:middle;">
+                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.markersizes_col method="GET" action="/" style="width:189px;height:22px;vertical-align:middle;">
                                     {% for markersizes_cols_ in markersizes_cols %}
                                         <option value="{{markersizes_cols_}}" {% if markersizes_cols_==group.markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
                                     {% endfor %}
@@ -335,13 +335,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> color: <select name={{group.name}}.markerc method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                <label> color: <select name={{group.name}}.markerc method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for marker_color_ in marker_color %}
                                         <option value="{{marker_color_}}" {% if marker_color_==group.markerc %} selected {% endif %}>{{marker_color_}}</option>"
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.markerc_col method="GET" action="/" style="width:155px;vertical-align:middle;">
+                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.markerc_col method="GET" action="/" style="width:155px;height:22px;vertical-align:middle;">
                                     {% for markerc_cols_ in markerc_cols %}
                                         <option value="{{markerc_cols_}}" {% if markerc_cols_==group.markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
                                     {% endfor %}
@@ -354,13 +354,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> line width: <select name={{group.name}}.edge_linewidth method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                <label> line width: <select name={{group.name}}.edge_linewidth method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for edge_linewidth_ in edge_linewidths %}
                                         <option value="{{edge_linewidth_}}" {% if edge_linewidth_==group.edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.edge_linewidth_col method="GET" action="/" style="width:155px;vertical-align:middle;">
+                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.edge_linewidth_col method="GET" action="/" style="width:155px;height:22px;vertical-align:middle;">
                                     {% for edge_linewidth_col_ in edge_linewidth_cols %}
                                         <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==group.edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
                                     {% endfor %}
@@ -368,13 +368,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> line color: <select name={{group.name}}.edgecolor method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                <label> line color: <select name={{group.name}}.edgecolor method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for edgecolor_ in edge_colors %}
                                         <option value="{{edgecolor_}}" {% if edgecolor_==group.edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.edgecolor_col method="GET" action="/" style="width:128px;vertical-align:middle;">
+                                <label style="padding-left:4px;"> ..or, <select name={{group.name}}.edgecolor_col method="GET" action="/" style="width:128px;height:22px;vertical-align:middle;">
                                     {% for edgecolor_col_ in edgecolor_cols %}
                                         <option value="{{edgecolor_col_}}" {% if edgecolor_col_==group.edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
                                     {% endfor %}
@@ -387,13 +387,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>shape: <select name={{group.name}}.marker method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                <label>shape: <select name={{group.name}}.marker method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for markerstyles_ in markerstyles %}
                                         <option value="{{markerstyles_}}" {% if markerstyles_==group.marker %} selected {% endif %}>{{markerstyles_}}</option>
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left:4px;">..or, <select name={{group.name}}.markerstyles_col method="GET" action="/" style="width:172px;vertical-align:middle;">
+                                <label style="padding-left:4px;">..or, <select name={{group.name}}.markerstyles_col method="GET" action="/" style="width:172px;height:22px;vertical-align:middle;">
                                     {% for markerstyles_cols_ in markerstyles_cols %}
                                         <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==group.markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
                                     {% endfor %}
@@ -404,7 +404,7 @@
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>alpha: <input type="text" name={{group.name}}.marker_alpha value='{{ group.marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
 
-                                <label style="padding-left:4px;">..or, <select name={{group.name}}.markeralpha_col_value method="GET" action="/" style="width:172px;vertical-align:middle;">
+                                <label style="padding-left:4px;">..or, <select name={{group.name}}.markeralpha_col_value method="GET" action="/" style="width:172px;height:22px;vertical-align:middle;">
                                     {% for markeralpha_col_ in markeralpha_col %}
                                         <option value="{{markeralpha_col_}}" {% if markeralpha_col_==group.markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
                                     {% endfor %}
@@ -432,13 +432,13 @@
                         <div class="row arguments"  style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> size: <select name=markers method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                <label> size: <select name=markers method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for marker_size_ in marker_size %}
                                         <option value="{{marker_size_}}" {% if marker_size_==markers %} selected {% endif %}>{{marker_size_}}</option>
                                     {% endfor %}
                                 </select></label>
 
-                                <label> ..or, <select name=markersizes_col method="GET" action="/" style="width:187px;vertical-align:middle;">
+                                <label> ..or, <select name=markersizes_col method="GET" action="/" style="width:187px;height:22px;vertical-align:middle;">
                                     {% for markersizes_cols_ in markersizes_cols %}
                                         <option value="{{markersizes_cols_}}" {% if markersizes_cols_==markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
                                     {% endfor %}
@@ -447,13 +447,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> color: <select name=markerc method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                <label> color: <select name=markerc method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for marker_color_ in marker_color %}
                                         <option value="{{marker_color_}}" {% if marker_color_==markerc %} selected {% endif %}>{{marker_color_}}</option>"
                                     {% endfor %}
                                 </select></label>
 
-                                <label> ..or, <select name=markerc_col method="GET" action="/" style="width:155px;vertical-align:middle;">
+                                <label> ..or, <select name=markerc_col method="GET" action="/" style="width:155px;height:22px;vertical-align:middle;">
                                     {% for markerc_cols_ in markerc_cols %}
                                         <option value="{{markerc_cols_}}" {% if markerc_cols_==markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
                                     {% endfor %}
@@ -469,7 +469,7 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> line width:
-                                    <select name=edge_linewidth method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    <select name=edge_linewidth method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                         {% for edge_linewidth_ in edge_linewidths %}
                                             <option value="{{edge_linewidth_}}" {% if edge_linewidth_==edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
                                         {% endfor %}
@@ -477,7 +477,7 @@
                                 </label>
 
                                 <label> ..or, 
-                                    <select name=edge_linewidth_col method="GET" action="/" style="width:155px;vertical-align:middle;">
+                                    <select name=edge_linewidth_col method="GET" action="/" style="width:155px;height:22px;vertical-align:middle;">
                                     {% for edge_linewidth_col_ in edge_linewidth_cols %}
                                         <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
                                     {% endfor %}
@@ -487,7 +487,7 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> line color: 
-                                    <select name=edgecolor method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    <select name=edgecolor method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for edgecolor_ in edge_colors %}
                                         <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
                                     {% endfor %}
@@ -495,7 +495,7 @@
                                 </label>
 
                                 <label> ..or, 
-                                    <select name=edgecolor_col method="GET" action="/" style="width:128px;vertical-align:middle;">
+                                    <select name=edgecolor_col method="GET" action="/" style="width:128px;height:22px;vertical-align:middle;">
                                     {% for edgecolor_col_ in edgecolor_cols %}
                                         <option value="{{edgecolor_col_}}" {% if edgecolor_col_==edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
                                     {% endfor %}
@@ -510,13 +510,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>shape: <select name=marker method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                <label>shape: <select name=marker method="GET" action="/" style="width:50px;height:22px;vertical-align:middle;">
                                     {% for markerstyles_ in markerstyles %}
                                         <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left: 4px">..or, <select name=markerstyles_col method="GET" action="/" style="width:172px;vertical-align:middle;">
+                                <label style="padding-left: 4px">..or, <select name=markerstyles_col method="GET" action="/" style="width:172px;height:22px;vertical-align:middle;">
                                     {% for markerstyles_cols_ in markerstyles_cols %}
                                         <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
                                     {% endfor %}
@@ -527,7 +527,7 @@
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>alpha: <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;height:22px;padding-left:4px;"></label>
 
-                                <label style="padding-left:4px;">..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px;vertical-align:middle;">
+                                <label style="padding-left:4px;">..or, <select name=markeralpha_col_value method="GET" action="/" style="width:172px;height:22px;vertical-align:middle;">
                                     {% for markeralpha_col_ in markeralpha_col %}
                                         <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
                                     {% endfor %}
@@ -555,7 +555,7 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Labels:</label>
-                                <label><select name=labels_col_value method="GET" action="/" style="width:252px;vertical-align:middle;">
+                                <label><select name=labels_col_value method="GET" action="/" style="width:252px;height:22px;vertical-align:middle;">
                                     {% for labels_col_ in labels_col %}
                                         <option value="{{labels_col_}}" {% if labels_col_==labels_col_value %} selected {% endif %}>{{labels_col_}}</option>
                                     {% endfor %}
@@ -563,7 +563,7 @@
                             </div>
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Labels font size: <input type="text" name="labels_font_size" value='{{ labels_font_size }}' style="width:80px;height:22px;padding-left:4px;"></label>
-                                <label style="padding-left:4px;">color: <select name=labels_font_color_value method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                <label style="padding-left:4px;">color: <select name=labels_font_color_value method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for labels_font_color_ in labels_font_color %}
                                         <option value="{{labels_font_color_}}" {% if labels_font_color_==labels_font_color_value %} selected {% endif %}>{{labels_font_color_}}</option>
                                     {% endfor %}
@@ -571,13 +571,13 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Labels arrows: <select name=labels_arrows_value method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                <label>Labels arrows: <select name=labels_arrows_value method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for labels_arrows_ in labels_arrows %}
                                         <option value="{{labels_arrows_}}" {% if labels_arrows_==labels_arrows_value %} selected {% endif %}>{{labels_arrows_}}</option>
                                     {% endfor %}
                                 </select></label>
 
-                                <label style="padding-left:8px;">color: <select name=labels_colors_value method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                <label style="padding-left:8px;">color: <select name=labels_colors_value method="GET" action="/" style="width:80px;height:22px;vertical-align:middle;">
                                     {% for labels_colors_ in labels_colors %}
                                         <option value="{{labels_colors_}}" {% if labels_colors_==labels_colors_value %} selected {% endif %}>{{labels_colors_}}</option>
                                     {% endfor %}
