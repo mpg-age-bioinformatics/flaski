@@ -145,18 +145,24 @@
                     <span>Tables</span>
                 </a>
                 <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Download file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
+                                </label>
                             </div>   
-                            <div class="row arg">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> format: <select name=downloadf method="GET" action="/" style="height:30px;width:50px">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}
-                                </select>
+                                    </select>
+                                </label>
                                 
                             </div>
                         </div>
@@ -172,21 +178,29 @@
                     <span>Arguments</span>
                 </a>
                 <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Upload arguments file:
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload arguments file:</label>
+                            </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom:8px;">
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="height:30px;width:300px;">
+                                        
                                         <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                        <label">
+                                            <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="vertical-align:middle;height:30px;width:310px;">
+                                        </label>
                                     </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
-                            <div class="row arg">
-                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
-                            </div>
+                                <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                    <label>Download file name:</label>
+                                </div>
+                                <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                    <label><input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="vertical-align:middle;width:310px;height:30px;padding-left:4px"></label>
+                                </div>
                             {% endif %}
 
                         </div>
@@ -203,20 +217,28 @@
                     <span>Session</span>
                 </a>
                 <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Upload session file:
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload session file:</label>
+                            </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom:8px;">
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="height:30px;width:300px;">
                                         <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                        <label>
+                                            <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="vertical-align:middle;height:30px;width:310px;">
+                                        </label>
                                     </div>
+                                </label>
                             </div> 
 
                             {% if filename != "Select file.." %}
-                            <div class="row arg">
-                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <input type="text" style="vertical-align:middle;width:310px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
                             </div>
                             {% endif %}
 
