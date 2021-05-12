@@ -192,7 +192,8 @@ def submission_check(inputfile):
     status, msg, attachment_path=check_intronret(EXC)
   elif submission_type[0]=="variantCalling":
     status, msg, attachment_path=check_variantCalling(EXC)
-    
+  elif submission_type[0]=="alternativeSplicing":
+    status, msg, attachment_path=check_alternativeSplicing(EXC)
   else:
     msg="Submission failed."
 
