@@ -142,22 +142,30 @@
                     <span>Figure</span>
                 </a>
                 <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                    <label>Width: <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px"></label>
-                                    <label style="padding-left: 7px">Height: <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Width:
+                                    <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                                <label>Height:
+                                    <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
                             </div>
 
 
-                            <div class="row arg">
-                                <label>Title: <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px"></label>
-                                <label style="padding-left: 4px"> size: <select name=title_size_value method="GET" action="/" style="width:50px">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Title: 
+                                    <input type="text" name="title" value='{{ title }}' style="width:180px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                                <label> size:
+                                    <select name=title_size_value method="GET" action="/" style="width:50px;vertical-align: middle;">
                                     {% for title_size_ in title_size %}
                                         <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                     {% endfor %}
-                                </select></label>
+                                    </select>
+                                </label>
                             </div>
                         
                         </div>
@@ -174,36 +182,74 @@
                     <span>Cluster</span>
                 </a>
                 <div id="collapseClustering" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Columns cluster
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="col_cluster" {% if col_cluster=="on" %} checked {% elif col_cluster==".on" %} checked {% endif %}/>
+                                </label>
+                                <label>Row cluster 
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="row_cluster" {% if row_cluster=="on" %} checked {% elif row_cluster==".on" %} checked {% endif %}/>
+                                </label>
+                            </div>
 
-                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="col_cluster" {% if col_cluster=="on" %} checked {% elif col_cluster==".on" %} checked {% endif %}/> Columns cluster </label>
-                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="row_cluster" {% if row_cluster=="on" %} checked {% elif row_cluster==".on" %} checked {% endif %}/> Row cluster </label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Method:
+                                    <select name=method_value method="GET" action="/" style="width:78px;vertical-align: middle;">
+                                    {% for method_ in method %}
+                                        <option value="{{method_}}" {% if method_==method_value %} selected {% endif %}>{{method_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
 
-                            <label>Method: <select name=method_value method="GET" action="/" style="width:78px">
-                                {% for method_ in method %}
-                                    <option value="{{method_}}" {% if method_==method_value %} selected {% endif %}>{{method_}}</option>
-                                {% endfor %}
-                            </select></label>
+                                <label> Distance: 
+                                    <select name=distance_value method="GET" action="/" style="width:98px;vertical-align: middle;">
+                                    {% for distance_ in distance %}
+                                        <option value="{{distance_}}" {% if distance_==distance_value %} selected {% endif %}>{{distance_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
 
-                            <label style="padding-left:8px;"> Distance: <select name=distance_value method="GET" action="/" style="width:98px">
-                                {% for distance_ in distance %}
-                                    <option value="{{distance_}}" {% if distance_==distance_value %} selected {% endif %}>{{distance_}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Cluster distance values:</label>
+                            </div>
 
-                            <label style="width:300px">Cluster distance values:</label>
-                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="col_dendogram_dist" {% if col_dendogram_dist=="on" %} checked {% elif col_dendogram_dist==".on" %} checked {% endif %}/> columns </label>
-                            <label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="row_dendogram_dist" {% if row_dendogram_dist=="on" %} checked {% elif row_dendogram_dist==".on" %} checked {% endif %}/> rows </label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:flex-start; text-align:justify;">
+                                <label>columns
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="col_dendogram_dist" {% if col_dendogram_dist=="on" %} checked {% elif col_dendogram_dist==".on" %} checked {% endif %}/>
+                                </label>
+                                <label style="padding-left: 8px;">rows
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="row_dendogram_dist" {% if row_dendogram_dist=="on" %} checked {% elif row_dendogram_dist==".on" %} checked {% endif %}/>
+                                </label>
+                            </div>
 
-                            <label style="width:300px">Distance cuttoff for cluster defenition:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="col_color_threshold" value='{{ col_color_threshold }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="row_color_threshold" value='{{ row_color_threshold }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Distance cuttoff for cluster defenition:</label>
+                            </div>
 
-                            <label style="width:300px">Dendogram-to-figure ratio:</label>
-                            <label style="padding-left:0x;padding-right:4px;">columns: <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">rows: <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>columns:
+                                    <input type="text" name="col_color_threshold" value='{{ col_color_threshold }}' style="width:98px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                                <label>rows:
+                                    <input type="text" name="row_color_threshold" value='{{ row_color_threshold }}' style="width:98px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Dendogram-to-figure ratio:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>columns:
+                                    <input type="text" name="row_dendogram_ratio" value='{{ row_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                                <label>rows:
+                                    <input type="text" name="col_dendogram_ratio" value='{{ col_dendogram_ratio }}' style="width:98px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
                         </div>
         
                     </div>
@@ -219,73 +265,149 @@
                     <span>Plot</span>
                 </a>
                 <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <label style="width:250px;">Data transformation: </label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label style="width:250px;">Data transformation:</label>
+                            </div>
 
-                            <label style="padding-left:0px;padding-right:0px;">add constant: <input type="text" name="add_constant" value='{{ add_constant }}' style="width:39px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:22px;">log transform: <select name=log_transform_value method="GET" action="/">
-                                {% for log_transform_ in log_transform %}
-                                    <option value="{{log_transform_}}" {% if log_transform_==log_transform_value %} selected {% endif %}>{{log_transform_}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>add constant: 
+                                    <input type="text" name="add_constant" value='{{ add_constant }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
-                            <label>z-score: <select name=zscore_value method="GET" action="/">
-                                {% for zscore_ in zscore %}
-                                    <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>log transform: 
+                                    <select name=log_transform_value method="GET" action="/" style="vertical-align: middle;">
+                                    {% for log_transform_ in log_transform %}
+                                        <option value="{{log_transform_}}" {% if log_transform_==log_transform_value %} selected {% endif %}>{{log_transform_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
 
-                            <label style="padding-left:0px;padding-right:0px;"> Robustness percentil (0 - 100): <input type="text" name="robust" value='{{ robust }}' style="width:103px;height:22px;padding-left:4px;"></label>
+                                <label>z-score: 
+                                    <select name=zscore_value method="GET" action="/" style="vertical-align: middle;">
+                                    {% for zscore_ in zscore %}
+                                        <option value="{{zscore_}}" {% if zscore_==zscore_value %} selected {% endif %}>{{zscore_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> Robustness percentil (0 - 100):
+                                    <input type="text" name="robust" value='{{ robust }}' style="width:109px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
                             <hr class="black">
 
-                            <label>Show labels: </label>
-                            <label style="padding-left:41px;padding-right:14px;"> columns: </label><label><input type="checkbox" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/></label>
-                            <label style="padding-left:30px;padding-right:14px;"> rows: </label><label><input type="checkbox" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Show labels: </label>
+                                <label> columns:
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="yticklabels" {% if yticklabels=="on" %} checked {% elif yticklabels==".on" %} checked {% endif %}/>
+                                </label>
+                                <label> rows:
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="xticklabels" {% if xticklabels=="on" %} checked {% elif xticklabels==".on" %} checked {% endif %}/>
+                                </label>
+                            </div>
 
-                            <label>Labels font size: </label>
-                            <label style="padding-left:21px;padding-right:0px;"> columns: <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
-                            <label style="padding-left:21px;padding-right:0px;"> rows: <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:30px;height:22px;padding-left:4px;"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Labels font size: </label>
+                                <label> columns: 
+                                    <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:28px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                                <label> rows:
+                                    <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:28px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                            </div>
+
 
                             <hr class="black">
 
-                            <label>CMAP: <select name=colorscale_value method="GET" action="/">
-                                {% for colorscale_ in colorscale %}
-                                    <option value="{{colorscale_}}" {% if colorscale_==colorscale_value %} selected {% endif %}>{{colorscale_}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:flex-start; text-align:justify;">
+                                <label>CMAP:
+                                    <select name=colorscale_value method="GET" action="/" style="vertical-align: middle;">
+                                    {% for colorscale_ in colorscale %}
+                                        <option value="{{colorscale_}}" {% if colorscale_==colorscale_value %} selected {% endif %}>{{colorscale_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
 
-                            <label style="padding-left:8px;padding-right:4px;">reverse: </label><label><input type="checkbox" name="reverse_color_scale" {% if reverse_color_scale=="on" %} checked {% elif reverse_color_scale==".on" %} checked {% endif %}/></label>
+                                <label style="padding-left: 8px;">reverse:
+                                    <input type="checkbox" type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="reverse_color_scale" {% if reverse_color_scale=="on" %} checked {% elif reverse_color_scale==".on" %} checked {% endif %}/>
+                                </label>
+                            </div>
 
                             <!--label style="padding-right:40px;">.. or the color scale percentile (0-100): </label>
                             <label style="padding-right:4px;">lower:</label><label><input type="text" name="lower_expression_percentile" value='{{ lower_expression_percentile }}' style="width:100px;height:22px;padding-left:4px;"></label>
                             <label style="padding-left:12px;padding-right:4px;">upper:</label><label><input type="text" name="upper_expression_percentile" value='{{ upper_expression_percentile }}' style="width:101px;height:22px;padding-left:4px;"></label-->
 
-                            <label style="padding-right:40px;">..or, explicitly define your color map:</label>
-                            <label style="padding-left:64px;">Lower</label><label style="padding-left:28px;">Center</label><label style="padding-left:28px;padding-right:50px;">Upper</label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>..or, explicitly define your color map:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label style="padding-left: 6px;"></label>
+                                <label>Lower</label>
+                                <label>Center</label>
+                                <label>Upper</label>
+                            </div>
                             
-                            <label style="padding-left:22px;padding-right:2px;">Value:</label><label style="padding-right:30px;">
-                                <input type="text" name="lower_value" value='{{ lower_value }}' style="width:65px;height:22px;padding-left:4px">
-                                <input type="text" name="center_value" value='{{ center_value }}' style="width:65px;height:22px;padding-left:4px">
-                                <input type="text" name="upper_value" value='{{ upper_value }}' style="width:65px;height:22px;padding-left:4px">
-                            </label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Value:</label>
+                                <label>
+                                    <input type="text" name="lower_value" value='{{ lower_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                                <label>
+                                    <input type="text" name="center_value" value='{{ center_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                                <label>
+                                    <input type="text" name="upper_value" value='{{ upper_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                                
+                            </div>
                             
-                            <label style="padding-left:23px;padding-right:2px;">Color:</label><label>
-                                <input type="text" name="lower_color" value='{{ lower_color }}' style="width:65px;height:22px;padding-left:4px">
-                                <input type="text" name="center_color" value='{{ center_color }}' style="width:65px;height:22px;padding-left:4px">
-                                <input type="text" name="upper_color" value='{{ upper_color }}' style="width:65px;height:22px;padding-left:4px">
-                            </label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Color:</label>
+                                <label>
+                                    <input type="text" name="lower_color" value='{{ lower_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                                <label>
+                                    <input type="text" name="center_color" value='{{ center_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                                <label>
+                                    <input type="text" name="upper_color" value='{{ upper_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
 
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Color bar: </label>
+                            </div>
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>label: 
+                                    <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:270px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
-                            <label style="width:263px;">Color bar: </label>
-                            <label style="padding-left:0px;padding-right:0px;">label: <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:263px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">label font size: <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:50px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:8px;padding-right:0px;">tickts font size: <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:52px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0px;padding-right:0px;">padding: <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:86px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>label font size:
+                                    <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                                <label>tickts font size:
+                                    <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>padding:
+                                    <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
                             <!--label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="annotate" {% if annotate=="on" %} checked {% elif annotate==".on" %} checked {% endif %}/> Annotate</label-->
 
                         </div>
@@ -301,18 +423,35 @@
                     <span>Find rows</span>
                 </a>
                 <div id="collapseFindRow" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
                             <!--label style="padding-left:0px;padding-right:8px;"> Row name(s): </label><textarea type="text" name="findrow" value='{{ findrow }}' rows="3" cols="30" style="width:200px;height:22px;padding-left:4px;">{{ findrow }}</textarea-->
-                            <label style="width:263px;">Find related rows: </label>
-                            <label style="padding-left:22px;"> bound type: <select name=findrowtype_value method="GET" action="/">
-                                {% for findrowtype_ in findrowtype %}
-                                    <option value="{{findrowtype_}}" {% if findrowtype_==findrowtype_value %} selected {% endif %}>{{findrowtype_}}</option>
-                                {% endfor %}
-                            </select></label>
-                            <label style="padding-left:22px;padding-right:0px;"> lower distance bounds: <input type="text" name="findrowdown" value='{{ findrowdown }}' style="width:86px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:22px;padding-right:0px;"> upper distance bounds: <input type="text" name="findrowup" value='{{ findrowup }}' style="width:86px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Find related rows: </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> bound type:
+                                    <select name=findrowtype_value method="GET" action="/" style="vertical-align: middle;">
+                                    {% for findrowtype_ in findrowtype %}
+                                        <option value="{{findrowtype_}}" {% if findrowtype_==findrowtype_value %} selected {% endif %}>{{findrowtype_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>lower distance bounds: 
+                                    <input type="text" name="findrowdown" value='{{ findrowdown }}' style="width:86px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>upper distance bounds: 
+                                    <input type="text" name="findrowup" value='{{ findrowup }}' style="width:86px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
                         </div>
                     </div>
@@ -338,19 +477,27 @@
                     <span>Figure</span>
                 </a>
                 <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Download file name: <input type="text" name="downloadn" value='{{ downloadn }}' style="width:298px;height:30px;padding-left: 4px">
-                            </div>   
-                            <div class="row arg">
-                                <label> format: <select name=downloadf method="GET" action="/" style="width:50px">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div> 
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>format:
+                                    <select name=downloadf method="GET" action="/" style="width:60px;vertical-align: middle;">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}
-                                </select>
-                                
+                                    </select>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -367,20 +514,31 @@
                     <span>Arguments</span>
                 </a>
                 <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Upload arguments file:
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
-                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
-                                    </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload arguments file:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    <label>
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="height: 30px;width:310px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
-                            <div class="row arg">
-                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+                                    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">        
+                                <label>
+                                    <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:310px;height:30px;padding-left:4px;vertical-align: middle;">
+                                </label>
                             </div>
                             {% endif %}
 
@@ -398,20 +556,31 @@
                     <span>Session</span>
                 </a>
                 <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Upload session file:
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
-                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
-                                    </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload session file:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    <label>
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:310px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
-                            <div class="row arg">
-                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" style="width:310px;height:30px;padding-left:4px;vertical-align: middle;" name="session_downloadn" value='{{ session_downloadn }}'>
+                                </label>
                             </div>
                             {% endif %}
 
