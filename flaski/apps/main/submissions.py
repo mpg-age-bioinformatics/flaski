@@ -19,14 +19,25 @@ def make_submission_file(suffix):
   return filename
 
 
-def check_rnaseq(EXC):
+def check_pipelines(EXC, TAG):
   status=False
   attachment_path=None
-  if "samples" not in EXC.sheet_names:
-    status=False
-    msg="Could not find sample information - 'samples' sheet - in the submission file."
-    return status, msg, attachment_path
-  metadata=EXC.parse("RNAseq")
+  # dictionary of expected sheet names per TAG
+  expected_sheets={ 'RNAseq': ['RNAseq', 'samples'],\
+    'intronRet' : ['intronRet', 'samples'],\
+    'alternativeSplicing' : ['alternativeSplicing', 'samples'],\
+    'ATAC_seq' : ['ATAC_seq', 'samples', 'input'],\
+    'circRNA' : ['circRNA', 'samples'],\
+    'riboseq' : ['riboseq', 'samples', 'matching'],\
+    'variantCalling' : ['variantCalling', 'samples'],\
+    'miRNAseq' : ['miRNAseq', 'samples']}
+  # loop over all expected sheets and check if they are present, if not, send email
+  for sheet in expected_sheets[TAG]:
+    if sheet not in EXC.sheet_names:
+      status=False
+      msg="Could not find '%s' sheet in the submission file." %(sheet)
+      return status, msg, attachment_path 
+  metadata=EXC.parse(TAG)
   email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
   email=str(email).rstrip().lstrip()
   email=email.split(",")
@@ -40,132 +51,26 @@ def check_rnaseq(EXC):
     msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
     return status, msg, attachment_path
   
-  status="RNAseq"
+  status=TAG
   msg="Submission successuful. Please check for email confirmation."
 
-  filename=make_submission_file(".RNAseq.xlsx")
-
-  # print(os.readlink(filename))
+  filename=make_submission_file(".%s.xlsx" %(TAG))
 
   EXCout=pd.ExcelWriter(filename)
-  metadata.to_excel(EXCout,"RNAseq",index=None)
-  samples=EXC.parse("samples")
-  samples.to_excel(EXCout,"samples",index=None)
+  # write out all expected sheets
+  for sheet in expected_sheets[TAG]:
+    df=EXC.parse(sheet)
+    df.to_excel(EXCout,sheet,index=None)
   EXCout.save()
 
   return status, msg, filename
 
-
-def check_intronret(EXC):
-  status=False
-  attachment_path=None
-  if "samples" not in EXC.sheet_names:
-    status=False
-    msg="Could not find sample information - 'samples' sheet - in the submission file."
-    return status, msg, attachment_path
-  metadata=EXC.parse("intronRet")
-  email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
-  email=str(email).rstrip().lstrip()
-  email=email.split(",")
-  email=[ re.search("([^@|\s]+@[^@]+\.[^@|\s]+)",e,re.I) for e in email ]
-  email=[ e.group(1) for e in email if e ]
-  if not email :
-    msg="Contact email is not a valid email. Please provide a valid email in the 'email' field of your submission file."
-    return status, msg, attachment_path
-  nas=metadata[metadata["Value"].isna()]["Field"].tolist()
-  if nas:
-    msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
-    return status, msg, attachment_path
-  
-  status="intronRet"
-  msg="Submission successuful. Please check for email confirmation."
-
-  filename=make_submission_file(".intronRet.xlsx")
-  # print(os.readlink(filename))
-
-  EXCout=pd.ExcelWriter(filename)
-  metadata.to_excel(EXCout,"intronRet",index=None)
-  samples=EXC.parse("samples")
-  samples.to_excel(EXCout,"samples",index=None)
-  EXCout.save()
-
-  return status, msg, filename
-
-def check_variantCalling(EXC):
-  status=False
-  attachment_path=None
-  if "samples" not in EXC.sheet_names:
-    status=False
-    msg="Could not find sample information - 'samples' sheet - in the submission file."
-    return status, msg, attachment_path
-  metadata=EXC.parse("variantCalling")
-  email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
-  email=str(email).rstrip().lstrip()
-  email=email.split(",")
-  email=[ re.search("([^@|\s]+@[^@]+\.[^@|\s]+)",e,re.I) for e in email ]
-  email=[ e.group(1) for e in email if e ]
-  if not email :
-    msg="Contact email is not a valid email. Please provide a valid email in the 'email' field of your submission file."
-    return status, msg, attachment_path
-  nas=metadata[metadata["Value"].isna()]["Field"].tolist()
-  if nas:
-    msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
-    return status, msg, attachment_path
-  
-  status="variantCalling"
-  msg="Submission successuful. Please check for email confirmation."
-
-  filename=make_submission_file(".variantCalling.xlsx")
-  # print(os.readlink(filename))
-
-  EXCout=pd.ExcelWriter(filename)
-  metadata.to_excel(EXCout,"variantCalling",index=None)
-  samples=EXC.parse("samples")
-  samples.to_excel(EXCout,"samples",index=None)
-  EXCout.save()
-
-  return status, msg, filename
-
-def check_alternativeSplicing(EXC):
-  status=False
-  attachment_path=None
-  if "samples" not in EXC.sheet_names:
-    status=False
-    msg="Could not find sample information - 'samples' sheet - in the submission file."
-    return status, msg, attachment_path
-  metadata=EXC.parse("alternativeSplicing")
-  email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
-  email=str(email).rstrip().lstrip()
-  email=email.split(",")
-  email=[ re.search("([^@|\s]+@[^@]+\.[^@|\s]+)",e,re.I) for e in email ]
-  email=[ e.group(1) for e in email if e ]
-  if not email :
-    msg="Contact email is not a valid email. Please provide a valid email in the 'email' field of your submission file."
-    return status, msg, attachment_path
-  nas=metadata[metadata["Value"].isna()]["Field"].tolist()
-  if nas:
-    msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
-    return status, msg, attachment_path
-  
-  status="alternativeSplicing"
-  msg="Submission successuful. Please check for email confirmation."
-
-  filename=make_submission_file(".alternativeSplicing.xlsx")
-  # print(os.readlink(filename))
-
-  EXCout=pd.ExcelWriter(filename)
-  metadata.to_excel(EXCout,"alternativeSplicing",index=None)
-  samples=EXC.parse("samples")
-  samples.to_excel(EXCout,"samples",index=None)
-  EXCout.save()
-
-  return status, msg, filename
 
 def submission_check(inputfile):
   status=False
   attachment_path=None
 
-  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" ]
+  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq']
 
   filename = secure_filename(inputfile.filename)
   fileread = inputfile.read()
@@ -186,15 +91,7 @@ def submission_check(inputfile):
     msg="This submission file did not contain a valid submission sheet. Make sure you do not change the sheet names when editing the submission file."
     return status, msg, attachment_path
 
-  if submission_type[0]=="RNAseq":
-    status, msg, attachment_path=check_rnaseq(EXC)
-  elif submission_type[0]=="intronRet":
-    status, msg, attachment_path=check_intronret(EXC)
-  elif submission_type[0]=="variantCalling":
-    status, msg, attachment_path=check_variantCalling(EXC)
-  elif submission_type[0]=="alternativeSplicing":
-    status, msg, attachment_path=check_alternativeSplicing(EXC)
-  else:
-    msg="Submission failed."
-
+  # test submission sheets, variable pipelines.
+  status, msg, attachment_path=check_pipelines(EXC, submission_type[0])
+  
   return status, msg, attachment_path
