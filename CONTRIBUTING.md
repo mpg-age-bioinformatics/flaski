@@ -176,3 +176,16 @@ git tag -a flaski/0.1.0 <commit_sha> -m "<tag message>"
 git push
 git push origin --tags      
 ```
+
+To tag the latest commit:
+```
+git tag -e -a <version> HEAD
+git push
+git push origin --tags
+```
+eg.
+```
+git tag -e -a 1.2.0 HEAD
+git push
+git push origin --tags
+```
