@@ -264,14 +264,18 @@
                         <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Annotation bars with n. terms:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="write_n_terms" {% if write_n_terms=="on" %} checked {% elif write_n_terms==".on" %} checked {% endif %}/></label>
+                                <label>Annotation bars with n. terms:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="write_n_terms" {% if write_n_terms=="on" %} checked {% elif write_n_terms==".on" %} checked {% endif %}/>
+                                </label>
                                 <label> size: 
                                     <input type="text" name="annotation_size" value='{{ annotation_size }}' style="width:40px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Reverse rows order:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="reverse_y_order" {% if reverse_y_order=="on" %} checked {% elif reverse_y_order==".on" %} checked {% endif %}/></label>
+                                <label>Reverse rows order:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="reverse_y_order" {% if reverse_y_order=="on" %} checked {% elif reverse_y_order==".on" %} checked {% endif %}/>
+                                </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -282,7 +286,9 @@
                                         {% endfor %}
                                     </select>
                                 </label>
-                                <label>reverse:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="reverse_color_scale" {% if reverse_color_scale=="on" %} checked {% elif reverse_color_scale==".on" %} checked {% endif %}/></label>
+                                <label>reverse:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="reverse_color_scale" {% if reverse_color_scale=="on" %} checked {% elif reverse_color_scale==".on" %} checked {% endif %}/>
+                                </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -309,36 +315,59 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label style="padding-left: 6px;"></label>
+                                <div class="column" style="width:17%;">
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>Lower</label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>Center</label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>Upper</label>
+                                </div>  
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:17%;">
                                 <label>Value:</label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>
                                     <input type="text" name="lower_value" value='{{ lower_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>
                                     <input type="text" name="center_value" value='{{ center_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>
                                     <input type="text" name="upper_value" value='{{ upper_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:17%;">
                                 <label>Color:</label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>
                                     <input type="text" name="lower_color" value='{{ lower_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>
                                     <input type="text" name="center_color" value='{{ center_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:27%;text-align:center;">
                                 <label>
                                     <input type="text" name="upper_color" value='{{ upper_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -367,12 +396,18 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Y-Axis line:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="yaxis_line" {% if yaxis_line=="on" %} checked {% elif yaxis_line==".on" %} checked {% endif %}/></label>
-                                <label>mirror line:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/></label>
+                                <label>Y-Axis line:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="yaxis_line" {% if yaxis_line=="on" %} checked {% elif yaxis_line==".on" %} checked {% endif %}/>
+                                </label>
+                                <label>mirror line:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="rightyaxis_line" {% if rightyaxis_line=="on" %} checked {% elif rightyaxis_line==".on" %} checked {% endif %}/>
+                                </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>X-Axis line:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="xaxis_line" {% if xaxis_line=="on" %} checked {% elif xaxis_line==".on" %} checked {% endif %}/></label>
+                                <label>X-Axis line:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="xaxis_line" {% if xaxis_line=="on" %} checked {% elif xaxis_line==".on" %} checked {% endif %}/>
+                                </label>
                                 <label>positon: 
                                     <select name=xaxis_side method="GET" action="/" style="width:65px;vertical-align: middle;"> 
                                         {% for xaxis_side_ in xaxis_side_opt %}
@@ -380,7 +415,9 @@
                                         {% endfor %}
                                     </select>
                                 </label>
-                                <label>mirror line:<input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="topxaxis_line" {% if topxaxis_line=="on" %} checked {% elif topxaxis_line==".on" %} checked {% endif %}/></label>
+                                <label>mirror line:
+                                    <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="topxaxis_line" {% if topxaxis_line=="on" %} checked {% elif topxaxis_line==".on" %} checked {% endif %}/>
+                                </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -391,45 +428,67 @@
                             <!-- <label style="padding-left:28px;">width: <input type="text" name="xaxis_linewidth" value='{{ xaxis_linewidth }}' style="width:38px;height:22px;padding-left:4px"></label> -->
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>X-Axis label: 
+                                <label>X-Axis label:
+                                </label>
+                                <label>
                                     <input type="text" name="xaxis_label" value='{{ xaxis_label }}' style="width:226px;height:22px;padding-left: 4px;vertical-align: middle;">
                                 </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Y-Axis label: 
+                                <label>Y-Axis label:
+                                </label>
+                                <label>
                                     <input type="text" name="yaxis_label" value='{{ yaxis_label }}' style="width:226px;height:22px;padding-left: 4px;vertical-align: middle;">
                                 </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:33%;">
                                 <label>Labels font size: </label>
+                                </div>
+                                <div class="column" style="width:33%;text-align:right;">
                                 <label>Y: 
                                     <input type="text" name="yaxis_label_size" value='{{ yaxis_label_size }}' style="width:38px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:33%;text-align:right;">
                                 <label>X: 
                                     <input type="text" name="xaxis_label_size" value='{{ xaxis_label_size }}' style="width:38px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:33%;">
                                 <label>Font size: </label>
+                                </div>
+                                <div class="column" style="width:33%;text-align:right;">
                                 <label>Y-Axis: 
                                     <input type="text" name="yaxis_font_size" value='{{ yaxis_font_size }}' style="width:38px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:33%;text-align:right;">
                                 <label>X-Axis: 
                                     <input type="text" name="xaxis_font_size" value='{{ xaxis_font_size }}' style="width:38px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
+                                </div>
                             </div>
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:33%;">
                                 <label>X-Axis tick: </label>
+                                </div>
+                                <div class="column" style="width:33%;text-align:right;">
                                 <label>width:
                                     <input type="text" name="xaxis_tickwidth" value='{{ xaxis_tickwidth }}' style="width:2.8em;height:1.6em;padding-left:0.25em;vertical-align: middle;">
                                 </label>
+                                </div>
+                                <div class="column" style="width:33%;text-align:right;">
                                 <label>length: 
                                     <input type="text" name="xaxis_ticklen" value='{{ xaxis_ticklen }}' style="width:2.8em;height:1.6em;padding-left:0.25em;vertical-align: middle;">
                                 </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -470,19 +529,19 @@
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Download file name:</label>
                             </div>
-
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
-                            </div>
-
+                                <label>
+                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
+                                </label>
+                            </div>   
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> format: 
-                                    <select name=downloadf method="GET" action="/" style="width:50px">
-                                        {% for download_format_ in download_format %}
-                                            <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
-                                        {% endfor %}
+                                <label> format: <select name=downloadf method="GET" action="/" style="height:30px;width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
                                     </select>
                                 </label>
+                                
                             </div>
                         </div>
                     </div>
