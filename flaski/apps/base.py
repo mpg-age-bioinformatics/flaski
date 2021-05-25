@@ -16,7 +16,7 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"Violin plot", "id":'violinplot_more',"link":'violinplot' ,"java":"javascript:ReverseDisplay('violinplot_more')", "description":"A Violin plot app. including box and swarm plots."},\
         { "name":"iViolin plot", "id":'iviolinplot_more',"link":'iviolinplot' ,"java":"javascript:ReverseDisplay('iviolinplot_more')", "description":"An interactive violin plot including box and swarm plots."},\
         { "name":"KEGG", "id":'kegg_more',"link":'kegg' ,"java":"javascript:ReverseDisplay('kegg_more')", "description":"A KEGG mapping and plotting app."} ,\
-        { "name":"LifeSpan", "id":'lifespan_more',"link":'lifespan' ,"java":"javascript:ReverseDisplay('lifespan_more')", "description":"A Survival Analysis app."},\
-        { "name":"Circular BarPlots", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular BarPlots app."}]  #,\
+        { "name":"Life Span", "id":'lifespan_more',"link":'lifespan' ,"java":"javascript:ReverseDisplay('lifespan_more')", "description":"A Survival Analysis app."},\
+        { "name":"Circular bars plot", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular bars plot app."}]  #,\
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
