@@ -124,15 +124,15 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Title size: 
-                                            <select name=title_size_value method="GET" action="/" style="width:80px;vertical-align: middle;">
+                                            <select name=title_size_value method="GET" action="/" style="width:83px;vertical-align: middle;">
                                             {% for title_size_ in title_size %}
                                                 <option value="{{title_size_}}" {% if title_size_==title_size_value %} selected {% endif %}>{{title_size_}}</option>
                                             {% endfor %}
                                             </select>
                                         </label>
 
-                                        <label>Style: 
-                                            <select name=style method="GET" action="/" style="width:80px;vertical-align: middle;">
+                                        <label>style: 
+                                            <select name=style method="GET" action="/" style="width:98px;vertical-align: middle;">
                                             {% for style_ in styles %}
                                                 <option value="{{style_}}" {% if style_==style %} selected {% endif %}>{{style_}}</option>
                                             {% endfor %}
@@ -226,7 +226,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>X ticks</label>
-                                        <label>fontsize: 
+                                        <label style="padding-left:5px">fontsize: 
                                             <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label> rotation: 
@@ -236,7 +236,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Y ticks</label>
-                                        <label>fontsize: 
+                                        <label style="padding-left:6px">fontsize: 
                                             <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label> rotation: 
@@ -256,7 +256,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Y limits</label>
-                                        <label >lower: 
+                                        <label style="padding-left:2px">lower: 
                                             <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label> upper: 
@@ -266,7 +266,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>N ticks</label>
-                                        <label>x-axis: 
+                                        <label style="padding-left:4px">x-axis: 
                                             <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label> y-axis: 
@@ -275,7 +275,7 @@
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Grid:
+                                        <label>Grid type:
                                             <select name=grid_value method="GET" action="/" style="width:65px;vertical-align: middle;">
                                             {% for grid_ in grid %}
                                                 <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
@@ -283,7 +283,7 @@
                                             </select>
                                         </label>
 
-                                        <label>Style:
+                                        <label>Grid style:
                                             <select name=grid_linestyle_value method="GET" action="/" style="width:65px;vertical-align: middle;">
                                             {% for grid_linestyle_ in grid_linestyle %}
                                                 <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
@@ -296,7 +296,7 @@
                                         <label>Grid alpha: 
                                             <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
-                                        <label> Width: 
+                                        <label>Grid width: 
                                             <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                     </div>
@@ -341,6 +341,9 @@
 
                                         <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                             <label> ..or write: 
+                                            </label>
+
+                                            <label>
                                                 <input type="text" name=vp_color_rgb value="{{vp_color_rgb}}" style="width:248px;height:22px;padding-left: 4px;vertical-align: middle;">
                                             </label>
                                         </div>
@@ -460,6 +463,8 @@
 
                                         <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                             <label> ..or write: 
+                                            </label>
+                                            <label>
                                                 <input type="text" name=bp_color_rgb value="{{bp_color_rgb}}" style="width:248px;height:22px;padding-left: 4px;vertical-align: middle;">
                                             </label>
                                         </div>
@@ -540,6 +545,8 @@
 
                                         <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                             <label> ..or write: 
+                                            </label>
+                                            <label>
                                                 <input type="text" name=sp_color_rgb value="{{sp_color_rgb}}" style="width:248px;height:22px;padding-left: 4px;vertical-align: middle;">
                                             </label>
                                         </div>
@@ -604,7 +611,7 @@
                                             </div>
 
                                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                                <label>Title fontsize: 
+                                                <label>Title font size: 
                                                     <select name="legend_title_fontsize" value="{{legend_title_fontsize}}" method="GET" action="/" style="width:70px;height:22px;padding-left:10px;vertical-align: middle; ">
                                                     {% for legend_title_fontsize_ in title_size %}
                                                         <option value="{{legend_title_fontsize_}}" {% if legend_title_fontsize_==legend_title_fontsize %} selected {% endif %}>{{legend_title_fontsize_}}</option>
@@ -616,7 +623,7 @@
                                             </div>
 
                                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                                <label>Body fontsize: 
+                                                <label>Body font size: 
                                                     <select name="legend_body_fontsize" value="{{legend_body_fontsize}}" method="GET" action="/" style="width:70px;height:22px;padding-left:2px;vertical-align: middle;">
                                                     {% for legend_body_fontsize_ in legend_fontsizes %}
                                                         <option value="{{legend_body_fontsize_}}" {% if legend_body_fontsize_==legend_body_fontsize %} selected {% endif %}>{{legend_body_fontsize_}}</option>
@@ -629,14 +636,14 @@
                                             </div>
 
                                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                                <label>Facecolor: 
+                                                <label>Face color: 
                                                     <select name="facecolor" value="{{facecolor}}"  method="GET" action="/" style="width:70px;vertical-align: middle;">
                                                     {% for facecolor_ in colors %}
                                                         <option value="{{facecolor_}}" {% if facecolor_==facecolor %} selected {% endif %}>{{facecolor_}}</option>
                                                     {% endfor %}
                                                     </select>
                                                 </label>
-                                                <label>Edgecolor: 
+                                                <label>Edge color: 
                                                     <select name="edgecolor" value="{{edgecolor}}" method="GET" action="/" style="width:70px;padding-left:2px;vertical-align: middle;">
                                                     {% for edgecolor_ in colors %}
                                                         <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>
@@ -669,7 +676,7 @@
                                             </div>
 
                                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                                <label>Borderpad:
+                                                <label>Border pad:
                                                     <input type="text" name="borderpad" value='{{ borderpad }}' style="width:50px;height:22px;padding-left:4px;vertical-align: middle;">
                                                 </label>
                                                 <label>Border-axes pad:
@@ -696,7 +703,7 @@
                                             </div>
 
                                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                                <label>Framealpha:
+                                                <label>Frame alpha:
                                                     <input type="text" name="framealpha" value='{{ framealpha }}' style="width:50px;height:22px;padding-left:4px;vertical-align: middle;">
                                                 </label>
                                                 <label>N columns: 
@@ -737,22 +744,23 @@
                     <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
                             <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
-                                
+    
                                 <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                     <label>Download file name:</label>
                                 </div>
-
                                 <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px;vertical-align: middle;">
-                                </div>
-                                
+                                    <label>
+                                        <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
+                                    </label>
+                                </div>   
                                 <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                    <label> format: <select name=downloadf method="GET" action="/" style="width: 60px;height: 30px;vertical-align: middle;">
+                                    <label> format: <select name=downloadf method="GET" action="/" style="height:30px;width:50px">
                                         {% for download_format_ in download_format %}
                                             <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
                                         {% endfor %}
                                         </select>
                                     </label>
+                                    
                                 </div>
                             </div>
                         </div>
