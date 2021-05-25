@@ -208,7 +208,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>X ticks </label>
-                                        <label>font size: 
+                                        <label style="padding-left:2px;">font size: 
                                             <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label>rotation:
@@ -218,7 +218,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Y ticks</label>
-                                        <label>font size: 
+                                        <label style="padding-left:3px;">font size: 
                                             <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label>rotation: 
@@ -238,7 +238,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Y limits</label>
-                                        <label>lower: 
+                                        <label style="padding-left:2px;">lower: 
                                             <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label> upper: 
@@ -248,7 +248,7 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>N ticks</label>
-                                        <label>x-axis:
+                                        <label style="padding-left:4px;">x-axis:
                                             <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                         <label>y-axis:
@@ -265,7 +265,7 @@
                                             </select>
                                         </label>
 
-                                        <label>Style: 
+                                        <label>Grid style: 
                                             <select name=grid_linestyle_value method="GET" action="/" style="width:65px;vertical-align: middle;">
                                             {% for grid_linestyle_ in grid_linestyle %}
                                                 <option value="{{grid_linestyle_}}" {% if grid_linestyle_==grid_linestyle_value %} selected {% endif %}>{{grid_linestyle_}}</option>
@@ -278,7 +278,7 @@
                                         <label>Grid alpha: 
                                             <input type="text" name="grid_alpha" value='{{ grid_alpha }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;"> 
                                         </label>
-                                        <label> Width: 
+                                        <label>Grid width: 
                                             <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                     </div>
@@ -301,6 +301,9 @@
 
                                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                                 <label>Title: 
+                                                </label>
+
+                                                <label>
                                                     <input type="text" name="legend_title" value='{{ legend_title }}' style="width:265px;height:22px;padding-left:4px;vertical-align: middle;">
                                                 </label>
                                             </div>
