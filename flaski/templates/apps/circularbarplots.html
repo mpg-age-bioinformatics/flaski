@@ -611,7 +611,7 @@
             {% if figure_url %}
 
             <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
-
+            
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
                     <i class="fas fa-fw fa-download"></i>
@@ -624,19 +624,19 @@
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Download file name:</label>
                             </div>
-                                    
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px;">
+                                <label>
+                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
+                                </label>
                             </div>   
-
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> format: 
-                                    <select name=downloadf method="GET" action="/" style="width: 60px;height: 30px;">
-                                        {% for download_format_ in download_format %}
-                                            <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
-                                        {% endfor %}
+                                <label> format: <select name=downloadf method="GET" action="/" style="height:30px;width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
                                     </select>
                                 </label>
+                                
                             </div>
                         </div>
                     </div>
