@@ -4,6 +4,8 @@ Welcome! Thanks for signing up. Please follow this link to activate your account
 
 {{ url_for('confirm', token=token, _external=True) }}
 
+Flaski works better on Google Chrome, both on your laptop or on your iPad.
+
 You can find several how-to videos on Flaski's YouTube channel: https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA.
 
 For documentation please visit Flaski's GitHub page: https://bioinformatics.age.mpg.de/flaski
