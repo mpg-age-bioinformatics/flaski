@@ -69,74 +69,75 @@
                     <span>Categories</span>
                 </a>
                 <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
-                            <div class="row arg" style="padding-bottom:10px;">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Gene ontology:</label>
-                                <select multiple name=categories_gene_ontology_value method="GET" action="/" style="width:302px;">
+                                <select multiple name=categories_gene_ontology_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_gene_ontology %}
                                         <option value="{{category}}" {% if category in categories_gene_ontology_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Gene domains:</label>
-                                <select multiple name=categories_gene_domains_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_gene_domains_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_gene_domains %}
                                         <option value="{{category}}" {% if category in categories_gene_domains_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Pathways:</label>
-                                <select multiple name=categories_pathways_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_pathways_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_pathways %}
                                         <option value="{{category}}" {% if category in categories_pathways_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>General annotations:</label>
-                                <select multiple name=categories_general_annotations_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_general_annotations_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_general_annotations %}
                                         <option value="{{category}}" {% if category in categories_general_annotations_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Functional categories:</label>
-                                <select multiple name=categories_functional_categories_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_functional_categories_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_functional_categories %}
                                         <option value="{{category}}" {% if category in categories_functional_categories_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Protein-protein interactions:</label>
-                                <select multiple name=categories_protein_protein_interactions_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_protein_protein_interactions_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_protein_protein_interactions %}
                                         <option value="{{category}}" {% if category in categories_protein_protein_interactions_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Literature:</label>
-                                <select multiple name=categories_literature_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_literature_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_literature %}
                                         <option value="{{category}}" {% if category in categories_literature_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="row arg" style="padding-bottom:10px;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
                                 <label>Disease:</label>
-                                <select multiple name=categories_disease_value method="GET" action="/" style="width:302px">
+                                <select multiple name=categories_disease_value method="GET" action="/" style="width:302px;vertical-align: middle;">
                                     {% for category in categories_disease %}
                                         <option value="{{category}}" {% if category in categories_disease_value %} selected {% endif %}>{{category}}</option>
                                     {% endfor %}
@@ -157,18 +158,36 @@
                     <span>Input</span>
                 </a>
                 <div id="collapseClustering" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <label>Database: <select name=database_value method="GET" action="/" style="width:233px">
-                                {% for db in database %}
-                                    <option value="{{db}}" {% if db==database_value %} selected {% endif %}>{{db}}</option>
-                                {% endfor %}
-                            </select></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Database: 
+                                    <select name=database_value method="GET" action="/" style="width:233px;vertical-align: middle;">
+                                        {% for db in database %}
+                                            <option value="{{db}}" {% if db==database_value %} selected {% endif %}>{{db}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
 
-                            <label style="padding-left:0x;padding-right:4px;">DAVID registered email: <input type="text" name="user" value='{{ user }}' style="width:142px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">Target list name: <input type="text" name="name" value='{{ name }}' style="width:189px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:0x;padding-right:4px;">Background list name: <input type="text" name="name_bg" value='{{ name_bg }}' style="width:154px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>DAVID registered email: 
+                                    <input type="text" name="user" value='{{ user }}' style="width:142px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Target list name: 
+                                    <input type="text" name="name" value='{{ name }}' style="width:189px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Background list name: 
+                                    <input type="text" name="name_bg" value='{{ name_bg }}' style="width:154px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
                         </div>
         
@@ -185,11 +204,20 @@
                     <span>Cut-offs</span>
                 </a>
                 <div id="collapsePlot" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <label style="padding-left:0px;padding-right:4px;">number of genes per term: <input type="text" name="n" value='{{ n }}' style="width:97px;height:22px;padding-left: 4px"></label>
-                            <label style="padding-left:118px;padding-right:4px;">p value: <input type="text" name="p" value='{{ p }}' style="width:97px;height:22px;padding-left: 4px"></label>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>number of genes per term: 
+                                    <input type="text" name="n" value='{{ n }}' style="width:97px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>p value: 
+                                    <input type="text" name="p" value='{{ p }}' style="width:97px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+                            </div>
 
                         </div>
                     </div>
@@ -211,19 +239,28 @@
                     <span>Output</span>
                 </a>
                 <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Download file name: <input type="text" name="download_name" value='{{ download_name }}' style="width:298px;height:30px;padding-left: 4px">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" name="download_name" value='{{ download_name }}' style="width:310px;height:30px;padding-left: 4px;vertical-align: middle;">
+                                </label>
                             </div>   
-                            <div class="row arg">
-                                <label> format: <select name=download_format_value method="GET" action="/" style="width:50px">
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> format:
+                                    <select name=download_format_value method="GET" action="/" style="width: 60px;height: 30px;">
                                     {% for download_format_ in download_format %}
                                         <option value="{{download_format_}}" {% if download_format_==download_format_value %} selected {% endif %}>{{download_format_}}</option>
                                     {% endfor %}
-                                </select>
-                                
+                                    </select>
+                                </label>
+
                             </div>
                         </div>
                     </div>
@@ -238,20 +275,31 @@
                     <span>Arguments</span>
                 </a>
                 <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Upload arguments file:
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width:300px;">
-                                        <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
-                                    </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload arguments file:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+                                    <label>
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="width: 310px;height: 30px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
-                            <div class="row arg">
-                                <label>Download file name: <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:298px;height:30px;padding-left:4px">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+                                  
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:310px;height:30px;padding-left:4px;vertical-align: middle;">
+                                </label>
                             </div>
                             {% endif %}
 
@@ -269,20 +317,31 @@
                     <span>Session</span>
                 </a>
                 <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu">
-                        <div class="row arguments">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
-                            <div class="row arg">
-                                <label>Upload session file:
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:300px;">
-                                        <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
-                                    </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload session file:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    <label>
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width: 310px;height: 30px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div> 
 
                             {% if filename != "Select file.." %}
-                            <div class="row arg">
-                                <label>Download file name:<input type="text" style="width:298px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+                                    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">  
+                                <label> 
+                                    <input type="text" style="width:310px;height:30px;padding-left:4px" name="session_downloadn" value='{{ session_downloadn }}'>
+                                </label>
                             </div>
                             {% endif %}
 
