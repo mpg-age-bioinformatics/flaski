@@ -259,7 +259,8 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>X ticks fontsize: 
+                                <label>X ticks</label>
+                                <label style="padding-left:5px;">fontsize: 
                                     <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
 
@@ -269,10 +270,11 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Y ticks fontsize: 
+                                <label>Y ticks
+                                </label>
+                                <label style="padding-left:6px;">fontsize: 
                                     <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
-
                                 <label> rotation: 
                                     <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
@@ -290,7 +292,7 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Y limits</label>
-                                <label>lower: 
+                                <label style="padding-left:1px;">lower: 
                                     <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
                                 <label> upper: 
@@ -300,7 +302,7 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>N ticks</label>
-                                <label>x-axis: 
+                                <label style="padding-left:4px;">x-axis: 
                                     <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
                                 <label> y-axis: 
@@ -310,7 +312,7 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Grid:
-                                    <select name=grid_value method="GET" action="/" style="width:135px;vertical-align:middle;">
+                                    <select name=grid_value method="GET" action="/" style="width:55px;vertical-align:middle;">
                                     {% for grid_ in grid %}
                                         <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                     {% endfor %}
@@ -318,25 +320,25 @@
                                 </label>
 
                                 <label> width:
-                                    <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
+                                    <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
-                            </div>
 
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:flex-start; text-align:justify;">
-                                <label> Color: 
-                                    <select name=grid_color_value method="GET" action="/" style="width:132px;vertical-align:middle;">
+                                <label> color: 
+                                    <select name=grid_color_value method="GET" action="/" style="width:75px;vertical-align:middle;">
                                     {% for marker_color_ in marker_color %}
                                         <option value="{{marker_color_}}" {% if marker_color_==grid_color_value %} selected {% endif %}>{{marker_color_}}</option> 
                                     {% endfor %}
                                     </select>
                                 </label>
-                                
-                                <label style="padding-left: 4px;">   or ..</label>
+
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> write a color name 
-                                    <input type="text" name=grid_color_text value="{{grid_color_text}}" style="width:190px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                <label>
+                                    .. or write a color name
+                                </label>
+                                <label>
+                                    <input type="text" name=grid_color_text value="{{grid_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                             </div>
 
@@ -394,6 +396,8 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> ..or, write a color name 
+                                </label>
+                                <label>
                                     <input type="text" name={{group.name}}.markerc_write value="{{group.markerc_write}}" style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
                                 </label>
                             </div>
@@ -436,6 +440,8 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> ..or, write a color name 
+                                </label>
+                                <label>
                                     <input type="text" name={{group.name}}.edgecolor_write value="{{group.edgecolor_write}}" style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
                                 </label>
                             </div>
@@ -532,6 +538,9 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> ..or, write a color name 
+                                </label>
+
+                                <label>
                                     <input type="text" name="markerc_write" value='{{ markerc_write }}' style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
                                 </label>
                             </div>
@@ -574,6 +583,8 @@
     
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> ..or, write a color name 
+                                </label>
+                                <label>
                                     <input type="text" name="edgecolor_write" value='{{ edgecolor_write }}' style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
                                 </label>
                             </div>
