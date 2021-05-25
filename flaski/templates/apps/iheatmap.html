@@ -63,7 +63,7 @@
                 <div class="column">
                     <div class="sidebar-heading">Row names:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
-                        <select title=xcols name=xvals method="GET" action="/" style="height:50px;width:365px">
+                        <select title=xcols name=xvals method="GET" action="/" style="height:33px;width:365px">
                             {% for xcol in xcols %}
                                 <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
                             {% endfor %}
@@ -99,7 +99,7 @@
                     <div class="column" >
                         <div class="sidebar-heading">Rows:</div>
                         <div style="padding-left:13px;">
-                            <select name="findrow" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            <select name="findrow" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="height:33px;width:364px;">
                                 {% for available_rows_ in available_rows %}
                                     <option value="{{available_rows_}}" {% if available_rows_ in findrow %} selected {% endif %}>{{available_rows_}}</option>
                                 {% endfor %}
@@ -302,7 +302,9 @@
                                 </label>
                             </div>
 
-                            <hr class="black">
+                            <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                <hr class="black">
+                            </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Show labels: </label>
@@ -325,7 +327,9 @@
                             </div>
 
 
-                            <hr class="black">
+                            <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                <hr class="black">
+                            </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:flex-start; text-align:justify;">
                                 <label>CMAP:
