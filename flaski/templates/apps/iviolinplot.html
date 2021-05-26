@@ -160,7 +160,9 @@
                                         </label>
                                     </div>
                                     
-                                    <hr class="black">
+                                    <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                        <hr class="black">
+                                    </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Title</label>
@@ -400,7 +402,9 @@
                                         </div>  
                                         {% endif %}
 
-                                        <hr class="black">
+                                        <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                            <hr class="black">
+                                        </div>
 
                                         <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                             <label>Hover</label>
@@ -584,7 +588,9 @@
                                             </label>
                                         </div>
 
-                                        <hr class="black">
+                                        <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                            <hr class="black">
+                                        </div>
 
                                         <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                             <label>Hover</label>
@@ -868,7 +874,9 @@
                                     </div>
 
 
-                                    <hr class="black">
+                                    <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                        <hr class="black">
+                                    </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Ticks</label>
@@ -880,6 +888,32 @@
                                         <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_right_axis" {% if tick_right_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
                                         <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/> upper </label>
                                         <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;"name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
+                                    </div>
+
+                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                        <label>Width: 
+                                            <input type="text" name="ticks_line_width" value='{{ ticks_line_width }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                        </label>
+                                        <label>Length: 
+                                            <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                        </label>
+                                    </div>
+
+                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                        <label>Direction: 
+                                            <select name=ticks_direction_value method="GET" action="/" style="width:65px;padding-bottom:0px;vertical-align: middle;">
+                                            {% for ticks_direction_ in ticks_direction %}
+                                                <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
+                                            {% endfor %}
+                                            </select>
+                                        </label>
+                                        <label>Color: 
+                                            <select  name=ticks_color value="{{ticks_color}}" method="GET" action="/" style="width:65px;vertical-align: middle;">
+                                            {% for ticks_color_ in colors %}
+                                                <option value="{{ticks_color_}}" {% if ticks_color_==ticks_color %} selected {% endif %}>{{ticks_color_}}</option>
+                                            {% endfor %}
+                                            </select>
+                                        </label>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -932,33 +966,9 @@
                                         </label>
                                     </div>
 
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Width: 
-                                            <input type="text" name="ticks_line_width" value='{{ ticks_line_width }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                        </label>
-                                        <label>Length: 
-                                            <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                        </label>
+                                    <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                        <hr class="black">
                                     </div>
-
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Direction: 
-                                            <select name=ticks_direction_value method="GET" action="/" style="width:65px;padding-bottom:0px;vertical-align: middle;">
-                                            {% for ticks_direction_ in ticks_direction %}
-                                                <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
-                                            {% endfor %}
-                                            </select>
-                                        </label>
-                                        <label>Color: 
-                                            <select  name=ticks_color value="{{ticks_color}}" method="GET" action="/" style="width:65px;vertical-align: middle;">
-                                            {% for ticks_color_ in colors %}
-                                                <option value="{{ticks_color_}}" {% if ticks_color_==ticks_color %} selected {% endif %}>{{ticks_color_}}</option>
-                                            {% endfor %}
-                                            </select>
-                                        </label>
-                                    </div>
-
-                                    <hr class="black">
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Spikes</label>
@@ -1004,7 +1014,9 @@
                                         </label>
                                     </div>
 
-                                    <hr class="black">
+                                    <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                        <hr class="black">
+                                    </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Grid</label>
@@ -1131,8 +1143,10 @@
                                             </label>
                                         </div>
                                     
-                                        <hr class="black">
-
+                                        <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
+                                            <hr class="black">
+                                        </div>
+                                    
                                         <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                             <label>Main body</label>
                                         </div>
@@ -1161,7 +1175,7 @@
                                                 {% endfor %}
                                                 </select>
                                             </label>
-                                            <label>Groupgap: 
+                                            <label>Group gap: 
                                                 <input type="text" name="legend_tracegroupgap" value='{{ legend_tracegroupgap }}' style="width:70px;height:22px;padding-left: 4px;vertical-align: middle;">
                                             </label>
                                         </div>
