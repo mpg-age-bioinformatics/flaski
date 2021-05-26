@@ -431,6 +431,7 @@ def figure_defaults():
         "download_fig_format":["png","pdf","svg"], \
         "download_fig":"pdf", \
         "downloadn":"LifeSpan",\
+        "downloadn_fig":"LifeSpan",\
         "session_downloadn":"MySession.LifeSpan",\
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.LifeSpan",\

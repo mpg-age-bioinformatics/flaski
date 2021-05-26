@@ -292,7 +292,6 @@
 
                                 </div>
                             </div>
-
                         </div>
                     </li>
 
@@ -411,48 +410,72 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>X ticks</label>
-                                <label>fontsize: 
-                                    <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label> rotation: 
-                                    <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
+                                <div class="column" style="width:6%;">
+                                    <label>X ticks</label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label>fontsize: 
+                                        <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label> rotation: 
+                                        <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Y ticks</label>
-                                <label>fontsize: 
-                                    <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label> rotation: 
-                                    <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
+                                <div class="column" style="width:6%;">
+                                    <label>Y ticks</label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label>fontsize: 
+                                        <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label> rotation: 
+                                        <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>X limits</label>
-                                <label>lower: 
-                                    <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label> upper: 
-                                    <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
+                                <div class="column" style="width:6%;">
+                                    <label>X limits</label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label>lower: 
+                                        <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label> upper: 
+                                        <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Y limits</label>
-                                <label>lower: 
-                                    <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label> upper: 
-                                    <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
+                                <div class="column" style="width:6%;">
+                                    <label>Y limits</label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label>lower: 
+                                        <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:47%;text-align:right;">
+                                    <label> upper: 
+                                        <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Grid: 
-                                    <select name=grid_value method="GET" action="/" style="width:97px;vertical-align: middle;">
+                                    <select name=grid_value method="GET" action="/" style="width:65px;vertical-align: middle;">
                                         {% for grid_ in grid %}
                                             <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
                                         {% endfor %}
@@ -460,34 +483,30 @@
                                 </label>
 
                                 <label> width: 
-                                    <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:74px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:40px;height:22px;padding-left:4px;vertical-align: middle;">
                                 </label>
 
-                            </div>
-
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> color: 
-                                    <select name=grid_color_value method="GET" action="/" style="width:95px;vertical-align: middle;">
+                                    <select name=grid_color_value method="GET" action="/" style="width:65px;vertical-align: middle;">
                                         {% for marker_color_ in marker_color %}
                                             <option value="{{marker_color_}}" {% if marker_color_==grid_color_value %} selected {% endif %}>{{marker_color_}}</option> 
                                         {% endfor %}
                                     </select>
                                 </label>
-                                
+
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> or write a color name 
-                                    <input type="text" name=grid_color_text value="{{grid_color_text}}" style="width:172px;height:22px;padding-left: 4px">
+                                <label> .. or write a color name 
+                                </label>
+                                <label>
+                                    <input type="text" name=grid_color_text value="{{grid_color_text}}" style="width:160px;height:22px;padding-left: 4px">
                                 </label>
                             </div>
 
                         </div>
-        
                     </div>
-
                 </div>
-
             </li>
            
             {% endif %}
@@ -499,6 +518,7 @@
             <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
 
             <!-- -------------------- TABLE DOWNLOAD ARGUMENTS ---------------------- -->
+
 
             <li class="nav-item" style="padding-top: 0px;">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
@@ -512,24 +532,23 @@
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Download file name:</label>
                             </div>
-
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px;vertical-align: middle;">
-                            </div>
-
+                                <label>
+                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
+                                </label>
+                            </div>   
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> format: 
-                                    <select name=downloadf method="GET" action="/" style="width:60px;">
-                                        {% for download_format_ in download_format %}
-                                            <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
-                                        {% endfor %}
+                                <label> format: <select name=downloadf method="GET" action="/" style="height:30px;width:50px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
                                     </select>
                                 </label>
+                                
                             </div>
                         </div>
                     </div>
                 </div>
-
             </li>
 
             <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
@@ -546,24 +565,23 @@
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Download file name:</label>
                             </div>
-                            
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px;vertical-align: middle;">
-                            </div>  
-
+                                <label>
+                                    <input type="text" name="downloadn_fig" value='{{ downloadn_fig }}' style="width:310px;height:30px;padding-left: 4px">
+                                </label>
+                            </div>   
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> format: 
-                                    <select name=download_fig method="GET" action="/" style="width:60px;">
-                                        {% for download_format_ in download_fig_format %}
-                                            <option value="{{download_format_}}" {% if download_format_==download_fig %} selected {% endif %}>{{download_format_}}</option>
-                                        {% endfor %}
+                                <label> format: <select name=download_fig method="GET" action="/" style="height:30px;width:50px">
+                                    {% for download_format_ in download_fig_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==download_fig %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
                                     </select>
                                 </label>
+                                
                             </div>
                         </div>
                     </div>
                 </div>
-
             </li>
 
             <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
