@@ -269,32 +269,44 @@ def make_figure(df,pa):
         #fig.update_traces(textposition='top center')
     
     if pa["vline"] != "":
-        if pa["vline_linestyle_value"] == '-':
-            linetype=None
-        elif pa["vline_linestyle_value"] == ':':
-            linetype="dot"
-        elif pa["vline_linestyle_value"] == '-.':
-            linetype="dashdot"
+        if pa["vline_color_text"]!="":
+            vline_color=pa["vline_color_text"]
         else:
-            linetype='dash'
+            vline_color=pa["vline_color_value"]
+
+        if pa["vline_linestyle_value"] == '-':
+            vline_linetype=None
+        elif pa["vline_linestyle_value"] == ':':
+            vline_linetype="dot"
+        elif pa["vline_linestyle_value"] == '-.':
+            vline_linetype="dashdot"
+        else:
+            vline_linetype='dash'
+
         fig.add_shape(type="line", x0=pa["vline"], x1=pa["vline"],\
             xref='x', yref='paper',\
             y0=0, y1=1,\
-            line=dict(color=pa["vline_color_value"],width=float(pa["vline_linewidth"]), dash=linetype))
+            line=dict(color=vline_color,width=float(pa["vline_linewidth"]), dash=vline_linetype))
 
     if pa['hline'] != "":
-        if pa["hline_linestyle_value"] == '-':
-            linetype=None
-        elif pa["hline_linestyle_value"] == ':':
-            linetype="dot"
-        elif pa["hline_linestyle_value"] == '-.':
-            linetype="dashdot"
+        if pa["hline_color_text"]!="":
+            hline_color=pa["hline_color_text"]
         else:
-            linetype='dash'
+            hline_color=pa["hline_color_value"]
+
+        if pa["hline_linestyle_value"] == '-':
+            hline_linetype=None
+        elif pa["hline_linestyle_value"] == ':':
+            hline_linetype="dot"
+        elif pa["hline_linestyle_value"] == '-.':
+            hline_linetype="dashdot"
+        else:
+            hline_linetype='dash'
+
         fig.add_shape(type="line", x0=0, x1=1,\
             xref='paper', yref='y',\
             y0=pa["hline"], y1= pa["hline"],\
-            line=dict(color=pa["hline_color_value"],width=float(pa["hline_linewidth"]), dash=linetype))
+            line=dict(color=hline_color,width=float(pa["hline_linewidth"]), dash=hline_linetype))
 
     return fig
 
