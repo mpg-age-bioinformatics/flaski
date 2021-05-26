@@ -354,37 +354,60 @@
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label style="padding-left: 6px;"></label>
-                                <label>Lower</label>
-                                <label>Center</label>
-                                <label>Upper</label>
+                                <div class="column" style="width:12%;vertical-align:middle;">
+                                    <label></label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>Lower</label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>Center</label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>Upper</label>
+                                </div>
                             </div>
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Value:</label>
-                                <label>
-                                    <input type="text" name="lower_value" value='{{ lower_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label>
-                                    <input type="text" name="center_value" value='{{ center_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label>
-                                    <input type="text" name="upper_value" value='{{ upper_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                
+                                <div class="column" style="width:13%;vertical-align:middle;text-align:center;">
+                                    <label>Value:</label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>
+                                        <input type="text" name="lower_value" value='{{ lower_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>
+                                        <input type="text" name="center_value" value='{{ center_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>
+                                        <input type="text" name="upper_value" value='{{ upper_value }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>                                
                             </div>
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>Color:</label>
-                                <label>
-                                    <input type="text" name="lower_color" value='{{ lower_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label>
-                                    <input type="text" name="center_color" value='{{ center_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
-                                <label>
-                                    <input type="text" name="upper_color" value='{{ upper_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
-                                </label>
+                                <div class="column" style="width:13%;vertical-align:middle;text-align:center;">
+                                    <label>Color:</label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>
+                                        <input type="text" name="lower_color" value='{{ lower_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>
+                                        <input type="text" name="center_color" value='{{ center_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:29%;vertical-align:middle;text-align:center;">
+                                    <label>
+                                        <input type="text" name="upper_color" value='{{ upper_color }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
                             </div>
 
 
@@ -394,24 +417,28 @@
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>label: 
+                                </label>
+                                <label>
                                     <input type="text" name="color_bar_label" value='{{ color_bar_label }}' style="width:270px;height:22px;padding-left: 4px;vertical-align: middle;">
                                 </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>label font size:
-                                    <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                <label>font size:
+                                    <input type="text" name="color_bar_font_size" value='{{ color_bar_font_size }}' style="width:40px;height:22px;padding-left: 4px;vertical-align: middle;">
                                 </label>
-                                <label>tickts font size:
-                                    <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                <label>tickts size:
+                                    <input type="text" name="color_bar_ticks_font_size" value='{{ color_bar_ticks_font_size }}' style="width:40px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                </label>
+
+                                <label>padding:
+                                    <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:40px;height:22px;padding-left: 4px;vertical-align: middle;">
                                 </label>
                             </div>
 
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>padding:
-                                    <input type="text" name="color_bar_horizontal_padding" value='{{ color_bar_horizontal_padding }}' style="width:50px;height:22px;padding-left: 4px;vertical-align: middle;">
-                                </label>
-                            </div>
+                            <!-- <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+
+                            </div> -->
                             <!--label style="padding-left:0x;padding-right:4px;width:150px;"><input type="checkbox" name="annotate" {% if annotate=="on" %} checked {% elif annotate==".on" %} checked {% endif %}/> Annotate</label-->
 
                         </div>
