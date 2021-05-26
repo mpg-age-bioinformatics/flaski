@@ -383,19 +383,19 @@
                                     <input type="text" name="hline" value='{{ hline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
 
-                                <label> width:
+                                <label>width:
                                     <input type="text" name="hline_linewidth" value='{{ hline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                                 
-                                <label> lty 
+                                <label>style 
                                     <select name=hline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
                                         {% for hline_linestyle_ in hline_linestyle %}
-                                            <option value="{{hline_linestyle_}}" {% if marker_color_==hline_linestyle_value %} selected {% endif %}>{{hline_linestyle_}}</option> 
+                                            <option value="{{hline_linestyle_}}" {% if hline_linestyle_==hline_linestyle_value %} selected {% endif %}>{{hline_linestyle_}}</option> 
                                         {% endfor %}
                                         </select>
                                 </label>
 
-                                <label> color: 
+                                <label>color: 
                                     <select name=hline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
                                     {% for marker_color_ in marker_color %}
                                         <option value="{{marker_color_}}" {% if marker_color_==hline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
@@ -424,10 +424,10 @@
                                     <input type="text" name="vline_linewidth" value='{{ vline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
 
-                                <label> lty 
+                                <label> style 
                                     <select name=vline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
                                         {% for vline_linestyle_ in vline_linestyle %}
-                                            <option value="{{vline_linestyle_}}" >{{vline_linestyle_}}</option> 
+                                            <option value="{{vline_linestyle_}}" {% if vline_linestyle_==vline_linestyle_value %} selected {% endif %}>{{vline_linestyle_}}</option> 
                                         {% endfor %}
                                         </select>
                                 </label>
