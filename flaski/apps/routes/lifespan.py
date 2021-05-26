@@ -341,7 +341,7 @@ def lifespan(download=None):
             db.session.add(eventlog)
             db.session.commit()
 
-            return send_file(figfile, mimetype=mimetypes[plot_arguments["download_fig"]], as_attachment=True, attachment_filename=plot_arguments["downloadn"]+"."+plot_arguments["download_fig"] )
+            return send_file(figfile, mimetype=mimetypes[plot_arguments["download_fig"]], as_attachment=True, attachment_filename=plot_arguments["downloadn_fig"]+"."+plot_arguments["download_fig"] )
 
             
 
