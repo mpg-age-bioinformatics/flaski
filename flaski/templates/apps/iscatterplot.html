@@ -386,9 +386,17 @@
                                 <label> width:
                                     <input type="text" name="hline_linewidth" value='{{ hline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
+                                
+                                <label> lty 
+                                    <select name=hline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
+                                        {% for hline_linestyle_ in hline_linestyle %}
+                                            <option value="{{hline_linestyle_}}" {% if marker_color_==hline_linestyle_value %} selected {% endif %}>{{hline_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
 
                                 <label> color: 
-                                    <select name=hline_color_value method="GET" action="/" style="width:75px;vertical-align:middle;">
+                                    <select name=hline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
                                     {% for marker_color_ in marker_color %}
                                         <option value="{{marker_color_}}" {% if marker_color_==hline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
                                     {% endfor %}
@@ -396,6 +404,16 @@
                                 </label>
 
                             </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    .. or write a color name
+                                </label>
+                                <label>
+                                    <input type="text" name=hline_color_text value="{{hline_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>vline:
@@ -406,14 +424,31 @@
                                     <input type="text" name="vline_linewidth" value='{{ vline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
 
+                                <label> lty 
+                                    <select name=vline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
+                                        {% for vline_linestyle_ in vline_linestyle %}
+                                            <option value="{{vline_linestyle_}}" >{{vline_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+
                                 <label> color: 
-                                    <select name=vline_color_value method="GET" action="/" style="width:75px;vertical-align:middle;">
+                                    <select name=vline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
                                     {% for marker_color_ in marker_color %}
                                         <option value="{{marker_color_}}" {% if marker_color_==vline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
                                     {% endfor %}
                                     </select>
                                 </label>
 
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    .. or write a color name
+                                </label>
+                                <label>
+                                    <input type="text" name=vline_color_text value="{{vline_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
                             </div>
 
                         </div>
