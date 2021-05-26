@@ -267,6 +267,34 @@ def make_figure(df,pa):
                         )
                     )
         #fig.update_traces(textposition='top center')
+    
+    if pa["vline"] != "":
+        if pa["vline_linestyle_value"] == '-':
+            linetype=None
+        elif pa["vline_linestyle_value"] == ':':
+            linetype="dot"
+        elif pa["vline_linestyle_value"] == '-.':
+            linetype="dashdot"
+        else:
+            linetype='dash'
+        fig.add_shape(type="line", x0=pa["vline"], x1=pa["vline"],\
+            xref='x', yref='paper',\
+            y0=0, y1=1,\
+            line=dict(color=pa["vline_color_value"],width=float(pa["vline_linewidth"]), dash=linetype))
+
+    if pa['hline'] != "":
+        if pa["hline_linestyle_value"] == '-':
+            linetype=None
+        elif pa["hline_linestyle_value"] == ':':
+            linetype="dot"
+        elif pa["hline_linestyle_value"] == '-.':
+            linetype="dashdot"
+        else:
+            linetype='dash'
+        fig.add_shape(type="line", x0=0, x1=1,\
+            xref='paper', yref='y',\
+            y0=pa["hline"], y1= pa["hline"],\
+            line=dict(color=pa["hline_color_value"],width=float(pa["hline_linewidth"]), dash=linetype))
 
     return fig
 
@@ -409,6 +437,23 @@ def figure_defaults():
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
+        "hline":"",\
+        "hline_color_text":"",\
+        "hline_colors":STANDARD_COLORS,\
+        "hline_color_value":"black",\
+        "hline_linestyle":['-', '--', '-.', ':'],\
+        "hline_linestyle_value":'--',\
+        "hline_linewidth":"1",\
+        "hline_alpha":"0.1",\
+        "vline":"",\
+        "vline_value":"None",\
+        "vline_color_text":"",\
+        "vline_colors":STANDARD_COLORS,\
+        "vline_color_value":"black",\
+        "vline_linestyle":['-', '--', '-.', ':'],\
+        "vline_linestyle_value":'--',\
+        "vline_linewidth":"1",\
+        "vline_alpha":"0.1",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
