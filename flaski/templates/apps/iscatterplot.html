@@ -192,17 +192,16 @@
                     <span>Axes</span>
                 </a>
                 <div id="collapseAxes" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:91%;padding-left:7%;padding-right:0%;">
-                        <div class="row arguments" style="width:100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
                             
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;"> 
                                 <label>x label: 
-                                    <input type="text" name="xlabel" value='{{ xlabel }}' style="width:81%;height:22px;padding-left:4px;vertical-align:middle">
+                                    <input type="text" name="xlabel" value='{{ xlabel }}' style="width:167px;height:22px;padding-left: 4px;vertical-align:middle">
                                 </label>
                                 
                                 <label> size: 
-                                    <select name=xlabels method="GET" action="/" style="width:62%;vertical-align:middle;">
+                                    <select name=xlabels method="GET" action="/" style="width:50px;vertical-align:middle;">
                                     {% for xlabel_size_ in xlabel_size %}
                                         <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
                                     {% endfor %}
@@ -210,7 +209,7 @@
                                 </label>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>y label: 
                                     <input type="text" name="ylabel" value='{{ ylabel }}' style="width:167px;height:22px;padding-left: 4px;vertical-align:middle">
                                 </label>
@@ -223,7 +222,7 @@
                                 </label>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Axis:</label>
                                 <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="left_axis" {% if left_axis=="on" %} checked {% elif left_axis==".on" %} checked {% endif %}/> left </label>
                                 <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="right_axis" {% if right_axis=="on" %} checked {% elif right_axis==".on" %} checked {% endif %}/> right </label>
@@ -231,13 +230,13 @@
                                 <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="lower_axis" {% if lower_axis=="on" %} checked {% elif lower_axis==".on" %} checked {% endif %}/> lower </label>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Line width:
                                     <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;height:22px;padding-left: 4px;vertical-align:middle">
                                 </label>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Ticks:</label>
                                 <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_left_axis" {% if tick_left_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/> left </label>
                                 <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_right_axis" {% if tick_right_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
@@ -245,7 +244,7 @@
                                 <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
                             </div>
                             
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <div class="column" style="width:16%;vertical-align:middle;">
                                 </div>
                                 <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
@@ -266,7 +265,7 @@
 
 
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <div class="column" style="width:16%;vertical-align:middle;">
                                     <label>X ticks</label>
                                 </div>
@@ -282,7 +281,7 @@
                                 </div>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <div class="column" style="width:16%;vertical-align:middle;">
                                     <label>Y ticks
                                     </label>
@@ -299,7 +298,7 @@
                                 </div>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <div class="column" style="width:16%;vertical-align:middle;">
                                     <label>X limits</label>
                                 </div>
@@ -315,7 +314,7 @@
                                 </div>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <div class="column" style="width:16%;vertical-align:middle;">
                                     <label>Y limits</label>
                                 </div>
@@ -331,7 +330,7 @@
                                 </div>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <div class="column" style="width:16%;vertical-align:middle;">
                                     <label>N ticks</label>  
                                 </div>
@@ -347,7 +346,7 @@
                                 </div>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Grid:
                                     <select name=grid_value method="GET" action="/" style="width:55px;vertical-align:middle;">
                                     {% for grid_ in grid %}
@@ -370,7 +369,7 @@
 
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>
                                     .. or write a color name
                                 </label>
@@ -379,7 +378,7 @@
                                 </label>
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>hline:
                                     <input type="text" name="hline" value='{{ hline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
@@ -406,7 +405,7 @@
 
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>
                                     .. or write a color name
                                 </label>
@@ -416,7 +415,7 @@
                             </div>
 
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>vline:
                                     <input type="text" name="vline" value='{{ vline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
@@ -443,7 +442,7 @@
 
                             </div>
 
-                            <div class="row arg" style="width:103%; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>
                                     .. or write a color name
                                 </label>
@@ -466,7 +465,7 @@
                 </a>
                 <div id="collapse{{group.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded openmenu" style="padding-left:7%;padding-right:0%;"> 
-                        <div class="row arguments" style="width:100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
+                        <div class="row arguments" style="width: 100%; padding-left:4%; padding-right:0%; white-space:nowrap; overflow-x: auto;display:flex;justify-content:space-between;text-align:justify;">
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label> size: 
