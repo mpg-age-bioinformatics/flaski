@@ -330,148 +330,205 @@
                                     </div>
                                     
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-
-                                        <label style="padding-left:43px;">Width:
-                                            <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:65px;height:22px;padding-left:4px">
-                                        </label>
-                                        <label>Color:
-                                            <select  name=axis_line_color value="{{axis_line_color}}" method="GET" action="/" style="width:70px;padding-left:4px;height:22px;vertical-align:middle;">
-                                                {% for axis_line_color_ in colors %}
-                                                <option value="{{axis_line_color_}}" {% if axis_line_color_==axis_line_color %} selected {% endif %}>{{axis_line_color_}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>width:
+                                                <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:65px;height:22px;padding-left:4px">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>color:
+                                                <select  name=axis_line_color value="{{axis_line_color}}" method="GET" action="/" style="width:65px;padding-left:4px;height:22px;vertical-align:middle;">
+                                                    {% for axis_line_color_ in colors %}
+                                                    <option value="{{axis_line_color_}}" {% if axis_line_color_==axis_line_color %} selected {% endif %}>{{axis_line_color_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Font:</label>
                                     </div>
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:39px;">Family:
-                                            <select  name=label_fontfamily value="{{label_fontfamily }}" method="GET" action="/" style="width:70px;padding-left:4px;height:22px;vertical-align:middle;">
-                                                {% for label_fontfamily_ in fonts %}
-                                                <option value="{{label_fontfamily_}}" {% if label_fontfamily_ == label_fontfamily  %} selected {% endif %}>{{label_fontfamily_}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
-                                        <label style="padding-left:40px;">Size:
-                                            <select name=label_fontsize value="{{label_fontsize}}" method="GET" action="/" style="width:70px;padding-left:4px;height:22px;vertical-align:middle;">
-                                                {% for label_fontsize_ in fontsizes %}
-                                                <option value="{{label_fontsize_}}" {% if label_fontsize_==label_fontsize %} selected {% endif %}>{{label_fontsize_}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>family:
+                                                <select  name=label_fontfamily value="{{label_fontfamily }}" method="GET" action="/" style="width:65px;padding-left:4px;height:22px;vertical-align:middle;">
+                                                    {% for label_fontfamily_ in fonts %}
+                                                    <option value="{{label_fontfamily_}}" {% if label_fontfamily_ == label_fontfamily  %} selected {% endif %}>{{label_fontfamily_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>size:
+                                                <select name=label_fontsize value="{{label_fontsize}}" method="GET" action="/" style="width:65px;padding-left:4px;height:22px;vertical-align:middle;">
+                                                    {% for label_fontsize_ in fontsizes %}
+                                                    <option value="{{label_fontsize_}}" {% if label_fontsize_==label_fontsize %} selected {% endif %}>{{label_fontsize_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:space-between;text-align:justify;">
-                                        <label style="padding-left:46px;">Color:
-                                            <select  name=label_fontcolor value="{{label_fontcolor}}" method="GET" action="/" style="width:70px;padding-left:4px;height:22px;vertical-align:middle;">
-                                                {% for label_fontcolor_ in colors %}
-                                                <option value="{{label_fontcolor_}}" {% if label_fontcolor_==label_fontcolor %} selected {% endif %}>{{label_fontcolor_}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>color:
+                                                <select  name=label_fontcolor value="{{label_fontcolor}}" method="GET" action="/" style="width:65px;padding-left:4px;height:22px;vertical-align:middle;">
+                                                    {% for label_fontcolor_ in colors %}
+                                                    <option value="{{label_fontcolor_}}" {% if label_fontcolor_==label_fontcolor %} selected {% endif %}>{{label_fontcolor_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:center;text-align:justify;">
                                         <hr class="black">
-
                                         <label>Ticks</label>
                                     </div>
+
                                     <div class="row arg" style="width:310px;padding-left:0%;padding-right:0%;display:flex;justify-content:space-between;text-align:justify;">
                                         <label>Location:</label>
-                                        <label style="padding-left:4x;">
+                                        <label>
                                             <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;padding-left:4px;" name="tick_left_axis" {% if tick_left_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/>
                                             left
                                         </label>
-                                        <label style="padding-left:4px;">
+                                        <label>
                                             <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;padding-left:4px;" name="tick_right_axis" {% if tick_right_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/>
                                             right
                                         </label>
-                                        <label style="padding-left:4px;">
+                                        <label>
                                             <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;padding-left:4px;" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/>
                                             upper
                                         </label>
-                                        <label style="padding-left:4px;">
+                                        <label>
                                             <input type="checkbox" style="vertical-align:middle;height:16px;width:16px;padding-left:4px;" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/>
                                             lower
                                         </label>
                                     </div>
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>X ticks</label>
-                                        <label style="padding-left:3px">font size:
-                                            <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
-                                        <label>rotation:
-                                            <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                            <label>X ticks</label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>font size:
+                                                <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>rotation:
+                                                <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Y ticks</label>
-                                        <label style="padding-left:3px">font size:
-                                            <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
-                                        <label>rotation:
-                                            <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="vertical-align:middle;width:65px;height:22px;padding-left:2px;">
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                            <label>Y ticks</label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>font size:
+                                                <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>rotation:
+                                                <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="vertical-align:middle;width:65px;height:22px;padding-left:2px;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>X limits</label>
-                                        <label>lower:
-                                            <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
-
-                                        <label>upper:
-                                            <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="vertical-align:middle;width:65px;height:22px;padding-left:2px;">
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                            <label>X limits</label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>lower:
+                                                <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>upper:
+                                                <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="vertical-align:middle;width:65px;height:22px;padding-left:2px;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Y limits</label>
-                                        <label style="padding-left:2px">lower:
-                                            <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
-                                        <label>upper:
-                                            <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style=vertical-align:middle;width:65px;height:22px;padding-left:2px;">
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                            <label>Y limits</label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>lower:
+                                                <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>upper:
+                                                <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style=vertical-align:middle;width:65px;height:22px;padding-left:2px;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>N ticks</label>
-                                        <label style="padding-left:4px">x-axis:
-                                            <input type="text" name="maxxticks" value='{{ maxxticks }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
-                                        <label>y-axis:
-                                            <input type="text" name="maxyticks" value='{{ maxyticks }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                            <label>N ticks</label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>x-axis:
+                                                <input type="text" name="maxxticks" value='{{ maxxticks }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>y-axis:
+                                                <input type="text" name="maxyticks" value='{{ maxyticks }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:71px">width:
-                                            <input type="text" name="ticks_line_width" value='{{ ticks_line_width }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
-                                        </label>
-                                        <label>length:
-                                            <input type="text" name="ticks_length" value='{{ ticks_length }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px">
-                                        </label>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>width:
+                                                <input type="text" name="ticks_line_width" value='{{ ticks_line_width }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>length:
+                                                <input type="text" name="ticks_length" value='{{ ticks_length }}' style="vertical-align:middle;width:65px;height:22px;padding-left:4px">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:54px">direction:
-                                            <select name=ticks_direction_value method="GET" action="/" style="height:22px;vertical-align:middle;width:65px;padding-bottom:0px;">
-                                            {% for ticks_direction_ in ticks_direction %}
-                                                <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
-                                            {% endfor %}
-                                            </select>
-                                        </label>
-
-                                        <label>color:
-                                            <select  name=ticks_color value="{{ticks_color}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:65px;">
-                                                {% for ticks_color_ in colors %}
-                                                <option value="{{ticks_color_}}" {% if ticks_color_==ticks_color %} selected {% endif %}>{{ticks_color_}}</option>
+                                        <div class="column" style="width:16%;vertical-align:middle;">
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>direction:
+                                                <select name=ticks_direction_value method="GET" action="/" style="height:22px;vertical-align:middle;width:65px;padding-bottom:0px;">
+                                                {% for ticks_direction_ in ticks_direction %}
+                                                    <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
                                                 {% endfor %}
-                                            </select>
-                                        </label>
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                            <label>color:
+                                                <select  name=ticks_color value="{{ticks_color}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:65px;">
+                                                    {% for ticks_color_ in colors %}
+                                                    <option value="{{ticks_color_}}" {% if ticks_color_==ticks_color %} selected {% endif %}>{{ticks_color_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:center; text-align:justify;">
@@ -480,44 +537,53 @@
                                     </div>
                                     
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:31px;">Type:
-                                            <select  name=spikes_value value="{{spikes_value}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
-                                                {% for spikes_value_ in spikes %}
-                                                <option value="{{spikes_value_}}" {% if spikes_value_==spikes_value %} selected {% endif %}>{{spikes_value_}}</option>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>type:
+                                                <select  name=spikes_value value="{{spikes_value}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
+                                                    {% for spikes_value_ in spikes %}
+                                                    <option value="{{spikes_value_}}" {% if spikes_value_==spikes_value %} selected {% endif %}>{{spikes_value_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>color:
+                                                <select  name=spikes_color value="{{spikes_color}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
+                                                {% for spikes_color_ in colors %}
+                                                <option value="{{spikes_color_}}" {% if spikes_color_==spikes_color %} selected {% endif %}>{{spikes_color_}}</option>
                                                 {% endfor %}
-                                            </select>
-                                        </label>
-                                        <label>Color:
-                                            <select  name=spikes_color value="{{spikes_color}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
-                                            {% for spikes_color_ in colors %}
-                                            <option value="{{spikes_color_}}" {% if spikes_color_==spikes_color %} selected {% endif %}>{{spikes_color_}}</option>
-                                            {% endfor %}
-                                            </select>
-                                        </label>
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:26px;">Mode:
-                                            <select  name=spikes_mode value="{{spikes_mode}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
-                                                {% for spikes_mode_ in spikes_modes %}
-                                                <option value="{{spikes_mode_}}" {% if spikes_mode_==spikes_mode %} selected {% endif %}>{{spikes_mode_}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
-
-                                        <label>Dash:
-                                            <select  name=spikes_dash value="{{spikes_dash}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
-                                                {% for spikes_dash_ in dashes %}
-                                                <option value="{{spikes_dash_}}" {% if spikes_dash_==spikes_dash %} selected {% endif %}>{{spikes_dash_}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </label>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>Mode:
+                                                <select  name=spikes_mode value="{{spikes_mode}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
+                                                    {% for spikes_mode_ in spikes_modes %}
+                                                    <option value="{{spikes_mode_}}" {% if spikes_mode_==spikes_mode %} selected {% endif %}>{{spikes_mode_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>dash:
+                                                <select  name=spikes_dash value="{{spikes_dash}}" method="GET" action="/" style="height:22px;vertical-align:middle;width:85px;">
+                                                    {% for spikes_dash_ in dashes %}
+                                                    <option value="{{spikes_dash_}}" {% if spikes_dash_==spikes_dash %} selected {% endif %}>{{spikes_dash_}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Thickness:
-                                            <input type="text" name="spikes_thickness" value='{{ spikes_thickness }}' style="vertical-align:middle;width:85px;height:22px;padding-left:4px;">
-                                        </label>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>thickness:
+                                                <input type="text" name="spikes_thickness" value='{{ spikes_thickness }}' style="vertical-align:middle;width:85px;height:22px;padding-left:4px;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:center; text-align:justify;">
@@ -526,24 +592,30 @@
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:31px;">Type: <select name=grid_value method="GET" action="/" style="height:22px;vertical-align:middle;width:85px">
-                                            {% for grid_ in grid %}
-                                                <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
-                                            {% endfor %}
-                                        </select></label>
-                                        <label>Color:
-                                            <select name=grid_color method="GET" action="/" style="height:22px;width:85px;vertical-align:middle;">
-                                            {% for grid_color_ in colors %}
-                                                <option value="{{grid_color_}}" {% if grid_color_==grid_color %} selected {% endif %}>{{grid_color_}}</option>
-                                            {% endfor %}
-                                            </select>
-                                        </label>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>type: <select name=grid_value method="GET" action="/" style="height:22px;vertical-align:middle;width:85px">
+                                                {% for grid_ in grid %}
+                                                    <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
+                                                {% endfor %}
+                                            </select></label>
+                                        </div>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>color:
+                                                <select name=grid_color method="GET" action="/" style="height:22px;width:85px;vertical-align:middle;">
+                                                {% for grid_color_ in colors %}
+                                                    <option value="{{grid_color_}}" {% if grid_color_==grid_color %} selected {% endif %}>{{grid_color_}}</option>
+                                                {% endfor %}
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label style="padding-left:21px;">Width:
-                                            <input type="text" name="grid_width" value='{{ grid_width }}' style="width:85px;height:22px;padding-left:4px;vertical-align:middle;">
-                                        </label>
+                                        <div class="column" style="width:50%;text-align:right;vertical-align:middle;">
+                                            <label>width:
+                                                <input type="text" name="grid_width" value='{{ grid_width }}' style="width:85px;height:22px;padding-left:4px;vertical-align:middle;">
+                                            </label>
+                                        </div>
                                     </div>
 
                                 </div>
