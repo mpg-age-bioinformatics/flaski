@@ -36,6 +36,7 @@ class User(UserMixin, db.Model):
     multipleapps=db.Column(db.Boolean, nullable=False, default=False)
     notifyme=db.Column(db.Boolean, nullable=False, default=True)
     user_apps = db.Column( PickleType )
+    administrator=db.Column(db.Boolean, nullable=False, default=False)
 
 
     def __repr__(self):

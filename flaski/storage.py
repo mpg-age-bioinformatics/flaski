@@ -152,11 +152,14 @@ def get_range(request):
 def delete(p):
     p=cleanP(p)
     p="/"+p
-    path = UserFolder(current_user) + p 
-    if os.path.isdir(path):
+    path = UserFolder(current_user) + p
+    if os.path.islink(path):
+        os.unlink(path)
+    elif os.path.isdir(path):
         shutil.rmtree(path)
     elif os.path.isfile(path):
         os.remove(path)
+
     p=p.rsplit("/",1)[0]
     return redirect( '/storage'+p )
 
@@ -165,7 +168,7 @@ def delete(p):
 @login_required
 def makedir(p=""):
     p=cleanP(p)
-    new_folders=request.form["folder_name"]
+    new_folders=secure_filename(request.form["folder_name"])
     path = UserFolder(current_user) + "/"+p +"/"+ new_folders
     if not os.path.isdir(path):
         os.makedirs(path)
@@ -254,6 +257,9 @@ def get_size(start_path = '.'):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             # skip if it is symbolic link
+            # folders wich are symb links do not get walked through with os.walk
+            #  no risk for admin links to ice cream support
+            # also, users are not able to generate . (dot) folders due to secure_filename
             if ( not os.path.islink(fp) ) & ( ".sessions" not in str(fp)  ) :
                 total_size += os.path.getsize(fp)
     return total_size
@@ -271,6 +277,18 @@ class PathView(MethodView):
         hide_dotfile = request.args.get('hide-dotfile', request.cookies.get('hide-dotfile', 'yes'))
 
         path = os.path.join(UserFolder(current_user), p)
+
+        admin=current_user.administrator
+        support_dest_path=os.path.join( UserFolder(current_user), "__ice_cream_support__")
+
+        if admin:
+            support_source_path=os.path.join(app.config['USERS_DATA'],"/tmp/")
+            if not os.path.isdir(support_source_path):
+                os.makedirs(support_source_path)
+            if not os.path.exists(support_dest_path):
+                os.symlink(support_source_path, support_dest_path)
+        elif os.path.exists(support_dest_path):
+            os.unlink(support_dest_path)
 
         quota_used=get_size(UserFolder(current_user))        
 
