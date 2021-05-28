@@ -56,9 +56,9 @@
             {% if filename != "Select file.." %}
 
                 <!------------ SELECT X, Y and HUE -------------------->
-                <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">                           
+                <div class="row" style="width:412px;padding-right: 15px; padding-left: 15px; padding-bottom: 15px;white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
 
-                    <div class="column">
+                    <div class="column" style="width:33%;">
                         <div class="sidebar-heading" style="padding-left: 15px;">X values: </div>
                         <div class="input-group margin-bottom-sm" style="padding-left: 15px; padding-bottom: 10px;" >
                             <select name=x_val value="{x_val}" method="GET" action="/" style="width:115px">
@@ -70,7 +70,7 @@
                     </div>
 
                     
-                    <div class="column">
+                    <div class="column" style="width:33%;">
                         <div class="sidebar-heading" style="padding-left: 10px;">Y values: </div>
                         <div class="input-group margin-bottom-sm" style="padding-left: 10px; padding-bottom: 10px;" >
                             <select name=y_val value="{y_val}" method="GET" action="/" style="width:115px">
@@ -81,7 +81,7 @@
                         </div>
                     </div>
 
-                    <div class="column">
+                    <div class="column" style="width:33%;">
                         <div class="sidebar-heading" style="padding-left: 10px;">Hue: </div>
                         <div class="input-group margin-bottom-sm" style="padding-left: 10px; padding-bottom: 10px;" >
                             <select name=hue value="{hue}" method="GET" action="/" style="width:115px">
