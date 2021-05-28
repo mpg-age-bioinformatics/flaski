@@ -3,7 +3,7 @@
 import os
 os.environ["PYFLASKI"] = "1"
 
-import pyflaski.__init__
+# import pyflaski.__init__
 import pyflaski.circularbarplots
 import pyflaski.david
 import pyflaski.heatmap
