@@ -223,7 +223,15 @@ def load(p):
     del(session_["ftype"])
     del(session_["COMMIT"])
     for k in list(session_.keys()):
-        session[k]=session_[k]
+        if k != "plot_arguments":
+            session[k]=session_[k]
+        else:
+            if "plot_arguments" not in list(session.keys()):
+                session[k] = {}
+            session[k] = {}
+            for kk in list(session_[k].keys()):
+                session[k][kk]=session_[k][kk]
+
     plot_arguments=session["plot_arguments"]
     app_redirect=session["app"]
     if path[:-3] == "ses":
