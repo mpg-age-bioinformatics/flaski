@@ -204,10 +204,16 @@ def before_request():
 def reset():
     if 'app' in list(session.keys()):
         page=session["app"]
+        ufolder=app.config['USERS_DATA']+str(current_user.id)+"/.sessions/"
+        insession=ufolder+page+".ses"
+        if os.path.isfile(insession):
+            os.remove(insession)
+        #os.remove(ufolder+f)
     else:
         page="index"
     reset_all(session)
     #session["app"]='reset'
+
     return redirect(url_for(page))
 
 @app.route('/resetall')
