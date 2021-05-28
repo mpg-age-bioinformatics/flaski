@@ -100,7 +100,7 @@ def login(width=None, height=None):
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash('Invalid username or password',"error")
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         session.permanent = form.remember_me.data
@@ -139,7 +139,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         send_validate_email(user)
-        flash('Please check your email and confirm your account.')
+        flash('Please check your email and confirm your account.',"standby")
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -168,7 +168,7 @@ def reset_password_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             send_password_reset_email(user)
-        flash('Check your email for the instructions to reset your password')
+        flash('Check your email for the instructions to reset your password',"standby")
         return redirect(url_for('login'))
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form)
@@ -185,7 +185,7 @@ def reset_password(token):
         user.password_set=datetime.utcnow()
         user.set_password(form.password.data)
         db.session.commit()
-        flash('Your password has been reset.')
+        flash('Your password has been reset.',"standby")
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
 
@@ -195,7 +195,7 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
         if not current_user.active:
-            flash('This account is not active. Please contact support.')
+            flash('This account is not active. Please contact support.',"error")
             logout_user()
             return redirect(url_for('login'))
 

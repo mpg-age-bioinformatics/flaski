@@ -87,10 +87,16 @@
                       {% endfor %}
                       <!--input type="password" class="form-control form-control-user" id="InputPassword" placeholder="Password"-->
                     </div>
-                    {% with messages = get_flashed_messages() %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-info" style="background-color: coral;" role="alert">{{ message }}</div>
+                        {% for category, message in messages %}
+                          {% if category == "success" %}
+                            <div class="alert alert-info" style="background-color: green;" role="alert">{{ message }}</div>
+                          {% elif category == "error" %}
+                            <div class="alert alert-info" style="background-color: red;" role="alert">{{ message }}</div>
+                          {% else %}
+                            <div class="alert alert-info" style="background-color: coral;" role="alert">{{ message }}</div>
+                          {% endif %}
                         {% endfor %}
                     {% endif %}
                     {% endwith %}
