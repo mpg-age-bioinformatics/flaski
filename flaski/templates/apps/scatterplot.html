@@ -58,9 +58,9 @@
             {% if filename != "Select file.." %}
 
             <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
-            <div class="row" style="padding-right: 15px; padding-left: 15px; padding-bottom: 15px;">
+            <div class="row" style="width:422px;padding-right: 15px; padding-left: 15px; padding-bottom: 15px;white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
 
-                <div class="column">
+                <div class="column" style="width:33%;">
                     <div class="sidebar-heading">X values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
                         <select title=xcols name=xvals method="GET" action="/" style="width:114px">
@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <div class="column">
+                <div class="column" style="width:33%;">
                     <div class="sidebar-heading" style="padding-left: 6px;">Y values:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
                         <select name=yvals method="GET" action="/" style="width:114px">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
 
-                <div class="column">
+                <div class="column" style="width:33%;">
                     <div class="sidebar-heading" style="padding-left: 6px;">Groups:</div>
                     <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
                         <select name=groups_value method="GET" action="/" style="width:114px">
