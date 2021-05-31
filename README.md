@@ -1,4 +1,4 @@
-![release](https://img.shields.io/badge/release-beta-green) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/mpg-age-bioinformatics/Flaski)
+![release](https://img.shields.io/badge/release-beta-green) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/mpg-age-bioinformatics/Flaski) [![DOI](https://zenodo.org/badge/227070034.svg)](https://zenodo.org/badge/latestdoi/227070034)
 
 # Flaski
 
@@ -41,6 +41,10 @@ Issues: [https://github.com/mpg-age-bioinformatics/flaski/issues](https://github
 Source: [https://github.com/mpg-age-bioinformatics/flaski](https://github.com/mpg-age-bioinformatics/flaski).
 
 Please check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before doing any contribution or opening an issue.
+
+## Citing
+
+Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515
 
 ## Credits
 
