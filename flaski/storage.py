@@ -282,7 +282,13 @@ class PathView(MethodView):
         support_dest_path=os.path.join( UserFolder(current_user), "__ice_cream_support__")
 
         if admin:
-            support_source_path=os.path.join(app.config['USERS_DATA'],"/tmp/")
+            support_source_path=app.config['USERS_DATA']
+            ## os.path.join has issues with app.config['USERS_DATA'] being on a container volume
+            ## work around:
+            if str(support_source_path)[-1] != "/":
+                support_source_path=support_source_path+"/tmp/"
+            else:
+                support_source_path=support_source_path+"tmp/"
             if not os.path.isdir(support_source_path):
                 os.makedirs(support_source_path)
             if not os.path.exists(support_dest_path):
