@@ -7,6 +7,9 @@ import io
 from flask_login import current_user
 import os
 
+from markupsafe import Markup
+markup_message = Markup('<br><br>Check out our YouTube tutorials <a href="https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA" style="color:gray">here</a>.')
+
 ########
 # from flaski import db
 # from flaski.models import UserLogging
@@ -125,7 +128,7 @@ def check_session_app(session,app,apps):
         reset_all(session)
         # if "session_file" in list(session.keys()):
         #     del(session["session_file"])
-        message="Could not find data for this App in your current session. Session has been reset."
+        message="Could not find data for this App in your current session. Session has been reset."+markup_message 
         return message
 
     elif ("app" not in list(session.keys())) & ( multipleapps ):
@@ -141,7 +144,7 @@ def check_session_app(session,app,apps):
             for k in list(session_.keys()):
                 session[k]=session_[k]
         else:
-            message="Could not find data for this App neither in your current session neither on disk. App data has been reset."
+            message="Could not find data for this App neither in your current session neither on disk. App data has been reset."+markup_message
             return message
 
     elif ( session["app"] != app ) & ( multipleapps ):
@@ -168,7 +171,7 @@ def check_session_app(session,app,apps):
             for k in list(session_.keys()):
                 session[k]=session_[k]
         else:
-            message="Could not find data for this App neither in your current session neither on disk. App data has been reset."
+            message="Could not find data for this App neither in your current session neither on disk. App data has been reset."+markup_message
             return message
 
     else:
@@ -178,7 +181,7 @@ def check_session_app(session,app,apps):
         db.session.commit()
         if "session_file" in list(session.keys()):
             del(session["session_file"])
-        message="Returning from '%s'. Your '%s' session has been reset."  %(appName,appName)
+        message="Returning from '%s'. Your '%s' session has been reset. %s"  %(appName,appName,markup_message)
             #Flaski is not yet made for working with multiple Apps nor data simultaneously on one single browser. \
             #If you wish to use multiple Apps or data simultaneously please use one App/data per web browser eg. Safari + Chrome. \
             #Your %s session has been reset."
