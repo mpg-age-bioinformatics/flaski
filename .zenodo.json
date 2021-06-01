@@ -30,17 +30,11 @@
     "title": "Flaski", 
     "related_identifiers": [
         {
-            "scheme": "url", 
-            "identifier": "https://github.com/mpg-age-bioinformatics/flaski/tree/2.0.0", 
-            "relation": "isSupplementTo"
-        }, 
-        {
             "scheme": "doi", 
             "identifier": "10.5281/zenodo.4849515", 
             "relation": "isVersionOf"
         }
     ], 
-    "version": "2.0.0", 
     "upload_type": "software", 
     "keywords": [
         "biology", 
