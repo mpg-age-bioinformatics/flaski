@@ -122,26 +122,22 @@
                         <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
                             <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
                                 
-                                <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <!-- <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                     <label>Estimate:</label>
-                                </div>
+                                </div> -->
 
                                 <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="Conf_Interval" {% if Conf_Interval=="on" %} checked {% elif Conf_Interval==".on" %} checked {% endif %}/> Show Confidence Intervals </label>
+                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="Conf_Interval" {% if Conf_Interval=="on" %} checked {% elif Conf_Interval==".on" %} checked {% endif %}/> Confidence Intervals </label>
+                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="show_censors" {% if show_censors=="on" %} checked {% elif show_censors==".on" %} checked {% endif %}/> Censors </label>
+                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="ci_legend" {% if ci_legend=="on" %} checked {% elif ci_legend==".on" %} checked {% endif %}/> Legend </label>
                                 </div>
                                 <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="show_censors" {% if show_censors=="on" %} checked {% elif show_censors==".on" %} checked {% endif %}/> Show censors </label>
-                                </div>
-                                <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="ci_legend" {% if ci_legend=="on" %} checked {% elif ci_legend==".on" %} checked {% endif %}/> Show legend </label>
-                                </div>
-                                <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="ci_force_lines" {% if ci_force_lines=="on" %} checked {% elif ci_force_lines==".on" %} checked {% endif %}/> Plot Confidence Interval lines</label>
+                                    <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="ci_force_lines" {% if ci_force_lines=="on" %} checked {% elif ci_force_lines==".on" %} checked {% endif %}/> Confidence Interval lines</label>
                                 </div>
 
                                 <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                     <label>Confidence Interval alpha: 
-                                        <input type="text" name="ci_alpha" value='{{ ci_alpha }}' style="width:56px;height:22px;padding-left:4px;vertical-align: middle;">
+                                        <input type="text" name="ci_alpha" value='{{ ci_alpha }}' style="width:50px;height:22px;padding-left:4px;vertical-align: middle;">
                                     </label>
                                 </div>
 
@@ -168,55 +164,54 @@
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.Conf_Interval" {% if group_h.Conf_Interval=="on" %} checked {% elif group_h.Conf_Interval==".on" %} checked {% endif %}/> Show Confidence Intervals </label>
+                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.Conf_Interval" {% if group_h.Conf_Interval=="on" %} checked {% elif group_h.Conf_Interval==".on" %} checked {% endif %}/> Confidence Intervals </label>
+                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.show_censors" {% if group_h.show_censors=="on" %} checked {% elif group_h.show_censors==".on" %} checked {% endif %}/> Censors </label>
+                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.ci_legend" {% if group_h.ci_legend=="on" %} checked {% elif group_h.ci_legend==".on" %} checked {% endif %}/> Legend </label>
                                     </div>
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.show_censors" {% if group_h.show_censors=="on" %} checked {% elif group_h.show_censors==".on" %} checked {% endif %}/> Show censors </label>
-                                    </div>
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.ci_legend" {% if group_h.ci_legend=="on" %} checked {% elif group_h.ci_legend==".on" %} checked {% endif %}/> Show legend </label>
-                                    </div>
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.ci_force_lines" {% if group_h.ci_force_lines=="on" %} checked {% elif group_h.ci_force_lines==".on" %} checked {% endif %}/> Plot Confidence Interval lines</label>
+                                        <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="{{group_h.name}}.ci_force_lines" {% if group_h.ci_force_lines=="on" %} checked {% elif group_h.ci_force_lines==".on" %} checked {% endif %}/> Confidence Interval lines</label>
                                     </div>
         
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label>Confidence Interval alpha: 
-                                            <input type="text" name="{{group_h.name}}.ci_alpha" value='{{ group_h.ci_alpha }}' style="width:56px;height:22px;padding-left:4px;vertical-align: middle;">
+                                            <input type="text" name="{{group_h.name}}.ci_alpha" value='{{ group_h.ci_alpha }}' style="width:50px;height:22px;padding-left:4px;vertical-align: middle;">
                                         </label>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label>Marker shape: 
+                                        <label> Marker:</label>
+                                    </div>
+
+                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                        <label>Shape: 
                                             <select name={{group_h.name}}.censor_marker_value method="GET" action="/" style="width:50px;vertical-align: middle;">
                                                 {% for markerstyles_ in censor_marker %}
                                                     <option value="{{markerstyles_}}" {% if markerstyles_==group_h.censor_marker_value %} selected {% endif %}>{{markerstyles_}}</option>
                                                 {% endfor %}
                                             </select>
                                         </label>
-
-                                        <label> Marker size: 
+                                        <label> Size: 
                                             <select name={{group_h.name}}.censor_marker_size_val method="GET" action="/" style="width:50px;vertical-align: middle;">
                                                 {% for marker_size_ in censor_marker_size %}
                                                     <option value="{{marker_size_}}" {% if marker_size_==group_h.censor_marker_size_val %} selected {% endif %}>{{marker_size_}}</option>
                                                 {% endfor %}
                                             </select>
                                         </label>
+                                        <label>Alpha: 
+                                            <input type="text" name="{{group_h.name}}.marker_alpha" value='{{ group_h.marker_alpha }}' style="width:50px;height:22px;padding-left:4px;vertical-align: middle;">
+                                        </label>
                                     </div>
                                     
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label> Marker edge width: 
+                                        <label> Edgewidth: 
                                             <select name={{group_h.name}}.edge_linewidth method="GET" action="/" style="width:50px;vertical-align: middle;">
                                                 {% for edge_linewidth_ in edge_linewidths %}
                                                     <option value="{{edge_linewidth_}}" {% if edge_linewidth_==group_h.edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
                                                 {% endfor %}
                                             </select>
                                         </label>
-                                    </div>
-
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label> Marker face color: 
-                                            <select name={{group_h.name}}.markerc method="GET" action="/" style="width:76x;vertical-align: middle;">
+                                        <label> Face color: 
+                                            <select name={{group_h.name}}.markerc method="GET" action="/" style="width:70x;vertical-align: middle;">
                                                 {% for markerc_ in marker_color %}
                                                     <option value="{{markerc_}}" {% if markerc_==group_h.markerc %} selected {% endif %}>{{markerc_}}</option>"
                                                 {% endfor %}
@@ -226,13 +221,13 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label> or write a color name 
-                                            <input type="text" name={{group_h.name}}.markerc_write value="{{group_h.markerc_write}}" style="width:172px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                            <input type="text" name={{group_h.name}}.markerc_write value="{{group_h.markerc_write}}" style="width:174px;height:22px;padding-left: 4px;vertical-align: middle;">
                                         </label>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label> Marker edge color: 
-                                            <select name={{group_h.name}}.edgecolor method="GET" action="/" style="width:76px;vertical-align: middle;">
+                                        <label> Edge color: 
+                                            <select name={{group_h.name}}.edgecolor method="GET" action="/" style="width:238px;vertical-align: middle;">
                                                 {% for edgecolor_ in edge_colors %}
                                                     <option value="{{edgecolor_}}" {% if edgecolor_==group_h.edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
                                                 {% endfor %}
@@ -240,20 +235,21 @@
                                         </label>
                                     </div>
 
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;"> 
                                         <label> or write a color name 
-                                            <input type="text" name={{group_h.name}}.edgecolor_write value="{{group_h.edgecolor_write}}" style="width:172px;height:22px;padding-left: 4px;vertical-align: middle;">
-                                        </label>
-                                    </div>
-
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">   
-                                        <label>Marker alpha: 
-                                            <input type="text" name="{{group_h.name}}.marker_alpha" value='{{ group_h.marker_alpha }}' style="width:56px;height:22px;padding-left:4px;vertical-align: middle;">
+                                            <input type="text" name={{group_h.name}}.edgecolor_write value="{{group_h.edgecolor_write}}" style="width:174px;height:22px;padding-left: 4px;vertical-align: middle;">
                                         </label>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label> Line style: 
+                                        <label> Line:</label>
+                                    </div>
+
+                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                        <label> Width 
+                                            <input type="text" name={{group_h.name}}.linewidth_write value="{{group_h.linewidth_write}}" style="width:60px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                        </label>
+                                        <label> Style: 
                                             <select name={{group_h.name}}.linestyle_value method="GET" action="/" style="width:80px;vertical-align: middle;">
                                                 {% for linestyle_ in linestyles %}
                                                     <option value="{{linestyle_}}" {% if linestyle_==group_h.linestyle_value %} selected {% endif %}>{{linestyle_}}</option>"
@@ -264,13 +260,13 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label> or write a linestyle name 
-                                            <input type="text" name={{group_h.name}}.linestyle_write value="{{group_h.linestyle_write}}" style="width:150px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                            <input type="text" name={{group_h.name}}.linestyle_write value="{{group_h.linestyle_write}}" style="width:152px;height:22px;padding-left: 4px;vertical-align: middle;">
                                         </label>
                                     </div>
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label> Line color: 
-                                            <select name={{group_h.name}}.line_color_value method="GET" action="/" style="width:80px;vertical-align: middle;">
+                                            <select name={{group_h.name}}.line_color_value method="GET" action="/" style="width:242px;vertical-align: middle;">
                                                 {% for linecolor_ in line_colors %}
                                                     <option value="{{linecolor_}}" {% if linecolor_==group_h.line_color_value %} selected {% endif %}>{{linecolor_}}</option>"
                                                 {% endfor %}
@@ -280,15 +276,9 @@
 
                                     <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                         <label> or write a color name 
-                                            <input type="text" name={{group_h.name}}.linecolor_write value="{{group_h.linecolor_write}}" style="width:172px;height:22px;padding-left: 4px;vertical-align: middle;">
+                                            <input type="text" name={{group_h.name}}.linecolor_write value="{{group_h.linecolor_write}}" style="width:174px;height:22px;padding-left: 4px;vertical-align: middle;">
                                         </label>
-                                    </div>
-
-                                    <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                        <label> Line width 
-                                            <input type="text" name={{group_h.name}}.linewidth_write value="{{group_h.linewidth_write}}" style="width:80px;height:22px;padding-left: 4px;vertical-align: middle;">
-                                        </label>
-                                    </div>
+                                    </div> 
 
                                 </div>
                             </div>
