@@ -181,7 +181,8 @@ def check_session_app(session,app,apps):
         db.session.commit()
         if "session_file" in list(session.keys()):
             del(session["session_file"])
-        message="Returning from '%s'. Your '%s' session has been reset. %s"  %(appName,appName,markup_message)
+        message="Returning from '%s'. Your '%s' session has been reset."  %(appName,appName)
+        message=message+markup_message
             #Flaski is not yet made for working with multiple Apps nor data simultaneously on one single browser. \
             #If you wish to use multiple Apps or data simultaneously please use one App/data per web browser eg. Safari + Chrome. \
             #Your %s session has been reset."
