@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if [[ ! -z $(git status -uno --porcelain) ]] ;
 then
     echo $(date +"%Y/%m/%d %H:%M:%S")": all changes have been commited"
@@ -65,6 +64,7 @@ if [ "${FORCE}" = true ] ; then
         docker push flaski/flaski:latest
         docker push flaski/flaski:${local_tag}
     fi
+exit
 fi
 
 # get local sha and tag
