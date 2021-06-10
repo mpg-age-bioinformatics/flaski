@@ -1,4 +1,4 @@
-![release](https://img.shields.io/badge/release-beta-green) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/mpg-age-bioinformatics/Flaski) [![DOI](https://zenodo.org/badge/227070034.svg)](https://zenodo.org/badge/latestdoi/227070034)
+![release](https://img.shields.io/badge/release-beta-green) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/mpg-age-bioinformatics/Flaski) [![DOI](https://zenodo.org/badge/227070034.svg)](https://zenodo.org/badge/latestdoi/227070034) [![Docker Image CI nightly](https://github.com/mpg-age-bioinformatics/flaski/actions/workflows/docker.nightly.yml/badge.svg)](https://github.com/mpg-age-bioinformatics/flaski/actions/workflows/docker.nightly.yml) [![Docker Image CI dev](https://github.com/mpg-age-bioinformatics/flaski/actions/workflows/docker.dev.yml/badge.svg)](https://github.com/mpg-age-bioinformatics/flaski/actions/workflows/docker.dev.yml) [![Docker Image CI nightly](https://github.com/mpg-age-bioinformatics/flaski/actions/workflows/docker.nightly.yml/badge.svg)](https://github.com/mpg-age-bioinformatics/flaski/actions/workflows/docker.nightly.yml)
 
 # Flaski
 
