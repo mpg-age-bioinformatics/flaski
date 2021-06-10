@@ -30,7 +30,8 @@ def check_pipelines(EXC, TAG):
     'circRNA' : ['circRNA', 'samples'],\
     'riboseq' : ['riboseq', 'samples', 'matching'],\
     'variantCalling' : ['variantCalling', 'samples'],\
-    'miRNAseq' : ['miRNAseq', 'samples']}
+    'miRNAseq' : ['miRNAseq', 'samples'],\
+    '16S' : ['16S', 'samples']}
   # loop over all expected sheets and check if they are present, if not, send email
   for sheet in expected_sheets[TAG]:
     if sheet not in EXC.sheet_names:
@@ -70,7 +71,7 @@ def submission_check(inputfile):
   status=False
   attachment_path=None
 
-  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq']
+  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq', '16S']
 
   filename = secure_filename(inputfile.filename)
   fileread = inputfile.read()
