@@ -37,8 +37,9 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }},docker.io/flaski/flaski:dev
         labels: ${{ steps.meta.outputs.labels }}
-        
+
   slackNotification:
+    needs: build
     name: Slack Notification
     runs-on: ubuntu-latest
     steps:
