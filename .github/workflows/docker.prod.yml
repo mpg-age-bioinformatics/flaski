@@ -37,5 +37,18 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }},docker.io/flaski/flaski:dev
         labels: ${{ steps.meta.outputs.labels }}
+        
+  slackNotification:
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_USERNAME: github_action_bot
+        SLACK_CHANNEL: flaski
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_TITLE: "Dev build and push completed."
 
 

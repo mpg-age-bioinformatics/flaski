@@ -2,11 +2,10 @@ name: Docker Image CI dev
 
 on:
   push:
+    branches:
+    - master
     tags-ignore:
     - '**'
-    branch:
-    - master
-
     
 jobs:
   build:
@@ -19,6 +18,7 @@ jobs:
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:dev
         docker push docker.io/flaski/flaski:dev
+
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
