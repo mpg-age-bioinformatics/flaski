@@ -2,6 +2,7 @@ name: Docker Image CI prod
 
 on:
   push:
+    branch: [master]
     tags: [ '*.*.*' ]
     
 jobs:
@@ -35,7 +36,7 @@ jobs:
         context: .
         file: ./services/server/dockerfiles/Dockerfile
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: dev,${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
     # # Build and push Docker image with Buildx (don't push on PR)
