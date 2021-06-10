@@ -1,0 +1,17 @@
+name: Docker Image CI dev
+
+on:
+  push:
+    branch: [master]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: | 
+        echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
+        docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:dev
+        docker push docker.io/flaski/flaski:dev
