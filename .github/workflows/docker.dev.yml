@@ -2,7 +2,8 @@ name: Docker Image CI dev
 
 on:
   push:
-    branch: [master]
+    branch:
+    - master
     tags-ignore:
     - '**'
     
