@@ -71,7 +71,7 @@ fi
 local_tag=$(git tag -l --sort=refname | tail -n 1 )
 local_sha=$(git rev-parse master)
 
-# remote sha andf tag
+# remote sha and tag
 remote_tag=$(git ls-remote --tags https://github.com/mpg-age-bioinformatics/flaski.git | cut -f 2 | tail -n 2 | head -n 1 | awk -F/ '{ print $3 }')
 remote_sha=$(git ls-remote https://github.com/mpg-age-bioinformatics/flaski.git | cut -f 1 | head -n 1)
 
