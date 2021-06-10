@@ -3,6 +3,7 @@ name: Docker Image CI prod
 on:
   push:
     branch: [master]
+  push:
     tags: [ '*.*.*' ]
     
 jobs:
