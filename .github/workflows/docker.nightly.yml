@@ -1,8 +1,8 @@
 name: Docker Image CI prod
 
 on:
-  push:
-    tags: [ '*.*.*' ]
+  schedule:
+    - cron: "0 0 * * *"
     
 jobs:
   build:
@@ -35,8 +35,7 @@ jobs:
         context: .
         file: ./services/server/dockerfiles/Dockerfile
         push: true
-        tags: ${{ steps.meta.outputs.tags }},docker.io/flaski/flaski:dev
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: docker.io/flaski/flaski:nightly
 
   slackNotification:
     needs: build
@@ -50,7 +49,7 @@ jobs:
         SLACK_USERNAME: github_action_bot
         SLACK_CHANNEL: flaski
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_TITLE: "Production build and push completed."
+        SLACK_TITLE: "Nightly build and push completed."
 
   #
 
