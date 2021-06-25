@@ -225,6 +225,7 @@ def iscatterplot(download=None):
             flash(tb_str,'traceback')
             if not plot_arguments:
                 plot_arguments=session["plot_arguments"]
+            filename=session["filename"]
             return render_template('/apps/iscatterplot.html', filename=filename, apps=apps, **plot_arguments)
 
     else:

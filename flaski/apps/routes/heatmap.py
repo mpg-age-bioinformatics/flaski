@@ -169,6 +169,7 @@ def heatmap(download=None):
         except Exception as e:
             tb_str=handle_exception(e,user=current_user,eapp="heatmap",session=session)
             flash(tb_str,'traceback')
+            filename=session["filename"]
             if not plot_arguments:
                 plot_arguments=session["plot_arguments"]
             return render_template('/apps/heatmap.html', filename=filename, apps=apps, **plot_arguments)
