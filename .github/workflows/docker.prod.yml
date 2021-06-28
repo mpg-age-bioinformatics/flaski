@@ -5,33 +5,18 @@ on:
     tags: [ '*.*.*' ]
     
 jobs:
-  get_ref:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Test
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ env.RELEASE_VERSION }}
-
   build:
-    needs: get_ref
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: | 
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:latest
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:${{ env.RELEASE_VERSION }}
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:dev
-        echo "**********************************************"
-        echo $RELEASE_VERSION
-        echo ${{ env.RELEASE_VERSION }}
-        echo "**********************************************"
         docker push docker.io/flaski/flaski:latest
         docker push docker.io/flaski/flaski:${{ env.RELEASE_VERSION }}
         docker push docker.io/flaski/flaski:dev
