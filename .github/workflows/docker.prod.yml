@@ -28,6 +28,10 @@ jobs:
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:latest
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:${{ env.RELEASE_VERSION }}
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:dev
+        echo "**********************************************"
+        echo $RELEASE_VERSION
+        echo ${{ env.RELEASE_VERSION }}
+        echo "**********************************************"
         docker push docker.io/flaski/flaski:latest
         docker push docker.io/flaski/flaski:${{ env.RELEASE_VERSION }}
         docker push docker.io/flaski/flaski:dev
