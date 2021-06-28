@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
@@ -15,11 +15,44 @@ jobs:
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:latest
         docker push docker.io/flaski/flaski:latest
-        # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:${GITHUB_REF#refs/*/}
-        # docker push docker.io/flaski/flaski:${GITHUB_REF#refs/*/}
-        # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:dev
-        # docker push docker.io/flaski/flaski:dev
 
+  slackNotification:
+    needs: build
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_USERNAME: github_action_bot
+        SLACK_CHANNEL: flaski
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_TITLE: "Dev build and push completed."
+
+
+
+# name: production
+
+# on:
+#   push:
+#     tags: [ '*.*.*' ]
+    
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Build the Docker image
+#       run: | 
+#         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
+#         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:latest
+#         docker push docker.io/flaski/flaski:latest
+#         # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:${GITHUB_REF#refs/*/}
+#         # docker push docker.io/flaski/flaski:${GITHUB_REF#refs/*/}
+#         # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:dev
+#         # docker push docker.io/flaski/flaski:dev
 
 
     # - name: Log into registry ${{ env.REGISTRY }}
