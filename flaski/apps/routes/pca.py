@@ -135,9 +135,9 @@ def pca(download=None):
                     return render_template('/apps/pca.html' , filename="Select file..", apps=apps, **plot_arguments)
             
             if "df" not in list(session.keys()):
-                    error_message="No data to plot, please upload a data or session  file."
-                    flash(error_message,'error')
-                    return render_template('/apps/pca.html' , filename="Select file..", apps=apps,  **plot_arguments)
+                error_message="No data to plot, please upload a data or session  file."
+                flash(error_message,'error')
+                return render_template('/apps/pca.html' , filename="Select file..", apps=apps,  **plot_arguments)
 
             # MAKE SURE WE HAVE THE LATEST ARGUMENTS FOR THIS SESSION
             filename=session["filename"]
