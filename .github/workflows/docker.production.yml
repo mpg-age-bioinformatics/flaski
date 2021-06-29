@@ -13,8 +13,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: | 
+        CURRENT_TAG=${GITHUB_REF#refs/*/}
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
-        git checkout ${GITHUB_REF#refs/*/}
+        mkdir current_build
+        git clone https://github.com/mpg-age-bioinformatics/flaski.git current_build
+        cd current_build
+        git checkout ${CURRENT_TAG}
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:production
         docker push docker.io/flaski/flaski:production
 
