@@ -18,6 +18,8 @@ import io
 from flaski.routines import session_to_file
 from flaski import app, sess
 
+from flaski.apps.base import *
+
 # root = "/tmp/"
 
 def cleanP(p):
@@ -225,13 +227,19 @@ def load(p):
         session_=json.load(json_in)
     del(session_["ftype"])
     del(session_["COMMIT"])
+
+    app_=session_["app"]
+    figure_defaults=defaults_dic[app_]
+    session["app"]=app_
+    session["plot_arguments"]=figure_defaults()
+
     for k in list(session_.keys()):
         if k != "plot_arguments":
             session[k]=session_[k]
         else:
-            if "plot_arguments" not in list(session.keys()):
-                session[k] = {}
-            session[k] = {}
+            #if "plot_arguments" not in list(session.keys()):
+            #    session[k] = {}
+            #session[k] = {}
             for kk in list(session_[k].keys()):
                 session[k][kk]=session_[k][kk]
 
