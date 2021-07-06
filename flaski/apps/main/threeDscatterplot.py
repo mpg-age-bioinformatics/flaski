@@ -31,8 +31,8 @@ def make_figure(df,pa):
     # the user can decide how the diferent groups should look like 
     # by unchecking the groups_autogenerate check box
     pab={}   
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis","x_axis_reverse_color_scale","y_axis_reverse_color_scale",\
-        "z_axis_reverse_color_scale","x_tick_labels","y_tick_labels","z_tick_labels"]:
+    for arg in ["show_legend","x_axis","y_axis","z_axis","mirror_x_axis","mirror_y_axis","mirror_z_axis",\
+        "x_axis_reverse_color_scale","y_axis_reverse_color_scale","z_axis_reverse_color_scale","x_tick_labels","y_tick_labels","z_tick_labels"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -185,10 +185,10 @@ def make_figure(df,pa):
     fig.update_layout( scene = dict(
         xaxis = dict(
             zeroline = False, 
-            showline = pab["lower_axis"], 
+            showline = pab["x_axis"], 
             linewidth = float(pa["axis_line_width"]), 
             linecolor = 'black', 
-            mirror = pab["upper_axis"],
+            mirror = pab["mirror_x_axis"],
             ticks = pa["ticks_direction_value"], 
             tickwidth = float(pa["axis_line_width"]), 
             tickcolor = 'black', 
@@ -196,10 +196,10 @@ def make_figure(df,pa):
             ),
         yaxis = dict(
             zeroline = False, 
-            showline = pab["left_axis"], 
+            showline = pab["y_axis"], 
             linewidth = float(pa["axis_line_width"]), 
             linecolor = 'black', 
-            mirror = pab["right_axis"],
+            mirror = pab["mirror_y_axis"],
             ticks = pa["ticks_direction_value"], 
             tickwidth = float(pa["axis_line_width"]), 
             tickcolor = 'black', 
@@ -207,10 +207,10 @@ def make_figure(df,pa):
             ),
         zaxis = dict(
             zeroline = False, 
-            showline = pab["lower_axis"], 
+            showline = pab["z_axis"], 
             linewidth = float(pa["axis_line_width"]), 
             linecolor = 'black', 
-            mirror = pab["upper_axis"],
+            mirror = pab["mirror_z_axis"],
             ticks = pa["ticks_direction_value"], 
             tickwidth = float(pa["axis_line_width"]), 
             tickcolor = 'black', 
@@ -550,14 +550,13 @@ def figure_defaults():
         "zlabel_size":STANDARD_SIZES,\
         "zlabels":"14",\
         "axis_line_width":"1.0",\
-        "left_axis":".on" ,\
-        "right_axis":".on",\
-        "upper_axis":".on",\
-        "lower_axis":".on",\
-        # "tick_left_axis":".on" ,\
-        # "tick_right_axis":".off",\
-        # "tick_upper_axis":".off",\
-        # "tick_lower_axis":".on",\
+        "x_axis":".on" ,\
+        "y_axis":".on",\
+        "z_axis":".on",\
+        "mirror_x_axis":".on" ,\
+        "mirror_y_axis":".on",\
+        "mirror_z_axis":".on",\
+        #"lower_axis":".on",\
         "x_tick_labels":".on",\
         "y_tick_labels":".on",\
         "z_tick_labels":".on",\
@@ -590,7 +589,6 @@ def figure_defaults():
         "grid_alpha":"0.1",\
         "plane_colors":PLANE_COLORS,\
         "x_axis_plane":"",\
-        #"x_axis_plane_color_text":"",\
         "x_axis_plane_color_value":"blues",\
         "x_axis_reverse_color_scale":".off",\
         "x_plane_lower_color":"",\
@@ -600,7 +598,6 @@ def figure_defaults():
         "x_axis_background_color":"white",\
         "x_axis_background_color_text":"",\
         "y_axis_plane":"",\
-        #"y_axis_plane_color_text":"",\
         "y_axis_plane_color_value":"blues",\
         "y_axis_reverse_color_scale":".off",\
         "y_plane_lower_color":"",\
@@ -610,7 +607,6 @@ def figure_defaults():
         "y_axis_background_color":"white",\
         "y_axis_background_color_text":"",\
         "z_axis_plane":"",\
-        #"z_axis_plane_color_text":"",\
         "z_axis_plane_color_value":"blues",\
         "z_axis_reverse_color_scale":".off",\
         "z_plane_lower_color":"",\
