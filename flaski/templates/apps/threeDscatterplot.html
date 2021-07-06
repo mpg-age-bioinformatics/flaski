@@ -255,10 +255,16 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Axis:</label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="left_axis" {% if left_axis=="on" %} checked {% elif left_axis==".on" %} checked {% endif %}/> left </label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="right_axis" {% if right_axis=="on" %} checked {% elif right_axis==".on" %} checked {% endif %}/> right </label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="upper_axis" {% if upper_axis=="on" %} checked {% elif upper_axis==".on" %} checked {% endif %}/> upper </label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="lower_axis" {% if lower_axis=="on" %} checked {% elif lower_axis==".on" %} checked {% endif %}/> lower </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="x_axis" {% if x_axis=="on" %} checked {% elif x_axis==".on" %} checked {% endif %}/> X-Axis </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="y_axis" {% if y_axis=="on" %} checked {% elif y_axis==".on" %} checked {% endif %}/> Y-Axis </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="z_axis" {% if z_axis=="on" %} checked {% elif z_axis==".on" %} checked {% endif %}/> Z-Axis </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Mirror:</label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="mirror_x_axis" {% if mirror_x_axis=="on" %} checked {% elif mirror_x_axis==".on" %} checked {% endif %}/> X-Axis </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="mirror_y_axis" {% if mirror_y_axis=="on" %} checked {% elif mirror_y_axis==".on" %} checked {% endif %}/> Y-Axis </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="mirror_z_axis" {% if mirror_z_axis=="on" %} checked {% elif mirror_z_axis==".on" %} checked {% endif %}/> Z-Axis </label>
                             </div>
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
