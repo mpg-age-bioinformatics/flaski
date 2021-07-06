@@ -3,6 +3,7 @@ from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
         { "name":"iScatter plot", "id":'iscatterplot_more',"link":'iscatterplot' ,"java":"javascript:ReverseDisplay('iscatterplot_more')", "description":"An intreactive scatterplot app."},\
+        { "name":"3D iscatter plot", "id":'threeDscatterplot_more',"link":'threeDscatterplot' ,"java":"javascript:ReverseDisplay('threeDscatterplot_more')", "description":"A 3D interactive scatter plot app."},\
         { "name":"Heatmap", "id":'heatmap_more',"link":'heatmap' ,"java":"javascript:ReverseDisplay('heatmap_more')", "description":"An heatmap plotting app."},\
         { "name":"iHeatmap", "id":'iheatmap_more',"link":'iheatmap' ,"java":"javascript:ReverseDisplay('iheatmap_more')", "description":"An interactive heatmap plotting app."},\
         { "name":"iDendrogram", "id":'idendrogram_more',"link":'idendrogram' ,"java":"javascript:ReverseDisplay('idendrogram_more')", "description":"An interactive Dendrogram app."},\
@@ -18,8 +19,7 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"iViolin plot", "id":'iviolinplot_more',"link":'iviolinplot' ,"java":"javascript:ReverseDisplay('iviolinplot_more')", "description":"An interactive violin plot including box and swarm plots."},\
         { "name":"KEGG", "id":'kegg_more',"link":'kegg' ,"java":"javascript:ReverseDisplay('kegg_more')", "description":"A KEGG mapping and plotting app."} ,\
         { "name":"Life Span", "id":'lifespan_more',"link":'lifespan' ,"java":"javascript:ReverseDisplay('lifespan_more')", "description":"A Survival Analysis app."},\
-        { "name":"Circular bars plot", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular bars plot app."},\
-        { "name":"3D scatter plot", "id":'threeDscatterplot_more',"link":'threeDscatterplot' ,"java":"javascript:ReverseDisplay('threeDscatterplot_more')", "description":"A 3D scatter plot app."}] #,\
+        { "name":"Circular bars plot", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular bars plot app."} ]
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
 
