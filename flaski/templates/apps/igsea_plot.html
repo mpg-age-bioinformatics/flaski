@@ -1,0 +1,1083 @@
+{% extends "base.html" %}
+
+{% block app_title %}
+
+<div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+    <h1 class="h3 mb-0 text-gray-800">iGSEA plot</h1>
+</div>
+
+{% endblock %}
+
+{% block apps_dropdown %}
+{% for app_ in apps %}
+<a class="dropdown-item" href="/{{app_.link}}">{{ app_.name }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block side_bar_content %}
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('login') }}">
+        <!-- div class="sidebar-brand-icon rotate-n-15"-->
+            <!-- i class="fas fa-laugh-wink"--><!-- /i -->
+        <!-- /div -->
+        <!--div style="padding-right: 0px; padding-left: px;" -->
+            <div class="sidebar-brand-icon rotate-n-0">
+                <i class="fas fa-dog"></i>
+            </div>
+        <!--/div-->
+        <div class="sidebar-brand-text mx-3">Flaski</div><!--sup>bioinf</sup></div-->
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
+
+        <form action="{{ url_for('iscatterplot') }}" method="post" enctype="multipart/form-data">
+
+            <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
+            <!-- Heading -->
+            <div class="sidebar-heading">Input</div>
+
+            <div class="input-group margin-bottom-sm" style="padding-right: 15px; padding-left: 15px;" >
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="inputfile" id="inputfile">
+                    <!--label id="inputfilelabel" class="custom-file-label" for="inputfile" placeholder="Choose File"></label-->
+                    <label class="custom-file-label" for="inputfile" placeholder="Choose File">{{filename}}</label>
+                </div>
+                <!--span class="input-group-addon"><i class="fa fa-file-o fa-2x" style="padding-right: 6px; padding-left: 6px; padding-top: 2px; padding-bottom: 2px;"></i></span-->
+                <!--input class="form-control" type="text" placeholder="input file"-->
+            </div>    
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            {% if filename != "Select file.." %}
+
+            <!-- -------------------- SELECT INPUT COLUMNS ---------------------- -->
+            <div class="row" style="width:422px;padding-right: 15px; padding-left: 15px; padding-bottom: 15px;white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+
+                <div class="column" style="width:33%;">
+                    <div class="sidebar-heading">X values:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 15px; padding-bottom: 15px;" >
+                        <select title=xcols name=xvals method="GET" action="/" style="width:114px">
+                            {% for xcol in xcols %}
+                                <option value="{{xcol}}" {% if xcol==xvals %} selected {% endif %}>{{xcol}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="column" style="width:33%;">
+                    <div class="sidebar-heading" style="padding-left: 6px;">Y values:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 6px; padding-left: 6px; padding-bottom: 15px;" >
+                        <select name=yvals method="GET" action="/" style="width:114px">
+                            {% for ycol in ycols %}
+                                <option value="{{ycol}}" {% if ycol==yvals %} selected {% endif %}>{{ycol}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="column" style="width:33%;">
+                    <div class="sidebar-heading" style="padding-left: 6px;">Groups:</div>
+                    <div class="input-group margin-bottom-sm" style="padding-right: 10px; padding-left: 6px; padding-bottom: 15px;" >
+                        <select name=groups_value method="GET" action="/" style="width:114px">
+                            {% for groups_ in groups %}
+                                <option value="{{groups_}}" {% if groups_==groups_value %} selected {% endif %}>{{groups_}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+
+            </div>
+
+            {% if labels_col_value != "select a column.." %}
+            <div class="row" style="padding-right:15px;padding-left:15px;padding-top:0px;padding-bottom:10px;">
+                <div class="column" >
+                    <div class="sidebar-heading">Fix labels:</div>
+                    <div style="padding-left:15px;">
+                        <select name="fixed_labels" method="GET" action="/" class="js-example-basic-multiple" multiple="multiple" tabindex="4" style="width:364px;">
+                            {% for label in available_labels %}
+                                <option value="{{label}}" {% if label in fixed_labels %} selected {% endif %}>{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+            Arguments:
+            </div>
+
+            <!-- -------------------- FIGURE ARGUMENTS ---------------------- -->
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item" style="padding-bottom: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFigure" aria-expanded="true" aria-controls="collapseFigure">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Figure</span>
+                </a>
+                <div id="collapseFigure" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">                                   
+                                <label>Width: 
+                                    <input type="text" name="fig_width" value='{{ fig_width }}' style="width:98px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+                                    
+                                <label>Height: 
+                                    <input type="text" name="fig_height" value='{{ fig_height }}' style="width:98px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">  
+                                <label>Title: 
+                                    <input type="text" name="title" value='{{ title }}' style="width:178px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+
+                                <label> size: 
+                                    <select name=titles method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for title_size_ in title_size %}
+                                        <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            {% if groups_value != "None" %}
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:flex-start; text-align:justify;"> 
+                                <label>Legend: 
+                                    <input style="vertical-align:middle;height:16px;width:16px;" type="checkbox" name="show_legend" {% if show_legend=="on" %} checked {% elif show_legend==".on" %} checked {% endif %}/>
+                                </label>
+
+                                <label style="padding-left: 16px;">size: 
+                                    <select name=titles method="GET" action="/" style="width:50px; vertical-align:middle;">
+                                    {% for title_size_ in title_size %}
+                                        <option value="{{title_size_}}" {% if title_size_==titles %} selected {% endif %}>{{title_size_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            {% else %}
+
+                                <input type="hidden" name ="show_legend" value="{{ show_legend }}">
+                                <input type="hidden" name ="legend_font_size" value="{{ legend_font_size }}">
+
+                            {% endif %}
+                        
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- AXES ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAxes" aria-expanded="true" aria-controls="collapseAxes" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Axes</span>
+                </a>
+                <div id="collapseAxes" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;"> 
+                                <label>x label: 
+                                    <input type="text" name="xlabel" value='{{ xlabel }}' style="width:167px;height:22px;padding-left: 4px;vertical-align:middle">
+                                </label>
+                                
+                                <label> size: 
+                                    <select name=xlabels method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for xlabel_size_ in xlabel_size %}
+                                        <option value="{{xlabel_size_}}" {% if xlabel_size_==xlabels %} selected {% endif %}>{{xlabel_size_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>y label: 
+                                    <input type="text" name="ylabel" value='{{ ylabel }}' style="width:167px;height:22px;padding-left: 4px;vertical-align:middle">
+                                </label>
+                                <label> size: 
+                                    <select name=ylabels method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for ylabel_size_ in ylabel_size %}
+                                        <option value="{{ylabel_size_}}" {% if ylabel_size_==ylabels %} selected {% endif %}>{{ylabel_size_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Axis:</label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="left_axis" {% if left_axis=="on" %} checked {% elif left_axis==".on" %} checked {% endif %}/> left </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="right_axis" {% if right_axis=="on" %} checked {% elif right_axis==".on" %} checked {% endif %}/> right </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="upper_axis" {% if upper_axis=="on" %} checked {% elif upper_axis==".on" %} checked {% endif %}/> upper </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="lower_axis" {% if lower_axis=="on" %} checked {% elif lower_axis==".on" %} checked {% endif %}/> lower </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Line width:
+                                    <input type="text" name="axis_line_width" value='{{ axis_line_width }}' style="width:50px;height:22px;padding-left: 4px;vertical-align:middle">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Ticks:</label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_left_axis" {% if tick_left_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/> left </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_right_axis" {% if tick_right_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/> upper </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
+                            </div>
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:16%;vertical-align:middle;">
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>length:
+                                        <input type="text" name="ticks_length" value='{{ ticks_length }}' style="width:65px;height:22px;padding-left: 4px;vertical-align:middle">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>direction:
+                                        <select name=ticks_direction_value method="GET" action="/" style="width:65px;vertical-align:middle;">
+                                        {% for ticks_direction_ in ticks_direction %}
+                                            <option value="{{ticks_direction_}}" {% if ticks_direction_==ticks_direction_value %} selected {% endif %}>{{ticks_direction_}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+
+
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:16%;vertical-align:middle;">
+                                    <label>X ticks</label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>fontsize: 
+                                        <input type="text" name="xticks_fontsize" value='{{ xticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label> rotation: 
+                                        <input type="text" name="xticks_rotation" value='{{ xticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
+                                    </label>      
+                                </div>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:16%;vertical-align:middle;">
+                                    <label>Y ticks
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>fontsize: 
+                                        <input type="text" name="yticks_fontsize" value='{{ yticks_fontsize }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>rotation:
+                                        <input type="text" name="yticks_rotation" value='{{ yticks_rotation }}' style="width:65px;height:22px;padding-left:4px;vertical-align:middle;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:16%;vertical-align:middle;">
+                                    <label>X limits</label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>lower: 
+                                        <input type="text" name="x_lower_limit" value='{{ x_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>upper: 
+                                        <input type="text" name="x_upper_limit" value='{{ x_upper_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:16%;vertical-align:middle;">
+                                    <label>Y limits</label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>lower: 
+                                        <input type="text" name="y_lower_limit" value='{{ y_lower_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label> upper: 
+                                        <input type="text" name="y_upper_limit" value='{{ y_upper_limit }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <div class="column" style="width:16%;vertical-align:middle;">
+                                    <label>N ticks</label>  
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label>x-axis: 
+                                        <input type="text" name="maxxticks" value='{{ maxxticks }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                                <div class="column" style="width:42%;text-align:right;vertical-align:middle;">
+                                    <label> y-axis: 
+                                        <input type="text" name="maxyticks" value='{{ maxyticks }}' style="width:65px;height:22px;padding-left:4px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Grid:
+                                    <select name=grid_value method="GET" action="/" style="width:55px;vertical-align:middle;">
+                                    {% for grid_ in grid %}
+                                        <option value="{{grid_}}" {% if grid_==grid_value %} selected {% endif %}>{{grid_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> width:
+                                    <input type="text" name="grid_linewidth" value='{{ grid_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> color: 
+                                    <select name=grid_color_value method="GET" action="/" style="width:75px;vertical-align:middle;">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==grid_color_value %} selected {% endif %}>{{marker_color_}}</option> 
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    .. or write a color name
+                                </label>
+                                <label>
+                                    <input type="text" name=grid_color_text value="{{grid_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>hline:
+                                    <input type="text" name="hline" value='{{ hline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label>width:
+                                    <input type="text" name="hline_linewidth" value='{{ hline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                                
+                                <label>style 
+                                    <select name=hline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
+                                        {% for hline_linestyle_ in hline_linestyle %}
+                                            <option value="{{hline_linestyle_}}" {% if hline_linestyle_==hline_linestyle_value %} selected {% endif %}>{{hline_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+
+                                <label>color: 
+                                    <select name=hline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==hline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    .. or write a color name
+                                </label>
+                                <label>
+                                    <input type="text" name=hline_color_text value="{{hline_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>vline:
+                                    <input type="text" name="vline" value='{{ vline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> width:
+                                    <input type="text" name="vline_linewidth" value='{{ vline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> style 
+                                    <select name=vline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
+                                        {% for vline_linestyle_ in vline_linestyle %}
+                                            <option value="{{vline_linestyle_}}" {% if vline_linestyle_==vline_linestyle_value %} selected {% endif %}>{{vline_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+
+                                <label> color: 
+                                    <select name=vline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==vline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    .. or write a color name
+                                </label>
+                                <label>
+                                    <input type="text" name=vline_color_text value="{{vline_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                        </div>
+        
+                    </div>
+                </div>
+            </li>
+
+            {% for group in groups_settings %}
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{group.name}}" aria-expanded="true" aria-controls="collapse{{group.name}}" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Marker: {{group.name}}</span>
+                </a>
+                <div id="collapse{{group.name}}" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> size: 
+                                    <select name={{group.name}}.markers method="GET" action="/" style="width:60px;vertical-align:middle;">
+                                    {% for marker_size_ in marker_size %}
+                                        <option value="{{marker_size_}}" {% if marker_size_==group.markers %} selected {% endif %}>{{marker_size_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or,
+                                    <select name={{group.name}}.markersizes_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markersizes_cols_ in markersizes_cols %}
+                                        <option value="{{markersizes_cols_}}" {% if markersizes_cols_==group.markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> color:
+                                    <select name={{group.name}}.markerc method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==group.markerc %} selected {% endif %}>{{marker_color_}}</option>"
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or,
+                                    <select name={{group.name}}.markerc_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markerc_cols_ in markerc_cols %}
+                                        <option value="{{markerc_cols_}}" {% if markerc_cols_==group.markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> ..or, write a color name 
+                                </label>
+                                <label>
+                                    <input type="text" name={{group.name}}.markerc_write value="{{group.markerc_write}}" style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line width: 
+                                    <select name={{group.name}}.edge_linewidth method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for edge_linewidth_ in edge_linewidths %}
+                                        <option value="{{edge_linewidth_}}" {% if edge_linewidth_==group.edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or, 
+                                    <select name={{group.name}}.edge_linewidth_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for edge_linewidth_col_ in edge_linewidth_cols %}
+                                        <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==group.edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line color: 
+                                    <select name={{group.name}}.edgecolor method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for edgecolor_ in edge_colors %}
+                                        <option value="{{edgecolor_}}" {% if edgecolor_==group.edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or, 
+                                    <select name={{group.name}}.edgecolor_col method="GET" action="/" style="width:128px;vertical-align:middle;">
+                                    {% for edgecolor_col_ in edgecolor_cols %}
+                                        <option value="{{edgecolor_col_}}" {% if edgecolor_col_==group.edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> ..or, write a color name 
+                                </label>
+                                <label>
+                                    <input type="text" name={{group.name}}.edgecolor_write value="{{group.edgecolor_write}}" style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>shape: 
+                                    <select name={{group.name}}.marker method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for markerstyles_ in markerstyles %}
+                                        <option value="{{markerstyles_}}" {% if markerstyles_==group.marker %} selected {% endif %}>{{markerstyles_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label>&nbsp;..or, 
+                                    <select name={{group.name}}.markerstyles_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markerstyles_cols_ in markerstyles_cols %}
+                                        <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==group.markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>alpha: 
+                                    <input type="text" name={{group.name}}.marker_alpha value='{{ group.marker_alpha }}' style="width:56px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label style="padding-left:1px;">&nbsp;..or, 
+                                    <select name={{group.name}}.markeralpha_col_value method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markeralpha_col_ in markeralpha_col %}
+                                        <option value="{{markeralpha_col_}}" {% if markeralpha_col_==group.markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </li>            
+            {% endfor %}
+
+
+            {% if groups_value == "None" %}
+
+            <!-- -------------------- MARKER ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMarker" aria-expanded="true" aria-controls="collapseMarker" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Marker</span>
+                </a>
+                <div id="collapseMarker" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> size: 
+                                    <select name=markers method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for marker_size_ in marker_size %}
+                                        <option value="{{marker_size_}}" {% if marker_size_==markers %} selected {% endif %}>{{marker_size_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or, 
+                                    <select name=markersizes_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markersizes_cols_ in markersizes_cols %}
+                                        <option value="{{markersizes_cols_}}" {% if markersizes_cols_==markersizes_col %} selected {% endif %}>{{markersizes_cols_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> color: 
+                                    <select name=markerc method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for marker_color_ in marker_color %}
+                                        <option value="{{marker_color_}}" {% if marker_color_==markerc %} selected {% endif %}>{{marker_color_}}</option>"
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or, 
+                                    <select name=markerc_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markerc_cols_ in markerc_cols %}
+                                        <option value="{{markerc_cols_}}" {% if markerc_cols_==markerc_col %} selected {% endif %}>{{markerc_cols_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> ..or, write a color name 
+                                </label>
+
+                                <label>
+                                    <input type="text" name="markerc_write" value='{{ markerc_write }}' style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line width: 
+                                    <select name=edge_linewidth method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                    {% for edge_linewidth_ in edge_linewidths %}
+                                        <option value="{{edge_linewidth_}}" {% if edge_linewidth_==edge_linewidth %} selected {% endif %}>{{edge_linewidth_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or, 
+                                    <select name=edge_linewidth_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for edge_linewidth_col_ in edge_linewidth_cols %}
+                                        <option value="{{edge_linewidth_col_}}" {% if edge_linewidth_col_==edge_linewidth_col %} selected {% endif %}>{{edge_linewidth_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line color: 
+                                    <select name=edgecolor method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for edgecolor_ in edge_colors %}
+                                        <option value="{{edgecolor_}}" {% if edgecolor_==edgecolor %} selected {% endif %}>{{edgecolor_}}</option>"
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label> ..or, 
+                                    <select name=edgecolor_col method="GET" action="/" style="width:128px;vertical-align:middle;">
+                                    {% for edgecolor_col_ in edgecolor_cols %}
+                                        <option value="{{edgecolor_col_}}" {% if edgecolor_col_==edgecolor_col %} selected {% endif %}>{{edgecolor_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> ..or, write a color name 
+                                </label>
+                                <label>
+                                    <input type="text" name="edgecolor_write" value='{{ edgecolor_write }}' style="width:162px;height:22px;padding-left: 4px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>shape: 
+                                    <select name=marker method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for markerstyles_ in markerstyles %}
+                                        <option value="{{markerstyles_}}" {% if markerstyles_==marker %} selected {% endif %}>{{markerstyles_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label>&nbsp;..or, 
+                                    <select name=markerstyles_col method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markerstyles_cols_ in markerstyles_cols %}
+                                        <option value="{{markerstyles_cols_}}" {% if markerstyles_cols_==markerstyles_col %} selected {% endif %}>{{markerstyles_cols_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>alpha: 
+                                    <input type="text" name="marker_alpha" value='{{ marker_alpha }}' style="width:56px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label style="padding-left:1px;">&nbsp;..or, 
+                                    <select name=markeralpha_col_value method="GET" action="/" style="width:152px;vertical-align:middle;">
+                                    {% for markeralpha_col_ in markeralpha_col %}
+                                        <option value="{{markeralpha_col_}}" {% if markeralpha_col_==markeralpha_col_value %} selected {% endif %}>{{markeralpha_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {% endif %}
+
+
+            <!-- -------------------- LABELS ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLabels" aria-expanded="true" aria-controls="collapseLabels" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Labels</span>
+                </a>
+                <div id="collapseLabels" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Labels: 
+                                    <select name=labels_col_value method="GET" action="/" style="width:261px;vertical-align:middle;">
+                                    {% for labels_col_ in labels_col %}
+                                        <option value="{{labels_col_}}" {% if labels_col_==labels_col_value %} selected {% endif %}>{{labels_col_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Labels font size: 
+                                    <input type="text" name="labels_font_size" value='{{ labels_font_size }}' style="width:70px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                                <label>color: 
+                                    <select name=labels_font_color_value method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for labels_font_color_ in labels_font_color %}
+                                        <option value="{{labels_font_color_}}" {% if labels_font_color_==labels_font_color_value %} selected {% endif %}>{{labels_font_color_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Labels arrows: 
+                                    <select name=labels_arrows_value method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for labels_arrows_ in labels_arrows %}
+                                        <option value="{{labels_arrows_}}" {% if labels_arrows_==labels_arrows_value %} selected {% endif %}>{{labels_arrows_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label>color: <select name=labels_colors_value method="GET" action="/" style="width:80px;vertical-align:middle;">
+                                    {% for labels_colors_ in labels_colors %}
+                                        <option value="{{labels_colors_}}" {% if labels_colors_==labels_colors_value %} selected {% endif %}>{{labels_colors_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Arrows line width: 
+                                    <input type="text" name="labels_line_width" value='{{ labels_line_width }}' style="width:64px;height:22px;vertical-align:middle;">
+                                </label>
+                                <label>alpha: 
+                                    <input type="text" name="labels_alpha" value='{{ labels_alpha }}' style="width:64px;height:22px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {% endif %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading" style="padding-bottom: 12px;">Management:</div>
+
+            {% if figure_url %}
+
+            <!-- -------------------- FIGURE DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDownload" aria-expanded="true" aria-controls="collapseDownload" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-download"></i>
+                    <span>Figure</span>
+                </a>
+                <div id="collapseDownload" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name: </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" name="downloadn" value='{{ downloadn }}' style="width:310px;height:30px;padding-left: 4px">
+                                </label>
+                            </div>   
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> format: 
+                                    <select name=downloadf method="GET" action="/" style="height:30px;width:60px">
+                                    {% for download_format_ in download_format %}
+                                        <option value="{{download_format_}}" {% if download_format_==downloadf %} selected {% endif %}>{{download_format_}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </label> 
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {% endif %}
+
+            <!-- -------------------- ARGUMENTS DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArguments" aria-expanded="true" aria-controls="collapseArguments" style="padding-top: 0px;">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Arguments</span>
+                </a>
+                <div id="collapseArguments" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload arguments file:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom:8px;">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputargumentsfile" placeholder="Choose File">{{ inputargumentsfile }}</label>
+
+                                    <label>
+                                        <input type="file" class="custom-file-input" name="inputargumentsfile" id="inputargumentsfile" style="vertical-align:middle;height:30px;width:310px;">
+                                    </label>
+                                </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" name="session_argumentsn" value='{{ session_argumentsn }}' style="width:310px;height:30px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- -------------------- SESSION DOWNLOAD ARGUMENTS ---------------------- -->
+
+            <li class="nav-item" style="padding-top: 0px;">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSession" aria-expanded="true" aria-controls="collapseSession" style="padding-top:0px;">
+                    <i class="fas fa-fw fa-th" aria-hidden="true"></i>
+                    <span>Session</span>
+                </a>
+                <div id="collapseSession" class="collapse closedmenu" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded openmenu" style="width:340px;padding-left:6%;padding-right:0%;justify-content:center">
+                        <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
+                            
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Upload session file:</label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;padding-bottom: 8px;">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputsessionfile" placeholder="Choose File">{{ inputsessionfile }}</label>
+                                    <label>
+                                        <input type="file" class="custom-file-input" name="inputsessionfile" id="inputsessionfile" style="width:310px;height: 30px;vertical-align: middle;">
+                                    </label>
+                                </div>
+                            </div> 
+
+                            {% if filename != "Select file.." %}
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>Download file name:</label>
+                            </div>                                    
+                                  
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>
+                                    <input type="text" style="width:310px;height:30px;padding-left:4px;vertical-align: middle;" name="session_downloadn" value='{{ session_downloadn }}'>
+                                </label>
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            
+
+            <!-- -------------------- SUBMIT ---------------------- -->
+
+            <div style="padding-right: 15px; padding-left: 15px;" >
+            <input class="btn btn-secondary btn-lg btn-block" type="submit" value="Submit" />
+            </div>
+        </form>
+
+                <!-- Divider -->
+        <!--hr class="sidebar-divider d-none d-md-block"-->
+    </div>
+    
+      <!-- Sidebar Toggler (Sidebar) -->
+      <!-- div class="text-center d-none d-md-inline" -->
+        <!-- button class="rounded-circle border-0" id="sidebarToggle"></button -->
+      <!-- /div -->
+
+</ul>
+
+{% endblock %}
+
+<!-- -------------------- MAIN BODY AND FIGURE ---------------------- -->
+
+{% block content %}
+<div class="container-fluid">
+
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Attention</font></h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: coral; color:black" role="alert">{{ message }}</div-->
+        {% elif category == "traceback" %}
+        <!-- ATTENTION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary"><font color="red">Whoops!</font></h6>
+            </div>
+            <div class="card-body">
+                {% autoescape false %}
+                {{ message }}
+                <br>Something went wrong. Check out our YouTube tutorials <a href="https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA" style="color:gray">here</a>. You can review your input and press <b>Submit</b>.<br><br>We have been notified that something is wrong and will investigate the source of this issue. 
+                If you would like help with this particular case please press <b>Ice cream</b> to share your session data and parameters with us.<br>
+                <br>
+                {% endautoescape %}
+
+                <form id="askforhelp" action="{{ url_for('askforhelp') }}" method="post" enctype="multipart/form-data">
+                    <div class="pull-xs-right" style="float:right;">
+                        <div class="btn-group" style="float:right;">
+                            <button type="submit" class="btn btn-primary" style="float:right;">
+                                <i></i> Ice cream
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- INFORMATION CARD -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3", >
+                <h6 class="m-0 font-weight-bold text-primary">Info</h6>
+            </div>
+            <div class="card-body">
+                {{ message }} 
+            </div>
+        </div>
+        <!--div class="alert alert-info" style="background-color: rgb(148,224,153); color:black" role="alert">{{ message }}</div-->
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if figure_url %}
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+        <div class="chart" id="iscatterplot" style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+            <script>
+                var graphs = {{figure_url | safe}};
+                Plotly.plot('iscatterplot',graphs,{});
+            </script>
+
+        <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
+            
+            <div style="padding-right: 2px;">
+                <form action="{{ url_for('iscatterplot', download='download') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-download fa-sm text-white-50"></i> Figure
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;padding-right: 2px;">
+                <form action="{{ url_for('download', json_type='arg') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
+                        <i class="fas fa-cogs fa-sm text-white-50"></i> Arguments
+                    </button>
+                </form>
+            </div>
+
+            <div style="padding-left: 2px;">
+                <form action="{{ url_for('download', json_type='ses') }}" method="get">
+                    <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-th fa-sm text-white-50"></i> Session
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}
+
+
+
+{% block in_app_footer %}
+<!-- Footer -->
+<footer class="sticky-footer bg-white" style="padding-top:0.5;padding-bottom:0.5;">
+    <div class="container my-auto" style="padding-top:2;padding-bottom:2;">
+        <div class="copyright text-center my-auto" style="padding-top:2;padding-bottom:2;">
+            <span><a href="https://github.com/mpg-age-bioinformatics/flaski#citing" style="color:black">Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515</a></span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}
