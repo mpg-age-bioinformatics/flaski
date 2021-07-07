@@ -79,17 +79,17 @@ def make_figure(df,pa):
                 c=pa_["markerc"]
 
 
-            if pa_["edgecolor_col"] != "select a column..":
-                edgecolor=[ i for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]
-            elif str(pa_["edgecolor_write"]) != "":
-                edgecolor=pa_["edgecolor_write"]
+            if pa_["gseacolor_col"] != "select a column..":
+                gseacolor=[ i for i in tmp[[pa_["gseacolor_col"]]].dropna()[pa_["gseacolor_col"]].tolist()][0]
+            elif str(pa_["gseacolor_write"]) != "":
+                gseacolor=pa_["gseacolor_write"]
             else:
-                edgecolor=pa_["edgecolor"]
+                gseacolor=pa_["gseacolor"]
 
-            if pa_["edge_linewidth_col"] != "select a column..":
-                edge_linewidth=[ float(i) for i in tmp[[pa_["edge_linewidth_col"]]].dropna()[pa_["edge_linewidth_col"]].tolist() ][0]
+            if pa_["gsea_linewidth_col"] != "select a column..":
+                gsea_linewidth=[ float(i) for i in tmp[[pa_["gsea_linewidth_col"]]].dropna()[pa_["gsea_linewidth_col"]].tolist() ][0]
             else:
-                edge_linewidth=float(pa_["edge_linewidth"])
+                gsea_linewidth=float(pa_["gsea_linewidth"])
 
             # https://plotly.com/python/line-and-scatter/
             # https://plotly.com/python/marker-style/
@@ -101,8 +101,8 @@ def make_figure(df,pa):
                     size=s,
                     opacity=a,
                     line=dict(
-                        color=edgecolor,
-                        width=edge_linewidth
+                        color=gseacolor,
+                        width=gsea_linewidth
                         )),\
                 showlegend=pab["show_legend"],\
                 name=group))
@@ -113,7 +113,7 @@ def make_figure(df,pa):
 
             for x_tick in x:
                 print(x_tick)
-                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y', y0 = 0 - max(y)* 0.1, y1 = max(y)* 0.1) 
+                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y', y0 = 0 - max([abs(ele) for ele in y])* 0.1, y1 = max([abs(ele) for ele in y])* 0.1) 
         
         fig.update_layout(legend_title_text=str("test"), legend=dict( font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
 
@@ -134,6 +134,9 @@ def make_figure(df,pa):
             text=tmp["___label___"].tolist()
 
 
+            # Define gsea line
+            # remove marker related thing
+            # change edge_ to gsea_
             if pa["markeralpha_col_value"] != "select a column..":
                 a=[ float(i) for i in tmp[[pa["markeralpha_col_value"]]].dropna()[pa["markeralpha_col_value"]].tolist() ][0]
             else:
@@ -151,40 +154,71 @@ def make_figure(df,pa):
             else:
                 c=pa["markerc"]
 
-            if pa["edgecolor_col"] != "select a column..":
-                edgecolor=tmp[[pa["edgecolor_col"]]].dropna()[pa["edgecolor_col"]].tolist()
-            elif str(pa["edgecolor_write"]) != "":
-                edgecolor=pa["edgecolor_write"]
+            if pa["gseacolor_col"] != "select a column..":
+                gseacolor=tmp[[pa["gseacolor_col"]]].dropna()[pa["gseacolor_col"]].tolist()
+            elif str(pa["gseacolor_write"]) != "":
+                gseacolor=pa["gseacolor_write"]
             else:
-                edgecolor=pa["edgecolor"]
+                gseacolor=pa["gseacolor"]
 
-            if pa["edge_linewidth_col"] != "select a column..":
-                edge_linewidth=[ float(i) for i in tmp[[pa["edge_linewidth_col"]]].dropna()[pa["edge_linewidth_col"]].tolist() ][0]
+            if pa["gsea_linewidth_col"] != "select a column..":
+                gsea_linewidth=[ float(i) for i in tmp[[pa["gsea_linewidth_col"]]].dropna()[pa["gsea_linewidth_col"]].tolist() ][0]
             else:
-                edge_linewidth=float(pa["edge_linewidth"])
+                gsea_linewidth=float(pa["gsea_linewidth"])
+        
+            if pa["gsea_linestyle_value"] == '-':
+                gsea_linetype=None
+            elif pa["gsea_linestyle_value"] == ':':
+                gsea_linetype="dot"
+            elif pa["gsea_linestyle_value"] == '-.':
+                gsea_linetype="dashdot"
+            else:
+                gsea_linetype='dash'
 
             fig.add_trace(go.Scatter(x=x, y=y,text=text,\
                 hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
                 hoverinfo='skip',
                 mode='lines',
-                marker=dict(symbol=marker,\
-                    color=c,
-                    size=s,
-                    opacity=a,
-                    line=dict(
-                        color=edgecolor,
-                        width=edge_linewidth
-                        )),\
+                line=dict(
+                    color=gseacolor,
+                    width=gsea_linewidth,
+                    dash=gsea_linetype
+                    ),\
                 showlegend=False,
-                name="" ) )
+                name="" ))
+
+            # Define gene ticks
+            # actually use their own definitions
+            if pa["genecolor_col"] != "select a column..":
+                gene_color=tmp[[pa["genecolor_col"]]].dropna()[pa["genecolor_col"]].tolist()
+            elif str(pa["genecolor_write"]) != "":
+                gene_color=pa["genecolor_write"]
+            else:
+                gene_color=pa["genecolor"]
+
+            if pa["gene_linewidth_col"] != "select a column..":
+                gene_width=[ float(i) for i in tmp[[pa["gene_linewidth_col"]]].dropna()[pa["gene_linewidth_col"]].tolist() ][0]
+            else:
+                gene_width=float(pa["gene_linewidth"])
+        
+            if pa["gene_linestyle_value"] == '-':
+                gene_linetype=None
+            elif pa["gene_linestyle_value"] == ':':
+                gene_linetype="dot"
+            elif pa["gene_linestyle_value"] == '-.':
+                gene_linetype="dashdot"
+            else:
+                gene_linetype='dash'
             
+            # plot line at 0, add yes or no box
             fig.add_shape(type="line", x0=0, x1=x[-1],\
             xref='x', yref='y',\
-            y0=0, y1=0)
+            y0=0, y1=0, line=dict(color = gene_color, width =  gene_width, dash = gene_linetype))
 
-            for x_tick in x:
-                print(x_tick)
-                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y', y0 = 0 - max(y)* 0.1, y1 = max(y)* 0.1) 
+            for x_tick in x[1:-1]:
+                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y',\
+                     y0 = 0 - max([abs(ele) for ele in y])* 0.1, y1 = max([abs(ele) for ele in y])* 0.1,\
+                         line=dict(color = gene_color, width = gene_width, dash = gene_linetype)) 
             
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
@@ -264,25 +298,48 @@ def make_figure(df,pa):
         y_values=tmp[pa["yvals"]].tolist()
         text_values=tmp["___label___"].tolist()
 
-        for x,y,text in zip(x_values,y_values,text_values):
-            fig.add_annotation(
-                    x=x,
-                    y=y,
-                    text=text,
-                    showarrow=showarrow,
-                    arrowhead=arrowhead,
-                    clicktoshow="onoff",
-                    visible=True,
-                    standoff=standoff,
-                    yshift=yshift,
-                    opacity=float(pa["labels_alpha"]),
-                    arrowwidth=float(pa["labels_line_width"]),
-                    arrowcolor=pa["labels_colors_value"],
-                    font=dict(
-                        size=float(pa["labels_font_size"]),
-                        color=pa["labels_font_color_value"]
+        if pa["labels_position"] == "with_enrichment_score":
+            for x,y,text in zip(x_values,y_values,text_values):
+                fig.add_annotation(
+                        x=x,
+                        y=y,
+                        text=text,
+                        showarrow=showarrow,
+                        arrowhead=arrowhead,
+                        clicktoshow="onoff",
+                        visible=True,
+                        standoff=standoff,
+                        yshift=yshift,
+                        opacity=float(pa["labels_alpha"]),
+                        arrowwidth=float(pa["labels_line_width"]),
+                        arrowcolor=pa["labels_colors_value"],
+                        font=dict(
+                            size=float(pa["labels_font_size"]),
+                            color=pa["labels_font_color_value"]
+                            )
                         )
-                    )
+        else:
+            y = max([abs(ele) for ele in df[pa["yvals"]].tolist()]) * 0.1
+            for x,text in zip(x_values,text_values):
+                fig.add_annotation(
+                        x=x,
+                        y=y,
+                        text=text,
+                        showarrow=showarrow,
+                        arrowhead=arrowhead,
+                        clicktoshow="onoff",
+                        visible=True,
+                        standoff=standoff,
+                        yshift=yshift,
+                        opacity=float(pa["labels_alpha"]),
+                        arrowwidth=float(pa["labels_line_width"]),
+                        arrowcolor=pa["labels_colors_value"],
+                        font=dict(
+                            size=float(pa["labels_font_size"]),
+                            color=pa["labels_font_color_value"]
+                            )
+                        )
+
         #fig.update_traces(textposition='top center')
     
     if pa["vline"] != "":
@@ -407,19 +464,33 @@ def figure_defaults():
         "marker_alpha":"1",\
         "markeralpha_col":["select a column.."],\
         "markeralpha_col_value":"select a column..",\
-        "edge_colors":STANDARD_COLORS,\
-        "edgecolor":"black",\
-        "edgecolor_cols":["select a column.."],\
-        "edgecolor_col":"select a column..",\
-        "edgecolor_write":"",\
-        "edge_linewidth_cols":["select a column.."],\
-        "edge_linewidth_col":"select a column..",\
-        "edge_linewidths":STANDARD_SIZES,\
-        "edge_linewidth":"0",\
+        "gsea_colors":STANDARD_COLORS,\
+        "gseacolor":"limegreen",\
+        "gseacolor_cols":["select a column.."],\
+        "gseacolor_col":"select a column..",\
+        "gseacolor_write":"",\
+        "gsea_linewidth_cols":["select a column.."],\
+        "gsea_linewidth_col":"select a column..",\
+        "gsea_linewidths":STANDARD_SIZES,\
+        "gsea_linewidth":"2",\
+        "gsea_linestyle": ['-', '--', '-.', ':'],\
+        "gsea_linestyle_value": "-",\
+        "gene_colors":STANDARD_COLORS,\
+        "genecolor":"black",\
+        "genecolor_cols":["select a column.."],\
+        "genecolor_col":"select a column..",\
+        "genecolor_write":"",\
+        "gene_linewidth_cols":["select a column.."],\
+        "gene_linewidth_col":"select a column..",\
+        "gene_linewidths":STANDARD_SIZES,\
+        "gene_linewidth":"2",\
+        "gene_linestyle": ['-', '--', '-.', ':'],\
+        "gene_linestyle_value": "-",\
         "available_labels":[],\
         "fixed_labels":[],\
         "labels_col":["select a column.."],\
         "labels_col_value":"select a column..",\
+        "labels_position":"with_genes",\
         "labels_font_size":"10",\
         "labels_font_color":STANDARD_COLORS ,\
         "labels_font_color_value":"black",\
@@ -485,7 +556,7 @@ def figure_defaults():
         "vline_alpha":"0.1",\
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
-        "downloadn":"scatterplot",\
+        "downloadn":"gsea",\
         "session_downloadn":"MySession.igsea.plot",\
         "inputsessionfile":"Select file..",\
         "session_argumentsn":"MyArguments.igsea.plot",\

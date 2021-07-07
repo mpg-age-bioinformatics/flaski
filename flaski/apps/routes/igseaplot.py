@@ -98,7 +98,7 @@ def igseaplot(download=None):
                         session["plot_arguments"]["groups"]=["None"]+cols
 
                     columns_select=["markerstyles_cols", "markerc_cols", "markersizes_cols","markeralpha_col",\
-                        "labels_col","edgecolor_cols","edge_linewidth_cols",]
+                        "labels_col","gseacolor_cols","gsea_linewidth_cols",]
                     for parg in columns_select:
                         if session["plot_arguments"]["markerstyles_cols"] not in cols:
                             session["plot_arguments"][parg]=["select a column.."]+cols
@@ -158,11 +158,11 @@ def igseaplot(download=None):
                                 "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
                                 "markerc_col":"select a column..",\
                                 "markerc_write":plot_arguments["markerc_write"],\
-                                "edge_linewidth":plot_arguments["edge_linewidth"],\
-                                "edge_linewidth_col":"select a column..",\
-                                "edgecolor":plot_arguments["edgecolor"],\
-                                "edgecolor_col":"select a column..",\
-                                "edgecolor_write":"",\
+                                "gsea_linewidth":plot_arguments["gsea_linewidth"],\
+                                "gsea_linewidth_col":"select a column..",\
+                                "gseacolor":plot_arguments["gseacolor"],\
+                                "gseacolor_col":"select a column..",\
+                                "gseacolor_write":"",\
                                 "marker":random.choice(plot_arguments["markerstyles"]),\
                                 "markerstyles_col":"select a column..",\
                                 "marker_alpha":plot_arguments["marker_alpha"],\
@@ -183,11 +183,11 @@ def igseaplot(download=None):
                             "markerc":request.form["%s.markerc" %group],\
                             "markerc_col":request.form["%s.markerc_col" %group],\
                             "markerc_write":request.form["%s.markerc_write" %group],\
-                            "edge_linewidth":request.form["%s.edge_linewidth" %group],\
-                            "edge_linewidth_col":request.form["%s.edge_linewidth_col" %group],\
-                            "edgecolor":request.form["%s.edgecolor" %group],\
-                            "edgecolor_col":request.form["%s.edgecolor_col" %group],\
-                            "edgecolor_write":request.form["%s.edgecolor_write" %group],\
+                            "gsea_linewidth":request.form["%s.gsea_linewidth" %group],\
+                            "gsea_linewidth_col":request.form["%s.gsea_linewidth_col" %group],\
+                            "gseacolor":request.form["%s.gseacolor" %group],\
+                            "gseacolor_col":request.form["%s.gseacolor_col" %group],\
+                            "gseacolor_write":request.form["%s.gseacolor_write" %group],\
                             "marker":request.form["%s.marker" %group],\
                             "markerstyles_col":request.form["%s.markerstyles_col" %group],\
                             "marker_alpha":request.form["%s.marker_alpha" %group],\
