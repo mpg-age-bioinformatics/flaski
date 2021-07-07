@@ -95,7 +95,7 @@ def make_figure(df,pa):
             # https://plotly.com/python/marker-style/
             fig.add_trace(go.Scatter(x=x, y=y, text=text,\
                 hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
-                mode='markers',
+                mode='lines',
                 marker=dict(symbol=marker,\
                     color=c,
                     size=s,
@@ -105,8 +105,16 @@ def make_figure(df,pa):
                         width=edge_linewidth
                         )),\
                 showlegend=pab["show_legend"],\
-                name=group) )
+                name=group))
+            
+            fig.add_shape(type="line", x0=0, x1=x[-1],\
+            xref='x', yref='y',\
+            y0=0, y1=0)
 
+            for x_tick in x:
+                print(x_tick)
+                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y', y0 = 0 - max(y)* 0.1, y1 = max(y)* 0.1) 
+        
         fig.update_layout(legend_title_text=str("test"), legend=dict( font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
 
     
@@ -158,7 +166,7 @@ def make_figure(df,pa):
             fig.add_trace(go.Scatter(x=x, y=y,text=text,\
                 hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
                 hoverinfo='skip',
-                mode='markers',
+                mode='lines',
                 marker=dict(symbol=marker,\
                     color=c,
                     size=s,
@@ -169,6 +177,15 @@ def make_figure(df,pa):
                         )),\
                 showlegend=False,
                 name="" ) )
+            
+            fig.add_shape(type="line", x0=0, x1=x[-1],\
+            xref='x', yref='y',\
+            y0=0, y1=0)
+
+            for x_tick in x:
+                print(x_tick)
+                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y', y0 = 0 - max(y)* 0.1, y1 = max(y)* 0.1) 
+            
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
@@ -337,7 +354,7 @@ ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'squa
   'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
   'line-ne-open', 'line-nw', 'line-nw-open']
 TICKS_DIRECTIONS=["","outside", "inside"]
-STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white"]
+STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white", 'gray', "limegreen"]
 
 
 def figure_defaults():
@@ -359,9 +376,9 @@ def figure_defaults():
     # "fig_size_y"="6"
 
     plot_arguments={
-        "fig_width":"600",\
+        "fig_width":"800",\
         "fig_height":"600",\
-        "title":'Scatter plot',\
+        "title":'GSEA plot',\
         "title_size":STANDARD_SIZES,\
         "titles":"20",\
         "xcols":[],\
@@ -383,7 +400,7 @@ def figure_defaults():
         "markersizes_cols":["select a column.."],\
         "markersizes_col":"select a column..",\
         "marker_color":STANDARD_COLORS,\
-        "markerc":"black",\
+        "markerc":"limegreen",\
         "markerc_write":"",\
         "markerc_cols":["select a column.."],\
         "markerc_col":"select a column..",\
@@ -412,17 +429,17 @@ def figure_defaults():
         "labels_alpha":"0.5",\
         "labels_colors":STANDARD_COLORS,\
         "labels_colors_value":"black",\
-        "xlabel":"x",\
+        "xlabel":"Rank",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
-        "ylabel":"y",\
+        "ylabel":"Enrichment Score",\
         "ylabel_size":STANDARD_SIZES,\
         "ylabels":"14",\
         "axis_line_width":"1.0",\
-        "left_axis":".on" ,\
-        "right_axis":".on",\
-        "upper_axis":".on",\
-        "lower_axis":".on",\
+        "left_axis":".off" ,\
+        "right_axis":".off",\
+        "upper_axis":".off",\
+        "lower_axis":".off",\
         "tick_left_axis":".on" ,\
         "tick_right_axis":".off",\
         "tick_upper_axis":".off",\
@@ -441,10 +458,10 @@ def figure_defaults():
         "maxxticks":"",\
         "maxyticks":"",\
         "grid":["None","both","x","y"],\
-        "grid_value":"None",\
+        "grid_value":"both",\
         "grid_color_text":"",\
         "grid_colors":STANDARD_COLORS,\
-        "grid_color_value":"black",\
+        "grid_color_value":"gray",\
         "grid_linestyle":['-', '--', '-.', ':'],\
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
@@ -469,9 +486,9 @@ def figure_defaults():
         "download_format":["png","pdf","svg"],\
         "downloadf":"pdf",\
         "downloadn":"scatterplot",\
-        "session_downloadn":"MySession.scatter.plot",\
+        "session_downloadn":"MySession.igsea.plot",\
         "inputsessionfile":"Select file..",\
-        "session_argumentsn":"MyArguments.scatter.plot",\
+        "session_argumentsn":"MyArguments.igsea.plot",\
         "inputargumentsfile":"Select file.."
     }
 

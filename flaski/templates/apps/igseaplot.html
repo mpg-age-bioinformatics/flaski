@@ -36,7 +36,7 @@
 
     <div id="" style="overflow-y:auto;height:calc(100vh - 80px);">
 
-        <form action="{{ url_for('iscatterplot') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ url_for('igseaplot') }}" method="post" enctype="multipart/form-data">
 
             <!-- -------------------- INPUT FILE SELECTION ---------------------- -->
             <!-- Heading -->
@@ -1028,16 +1028,16 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 
-        <div class="chart" id="iscatterplot" style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
+        <div class="chart" id="igseaplot" style="overflow-y:auto;height:calc(100vh - 195px);overflow-x:auto;">
             <script>
                 var graphs = {{figure_url | safe}};
-                Plotly.plot('iscatterplot',graphs,{});
+                Plotly.plot('igseaplot',graphs,{});
             </script>
 
         <div class="d-sm-flex align-items-center mb-4" style="padding-top: 20px;">
             
             <div style="padding-right: 2px;">
-                <form action="{{ url_for('iscatterplot', download='download') }}" method="get">
+                <form action="{{ url_for('igseaplot', download='download') }}" method="get">
                     <button type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" >
                         <i class="fas fa-download fa-sm text-white-50"></i> Figure
                     </button>
