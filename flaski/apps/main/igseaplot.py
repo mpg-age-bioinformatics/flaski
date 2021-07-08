@@ -210,15 +210,23 @@ def make_figure(df,pa):
             else:
                 gene_linetype='dash'
             
-            # plot line at 0, add yes or no box
+            
+            # plot line at 0, add yes or no box or at other spots
             fig.add_shape(type="line", x0=0, x1=x[-1],\
             xref='x', yref='y',\
             y0=0, y1=0, line=dict(color = gene_color, width =  gene_width, dash = gene_linetype))
 
-            for x_tick in x[1:-1]:
-                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y',\
-                     y0 = 0 - max([abs(ele) for ele in y])* 0.1, y1 = max([abs(ele) for ele in y])* 0.1,\
-                         line=dict(color = gene_color, width = gene_width, dash = gene_linetype)) 
+            # if label is present, only plot sites with label present
+            fig.add_trace(go.Scatter(x=x, y=[0]*len(x),text=text, customdata=y, \
+                hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{customdata}<br>' ,
+                hoverinfo='skip',
+                mode='markers',
+                marker=dict(
+                    color=gene_color,
+                    symbol=142,
+                    size = gene_width),\
+                showlegend=False,
+                name="" ))
             
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
@@ -411,7 +419,7 @@ ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'squa
   'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
   'line-ne-open', 'line-nw', 'line-nw-open']
 TICKS_DIRECTIONS=["","outside", "inside"]
-STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white", 'gray', "limegreen"]
+STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white", 'lightgray', "limegreen"]
 
 
 def figure_defaults():
@@ -532,7 +540,7 @@ def figure_defaults():
         "grid_value":"both",\
         "grid_color_text":"",\
         "grid_colors":STANDARD_COLORS,\
-        "grid_color_value":"gray",\
+        "grid_color_value":"lightgray",\
         "grid_linestyle":['-', '--', '-.', ':'],\
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
