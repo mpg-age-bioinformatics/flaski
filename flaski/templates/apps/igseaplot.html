@@ -377,80 +377,6 @@
                                     <input type="text" name=grid_color_text value="{{grid_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                             </div>
-
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>hline:
-                                    <input type="text" name="hline" value='{{ hline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
-                                </label>
-
-                                <label>width:
-                                    <input type="text" name="hline_linewidth" value='{{ hline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
-                                </label>
-                                
-                                <label>style 
-                                    <select name=hline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
-                                        {% for hline_linestyle_ in hline_linestyle %}
-                                            <option value="{{hline_linestyle_}}" {% if hline_linestyle_==hline_linestyle_value %} selected {% endif %}>{{hline_linestyle_}}</option> 
-                                        {% endfor %}
-                                        </select>
-                                </label>
-
-                                <label>color: 
-                                    <select name=hline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
-                                    {% for marker_color_ in marker_color %}
-                                        <option value="{{marker_color_}}" {% if marker_color_==hline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
-                                    {% endfor %}
-                                    </select>
-                                </label>
-
-                            </div>
-
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>
-                                    .. or write a color name
-                                </label>
-                                <label>
-                                    <input type="text" name=hline_color_text value="{{hline_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
-                                </label>
-                            </div>
-
-
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>vline:
-                                    <input type="text" name="vline" value='{{ vline }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
-                                </label>
-
-                                <label> width:
-                                    <input type="text" name="vline_linewidth" value='{{ vline_linewidth }}' style="width:30px;height:22px;padding-left:4px;vertical-align:middle;">
-                                </label>
-
-                                <label> style 
-                                    <select name=vline_linestyle_value method="GET" action="/" style="width:30px;vertical-align:middle;">
-                                        {% for vline_linestyle_ in vline_linestyle %}
-                                            <option value="{{vline_linestyle_}}" {% if vline_linestyle_==vline_linestyle_value %} selected {% endif %}>{{vline_linestyle_}}</option> 
-                                        {% endfor %}
-                                        </select>
-                                </label>
-
-                                <label> color: 
-                                    <select name=vline_color_value method="GET" action="/" style="width:50px;vertical-align:middle;">
-                                    {% for marker_color_ in marker_color %}
-                                        <option value="{{marker_color_}}" {% if marker_color_==vline_color_value %} selected {% endif %}>{{marker_color_}}</option> 
-                                    {% endfor %}
-                                    </select>
-                                </label>
-
-                            </div>
-
-                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label>
-                                    .. or write a color name
-                                </label>
-                                <label>
-                                    <input type="text" name=vline_color_text value="{{vline_color_text}}" style="width:160px;height:22px;padding-left:4px;vertical-align:middle;">
-                                </label>
-                            </div>
-
                         </div>
         
                     </div>
@@ -649,7 +575,7 @@
                             </div>
     
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> line width: 
+                                <label> tick size: 
                                     <select name=gene_linewidth method="GET" action="/" style="width:50px;vertical-align:middle;">
                                     {% for gene_linewidth_ in gene_linewidths %}
                                         <option value="{{gene_linewidth_}}" {% if gene_linewidth_==gene_linewidth %} selected {% endif %}>{{gene_linewidth_}}</option>
@@ -677,6 +603,149 @@
 
                                 <label style="padding-left:2px;">&nbsp; ..or 
                                     <input type="text" name="genecolor_write" value='{{ genecolor_write }}' style="width:100px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:center;">
+                                <label>Center Line:</label>
+                            </div>
+    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>at:
+                                    <input type="text" name="centerline" value='{{ centerline }}' style="width:50px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> line width: 
+                                    <input type="text" name=center_linewidth value="{{center_linewidth}}" style="width:50px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                                
+                                <label> line style 
+                                    <select name=center_linestyle_value method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                        {% for center_linestyle_ in center_linestyle %}
+                                            <option value="{{center_linestyle_}}" {% if center_linestyle_==center_linestyle_value %} selected {% endif %}>{{center_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line color: 
+                                    <select name=center_color_value method="GET" action="/" style="width:100px;vertical-align:middle;">
+                                    {% for center_colors_ in center_colors %}
+                                        <option value="{{center_colors_}}" {% if center_colors_==center_color_value %} selected {% endif %}>{{center_colors_}}</option>"
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label style="padding-left:2px;">&nbsp; ..or 
+                                    <input type="text" name="center_color_text" value='{{ center_color_text }}' style="width:100px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:center;">
+                                <label>Maximum Line:</label>
+                            </div>
+    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>at:
+                                    <input type="text" name="hline1" value='{{ hline1 }}' style="width:50px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> line width: 
+                                    <input type="text" name=hline1_linewidth value="{{hline1_linewidth}}" style="width:50px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                                
+                                <label> line style 
+                                    <select name=hline1_linestyle_value method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                        {% for hline1_linestyle_ in hline1_linestyle %}
+                                            <option value="{{hline1_linestyle_}}" {% if hline1_linestyle_==hline1_linestyle_value %} selected {% endif %}>{{hline1_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line color: 
+                                    <select name=hline1_color_value method="GET" action="/" style="width:100px;vertical-align:middle;">
+                                    {% for hline1_colors_ in hline1_colors %}
+                                        <option value="{{hline1_colors_}}" {% if hline1_colors_==hline1_color_value %} selected {% endif %}>{{hline1_colors_}}</option>"
+                                    {% endfor %}
+                                    </select>
+                                </label>
+
+                                <label style="padding-left:2px;">&nbsp; ..or 
+                                    <input type="text" name="hline1_color_text" value='{{ hline1_color_text }}' style="width:100px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                            </div>
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:center;">
+                                <label>Minimum Line:</label>
+                            </div>
+    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>at:
+                                    <input type="text" name="hline2" value='{{ hline2 }}' style="width:50px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> line width: 
+                                    <input type="text" name=hline2_linewidth value="{{hline2_linewidth}}" style="width:50px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                                
+                                <label> line style 
+                                    <select name=hline2_linestyle_value method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                        {% for hline2_linestyle_ in hline2_linestyle %}
+                                            <option value="{{hline2_linestyle_}}" {% if hline2_linestyle_==hline2_linestyle_value %} selected {% endif %}>{{hline2_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line color: 
+                                    <select name=hline2_color_value method="GET" action="/" style="width:100px;vertical-align:middle;">
+                                        {% for hline2_colors_ in hline2_colors %}
+                                            <option value="{{hline2_colors_}}" {% if hline2_colors_==hline2_color_value %} selected {% endif %}>{{hline2_colors_}}</option>"
+                                        {% endfor %}
+                                        </select>
+                                    </label>
+
+                                <label style="padding-left:2px;">&nbsp; ..or 
+                                    <input type="text" name="hline2_color_text" value='{{ hline2_color_text }}' style="width:100px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:center;">
+                                <label>Vertical Line:</label>
+                            </div>
+    
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label>at:
+                                    <input type="text" name="vline" value='{{ vline }}' style="width:50px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+
+                                <label> line width: 
+                                    <input type="text" name=vline_linewidth value="{{vline_linewidth}}" style="width:50px;height:22px;padding-left:2px;vertical-align:middle;">
+                                </label>
+                                
+                                <label> line style 
+                                    <select name=vline_linestyle_value method="GET" action="/" style="width:50px;vertical-align:middle;">
+                                        {% for vline_linestyle_ in vline_linestyle %}
+                                            <option value="{{vline_linestyle_}}" {% if vline_linestyle_==vline_linestyle_value %} selected {% endif %}>{{vline_linestyle_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                </label>
+                            </div>
+
+                            <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
+                                <label> line color: 
+                                    <select name=vline_color_value method="GET" action="/" style="width:100px;vertical-align:middle;">
+                                        {% for vline_colors_ in vline_colors %}
+                                            <option value="{{vline_colors_}}" {% if vline_colors_==vline_color_value %} selected {% endif %}>{{vline_colors_}}</option> 
+                                        {% endfor %}
+                                        </select>
+                                    </label>
+
+                                <label style="padding-left:2px;">&nbsp; ..or 
+                                    <input type="text" name=vline_color_text value="{{vline_color_text}}" style="width:100px;height:22px;padding-left:2px;vertical-align:middle;">
                                 </label>
                             </div>
 

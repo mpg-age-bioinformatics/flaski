@@ -200,24 +200,9 @@ def make_figure(df,pa):
                 gene_width=[ float(i) for i in tmp[[pa["gene_linewidth_col"]]].dropna()[pa["gene_linewidth_col"]].tolist() ][0]
             else:
                 gene_width=float(pa["gene_linewidth"])
-        
-            if pa["gene_linestyle_value"] == '-':
-                gene_linetype=None
-            elif pa["gene_linestyle_value"] == ':':
-                gene_linetype="dot"
-            elif pa["gene_linestyle_value"] == '-.':
-                gene_linetype="dashdot"
-            else:
-                gene_linetype='dash'
-            
-            
-            # plot line at 0, add yes or no box or at other spots
-            fig.add_shape(type="line", x0=0, x1=x[-1],\
-            xref='x', yref='y',\
-            y0=0, y1=0, line=dict(color = gene_color, width =  gene_width, dash = gene_linetype))
-
+                    
             # if label is present, only plot sites with label present
-            fig.add_trace(go.Scatter(x=x, y=[0]*len(x),text=text, customdata=y, \
+            fig.add_trace(go.Scatter(x=x, y=[pa["centerline"]]*len(x),text=text, customdata=y, \
                 hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{customdata}<br>' ,
                 hoverinfo='skip',
                 mode='markers',
@@ -327,7 +312,7 @@ def make_figure(df,pa):
                             )
                         )
         else:
-            y = max([abs(ele) for ele in df[pa["yvals"]].tolist()]) * 0.1
+            y = pa["centerline"] 
             for x,text in zip(x_values,text_values):
                 fig.add_annotation(
                         x=x,
@@ -350,6 +335,27 @@ def make_figure(df,pa):
 
         #fig.update_traces(textposition='top center')
     
+    # plot line at 0, add yes or no box or at other spots
+    if pa["centerline"] != "":
+        if pa["center_color_text"]!="":
+            center_color=pa["center_color_text"]
+        else:
+            center_color=pa["center_color_value"]
+
+        if pa["center_linestyle_value"] == '-':
+            center_linetype=None
+        elif pa["center_linestyle_value"] == ':':
+            center_linetype="dot"
+        elif pa["center_linestyle_value"] == '-.':
+            center_linetype="dashdot"
+        else:
+            center_linetype='dash'
+    
+        fig.add_shape(type="line", x0=0, x1=1,\
+            xref='paper', yref='y',\
+            y0=pa["centerline"], y1=pa["centerline"], line=dict(color = center_color, width =  float(pa["center_linewidth"]), dash = center_linetype))
+
+    
     if pa["vline"] != "":
         if pa["vline_color_text"]!="":
             vline_color=pa["vline_color_text"]
@@ -370,25 +376,46 @@ def make_figure(df,pa):
             y0=0, y1=1,\
             line=dict(color=vline_color,width=float(pa["vline_linewidth"]), dash=vline_linetype))
 
-    if pa['hline'] != "":
-        if pa["hline_color_text"]!="":
-            hline_color=pa["hline_color_text"]
+    if pa['hline1'] != "":
+        if pa["hline1_color_text"]!="":
+            hline1_color=pa["hline1_color_text"]
         else:
-            hline_color=pa["hline_color_value"]
+            hline1_color=pa["hline1_color_value"]
 
-        if pa["hline_linestyle_value"] == '-':
-            hline_linetype=None
-        elif pa["hline_linestyle_value"] == ':':
-            hline_linetype="dot"
-        elif pa["hline_linestyle_value"] == '-.':
-            hline_linetype="dashdot"
+        if pa["hline1_linestyle_value"] == '-':
+            hline1_linetype=None
+        elif pa["hline1_linestyle_value"] == ':':
+            hline1_linetype="dot"
+        elif pa["hline1_linestyle_value"] == '-.':
+            hline1_linetype="dashdot"
         else:
-            hline_linetype='dash'
+            hline1_linetype='dash'
 
         fig.add_shape(type="line", x0=0, x1=1,\
             xref='paper', yref='y',\
-            y0=pa["hline"], y1= pa["hline"],\
-            line=dict(color=hline_color,width=float(pa["hline_linewidth"]), dash=hline_linetype))
+            y0=pa["hline1"], y1= pa["hline1"],\
+            line=dict(color=hline1_color,width=float(pa["hline1_linewidth"]), dash=hline1_linetype))
+    
+    if pa['hline2'] != "":
+        if pa["hline2_color_text"]!="":
+            hline2_color=pa["hline2_color_text"]
+        else:
+            hline2_color=pa["hline2_color_value"]
+
+        if pa["hline2_linestyle_value"] == '-':
+            hline2_linetype=None
+        elif pa["hline2_linestyle_value"] == ':':
+            hline2_linetype="dot"
+        elif pa["hline2_linestyle_value"] == '-.':
+            hline2_linetype="dashdot"
+        else:
+            hline2_linetype='dash'
+
+        fig.add_shape(type="line", x0=0, x1=1,\
+            xref='paper', yref='y',\
+            y0=pa["hline2"], y1= pa["hline2"],\
+            line=dict(color=hline2_color,width=float(pa["hline2_linewidth"]), dash=hline2_linetype))
+
 
     return fig
 
@@ -491,7 +518,7 @@ def figure_defaults():
         "gene_linewidth_cols":["select a column.."],\
         "gene_linewidth_col":"select a column..",\
         "gene_linewidths":STANDARD_SIZES,\
-        "gene_linewidth":"2",\
+        "gene_linewidth":"40",\
         "gene_linestyle": ['-', '--', '-.', ':'],\
         "gene_linestyle_value": "-",\
         "available_labels":[],\
@@ -545,19 +572,35 @@ def figure_defaults():
         "grid_linestyle_value":'--',\
         "grid_linewidth":"1",\
         "grid_alpha":"0.1",\
-        "hline":"",\
-        "hline_color_text":"",\
-        "hline_colors":STANDARD_COLORS,\
-        "hline_color_value":"black",\
-        "hline_linestyle":['-', '--', '-.', ':'],\
-        "hline_linestyle_value":'--',\
-        "hline_linewidth":"1",\
-        "hline_alpha":"0.1",\
+        "centerline":"0",\
+        "center_color_text":"",\
+        "center_colors":STANDARD_COLORS,\
+        "center_color_value":"black",\
+        "center_linestyle":['-', '--', '-.', ':'],\
+        "center_linestyle_value":'-',\
+        "center_linewidth":"1",\
+        "center_alpha":"0.1",\
+        "hline1":"",\
+        "hline1_color_text":"",\
+        "hline1_colors":STANDARD_COLORS,\
+        "hline1_color_value":"red",\
+        "hline1_linestyle":['-', '--', '-.', ':'],\
+        "hline1_linestyle_value":'--',\
+        "hline1_linewidth":"1",\
+        "hline1_alpha":"0.1",\
+        "hline2":"",\
+        "hline2_color_text":"",\
+        "hline2_colors":STANDARD_COLORS,\
+        "hline2_color_value":"red",\
+        "hline2_linestyle":['-', '--', '-.', ':'],\
+        "hline2_linestyle_value":'--',\
+        "hline2_linewidth":"1",\
+        "hline2_alpha":"0.1",\
         "vline":"",\
         "vline_value":"None",\
         "vline_color_text":"",\
         "vline_colors":STANDARD_COLORS,\
-        "vline_color_value":"black",\
+        "vline_color_value":"blue",\
         "vline_linestyle":['-', '--', '-.', ':'],\
         "vline_linestyle_value":'--',\
         "vline_linewidth":"1",\

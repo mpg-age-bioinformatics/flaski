@@ -188,6 +188,7 @@ def igseaplot(download=None):
                             "gseacolor":request.form["%s.gseacolor" %group],\
                             "gseacolor_col":request.form["%s.gseacolor_col" %group],\
                             "gseacolor_write":request.form["%s.gseacolor_write" %group],\
+                            "centerline":request.form["%s.centerline" %group],\
                             "marker":request.form["%s.marker" %group],\
                             "markerstyles_col":request.form["%s.markerstyles_col" %group],\
                             "marker_alpha":request.form["%s.marker_alpha" %group],\
