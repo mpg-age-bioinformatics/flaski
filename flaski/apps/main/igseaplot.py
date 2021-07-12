@@ -42,176 +42,89 @@ def make_figure(df,pa):
         df["___label___"]=df[pa["labels_col_value"]].tolist()
     else:
         df["___label___"]=df.index.tolist()
-
-    if str(pa["groups_value"])!="None":
-
-        fig.update_layout(legend_title_text=str(pa["groups_value"]), legend=dict( title_font_color="black", font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
-        
-        for group in pa["list_of_groups"]:
-            tmp=df[df[pa["groups_value"]]==group]
-
-            x=tmp[pa["xvals"]].tolist()
-            y=tmp[pa["yvals"]].tolist()
-            text=tmp["___label___"].tolist()
-            
-            pa_=[ g for g in pa["groups_settings"] if g["name"]==group ][0]
-            
-            if pa_["markeralpha_col_value"] != "select a column..":
-                a=[ float(i) for i in tmp[[pa_["markeralpha_col_value"]]].dropna()[pa_["markeralpha_col_value"]].tolist() ][0]
-            else:
-                a=float(pa_["marker_alpha"])
-
-            if pa_["markerstyles_col"] != "select a column..":
-                marker=[ str(i) for i in tmp[[pa_["markerstyles_col"]]].dropna()[pa_["markerstyles_col"]].tolist() ][0]
-            else:
-                marker=pa_["marker"]
-
-            if pa_["markersizes_col"] != "select a column..":
-                s=[ float(i) for i in tmp[[pa_["markersizes_col"]]].dropna()[pa_["markersizes_col"]].tolist() ][0]
-            else:
-                s=float(pa_["markers"])
-
-            if pa_["markerc_col"] != "select a column..":
-                c=[ i for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
-            elif str(pa["markerc_write"]) != "":
-                c=pa_["markerc_write"]
-            else:
-                c=pa_["markerc"]
-
-
-            if pa_["gseacolor_col"] != "select a column..":
-                gseacolor=[ i for i in tmp[[pa_["gseacolor_col"]]].dropna()[pa_["gseacolor_col"]].tolist()][0]
-            elif str(pa_["gseacolor_write"]) != "":
-                gseacolor=pa_["gseacolor_write"]
-            else:
-                gseacolor=pa_["gseacolor"]
-
-            if pa_["gsea_linewidth_col"] != "select a column..":
-                gsea_linewidth=[ float(i) for i in tmp[[pa_["gsea_linewidth_col"]]].dropna()[pa_["gsea_linewidth_col"]].tolist() ][0]
-            else:
-                gsea_linewidth=float(pa_["gsea_linewidth"])
-
-            # https://plotly.com/python/line-and-scatter/
-            # https://plotly.com/python/marker-style/
-            fig.add_trace(go.Scatter(x=x, y=y, text=text,\
-                hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
-                mode='lines',
-                marker=dict(symbol=marker,\
-                    color=c,
-                    size=s,
-                    opacity=a,
-                    line=dict(
-                        color=gseacolor,
-                        width=gsea_linewidth
-                        )),\
-                showlegend=pab["show_legend"],\
-                name=group))
-            
-            fig.add_shape(type="line", x0=0, x1=x[-1],\
-            xref='x', yref='y',\
-            y0=0, y1=0)
-
-            for x_tick in x:
-                print(x_tick)
-                fig.add_shape(type = "line", x0 = x_tick, x1 = x_tick, xref = 'x', yref = 'y', y0 = 0 - max([abs(ele) for ele in y])* 0.1, y1 = max([abs(ele) for ele in y])* 0.1) 
-        
-        fig.update_layout(legend_title_text=str("test"), legend=dict( font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
-
     
-    elif pa["groups_value"]=="None":
-
-        if pa["markerstyles_col"] != "select a column..":
-            markers=[ str(i) for i in df[pa["markerstyles_col"]].tolist() ]
-            df["__marker__"]=markers
-        else:
-            df["__marker__"]=pa["marker"]
-    
-        for marker in list(OrderedDict.fromkeys(df["__marker__"].tolist())):
-
-            tmp=df[df["__marker__"]==marker]
-            x=tmp[pa["xvals"]].tolist()
-            y=tmp[pa["yvals"]].tolist()
-            text=tmp["___label___"].tolist()
+   
+    tmp=df
+    x=tmp[pa["xvals"]].tolist()
+    y=tmp[pa["yvals"]].tolist()
+    text=tmp["___label___"].tolist()
 
 
-            # Define gsea line
-            # remove marker related thing
-            # change edge_ to gsea_
-            if pa["markeralpha_col_value"] != "select a column..":
-                a=[ float(i) for i in tmp[[pa["markeralpha_col_value"]]].dropna()[pa["markeralpha_col_value"]].tolist() ][0]
-            else:
-                a=float(pa["marker_alpha"])
-            
-            if pa["markersizes_col"] != "select a column..":
-                s=[ float(i) for i in tmp[pa["markersizes_col"]].tolist() ]
-            else:
-                s=float(pa["markers"])
+    # Define gsea line_
+    if pa["gseacolor_col"] != "select a column..":
+        gseacolor=tmp[[pa["gseacolor_col"]]].dropna()[pa["gseacolor_col"]].tolist()
+    elif str(pa["gseacolor_write"]) != "":
+        gseacolor=pa["gseacolor_write"]
+    else:
+        gseacolor=pa["gseacolor"]
 
-            if pa["markerc_col"] != "select a column..":
-                c=tmp[pa["markerc_col"]].tolist()
-            elif str(pa["markerc_write"]) != "":
-                c=pa["markerc_write"]
-            else:
-                c=pa["markerc"]
-
-            if pa["gseacolor_col"] != "select a column..":
-                gseacolor=tmp[[pa["gseacolor_col"]]].dropna()[pa["gseacolor_col"]].tolist()
-            elif str(pa["gseacolor_write"]) != "":
-                gseacolor=pa["gseacolor_write"]
-            else:
-                gseacolor=pa["gseacolor"]
-
-            if pa["gsea_linewidth_col"] != "select a column..":
-                gsea_linewidth=[ float(i) for i in tmp[[pa["gsea_linewidth_col"]]].dropna()[pa["gsea_linewidth_col"]].tolist() ][0]
-            else:
-                gsea_linewidth=float(pa["gsea_linewidth"])
+    if pa["gsea_linewidth_col"] != "select a column..":
+        gsea_linewidth=[ float(i) for i in tmp[[pa["gsea_linewidth_col"]]].dropna()[pa["gsea_linewidth_col"]].tolist() ][0]
+    else:
+        gsea_linewidth=float(pa["gsea_linewidth"])
         
-            if pa["gsea_linestyle_value"] == '-':
-                gsea_linetype=None
-            elif pa["gsea_linestyle_value"] == ':':
-                gsea_linetype="dot"
-            elif pa["gsea_linestyle_value"] == '-.':
-                gsea_linetype="dashdot"
+    if pa["gsea_linestyle_value"] == '-':
+        gsea_linetype=None
+    elif pa["gsea_linestyle_value"] == ':':
+        gsea_linetype="dot"
+    elif pa["gsea_linestyle_value"] == '-.':
+        gsea_linetype="dashdot"
+    else:
+        gsea_linetype='dash'
+        
+    if pa["labels_col_value"] != "select a column..":
+        full_text = ['']
+        for i, gene in enumerate(text[1:-1]):
+            if gene != "nan":
+                full_text.append(gene)
             else:
-                gsea_linetype='dash'
+                full_text.append(text[(i+2)])
+        full_text.append("")
+        text=full_text
 
-            fig.add_trace(go.Scatter(x=x, y=y,text=text,\
-                hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
-                hoverinfo='skip',
-                mode='lines',
-                line=dict(
-                    color=gseacolor,
-                    width=gsea_linewidth,
-                    dash=gsea_linetype
-                    ),\
-                showlegend=False,
-                name="" ))
+    fig.add_trace(go.Scatter(x=x, y=y,text=text,\
+        hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{y}<br>' ,
+        hoverinfo='skip',
+        mode='lines',
+        line=dict(
+            color=gseacolor,
+            width=gsea_linewidth,
+            dash=gsea_linetype
+            ),\
+        showlegend=False,
+        name="" ))
 
-            # Define gene ticks
-            # actually use their own definitions
-            if pa["genecolor_col"] != "select a column..":
-                gene_color=tmp[[pa["genecolor_col"]]].dropna()[pa["genecolor_col"]].tolist()
-            elif str(pa["genecolor_write"]) != "":
-                gene_color=pa["genecolor_write"]
-            else:
-                gene_color=pa["genecolor"]
-
-            if pa["gene_linewidth_col"] != "select a column..":
-                gene_width=[ float(i) for i in tmp[[pa["gene_linewidth_col"]]].dropna()[pa["gene_linewidth_col"]].tolist() ][0]
-            else:
-                gene_width=float(pa["gene_linewidth"])
+    # Define gene ticks
+    if pa["genecolor_col"] != "select a column..":
+        gene_color=tmp[[pa["genecolor_col"]]].dropna()[pa["genecolor_col"]].tolist()
+    elif str(pa["genecolor_write"]) != "":
+        gene_color=pa["genecolor_write"]
+    else:
+        gene_color=pa["genecolor"]
+        
+    if pa["gene_linewidth_col"] != "select a column..":
+        gene_width=[ float(i) for i in tmp[[pa["gene_linewidth_col"]]].dropna()[pa["gene_linewidth_col"]].tolist() ][0]
+    else:
+        gene_width=float(pa["gene_linewidth"])
                     
-            # if label is present, only plot sites with label present
-            fig.add_trace(go.Scatter(x=x, y=[pa["centerline"]]*len(x),text=text, customdata=y, \
-                hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{customdata}<br>' ,
-                hoverinfo='skip',
-                mode='markers',
-                marker=dict(
-                    color=gene_color,
-                    symbol=142,
-                    size = gene_width),\
-                showlegend=False,
-                name="" ))
+    # if label is present, only plot sites with label present
+    if pa["labels_col_value"] != "select a column..":
+        tmp=df
+        tmp.drop(tmp[tmp["___label___"] == 'nan'].index , inplace=True)
+        x=tmp[pa["xvals"]].tolist()
+        y=tmp[pa["yvals"]].tolist()
+        text=tmp["___label___"].tolist()
+        
+    fig.add_trace(go.Scatter(x=x, y=[pa["centerline"]]*len(x),text=text, customdata=y, \
+        hovertemplate ='<b>%{text}</b><br><br><b>'+pa["xvals"]+'</b>: %{x}<br><b>'+pa["yvals"]+'</b>: %{customdata}<br>' ,
+        hoverinfo='skip',
+        mode='markers',
+        marker=dict(
+            color=gene_color,
+            symbol=142,
+            size = gene_width),\
+        showlegend=False,
+        name="" ))
             
 
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
@@ -290,48 +203,30 @@ def make_figure(df,pa):
         x_values=tmp[pa["xvals"]].tolist()
         y_values=tmp[pa["yvals"]].tolist()
         text_values=tmp["___label___"].tolist()
-
-        if pa["labels_position"] == "with_enrichment_score":
-            for x,y,text in zip(x_values,y_values,text_values):
-                fig.add_annotation(
-                        x=x,
-                        y=y,
-                        text=text,
-                        showarrow=showarrow,
-                        arrowhead=arrowhead,
-                        clicktoshow="onoff",
-                        visible=True,
-                        standoff=standoff,
-                        yshift=yshift,
-                        opacity=float(pa["labels_alpha"]),
-                        arrowwidth=float(pa["labels_line_width"]),
-                        arrowcolor=pa["labels_colors_value"],
-                        font=dict(
-                            size=float(pa["labels_font_size"]),
-                            color=pa["labels_font_color_value"]
-                            )
-                        )
+        if pa["labels_ypos"] == "":
+            y=float(pa["centerline"]) + max([abs(ele) for ele in y_values])* 0.12
         else:
-            y = pa["centerline"] 
-            for x,text in zip(x_values,text_values):
-                fig.add_annotation(
-                        x=x,
-                        y=y,
-                        text=text,
-                        showarrow=showarrow,
-                        arrowhead=arrowhead,
-                        clicktoshow="onoff",
-                        visible=True,
-                        standoff=standoff,
-                        yshift=yshift,
-                        opacity=float(pa["labels_alpha"]),
-                        arrowwidth=float(pa["labels_line_width"]),
-                        arrowcolor=pa["labels_colors_value"],
-                        font=dict(
-                            size=float(pa["labels_font_size"]),
-                            color=pa["labels_font_color_value"]
-                            )
+            y = pa["labels_ypos"] 
+        
+        for x,text in zip(x_values,text_values):
+            fig.add_annotation(
+                    x=x,
+                    y=y,
+                    text=text,
+                    showarrow=showarrow,
+                    arrowhead=arrowhead,
+                    clicktoshow="onoff",
+                    visible=True,
+                    standoff=standoff,
+                    yshift=yshift,
+                    opacity=float(pa["labels_alpha"]),
+                    arrowwidth=float(pa["labels_line_width"]),
+                    arrowcolor=pa["labels_colors_value"],
+                    font=dict(
+                        size=float(pa["labels_font_size"]),
+                        color=pa["labels_font_color_value"]
                         )
+                    )
 
         #fig.update_traces(textposition='top center')
     
@@ -535,6 +430,7 @@ def figure_defaults():
         "labels_alpha":"0.5",\
         "labels_colors":STANDARD_COLORS,\
         "labels_colors_value":"black",\
+        "labels_ypos": "",\
         "xlabel":"Rank",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\

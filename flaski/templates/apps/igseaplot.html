@@ -770,11 +770,14 @@
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Labels: 
-                                    <select name=labels_col_value method="GET" action="/" style="width:261px;vertical-align:middle;">
+                                    <select name=labels_col_value method="GET" action="/" style="width:100px;vertical-align:middle;">
                                     {% for labels_col_ in labels_col %}
                                         <option value="{{labels_col_}}" {% if labels_col_==labels_col_value %} selected {% endif %}>{{labels_col_}}</option>
                                     {% endfor %}
                                     </select>
+                                </label>
+                                <label> at y-position: 
+                                    <input type="text" name="labels_ypos" value='{{ labels_ypos }}' style="width:70px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                             </div>
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
