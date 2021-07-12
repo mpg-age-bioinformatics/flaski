@@ -94,9 +94,6 @@ def igseaplot(download=None):
                         flash(error_msg,'error')
                         return render_template('/apps/igseaplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-                    if session["plot_arguments"]["groups"] not in cols:
-                        session["plot_arguments"]["groups"]=["None"]+cols
-
                     columns_select=["markerstyles_cols", "markerc_cols", "markersizes_cols","markeralpha_col",\
                         "labels_col","gseacolor_cols","gsea_linewidth_cols",]
                     for parg in columns_select:
@@ -135,67 +132,6 @@ def igseaplot(download=None):
                 # USER INPUT/PLOT_ARGUMENTS GETS UPDATED TO THE LATEST INPUT
                 # WITH THE EXCEPTION OF SELECTION LISTS
                 plot_arguments = session["plot_arguments"]
-
-                # if request.form["groups_value"] == "None":
-                #     plot_arguments["groups_value"]="None"
-
-                if plot_arguments["groups_value"]!=request.form["groups_value"]:
-                    if request.form["groups_value"]  != "None":
-                        df=pd.read_json(session["df"])
-                        df[request.form["groups_value"]]=df[request.form["groups_value"]].apply(lambda x: secure_filename(str(x) ) )
-                        df=df.astype(str)
-                        session["df"]=df.to_json()
-                        groups=df[request.form["groups_value"]]
-                        groups=list(set(groups))
-                        groups.sort()
-                        plot_arguments["list_of_groups"]=groups
-                        groups_settings=[]
-                        group_dic={}
-                        for group in groups:
-                            group_dic={"name":group,\
-                                "markers":plot_arguments["markers"],\
-                                "markersizes_col":"select a column..",\
-                                "markerc":random.choice([ cc for cc in plot_arguments["marker_color"] if cc != "white"]),\
-                                "markerc_col":"select a column..",\
-                                "markerc_write":plot_arguments["markerc_write"],\
-                                "gsea_linewidth":plot_arguments["gsea_linewidth"],\
-                                "gsea_linewidth_col":"select a column..",\
-                                "gseacolor":plot_arguments["gseacolor"],\
-                                "gseacolor_col":"select a column..",\
-                                "gseacolor_write":"",\
-                                "marker":random.choice(plot_arguments["markerstyles"]),\
-                                "markerstyles_col":"select a column..",\
-                                "marker_alpha":plot_arguments["marker_alpha"],\
-                                "markeralpha_col_value":"select a column.."}
-                            groups_settings.append(group_dic)
-                        plot_arguments["groups_settings"]=groups_settings
-                    elif request.form["groups_value"] == "None" :
-                        plot_arguments["groups_settings"]=[]
-                        plot_arguments["list_of_groups"]=[]
-
-                elif plot_arguments["groups_value"] != "None":
-                    groups_settings=[]
-                    group_dic={}
-                    for group in plot_arguments["list_of_groups"]:
-                        group_dic={"name":group,\
-                            "markers":request.form["%s.markers" %group],\
-                            "markersizes_col":request.form["%s.markersizes_col" %group],\
-                            "markerc":request.form["%s.markerc" %group],\
-                            "markerc_col":request.form["%s.markerc_col" %group],\
-                            "markerc_write":request.form["%s.markerc_write" %group],\
-                            "gsea_linewidth":request.form["%s.gsea_linewidth" %group],\
-                            "gsea_linewidth_col":request.form["%s.gsea_linewidth_col" %group],\
-                            "gseacolor":request.form["%s.gseacolor" %group],\
-                            "gseacolor_col":request.form["%s.gseacolor_col" %group],\
-                            "gseacolor_write":request.form["%s.gseacolor_write" %group],\
-                            "centerline":request.form["%s.centerline" %group],\
-                            "marker":request.form["%s.marker" %group],\
-                            "markerstyles_col":request.form["%s.markerstyles_col" %group],\
-                            "marker_alpha":request.form["%s.marker_alpha" %group],\
-                            "markeralpha_col_value":request.form["%s.markeralpha_col_value" %group]
-                            }   
-                        groups_settings.append(group_dic)
-                    plot_arguments["groups_settings"]=groups_settings
                 
                 if request.form["labels_col_value"] != "select a column.." :
                     df=pd.read_json(session["df"])

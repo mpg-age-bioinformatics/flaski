@@ -28,11 +28,8 @@ def make_figure(df,pa):
     fig.update_layout( width=pa_["fig_width"], height=pa_["fig_height"] ) #  autosize=False,
 
     # MAIN FIGURE
-    # if we have groups
-    # the user can decide how the diferent groups should look like 
-    # by unchecking the groups_autogenerate check box
     pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis"]:
+    for arg in ["upper_axis","lower_axis","left_axis","right_axis"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -315,31 +312,6 @@ def make_figure(df,pa):
     return fig
 
 STANDARD_SIZES=[ str(i) for i in list(range(101)) ]
-ALLOWED_MARKERS=['circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'square', 'square-open', 
-'square-dot', 'square-open-dot', 'diamond', 'diamond-open', 'diamond-dot', 'diamond-open-dot', 
-'cross', 'cross-open', 'cross-dot', 'cross-open-dot', 'x', 'x-open', 'x-dot', 'x-open-dot', 
-'triangle-up', 'triangle-up-open', 'triangle-up-dot', 'triangle-up-open-dot', 'triangle-down', 
-'triangle-down-open', 'triangle-down-dot', 'triangle-down-open-dot', 'triangle-left', 'triangle-left-open', 
-'triangle-left-dot', 'triangle-left-open-dot', 'triangle-right', 'triangle-right-open', 'triangle-right-dot', 
-'triangle-right-open-dot', 'triangle-ne', 'triangle-ne-open', 'triangle-ne-dot', 'triangle-ne-open-dot', 
-'triangle-se', 'triangle-se-open', 'triangle-se-dot', 'triangle-se-open-dot', 'triangle-sw', 
-'triangle-sw-open', 'triangle-sw-dot', 'triangle-sw-open-dot', 'triangle-nw', 'triangle-nw-open',
- 'triangle-nw-dot', 'triangle-nw-open-dot', 'pentagon', 'pentagon-open', 'pentagon-dot', 'pentagon-open-dot', 
- 'hexagon', 'hexagon-open', 'hexagon-dot', 'hexagon-open-dot', 'hexagon2', 'hexagon2-open', 'hexagon2-dot',
-  'hexagon2-open-dot', 'octagon', 'octagon-open', 'octagon-dot', 'octagon-open-dot', 'star', 'star-open', 
-  'star-dot', 'star-open-dot', 'hexagram', 'hexagram-open', 'hexagram-dot', 'hexagram-open-dot', 
-  'star-triangle-up', 'star-triangle-up-open', 'star-triangle-up-dot', 'star-triangle-up-open-dot', 
-  'star-triangle-down', 'star-triangle-down-open', 'star-triangle-down-dot', 'star-triangle-down-open-dot', 
-  'star-square', 'star-square-open', 'star-square-dot', 'star-square-open-dot', 'star-diamond', 
-  'star-diamond-open', 'star-diamond-dot', 'star-diamond-open-dot', 'diamond-tall', 'diamond-tall-open', 
-  'diamond-tall-dot', 'diamond-tall-open-dot', 'diamond-wide', 'diamond-wide-open', 'diamond-wide-dot', 
-  'diamond-wide-open-dot', 'hourglass', 'hourglass-open', 'bowtie', 'bowtie-open', 'circle-cross', 
-  'circle-cross-open', 'circle-x', 'circle-x-open', 'square-cross', 'square-cross-open', 'square-x', 
-  'square-x-open', 'diamond-cross', 'diamond-cross-open', 'diamond-x', 'diamond-x-open', 'cross-thin', 
-  'cross-thin-open', 'x-thin', 'x-thin-open', 'asterisk', 'asterisk-open', 'hash', 'hash-open', 
-  'hash-dot', 'hash-open-dot', 'y-up', 'y-up-open', 'y-down', 'y-down-open', 'y-left', 'y-left-open', 
-  'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 
-  'line-ne-open', 'line-nw', 'line-nw-open']
 TICKS_DIRECTIONS=["","outside", "inside"]
 STANDARD_COLORS=["blue","green","red","cyan","magenta","yellow","black","white", 'lightgray', "limegreen"]
 
@@ -372,28 +344,6 @@ def figure_defaults():
         "xvals":None,\
         "ycols":[],\
         "yvals":None,\
-        "groups":["None"],\
-        "groups_value":"None",\
-        "list_of_groups":[],\
-        "groups_settings":[],\
-        "show_legend":".on",\
-        "legend_font_size":"14",\
-        "markerstyles":ALLOWED_MARKERS,\
-        "marker":"circle",\
-        "markerstyles_cols":["select a column.."],\
-        "markerstyles_col":"select a column..",\
-        "marker_size":STANDARD_SIZES,\
-        "markers":"4",\
-        "markersizes_cols":["select a column.."],\
-        "markersizes_col":"select a column..",\
-        "marker_color":STANDARD_COLORS,\
-        "markerc":"limegreen",\
-        "markerc_write":"",\
-        "markerc_cols":["select a column.."],\
-        "markerc_col":"select a column..",\
-        "marker_alpha":"1",\
-        "markeralpha_col":["select a column.."],\
-        "markeralpha_col_value":"select a column..",\
         "gsea_colors":STANDARD_COLORS,\
         "gseacolor":"limegreen",\
         "gseacolor_cols":["select a column.."],\
