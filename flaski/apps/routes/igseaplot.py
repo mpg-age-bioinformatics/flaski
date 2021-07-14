@@ -94,10 +94,9 @@ def igseaplot(download=None):
                         flash(error_msg,'error')
                         return render_template('/apps/igseaplot.html' , filename=session["filename"], apps=apps, **plot_arguments)
 
-                    columns_select=["markerstyles_cols", "markerc_cols", "markersizes_cols","markeralpha_col",\
-                        "labels_col","gseacolor_cols","gsea_linewidth_cols",]
+                    columns_select=["labels_col","gseacolor_cols","gsea_linewidth_cols",]
                     for parg in columns_select:
-                        if session["plot_arguments"]["markerstyles_cols"] not in cols:
+                        if session["plot_arguments"]["labels_col"] not in cols:
                             session["plot_arguments"][parg]=["select a column.."]+cols
                         
                     session["plot_arguments"]["xcols"]=cols
