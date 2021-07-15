@@ -214,10 +214,8 @@
 
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
                                 <label>Ticks:</label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_left_axis" {% if tick_left_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/> left </label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_right_axis" {% if tick_right_axis=="on" %} checked {% elif tick_right_axis==".on" %} checked {% endif %}/> right </label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_upper_axis" {% if tick_upper_axis=="on" %} checked {% elif tick_upper_axis==".on" %} checked {% endif %}/> upper </label>
-                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_lower_axis" {% if tick_lower_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> lower </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_x_axis" {% if tick_x_axis=="on" %} checked {% elif tick_lower_axis==".on" %} checked {% endif %}/> X </label>
+                                <label><input type="checkbox" style="vertical-align:middle;height:16px;width:16px;" name="tick_y_axis" {% if tick_y_axis=="on" %} checked {% elif tick_left_axis==".on" %} checked {% endif %}/> Y </label>
                             </div>
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
@@ -603,8 +601,11 @@
                         <div class="row arguments" style="width:100%; padding-left:0%; padding-right:0%; white-space:nowrap; overflow-x:auto;display:flex;justify-content:center;text-align:center;">
                             
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">
-                                <label> Draw labels at y-position: 
-                                    <input type="text" name="labels_ypos" value='{{ labels_ypos }}' style="width:70px;height:22px;padding-left:4px;vertical-align:middle;">
+                                <label> Labels at y-position: 
+                                    <input type="text" name="labels_ypos" value='{{ labels_ypos }}' style="width:50px;height:22px;padding-left:4px;vertical-align:middle;">
+                                </label>
+                                <label> with angle: 
+                                    <input type="text" name="label_angle" value='{{ label_angle }}' style="width:50px;height:22px;padding-left:4px;vertical-align:middle;">
                                 </label>
                             </div>
                             <div class="row arg" style="width:310px; padding-left:0%; padding-right:0%; display:flex; justify-content:space-between; text-align:justify;">

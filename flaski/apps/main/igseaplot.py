@@ -29,7 +29,7 @@ def make_figure(df,pa):
 
     # MAIN FIGURE
     pab={}
-    for arg in ["upper_axis","lower_axis","left_axis","right_axis"]:
+    for arg in ["upper_axis","lower_axis","left_axis","right_axis", "tick_x_axis", "tick_y_axis"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -127,9 +127,16 @@ def make_figure(df,pa):
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
 
-    fig.update_xaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
-    fig.update_yaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    if pab["tick_x_axis"] :
+        fig.update_xaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    else:
+        fig.update_xaxes(ticks="", tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
 
+    if pab["tick_y_axis"] :
+        fig.update_yaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    else:
+        fig.update_yaxes(ticks="", tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]))
+    
     if (pa["x_lower_limit"]!="") and (pa["x_upper_limit"]!="") :
         xmin=float(pa["x_lower_limit"])
         xmax=float(pa["x_upper_limit"])
@@ -216,6 +223,7 @@ def make_figure(df,pa):
                     visible=True,
                     standoff=standoff,
                     yshift=yshift,
+                    textangle=float(pa["label_angle"]),
                     opacity=float(pa["labels_alpha"]),
                     arrowwidth=float(pa["labels_line_width"]),
                     arrowcolor=pa["labels_colors_value"],
@@ -381,6 +389,7 @@ def figure_defaults():
         "labels_colors":STANDARD_COLORS,\
         "labels_colors_value":"black",\
         "labels_ypos": "",\
+        "label_angle":"0",\
         "xlabel":"Rank",\
         "xlabel_size":STANDARD_SIZES,\
         "xlabels":"14",\
@@ -392,10 +401,8 @@ def figure_defaults():
         "right_axis":".off",\
         "upper_axis":".off",\
         "lower_axis":".off",\
-        "tick_left_axis":".on" ,\
-        "tick_right_axis":".off",\
-        "tick_upper_axis":".off",\
-        "tick_lower_axis":".on",\
+        "tick_x_axis":".on" ,\
+        "tick_y_axis":".on",\
         "ticks_direction":TICKS_DIRECTIONS,\
         "ticks_direction_value":TICKS_DIRECTIONS[1],\
         "ticks_length":"6.0",\
