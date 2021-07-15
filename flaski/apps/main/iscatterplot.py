@@ -32,7 +32,7 @@ def make_figure(df,pa):
     # the user can decide how the diferent groups should look like 
     # by unchecking the groups_autogenerate check box
     pab={}
-    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis"]:
+    for arg in ["show_legend","upper_axis","lower_axis","left_axis","right_axis", "tick_x_axis", "tick_y_axis"]:
         if pa[arg] in ["off",".off"]:
             pab[arg]=False
         else:
@@ -173,8 +173,18 @@ def make_figure(df,pa):
     fig.update_xaxes(zeroline=False, showline=pab["lower_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["upper_axis"])
     fig.update_yaxes(zeroline=False, showline=pab["left_axis"], linewidth=float(pa["axis_line_width"]), linecolor='black', mirror=pab["right_axis"])
 
-    fig.update_xaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
-    fig.update_yaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    #"tick_left_axis", "tick_right_axis", "tick_upper_axis","tick_lower_axis"
+    # print("\n\n************\n","!"+pa["ticks_direction_value"]+"!",type(pa["ticks_direction_value"]),"\n************\n\n")
+    if pab["tick_x_axis"] :
+        fig.update_xaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    else:
+        fig.update_xaxes(ticks="", tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+
+    if pab["tick_y_axis"] :
+        fig.update_yaxes(ticks=pa["ticks_direction_value"], tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+    else:
+        fig.update_yaxes(ticks="", tickwidth=float(pa["axis_line_width"]), tickcolor='black', ticklen=float(pa["ticks_length"]) )
+
 
     if (pa["x_lower_limit"]!="") and (pa["x_upper_limit"]!="") :
         xmin=float(pa["x_lower_limit"])
@@ -423,10 +433,8 @@ def figure_defaults():
         "right_axis":".on",\
         "upper_axis":".on",\
         "lower_axis":".on",\
-        "tick_left_axis":".on" ,\
-        "tick_right_axis":".off",\
-        "tick_upper_axis":".off",\
-        "tick_lower_axis":".on",\
+        "tick_x_axis":".on" ,\
+        "tick_y_axis":".on",\
         "ticks_direction":TICKS_DIRECTIONS,\
         "ticks_direction_value":TICKS_DIRECTIONS[1],\
         "ticks_length":"6.0",\
