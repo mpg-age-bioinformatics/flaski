@@ -95,6 +95,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         tmp["expression"]=tmp["genes"].apply(lambda x: float( gedic.get(x.upper())  ) )
         tmp["gene_name"]=tmp["genes"].apply(lambda x: namesdic.get(x.upper()) )
         tmp["n_genes"]=len(genes)
+        tmp["n genes"]=len(genes)
         tmp=tmp.sort_values(by=["expression"], ascending=True)
         tmp.reset_index(inplace=True, drop=True)
         frac=plotvalue/len(genes)
@@ -168,7 +169,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
     
         fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
                 color_continuous_scale=color_continuous_scale, \
-                hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
+                hover_name="gene_name", hover_data=["expression", "term value","n genes"],\
                 range_color=[low,high],\
                 title=pa["title"],\
                 width=pa_["width"],\
@@ -180,7 +181,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         if pa["color_continuous_midpoint"]!="":
             fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
                     color_continuous_scale=color_continuous_scale, \
-                    hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
+                    hover_name="gene_name", hover_data=["expression", "term value","n genes"],\
                     title=pa["title"],\
                     color_continuous_midpoint=pa_["color_continuous_midpoint"],
                     width=pa_["width"],\
@@ -189,7 +190,7 @@ def make_figure(david_df, ge_df, pa,checkboxes=CHECKBOXES):
         else:
             fig = px.bar( plotdf, y="term", x=pa["plotvalue"], color="expression", orientation="h",
                     color_continuous_scale=color_continuous_scale, \
-                    hover_name="gene_name", hover_data=["expression", "term value","n_genes"],\
+                    hover_name="gene_name", hover_data=["expression", "term value","n genes"],\
                     title=pa["title"],\
                     range_color=[low,high],\
                     width=pa_["width"],\
