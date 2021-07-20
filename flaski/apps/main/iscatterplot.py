@@ -197,7 +197,7 @@ def make_figure(df,pa):
         fig.update_yaxes(range=[ymin, ymax])
 
     if pa["maxxticks"]!="":
-        fig.update_yaxes(nticks=int(pa["maxxticks"]))
+        fig.update_xaxes(nticks=int(pa["maxxticks"]))
 
     if pa["maxyticks"]!="":
         fig.update_yaxes(nticks=int(pa["maxyticks"]))
