@@ -37,15 +37,17 @@ def make_figure(df,pa):
 
     pa_={}
     if pa["yvals_colors"] != "select a column..":
-        pa_["yvals_colors"]=list( tmp[ tmp.index == pa["yvals_colors"] ].values[0] )
-        tmp=tmp[tmp.index != pa_["yvals_colors"]]
-    else :
-        pa_["yvals_colors"]=None
-
-    if pa["xvals_colors"] != 'select a row..':
-        pa_["xvals_colors"]=df[ pa["xvals_colors"] ].tolist()
+        pa_["xvals_colors"]=df[ pa["yvals_colors"] ].tolist()
+        # pa_["yvals_colors"]=list( df[ df.index == pa["yvals_colors"] ].values[0] )
     else :
         pa_["xvals_colors"]=None
+
+    if pa["xvals_colors"] != 'select a row..':
+        pa_["yvals_colors"]=list( df[ df.index == pa["xvals_colors"] ].values[0] )
+        tmp=tmp[tmp.index != pa_["xvals_colors"]]
+        # pa_["xvals_colors"]=df[ pa["xvals_colors"] ].tolist()
+    else :
+        pa_["yvals_colors"]=None
 
     checkboxes=["row_cluster","col_cluster","robust","xticklabels","yticklabels","annotate"]
 
