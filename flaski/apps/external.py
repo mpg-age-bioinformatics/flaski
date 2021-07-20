@@ -29,3 +29,6 @@
 #         - ~/histogram/route.py:/flaski/flaski/apps/routes/igseaplot.py
 #         - ~/histogram/main.py:/flaski/flaski/apps/main/igseaplot.py
 #         - ~/histogram/external.py:/flaski/flaski/apps/igseaplot.py
+
+EXTERNAL_APPS=[]
+EXT_DEFAULTS_DIC={}
