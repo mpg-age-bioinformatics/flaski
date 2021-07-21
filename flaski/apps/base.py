@@ -1,4 +1,5 @@
-from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot, mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot
+from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
+from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot
 from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
@@ -19,7 +20,8 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"iViolin plot", "id":'iviolinplot_more',"link":'iviolinplot' ,"java":"javascript:ReverseDisplay('iviolinplot_more')", "description":"An interactive violin plot including box and swarm plots."},\
         { "name":"KEGG", "id":'kegg_more',"link":'kegg' ,"java":"javascript:ReverseDisplay('kegg_more')", "description":"A KEGG mapping and plotting app."} ,\
         { "name":"Life Span", "id":'lifespan_more',"link":'lifespan' ,"java":"javascript:ReverseDisplay('lifespan_more')", "description":"A Survival Analysis app."},\
-        { "name":"Circular bars plot", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular bars plot app."} ]
+        { "name":"Circular bars plot", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular bars plot app."},\
+        { "name":"iGSEA plot", "id":'igseaplot_more',"link":'igseaplot' ,"java":"javascript:ReverseDisplay('igseaplot_more')", "description":"An app to customize GSEA plots."} ]
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
 
@@ -46,6 +48,8 @@ from flaski.apps.main.scatterplot import figure_defaults as scatterplot_def
 from flaski.apps.main.tsne import figure_defaults as tsne_def
 from flaski.apps.main.venndiagram import figure_defaults as venndiagram_def
 from flaski.apps.main.violinplot import figure_defaults as violinplot_def
+from flaski.apps.main.igseaplot import figure_defaults as igseaplot_def
+
 
 defaults_dic={"rnaseqlake":dict,\
     "circularbarplots":circularbarplots_def,\
@@ -66,7 +70,8 @@ defaults_dic={"rnaseqlake":dict,\
     "tsne":tsne_def,\
     "venndiagram":venndiagram_def,\
     "violinplot":violinplot_def,\
-    "threeDscatterplot":threeDscatterplot_def
+    "threeDscatterplot":threeDscatterplot_def,\
+    "igseaplot":igseaplot_def
 }
 
 defaults_dic.update(EXT_DEFAULTS_DIC)
