@@ -31,7 +31,9 @@ def check_pipelines(EXC, TAG):
     'riboseq' : ['riboseq', 'samples', 'matching'],\
     'variantCalling' : ['variantCalling', 'samples'],\
     'miRNAseq' : ['miRNAseq', 'samples'],\
-    '16S' : ['16S', 'samples']}
+    '16S' : ['16S', 'samples'],\
+    'GSEA' : ['GSEA', 'samples', 'ExpMatrix', 'GeneSets'],\
+    'motif_enrichment' : ['motif_enrichment', 'samples']}
   # loop over all expected sheets and check if they are present, if not, send email
   for sheet in expected_sheets[TAG]:
     if sheet not in EXC.sheet_names:
@@ -71,7 +73,7 @@ def submission_check(inputfile):
   status=False
   attachment_path=None
 
-  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq', '16S']
+  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq', '16S', 'GSEA', 'motif_enrichment']
 
   filename = secure_filename(inputfile.filename)
   fileread = inputfile.read()
