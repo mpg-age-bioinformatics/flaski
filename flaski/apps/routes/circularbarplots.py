@@ -198,8 +198,8 @@ def circularbarplots(download=None):
             # CALL FIGURE FUNCTION
             fig=make_figure(df,plot_arguments)
 
-            pio.orca.config.executable='/miniconda/bin/orca'
-            pio.orca.config.use_xvfb = True
+            #pio.orca.config.executable='/miniconda/bin/orca'
+            #pio.orca.config.use_xvfb = True
             #pio.orca.config.save()
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}

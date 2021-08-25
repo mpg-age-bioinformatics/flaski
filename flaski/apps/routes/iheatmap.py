@@ -172,8 +172,8 @@ def iheatmap(download=None):
             # CALL FIGURE FUNCTION
             fig, cols_cluster_numbers, index_cluster_numbers, df_=make_figure(df,plot_arguments)
 
-            pio.orca.config.executable='/miniconda/bin/orca'
-            pio.orca.config.use_xvfb = True
+            #pio.orca.config.executable='/miniconda/bin/orca'
+            #pio.orca.config.use_xvfb = True
             #pio.orca.config.save()
             figfile = io.BytesIO()
             mimetypes={"png":'image/png',"pdf":"application/pdf","svg":"image/svg+xml"}
