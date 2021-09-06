@@ -146,7 +146,7 @@ def iscatterplot(download=None):
                         df=df.astype(str)
                         session["df"]=df.to_json()
                         groups=df[[request.form["groups_value"]]].drop_duplicates()
-                        groups=df[request.form["groups_value"]].tolist()
+                        groups=groups[request.form["groups_value"]].tolist()
                         # groups=list(set(groups))
                         # groups.sort()
                         plot_arguments["list_of_groups"]=groups
