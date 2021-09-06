@@ -34,6 +34,8 @@ import datetime
 import io
 import pandas as pd
 
+CURRENTAPP="dashapp"
+
 def handle_error(e):
     err = ''.join(traceback.format_exception(None, e, e.__traceback__))
     err = err.split("\n")
@@ -123,21 +125,17 @@ def get_dataframe(session_id, contents,filename,last_modified):
         return df.to_json()
     return pd.read_json(query_and_serialize_data(session_id,contents,filename,last_modified))
 
-def _validate_access(apps):
+def _validate_access(apps, app):
     @cache.memoize()
-    def check_current_user(apps):
-        # apps=current_user.user_apps
-        print(apps)
-        import sys
-        sys.stdout.flush()
+    def check_current_user(apps,app):
         if "dashapp" not in [ s["link"] for s in apps ] :
             return False
-        reset_info=check_session_app(session,"dashapp",apps)
+        reset_info=check_session_app(session,app,apps)
         if reset_info:
             # flash(reset_info,'error')
             session["app"]="dashapp"
         return True
-    return check_current_user(apps)
+    return check_current_user(apps,app)
 
 controls = [ html.Div([
     dcc.Upload(
@@ -162,6 +160,10 @@ controls = [ html.Div([
     html.H5("Arguments", style={"margin-top":10}), 
     "X multiplier: ", dcc.Input(id='multiplier', value=1, type='text') ]
 
+side_bar=[ dbc.Card(controls, body=True),
+            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4} )
+         ]
+                        
 # Define Layout
 dashapp.layout = dbc.Container(
     fluid=True,
@@ -172,10 +174,7 @@ dashapp.layout = dbc.Container(
         html.Hr(),
         dbc.Row(
             [
-                dbc.Col( [ dbc.Card(controls, body=True),
-                html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4} )]  ,  
-                md=3, style={"height": "100%",'overflow': 'scroll'}),
-                
+                dbc.Col( id="side_bar", md=3, style={"height": "100%",'overflow': 'scroll'} ),
                 dbc.Col( id='my-output', md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
              style={"height": "87vh"}),
@@ -186,18 +185,13 @@ dashapp.layout = dbc.Container(
 )
 
 @dashapp.callback( Output('app_access', 'children'),
+                   Output('side_bar', 'children'),
                    Input('session-id', 'data') )
-def validate_access(session_id):
-    apps=current_user.user_apps
-    # print(apps)
-    # import sys
-    # sys.stdout.flush()
-    apps={}
-    print(apps)
-    import sys
-    sys.stdout.flush()
-    if not _validate_access(apps):
-        return dcc.Location(pathname="/index", id="index")
+def get_side_bar(session_id):
+    if not _validate_access(current_user.user_apps,CURRENTAPP):
+        return dcc.Location(pathname="/index", id="index"), None
+    else:
+        return None, side_bar
 
 ## all callback elements with `State` will be updated only once submit is pressed
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
@@ -209,13 +203,11 @@ def validate_access(session_id):
     State("opt-xcol", "value"),
     State(component_id='multiplier', component_property='value'),
     State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('app_access','value') )
-def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, last_modified, app_access):
-    # print(session,session["user_id"])
-    # import sys
-    # sys.stdout.flush()
-    # print(current_user.user_apps)
+    State('upload-data', 'last_modified')
+)
+def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, last_modified):
+    if not _validate_access(current_user.user_apps,CURRENTAPP):
+        return None
     if contents is not None:
         fig=make_output(session_id,multiplier,contents,filename,last_modified,x_col)
         return fig
@@ -226,9 +218,11 @@ def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, l
     Input('session-id', 'data'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('app_access','value') )
-def update_xcol(session_id,contents,filename,last_modified,app_access):
+    State('upload-data', 'last_modified')
+    )
+def update_xcol(session_id,contents,filename,last_modified):
+    if not _validate_access(current_user.user_apps,CURRENTAPP):
+        return None
     if contents is not None:
         df=get_dataframe(session_id,contents,filename,last_modified)
         cols=df.columns.tolist()
@@ -242,9 +236,10 @@ def update_xcol(session_id,contents,filename,last_modified,app_access):
 ## update x-col value once options are a available
 @dashapp.callback(
     dash.dependencies.Output('opt-xcol', 'value'),
-    [dash.dependencies.Input('opt-xcol', 'options')],
-    State('app_access','value') )
-def set_xcol(available_options,app_access):
+    [dash.dependencies.Input('opt-xcol', 'options')] )
+def set_xcol(available_options):
+    if not _validate_access(current_user.user_apps,CURRENTAPP):
+        return None
     if available_options:
         return available_options[0]['value']
 
