@@ -107,6 +107,12 @@ def _protect_dashviews(dashapp):
         if view_func.startswith(dashapp.config.url_base_pathname):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])
+    # print(session,session["user_id"])
+    # import sys
+    # sys.stdout.flush()
+    # print(current_user)
+    # check if user session[] has access to Apps otherwise redict 
+    # dcc.Location(pathname="/index", id="index")
 
 _protect_dashviews(dashapp)
 
@@ -116,10 +122,6 @@ def get_dataframe(session_id, contents,filename,last_modified):
         df=parse_table(contents, filename, last_modified)
         return df.to_json()
     return pd.read_json(query_and_serialize_data(session_id,contents,filename,last_modified))
-
-
-# app.scripts.config.serve_locally = False
-# dcc._js_dist[0]['external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
 
 controls = [ html.Div([
     dcc.Upload(
@@ -178,11 +180,12 @@ dashapp.layout = dbc.Container(
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified') )
 def update_output(session_id,n_clicks,contents, x_col, multiplier,filename,last_modified):
+    # print(session,session["user_id"])
+    # import sys
+    # sys.stdout.flush()
+    # print(current_user)
     if contents is not None:
         fig=make_output(session_id,multiplier,contents,filename,last_modified,x_col)
-        print(session,session["user_id"])
-        import sys
-        sys.stdout.flush()
         return fig
 
 ## update x-col options after reading the input file
