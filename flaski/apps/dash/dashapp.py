@@ -24,6 +24,74 @@ cache = Cache(dashapp.server, config={
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
 })
 
+PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
+# navbar = dbc.NavbarSimple(
+#     [
+#         html.A(
+#             # Use row and col to control vertical alignment of logo / brand
+#             dbc.Row(
+#                 [
+#                     dbc.Col(html.Img(src=dashapp.get_asset_url('dog-solid.png'), height="30px")),
+#                     dbc.Col(dbc.NavbarBrand("Navbar", className="ml-2")),
+#                 ],
+#                 align="center",
+#                 no_gutters=True,
+#             ),
+#             href="/index",
+#         ),
+#         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+#         dbc.DropdownMenu(
+#             children=[
+#                 dbc.DropdownMenuItem("Page 1", href="#"),
+#                 dbc.DropdownMenuItem("Page 2", href="#"),
+#                 dbc.DropdownMenuItem("Page 3", href="#"),
+#             ],
+#             nav=True,
+#             in_navbar=True,
+#             label="Apps",
+#         ),
+#         # dbc.Collapse(
+#         #     search_bar, id="navbar-collapse", navbar=True, is_open=False
+#         # ),
+
+#     ],
+#     color="primary",
+#     dark=True,
+#     style={ "margin-bottom": 5} 
+# )
+
+navbar = dbc.NavbarSimple(
+    children=[
+        html.A(dbc.Row(
+                [
+                    dbc.Col(html.Img(src=PLOTLY_LOGO, height="30px")),
+                    dbc.Col(dbc.NavbarBrand("Faski.Dash", className="ml-2")),
+                ],
+                align="center",
+                no_gutters=True,
+                style={'text-align':'left'}
+            ),
+            href="https://plotly.com",
+        ),
+        # dbc.NavItem(dbc.NavLink("Page 1", href="#")),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("More pages", href="#"),
+                dbc.DropdownMenuItem("Page 2", href="#"),
+                dbc.DropdownMenuItem("Page 3", href="#"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Apps",
+        ),
+    ],
+    # brand="Flaski.Dash",
+    # brand_href="/index",
+    color="dark",
+    dark=True,
+    style={ "margin-bottom": 5, 'text-align':'left'}
+)
+
 controls = [ html.Div([
     dcc.Upload(
         id='upload-data',
@@ -57,8 +125,9 @@ dashapp.layout = dbc.Container(
     children=[
         html.Div(id="app_access"),
         dcc.Store(data=str(uuid.uuid4()), id='session-id'),
-        html.H2("A dash based web application for scatterplots.", style={"margin-top": 10}),
-        html.Hr(),
+        # html.H2("A dash based web application for scatterplots.", style={"margin-top": 10}),
+        navbar, 
+        # html.Hr(),
         dbc.Row(
             [
                 dbc.Col( id="side_bar", md=3, style={"height": "100%",'overflow': 'scroll'} ),
