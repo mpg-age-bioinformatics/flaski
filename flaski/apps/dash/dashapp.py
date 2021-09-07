@@ -1,6 +1,5 @@
 from flaski import app
 from flask_login import current_user
-from flaski.email import send_exception_email
 from flask_caching import Cache
 import dash
 from dash.dependencies import Input, Output, State
@@ -8,50 +7,16 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access
+from ._dashapp import make_figure
 import uuid
 
-import pandas as pd
+# import pandas as pd
 import os
-import plotly.graph_objects as go
+
 
 CURRENTAPP="dashapp"
 
-####### _plot_file.py #######
-
-def make_figure(df):
-    fig = go.Figure( )
-    fig.update_layout(  width=600, height=600)
-    fig.add_trace(go.Scatter(x=df["x"].tolist(), y=df["y"].tolist() ))
-    fig.update_layout(
-            title={
-                'text': "Demo plotly title",
-                'xanchor': 'left',
-                'yanchor': 'top' ,
-                "font": {"size": 25, "color":"black"  } } )
-    return fig
-
-# standard make output function
-def make_output(session_id,multiplier,contents,filename,last_modified,x_col):
-    try:
-        # df=get_dataframe(session_id,contents,filename,last_modified)
-        df=parse_table(contents,filename,last_modified,session_id,cache)
-
-        # demo purspose for multipliter value
-        y=df.columns.tolist()[1]
-        df["x"]=df[x_col].astype(float)
-        df["y"]=df[y].astype(float)
-        df["x"]= df["x"]*float(multiplier)
-
-        fig=make_figure(df)
-        fig=dcc.Graph(figure=fig)
-
-    except Exception as e:
-        fig=handle_dash_exception(e,current_user,CURRENTAPP)
-    return fig
-
-####### END OF _plot_file.py #######
-
-dashapp = dash.Dash('dashapp',url_base_pathname='/dashapp/', server=app, external_stylesheets=[dbc.themes.BOOTSTRAP])
+dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , server=app, external_stylesheets=[dbc.themes.BOOTSTRAP])
 protect_dashviews(dashapp)
 
 cache = Cache(dashapp.server, config={
@@ -106,15 +71,6 @@ dashapp.layout = dbc.Container(
     style={"margin": "auto", "height": "100vh"},
 )
 
-@dashapp.callback( Output('app_access', 'children'),
-                   Output('side_bar', 'children'),
-                   Input('session-id', 'data') )
-def get_side_bar(session_id):
-    if not validate_user_access(current_user,CURRENTAPP,cache):
-        return dcc.Location(pathname="/index", id="index"), None
-    else:
-        return None, side_bar
-
 ## all callback elements with `State` will be updated only once submit is pressed
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
 @dashapp.callback(
@@ -131,7 +87,22 @@ def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, l
     if not validate_user_access(current_user,CURRENTAPP,cache):
         return None
     if contents is not None:
-        fig=make_output(session_id,multiplier,contents,filename,last_modified,x_col)
+        try:
+            # df=get_dataframe(session_id,contents,filename,last_modified)
+            df=parse_table(contents,filename,last_modified,session_id,cache)
+
+            # demo purspose for multipliter value
+            y=df.columns.tolist()[1]
+            df["x"]=df[x_col].astype(float)
+            df["y"]=df[y].astype(float)
+            df["x"]= df["x"]*float(multiplier)
+
+            fig=make_figure(df)
+            fig=dcc.Graph(figure=fig)
+
+        except Exception as e:
+            fig=handle_dash_exception(e,current_user,CURRENTAPP)
+
         return fig
 
 ## update x-col options after reading the input file
@@ -165,6 +136,17 @@ def set_xcol(available_options):
         return None
     if available_options:
         return available_options[0]['value']
+
+# this call back prevents the side bar from being shortly 
+# show / exposed to users without access to this App
+@dashapp.callback( Output('app_access', 'children'),
+                   Output('side_bar', 'children'),
+                   Input('session-id', 'data') )
+def get_side_bar(session_id):
+    if not validate_user_access(current_user,CURRENTAPP,cache):
+        return dcc.Location(pathname="/index", id="index"), None
+    else:
+        return None, side_bar
 
 # if __name__ == '__main__':
 #     app.run_server(host='0.0.0.0', debug=True, port=8050)
