@@ -73,11 +73,10 @@ def make_figure(df,pa):
 
             if pa_["markerc_col"] != "select a column..":
                 c=[ i for i in tmp[[pa_["markerc_col"]]].dropna()[pa_["markerc_col"]].tolist()][0]
-            elif str(pa["markerc_write"]) != "":
+            elif str(pa_["markerc_write"]) != "":
                 c=pa_["markerc_write"]
             else:
                 c=pa_["markerc"]
-
 
             if pa_["edgecolor_col"] != "select a column..":
                 edgecolor=[ i for i in tmp[[pa_["edgecolor_col"]]].dropna()[pa_["edgecolor_col"]].tolist()][0]

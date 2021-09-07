@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.models import User, UserLogging
 from flaski.email import send_exception_email
-from flaski.routines import check_session_app, handle_exception, read_request, fuzzy_search
+from flaski.routines import check_session_app, fuzzy_search
 from flask_caching import Cache
 
 import dash
@@ -26,43 +26,14 @@ import time
 import os
 import plotly.graph_objects as go
 
-import traceback
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-import base64
-import datetime
-import io
+
 import pandas as pd
 
+from ._utils import handle_dash_exception, parse_table, protect_dashviews
+
 CURRENTAPP="dashapp"
-
-def handle_error(e):
-    err = ''.join(traceback.format_exception(None, e, e.__traceback__))
-    err = err.split("\n")
-    card_text= [ html.H4("Exception") ] 
-    for s in err:
-        s_=str(s)
-        i=0
-        if len(s_) > 0:
-            while s_[0] == " ":
-                i=i+1
-                s_=s_[i:]
-            i=i*10
-            card_text.append(html.P(s, style={"margin-top": 0, "margin-bottom": 0, "margin-left": i}))
-    fig=dbc.Card( card_text, body=True, color="gray", inverse=True) 
-    return fig
-
-def parse_table(contents,filename,last_modified):
-    content_type, content_string = contents.split(',')
-    decoded = base64.b64decode(content_string)
-    if 'csv' in filename:
-        # Assume that the user uploaded a CSV file
-        df = pd.read_csv(
-            io.StringIO(decoded.decode('utf-8')))
-    elif 'xls' in filename:
-        # Assume that the user uploaded an excel file
-        df = pd.read_excel(io.BytesIO(decoded)) 
-    return df
 
 def make_figure(df):
     fig = go.Figure( )
@@ -81,7 +52,8 @@ def make_figure(df):
 # standard make output function
 def make_output(session_id,multiplier,contents,filename,last_modified,x_col):
     try:
-        df=get_dataframe(session_id,contents,filename,last_modified)
+        # df=get_dataframe(session_id,contents,filename,last_modified)
+        df=parse_table(contents,filename,last_modified,session_id,cache)
 
         # demo purspose for multipliter value
         y=df.columns.tolist()[1]
@@ -93,10 +65,11 @@ def make_output(session_id,multiplier,contents,filename,last_modified,x_col):
         fig=dcc.Graph(figure=fig)
 
     except Exception as e:
-        fig=handle_error(e)
+        fig=handle_dash_exception(e)
     return fig
 
 dashapp = dash.Dash('dashapp',url_base_pathname='/dashapp/', server=app, external_stylesheets=[dbc.themes.BOOTSTRAP])
+protect_dashviews(dashapp)
 
 cache = Cache(dashapp.server, config={
     'CACHE_TYPE': 'redis',
@@ -104,11 +77,7 @@ cache = Cache(dashapp.server, config={
     # 'CACHE_REDIS_PASSWORD': os.environ.get('REDIS_PASSWORD', 'REDIS_PASSWORD')
 })
 
-def _protect_dashviews(dashapp):
-    for view_func in dashapp.server.view_functions:
-        if view_func.startswith(dashapp.config.url_base_pathname):
-            dashapp.server.view_functions[view_func] = login_required(
-                dashapp.server.view_functions[view_func])
+
     # print(session,session["user_id"])
     # import sys
     # sys.stdout.flush()
@@ -116,14 +85,17 @@ def _protect_dashviews(dashapp):
     # check if user session[] has access to Apps otherwise redict 
     # dcc.Location(pathname="/index", id="index")
 
-_protect_dashviews(dashapp)
 
-def get_dataframe(session_id, contents,filename,last_modified):
-    @cache.memoize()
-    def query_and_serialize_data(session_id, contents,filename,last_modified):
-        df=parse_table(contents, filename, last_modified)
-        return df.to_json()
-    return pd.read_json(query_and_serialize_data(session_id,contents,filename,last_modified))
+# def get_dataframe(session_id, contents,filename,last_modified, cache):
+#     @cache.memoize()
+#     def 
+#     df=parse_table(contents,filename,last_modified,session_id)
+#     return df
+
+    # def query_and_serialize_data(session_id, contents,filename,last_modified):
+    #     df=parse_table(contents, filename, last_modified)
+    #     return df.to_json()
+    # return pd.read_json(query_and_serialize_data(session_id,contents,filename,last_modified))
 
 def _validate_access(apps, app):
     @cache.memoize()
@@ -224,7 +196,8 @@ def update_xcol(session_id,contents,filename,last_modified):
     if not _validate_access(current_user.user_apps,CURRENTAPP):
         return None
     if contents is not None:
-        df=get_dataframe(session_id,contents,filename,last_modified)
+        # df=get_dataframe(session_id,contents,filename,last_modified)
+        df=parse_table(contents,filename,last_modified,session_id,cache)
         cols=df.columns.tolist()
         opts=[]
         for c in cols:
