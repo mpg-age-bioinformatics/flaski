@@ -1,39 +1,22 @@
-from flask import render_template, Flask, Response, request, url_for, redirect, session, send_file, flash, jsonify
 from flaski import app
-from werkzeug.utils import secure_filename
-from flask_session import Session
-from flaski.forms import LoginForm
-from flask_login import current_user, login_user, logout_user, login_required
-from datetime import datetime
-from flaski import db
-from werkzeug.urls import url_parse
-from flaski.models import User, UserLogging
+from flask_login import current_user
 from flaski.email import send_exception_email
-from flaski.routines import check_session_app, fuzzy_search
 from flask_caching import Cache
-
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access
 import uuid
 
-import flask
 import pandas as pd
-import time
 import os
 import plotly.graph_objects as go
 
-import dash_html_components as html
-import dash_bootstrap_components as dbc
-
-import pandas as pd
-
-from ._utils import handle_dash_exception, parse_table, protect_dashviews
-
 CURRENTAPP="dashapp"
+
+####### _plot_file.py #######
 
 def make_figure(df):
     fig = go.Figure( )
@@ -46,8 +29,6 @@ def make_figure(df):
                 'yanchor': 'top' ,
                 "font": {"size": 25, "color":"black"  } } )
     return fig
-
-###### END OF UTILS ######
 
 # standard make output function
 def make_output(session_id,multiplier,contents,filename,last_modified,x_col):
@@ -65,8 +46,10 @@ def make_output(session_id,multiplier,contents,filename,last_modified,x_col):
         fig=dcc.Graph(figure=fig)
 
     except Exception as e:
-        fig=handle_dash_exception(e)
+        fig=handle_dash_exception(e,current_user,CURRENTAPP)
     return fig
+
+####### END OF _plot_file.py #######
 
 dashapp = dash.Dash('dashapp',url_base_pathname='/dashapp/', server=app, external_stylesheets=[dbc.themes.BOOTSTRAP])
 protect_dashviews(dashapp)
@@ -74,40 +57,7 @@ protect_dashviews(dashapp)
 cache = Cache(dashapp.server, config={
     'CACHE_TYPE': 'redis',
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
-    # 'CACHE_REDIS_PASSWORD': os.environ.get('REDIS_PASSWORD', 'REDIS_PASSWORD')
 })
-
-
-    # print(session,session["user_id"])
-    # import sys
-    # sys.stdout.flush()
-    # print(current_user)
-    # check if user session[] has access to Apps otherwise redict 
-    # dcc.Location(pathname="/index", id="index")
-
-
-# def get_dataframe(session_id, contents,filename,last_modified, cache):
-#     @cache.memoize()
-#     def 
-#     df=parse_table(contents,filename,last_modified,session_id)
-#     return df
-
-    # def query_and_serialize_data(session_id, contents,filename,last_modified):
-    #     df=parse_table(contents, filename, last_modified)
-    #     return df.to_json()
-    # return pd.read_json(query_and_serialize_data(session_id,contents,filename,last_modified))
-
-def _validate_access(apps, app):
-    @cache.memoize()
-    def check_current_user(apps,app):
-        if "dashapp" not in [ s["link"] for s in apps ] :
-            return False
-        reset_info=check_session_app(session,app,apps)
-        if reset_info:
-            # flash(reset_info,'error')
-            session["app"]="dashapp"
-        return True
-    return check_current_user(apps,app)
 
 controls = [ html.Div([
     dcc.Upload(
@@ -160,7 +110,7 @@ dashapp.layout = dbc.Container(
                    Output('side_bar', 'children'),
                    Input('session-id', 'data') )
 def get_side_bar(session_id):
-    if not _validate_access(current_user.user_apps,CURRENTAPP):
+    if not validate_user_access(current_user,CURRENTAPP,cache):
         return dcc.Location(pathname="/index", id="index"), None
     else:
         return None, side_bar
@@ -178,7 +128,7 @@ def get_side_bar(session_id):
     State('upload-data', 'last_modified')
 )
 def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, last_modified):
-    if not _validate_access(current_user.user_apps,CURRENTAPP):
+    if not validate_user_access(current_user,CURRENTAPP,cache):
         return None
     if contents is not None:
         fig=make_output(session_id,multiplier,contents,filename,last_modified,x_col)
@@ -193,7 +143,7 @@ def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, l
     State('upload-data', 'last_modified')
     )
 def update_xcol(session_id,contents,filename,last_modified):
-    if not _validate_access(current_user.user_apps,CURRENTAPP):
+    if not validate_user_access(current_user,CURRENTAPP,cache):
         return None
     if contents is not None:
         # df=get_dataframe(session_id,contents,filename,last_modified)
@@ -211,7 +161,7 @@ def update_xcol(session_id,contents,filename,last_modified):
     dash.dependencies.Output('opt-xcol', 'value'),
     [dash.dependencies.Input('opt-xcol', 'options')] )
 def set_xcol(available_options):
-    if not _validate_access(current_user.user_apps,CURRENTAPP):
+    if not validate_user_access(current_user,CURRENTAPP,cache):
         return None
     if available_options:
         return available_options[0]['value']
