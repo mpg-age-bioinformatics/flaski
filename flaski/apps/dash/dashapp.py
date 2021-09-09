@@ -71,7 +71,7 @@ navbar = dbc.Navbar(
     fluid=True,
     style={"margin-left":0,"margin-right":0, 'textAlign': 'center'}
     ),
-    color="dark",
+    color="#5474d8",
     dark=True,
     # className="mb-5",
     style={"margin-bottom":10, "margin-left":0,"margin-right":0}
