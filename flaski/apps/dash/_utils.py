@@ -66,56 +66,63 @@ def protect_dashviews(dashapp):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])
 
-def make_navbar(app_name):
-    image_filename = '/flaski/flaski/static/dog-solid-white.png' # replace with your own image
-    encoded_image = base64.b64encode(open(image_filename, 'rb').read())
+def make_navbar(app_name, current_user, cache):
+    @cache.memoize(300)
+    def _make_navbar(app_name, current_user):
+        image_filename = '/flaski/flaski/static/dog-solid-white.png' # replace with your own image
+        encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
-    dropdown=dbc.DropdownMenu(
-                children=[
-                    dbc.DropdownMenuItem("Page 2", href="#"),
-                    dbc.DropdownMenuItem("Page 3", href="#"),
-                ],
-                nav=True,
-                in_navbar=True,
-                label="Apps",
-                right=True
-            )
+        apps=current_user.user_apps
 
-    inner_brand_col=html.A(
-                    dbc.Row(
-                        [                         
-                            html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}),
-                            dbc.NavbarBrand("Flaski.Dash  |  %s" %str(app_name), className="ml-2"),
-                        ],
-                        align="center",
-                        no_gutters=True,
-                    ),
-                    href="/index",
+        dropdown_items=[]
+        for a in apps :
+            i=dbc.DropdownMenuItem(a['name'], href="/%s" %str(a['link']))
+            dropdown_items.append(i)
+
+        dropdown=dbc.DropdownMenu(
+                    children=dropdown_items,
+                    nav=True,
+                    in_navbar=True,
+                    label="Apps",
+                    right=True
                 )
 
-    brand=dbc.Col(inner_brand_col, sm=3, md=3, style={ 'textAlign': 'center'})
-    brand_=dbc.Col(dbc.NavbarBrand(app_name, href="#"), sm=3, md=6, style={ 'textAlign': 'left'})
+        inner_brand_col=html.A(
+                        dbc.Row(
+                            [                         
+                                html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}),
+                                dbc.NavbarBrand("Flaski.Dash  |  %s" %str(app_name), className="ml-2"),
+                            ],
+                            align="center",
+                            no_gutters=True,
+                        ),
+                        href="/index",
+                    )
 
-    navbar = dbc.Navbar(
-        dbc.Container(
-            [
-                brand,
-                # brand_,
-                dbc.NavbarToggler(id="navbar-toggler2"),
-                dbc.Collapse(
-                    dbc.Nav(
-                        [dropdown], className="ml-auto", navbar=True
+        brand=dbc.Col(inner_brand_col, sm=3, md=3, style={ 'textAlign': 'center'})
+        brand_=dbc.Col(dbc.NavbarBrand(app_name, href="#"), sm=3, md=6, style={ 'textAlign': 'left'})
+
+        navbar = dbc.Navbar(
+            dbc.Container(
+                [
+                    brand,
+                    # brand_,
+                    dbc.NavbarToggler(id="navbar-toggler2"),
+                    dbc.Collapse(
+                        dbc.Nav(
+                            [dropdown], className="ml-auto", navbar=True
+                        ),
+                        id="navbar-collapse2",
+                        navbar=True,
                     ),
-                    id="navbar-collapse2",
-                    navbar=True,
-                ),
-            ], 
-        fluid=True,
-        style={"margin-left":0,"margin-right":0, 'textAlign': 'center'}
-        ),
-        color="#5474d8",
-        dark=True,
-        # className="mb-5",
-        style={"margin-bottom":10, "margin-left":0,"margin-right":0}
-    )
-    return navbar
+                ], 
+            fluid=True,
+            style={"margin-left":0,"margin-right":0, 'textAlign': 'center'}
+            ),
+            color="#5474d8",
+            dark=True,
+            # className="mb-5",
+            style={"margin-bottom":10, "margin-left":0,"margin-right":0}
+        )
+        return navbar
+    return _make_navbar(app_name, current_user)

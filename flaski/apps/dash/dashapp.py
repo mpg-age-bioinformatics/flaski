@@ -50,9 +50,9 @@ controls = [ html.Div([
 side_bar=[ dbc.Card(controls, body=True),
             html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4} )
          ]
-                        
+
 # Define Layout
-dashapp.layout = html.Div( [ make_navbar(navbar_title), dbc.Container(
+dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     fluid=True,
     children=[
         html.Div(id="app_access"),
@@ -143,12 +143,14 @@ def set_xcol(available_options):
 # show / exposed to users without access to this App
 @dashapp.callback( Output('app_access', 'children'),
                    Output('side_bar', 'children'),
+                   Output('navbar','children'),
                    Input('session-id', 'data') )
 def get_side_bar(session_id):
     if not validate_user_access(current_user,CURRENTAPP,cache):
-        return dcc.Location(pathname="/index", id="index"), None
+        return dcc.Location(pathname="/index", id="index"), None, None
     else:
-        return None, side_bar
+        navbar=make_navbar(navbar_title, current_user,cache)
+        return None, side_bar, navbar
 
 # if __name__ == '__main__':
 #     app.run_server(host='0.0.0.0', debug=True, port=8050)
