@@ -12,7 +12,7 @@ import uuid
 
 # import pandas as pd
 import os
-
+import base64
 
 CURRENTAPP="dashapp"
 
@@ -24,73 +24,59 @@ cache = Cache(dashapp.server, config={
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
 })
 
-PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
-# navbar = dbc.NavbarSimple(
-#     [
-#         html.A(
-#             # Use row and col to control vertical alignment of logo / brand
-#             dbc.Row(
-#                 [
-#                     dbc.Col(html.Img(src=dashapp.get_asset_url('dog-solid.png'), height="30px")),
-#                     dbc.Col(dbc.NavbarBrand("Navbar", className="ml-2")),
-#                 ],
-#                 align="center",
-#                 no_gutters=True,
-#             ),
-#             href="/index",
-#         ),
-#         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-#         dbc.DropdownMenu(
-#             children=[
-#                 dbc.DropdownMenuItem("Page 1", href="#"),
-#                 dbc.DropdownMenuItem("Page 2", href="#"),
-#                 dbc.DropdownMenuItem("Page 3", href="#"),
-#             ],
-#             nav=True,
-#             in_navbar=True,
-#             label="Apps",
-#         ),
-#         # dbc.Collapse(
-#         #     search_bar, id="navbar-collapse", navbar=True, is_open=False
-#         # ),
 
-#     ],
-#     color="primary",
-#     dark=True,
-#     style={ "margin-bottom": 5} 
-# )
+image_filename = os.getcwd()+'/flaski/static/dog-solid-white.png' # replace with your own image
+encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
-navbar = dbc.NavbarSimple(
-    children=[
-        html.A(dbc.Row(
-                [
-                    dbc.Col(html.Img(src=PLOTLY_LOGO, height="30px")),
-                    dbc.Col(dbc.NavbarBrand("Faski.Dash", className="ml-2")),
-                ],
-                align="center",
-                no_gutters=True,
-                style={'text-align':'left'}
-            ),
-            href="https://plotly.com",
-        ),
-        # dbc.NavItem(dbc.NavLink("Page 1", href="#")),
-        dbc.DropdownMenu(
+dropdown=dbc.DropdownMenu(
             children=[
-                dbc.DropdownMenuItem("More pages", href="#"),
                 dbc.DropdownMenuItem("Page 2", href="#"),
                 dbc.DropdownMenuItem("Page 3", href="#"),
             ],
             nav=True,
             in_navbar=True,
             label="Apps",
-        ),
-    ],
-    # brand="Flaski.Dash",
-    # brand_href="/index",
+            right=True
+        )
+
+inner_brand_col=html.A(
+                dbc.Row(
+                    [                         
+                        html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}),
+                        dbc.NavbarBrand("Flaski.Dash  |  Demo App", className="ml-2"),
+                    ],
+                    align="center",
+                    no_gutters=True,
+                ),
+                href="/index",
+            )
+
+brand=dbc.Col(inner_brand_col, sm=3, md=3, style={ 'textAlign': 'center'})
+brand_=dbc.Col(dbc.NavbarBrand("Demo App", href="#"), sm=3, md=6, style={ 'textAlign': 'left'})
+
+navbar = dbc.Navbar(
+    dbc.Container(
+        [
+            brand,
+            # brand_,
+            dbc.NavbarToggler(id="navbar-toggler2"),
+            dbc.Collapse(
+                dbc.Nav(
+                    [dropdown], className="ml-auto", navbar=True
+                ),
+                id="navbar-collapse2",
+                navbar=True,
+            ),
+        ], 
+    fluid=True,
+    style={"margin-left":0,"margin-right":0, 'textAlign': 'center'}
+    ),
     color="dark",
     dark=True,
-    style={ "margin-bottom": 5, 'text-align':'left'}
+    # className="mb-5",
+    style={"margin-bottom":10, "margin-left":0,"margin-right":0}
 )
+# )
 
 controls = [ html.Div([
     dcc.Upload(
@@ -120,25 +106,26 @@ side_bar=[ dbc.Card(controls, body=True),
          ]
                         
 # Define Layout
-dashapp.layout = dbc.Container(
+dashapp.layout = html.Div( [ navbar, dbc.Container(
     fluid=True,
     children=[
         html.Div(id="app_access"),
         dcc.Store(data=str(uuid.uuid4()), id='session-id'),
-        # html.H2("A dash based web application for scatterplots.", style={"margin-top": 10}),
-        navbar, 
-        # html.Hr(),
         dbc.Row(
             [
                 dbc.Col( id="side_bar", md=3, style={"height": "100%",'overflow': 'scroll'} ),
                 dbc.Col( id='my-output', md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
              style={"height": "87vh"}),
-        html.Hr( style={"margin-top": 5, "margin-bottom": 5 } ),
-        dbc.Row( html.Footer("Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing", style={"margin-top": 5, "margin-bottom": 5, "margin-left": "20px"}) )
-    ],
-    style={"margin": "auto", "height": "100vh"},
-)
+    ] ),
+    html.Hr( style={"margin-top": 5, "margin-bottom": 5 } ),
+    dbc.Row( 
+        html.Footer( html.A("Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515", style={"color":"#35443f"},href="/"), 
+        style={"margin-top": 5, "margin-bottom": 5, "margin-left": "20px"},
+        ),
+        style={"justify-content":"center"}
+        )
+]) 
 
 ## all callback elements with `State` will be updated only once submit is pressed
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
