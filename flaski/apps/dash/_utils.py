@@ -66,17 +66,26 @@ def protect_dashviews(dashapp):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])
 
-def make_navbar(app_name, current_user, cache):
-    @cache.memoize(300)
+def make_navbar(app_name, current_user):
     def _make_navbar(app_name, current_user):
         image_filename = '/flaski/flaski/static/dog-solid-white.png' # replace with your own image
         encoded_image = base64.b64encode(open(image_filename, 'rb').read())
+
+        logout_link=html.A("Logout", style={"align":"center", "color":"#acbae8"},href="/logout")
+
+        separator=html.A("|", style={"font-size":"25px",
+        "margin-left":10,
+        "margin-right":14,  
+        "margin-bottom":4,
+        "margin-top":0,
+        "align":"center", 
+        "color":"#acbae8"})
 
         apps=current_user.user_apps
 
         dropdown_items=[]
         for a in apps :
-            i=dbc.DropdownMenuItem(a['name'], href="/%s" %str(a['link']))
+            i=dbc.DropdownMenuItem(a['name'], href="/%s" %str(a['link']), external_link=True)
             dropdown_items.append(i)
 
         dropdown=dbc.DropdownMenu(
@@ -110,7 +119,8 @@ def make_navbar(app_name, current_user, cache):
                     dbc.NavbarToggler(id="navbar-toggler2"),
                     dbc.Collapse(
                         dbc.Nav(
-                            [dropdown], className="ml-auto", navbar=True
+                            [dbc.Row([dropdown, separator, logout_link],align="center")], 
+                            className="ml-auto", navbar=True
                         ),
                         id="navbar-collapse2",
                         navbar=True,
@@ -126,3 +136,16 @@ def make_navbar(app_name, current_user, cache):
         )
         return navbar
     return _make_navbar(app_name, current_user)
+
+def make_footer():
+    footer=[ html.Hr( style={"margin-top": 5, "margin-bottom": 5 } ),
+    dbc.Row( 
+        html.Footer( html.A("Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515", 
+            style={"color":"#35443f"},
+            href="https://github.com/mpg-age-bioinformatics/flaski#citing"), 
+        style={"margin-top": 5, "margin-bottom": 5, "margin-left": "20px"},
+        ),
+        style={"justify-content":"center"}
+        )
+    ]
+    return footer

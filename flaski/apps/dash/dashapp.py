@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer
 from ._dashapp import make_figure
 import uuid
 
@@ -63,15 +63,9 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
                 dbc.Col( id='my-output', md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
              style={"height": "87vh"}),
-    ] ),
-    html.Hr( style={"margin-top": 5, "margin-bottom": 5 } ),
-    dbc.Row( 
-        html.Footer( html.A("Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515", style={"color":"#35443f"},href="/"), 
-        style={"margin-top": 5, "margin-bottom": 5, "margin-left": "20px"},
-        ),
-        style={"justify-content":"center"}
-        )
-]) 
+    ] ) 
+    ] + make_footer()
+)
 
 ## all callback elements with `State` will be updated only once submit is pressed
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
@@ -149,7 +143,7 @@ def get_side_bar(session_id):
     if not validate_user_access(current_user,CURRENTAPP,cache):
         return dcc.Location(pathname="/index", id="index"), None, None
     else:
-        navbar=make_navbar(navbar_title, current_user,cache)
+        navbar=make_navbar(navbar_title, current_user)
         return None, side_bar, navbar
 
 # if __name__ == '__main__':
