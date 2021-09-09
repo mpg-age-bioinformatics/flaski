@@ -65,3 +65,57 @@ def protect_dashviews(dashapp):
         if view_func.startswith(dashapp.config.url_base_pathname):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])
+
+def make_navbar(app_name):
+    image_filename = '/flaski/flaski/static/dog-solid-white.png' # replace with your own image
+    encoded_image = base64.b64encode(open(image_filename, 'rb').read())
+
+    dropdown=dbc.DropdownMenu(
+                children=[
+                    dbc.DropdownMenuItem("Page 2", href="#"),
+                    dbc.DropdownMenuItem("Page 3", href="#"),
+                ],
+                nav=True,
+                in_navbar=True,
+                label="Apps",
+                right=True
+            )
+
+    inner_brand_col=html.A(
+                    dbc.Row(
+                        [                         
+                            html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}),
+                            dbc.NavbarBrand("Flaski.Dash  |  %s" %str(app_name), className="ml-2"),
+                        ],
+                        align="center",
+                        no_gutters=True,
+                    ),
+                    href="/index",
+                )
+
+    brand=dbc.Col(inner_brand_col, sm=3, md=3, style={ 'textAlign': 'center'})
+    brand_=dbc.Col(dbc.NavbarBrand(app_name, href="#"), sm=3, md=6, style={ 'textAlign': 'left'})
+
+    navbar = dbc.Navbar(
+        dbc.Container(
+            [
+                brand,
+                # brand_,
+                dbc.NavbarToggler(id="navbar-toggler2"),
+                dbc.Collapse(
+                    dbc.Nav(
+                        [dropdown], className="ml-auto", navbar=True
+                    ),
+                    id="navbar-collapse2",
+                    navbar=True,
+                ),
+            ], 
+        fluid=True,
+        style={"margin-left":0,"margin-right":0, 'textAlign': 'center'}
+        ),
+        color="#5474d8",
+        dark=True,
+        # className="mb-5",
+        style={"margin-bottom":10, "margin-left":0,"margin-right":0}
+    )
+    return navbar

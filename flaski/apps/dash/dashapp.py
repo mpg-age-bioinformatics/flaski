@@ -6,15 +6,15 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar
 from ._dashapp import make_figure
 import uuid
 
 # import pandas as pd
 import os
-import base64
 
 CURRENTAPP="dashapp"
+navbar_title="Demo Dash App"
 
 dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , server=app, external_stylesheets=[dbc.themes.BOOTSTRAP])
 protect_dashviews(dashapp)
@@ -23,60 +23,6 @@ cache = Cache(dashapp.server, config={
     'CACHE_TYPE': 'redis',
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
 })
-
-
-image_filename = os.getcwd()+'/flaski/static/dog-solid-white.png' # replace with your own image
-encoded_image = base64.b64encode(open(image_filename, 'rb').read())
-
-dropdown=dbc.DropdownMenu(
-            children=[
-                dbc.DropdownMenuItem("Page 2", href="#"),
-                dbc.DropdownMenuItem("Page 3", href="#"),
-            ],
-            nav=True,
-            in_navbar=True,
-            label="Apps",
-            right=True
-        )
-
-inner_brand_col=html.A(
-                dbc.Row(
-                    [                         
-                        html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}),
-                        dbc.NavbarBrand("Flaski.Dash  |  Demo App", className="ml-2"),
-                    ],
-                    align="center",
-                    no_gutters=True,
-                ),
-                href="/index",
-            )
-
-brand=dbc.Col(inner_brand_col, sm=3, md=3, style={ 'textAlign': 'center'})
-brand_=dbc.Col(dbc.NavbarBrand("Demo App", href="#"), sm=3, md=6, style={ 'textAlign': 'left'})
-
-navbar = dbc.Navbar(
-    dbc.Container(
-        [
-            brand,
-            # brand_,
-            dbc.NavbarToggler(id="navbar-toggler2"),
-            dbc.Collapse(
-                dbc.Nav(
-                    [dropdown], className="ml-auto", navbar=True
-                ),
-                id="navbar-collapse2",
-                navbar=True,
-            ),
-        ], 
-    fluid=True,
-    style={"margin-left":0,"margin-right":0, 'textAlign': 'center'}
-    ),
-    color="#5474d8",
-    dark=True,
-    # className="mb-5",
-    style={"margin-bottom":10, "margin-left":0,"margin-right":0}
-)
-# )
 
 controls = [ html.Div([
     dcc.Upload(
@@ -106,7 +52,7 @@ side_bar=[ dbc.Card(controls, body=True),
          ]
                         
 # Define Layout
-dashapp.layout = html.Div( [ navbar, dbc.Container(
+dashapp.layout = html.Div( [ make_navbar(navbar_title), dbc.Container(
     fluid=True,
     children=[
         html.Div(id="app_access"),
