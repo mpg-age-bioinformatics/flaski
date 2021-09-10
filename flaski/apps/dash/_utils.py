@@ -1,3 +1,4 @@
+import sys
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import traceback
@@ -71,11 +72,17 @@ def make_navbar(app_name, current_user):
         image_filename = '/flaski/flaski/static/dog-solid-white.png' # replace with your own image
         encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
-        logout_link=html.A("Logout", style={"align":"center", "color":"#acbae8"},href="/logout")
+        logout_link=html.A("Logout", style={"vertical-align":"center", \
+                                            'textAlign': 'center',\
+                                            "margin-bottom":0, \
+                                            "margin-top":8, \
+                                            # "margin-left":6, \
+                                            # "margin-right":6
+                                            "color":"#acbae8",}, href="/logout")
 
-        separator=html.A("|", style={"font-size":"25px",
-        "margin-left":10,
-        "margin-right":14,  
+        separator=html.A("", style={"font-size":"25px",
+        "margin-left":8,
+        "margin-right":8,  
         "margin-bottom":4,
         "margin-top":0,
         "align":"center", 
@@ -93,22 +100,23 @@ def make_navbar(app_name, current_user):
                     nav=True,
                     in_navbar=True,
                     label="Apps",
-                    right=True
+                    right=True,
+                    style={ "align":"center"}
                 )
 
         inner_brand_col=html.A(
                         dbc.Row(
                             [                         
-                                html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}),
+                                html.A( html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}), href="/index"),
                                 dbc.NavbarBrand("Flaski.Dash  |  %s" %str(app_name), className="ml-2"),
+                                dbc.NavbarToggler(id="navbar-toggler", className="ml-auto" )
                             ],
                             align="center",
                             no_gutters=True,
-                        ),
-                        href="/index",
+                        )
                     )
-
-        brand=dbc.Col(inner_brand_col, sm=3, md=3, style={ 'textAlign': 'center'})
+ 
+        brand=dbc.Col(inner_brand_col , width=True, style={ 'textAlign': 'center'}) # sm=6, md=6,
         brand_=dbc.Col(dbc.NavbarBrand(app_name, href="#"), sm=3, md=6, style={ 'textAlign': 'left'})
 
         navbar = dbc.Navbar(
@@ -116,14 +124,20 @@ def make_navbar(app_name, current_user):
                 [
                     brand,
                     # brand_,
-                    dbc.NavbarToggler(id="navbar-toggler2"),
+                    # dbc.NavbarToggler(id="navbar-toggler" ),
                     dbc.Collapse(
                         dbc.Nav(
-                            [dbc.Row([dropdown, separator, logout_link],align="center")], 
+                            [dropdown, separator, logout_link],
+                            # dbc.Row([separator],style={"margin-left":8},align="center"), 
+                            # dbc.Row([logout_link],style={"margin-left":8},align="center")], 
+                            # [dbc.Row([dropdown],style={"margin-left":8},align="center"),
+                            # dbc.Row([separator],style={"margin-left":8},align="center"), 
+                            # dbc.Row([logout_link],style={"margin-left":8},align="center")], 
                             className="ml-auto", navbar=True
                         ),
-                        id="navbar-collapse2",
+                        id="navbar-collapse",
                         navbar=True,
+                        is_open=False,
                     ),
                 ], 
             fluid=True,
