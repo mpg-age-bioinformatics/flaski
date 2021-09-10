@@ -67,7 +67,8 @@ def protect_dashviews(dashapp):
             dashapp.server.view_functions[view_func] = login_required(
                 dashapp.server.view_functions[view_func])
 
-def make_navbar(app_name, current_user):
+def make_navbar(app_name, current_user, cache):
+    @cache.memoize(300)
     def _make_navbar(app_name, current_user):
         image_filename = '/flaski/flaski/static/dog-solid-white.png' # replace with your own image
         encoded_image = base64.b64encode(open(image_filename, 'rb').read())
