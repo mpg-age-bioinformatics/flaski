@@ -12,6 +12,12 @@ import traceback
 from flaski.email import send_exception_email
 from datetime import datetime
 
+def make_options(valuesin):
+    opts=[]
+    for c in valuesin:
+        opts.append( {"label":c, "value":c} )
+    return opts
+
 def handle_dash_exception(e, user, current_app):
     err = ''.join(traceback.format_exception(None, e, e.__traceback__))
     send_exception_email( user=user, eapp=current_app, emsg=err, etime=str(datetime.now()) )
