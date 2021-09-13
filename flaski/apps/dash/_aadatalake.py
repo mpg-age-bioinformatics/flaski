@@ -33,22 +33,33 @@ def read_significant_genes(cache, path_to_files=path_to_files):
     return pd.read_json(_read_significant_genes())
 
 
-def filter_samples(data_sets, reps, groups, cache):
+def filter_samples(datasets=None, reps=None, groups=None, cache=None):
     results_files=read_results_files(cache)
-    selected_results_files=results_files[ ( results_files['Set'].isin( data_sets ) ) & \
-                                    ( results_files['Reps'].isin( reps ) ) & \
-                                    ( results_files['Group'].isin( groups ) ) ]
-    nsets=list(set(selected_results_files['Set']))
-    if nsets > 1: 
-        selected_results_files["Labels"]=selected_results_files["Set"]+"_"+selected_results_files["Reps"]
-    else:
-        selected_results_files["Labels"]=selected_results_files["Reps"]
 
-    ids2labels=selected_results_files[["IDs","Labels"]].drop_duplicates()
+    # print(datasets)
+    # import sys
+    # sys.stdout.flush()
+
+    if datasets:
+        results_files=results_files[ results_files['Set'].isin( datasets ) ]
+
+    if reps:
+        results_files=results_files[ results_files['Reps'].isin( reps ) ]
+
+    if groups:
+        results_files=results_files[ results_files['Group'].isin( groups ) ]
+
+    nsets=len(list(set(results_files['Set'])))
+    if nsets > 1: 
+        results_files["Labels"]=results_files["Set"]+"_"+results_files["Reps"]
+    else:
+        results_files["Labels"]=results_files["Reps"]
+
+    ids2labels=results_files[["IDs","Labels"]].drop_duplicates()
     ids2labels.index=ids2labels["IDs"].tolist()
     ids2labels=ids2labels[["Labels"]].to_dict()["Labels"]
 
-    return selected_results_files, ids2labels
+    return results_files, ids2labels
 
 def filter_genes(selected_gene_names, selected_gene_ids, cache):
     selected_genes=read_genes(cache)

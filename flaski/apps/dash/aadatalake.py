@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression
 import uuid
@@ -26,28 +26,14 @@ cache = Cache(dashapp.server, config={
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
 })
 
-controls = [ html.Div([
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select File')], style={ 'textAlign': 'center', "margin-top": 3, "margin-bottom": 3} 
-        ),
-        style={
-            'width': '100%',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-        },
-        # Allow multiple files to be uploaded
-        multiple=False
-    )]),
-    html.Label('X values', style={"margin-top":10}),
-    dcc.Dropdown(
-        id='opt-xcol',
-    ),
-    html.H5("Arguments", style={"margin-top":10}), 
-    "X multiplier: ", dcc.Input(id='multiplier', value=1, type='text') ]
+controls = [ 
+    html.H5("Filters", style={"margin-top":10}), 
+    html.Label('Data sets'), dcc.Dropdown( id='opt-datasets', multi=True),
+    html.Label('Groups',style={"margin-top":10}), dcc.Dropdown( id='opt-groups', multi=True),
+    html.Label('Samples',style={"margin-top":10}), dcc.Dropdown( id='opt-samples', multi=True),
+    html.Label('Gene names',style={"margin-top":10}), dcc.Dropdown( id='opt-genenames', multi=True),
+    html.Label('Gene IDs',style={"margin-top":10}), dcc.Dropdown( id='opt-geneids', multi=True),
+    html.Label('Download name',style={"margin-top":10}), dcc.Input(id='download_name', value="data.lake", type='text') ]
 
 side_bar=[ dbc.Card(controls, body=True),
             html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4} )
@@ -73,21 +59,34 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
 @dashapp.callback(
     Output(component_id='my-output', component_property='children'),
+    Output(component_id='opt-groups', component_property='options'),
+    Output(component_id='opt-samples', component_property='options'),
     Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
-    State('upload-data', 'contents'),
-    State("opt-xcol", "value"),
-    State(component_id='multiplier', component_property='value'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified')
+    Input("opt-datasets", "value"),
+    Input("opt-groups", "value"),
+    Input("opt-samples", "value"),
+    State("opt-genenames", "value"),
+    State("opt-geneids", "value"),
+    State(component_id='download_name', component_property='value'),
 )
-def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, last_modified):
+def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
     if not validate_user_access(current_user,CURRENTAPP):
         return None
-    results_files=read_results_files(cache)
+    selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)    
+    groups_=list(set(selected_results_files["Group"]))
+    groups_=make_options(groups_)
 
+    selected_results_files, ids2labels=filter_samples(datasets=datasets, groups=groups,cache=cache)    
+    reps_=list(set(selected_results_files["Reps"]))
+    reps_=make_options(reps_)
 
-    results_files_=results_files[["Set","Group","Reps"]]
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    
+    results_files_=selected_results_files[["Set","Group","Reps"]]
+    results_files_.columns=["Set","Group","Sample"]
+    results_files_=results_files_.drop_duplicates()      
+
     results_files_=dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in results_files_.columns],
@@ -102,67 +101,30 @@ def update_output(session_id, n_clicks, contents, x_col, multiplier, filename, l
         # page_action='none'
         )
     
+    # if not active_tab:
+        # active_tab="tab-samples"
     out=dbc.Tabs(
         [
            dbc.Tab(results_files_, label="Samples", tab_id="tab-samples"), 
            dbc.Tab(label="Gene expression", tab_id="tab-geneexpression"), 
         ],
         id="card-tabs",
+        active_tab="tab-samples"
         # card=True
     )
-    return out
+    return out, groups_, reps_
 
-    
-    # if contents is not None:
-    #     try:
-    #         # df=get_dataframe(session_id,contents,filename,last_modified)
-    #         df=parse_table(contents,filename,last_modified,session_id,cache)
-
-    #         # demo purspose for multipliter value
-    #         y=df.columns.tolist()[1]
-    #         df["x"]=df[x_col].astype(float)
-    #         df["y"]=df[y].astype(float)
-    #         df["x"]= df["x"]*float(multiplier)
-
-    #         fig=make_figure(df)
-    #         fig=dcc.Graph(figure=fig)
-
-    #     except Exception as e:
-    #         fig=handle_dash_exception(e,current_user,CURRENTAPP)
-
-    #     return fig
-
-## update x-col options after reading the input file
 @dashapp.callback(
-    Output(component_id='opt-xcol', component_property='options'),
+    Output(component_id='opt-datasets', component_property='options'),
     Input('session-id', 'data'),
-    Input('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified')
     )
-def update_xcol(session_id,contents,filename,last_modified):
+def update_datasets(session_id):
     if not validate_user_access(current_user,CURRENTAPP):
         return None
-    if contents is not None:
-        # df=get_dataframe(session_id,contents,filename,last_modified)
-        df=parse_table(contents,filename,last_modified,session_id,cache)
-        cols=df.columns.tolist()
-        opts=[]
-        for c in cols:
-            opts.append( {"label":c, "value":c} )
-    else:
-        opts=[]
-    return opts
-
-## update x-col value once options are a available
-# @dashapp.callback(
-#     dash.dependencies.Output('opt-xcol', 'value'),
-#     [dash.dependencies.Input('opt-xcol', 'options')] )
-# def set_xcol(available_options):
-#     if not validate_user_access(current_user,CURRENTAPP):
-#         return None
-#     if available_options:
-#         return available_options[0]['value']
+    results_files=read_results_files(cache)
+    datasets=list(set(results_files["Set"]))
+    datasets=make_options(datasets)
+    return datasets
 
 # this call back prevents the side bar from being shortly 
 # show / exposed to users without access to this App
