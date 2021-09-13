@@ -6,11 +6,10 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
-    filter_samples, filter_genes, filter_gene_expression
+    filter_samples, filter_genes, filter_gene_expression, nFormat
 import uuid
-import dash_table
 
 # import pandas as pd
 import os
@@ -48,7 +47,13 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
         dbc.Row(
             [
                 dbc.Col( id="side_bar", md=3, style={"height": "100%",'overflow': 'scroll'} ),
-                dbc.Col( id='my-output', md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
+                dbc.Col( dcc.Loading(
+                        id="loading-output-1",
+                        type="default",
+                        children=html.Div(id="my-output"
+                        ),style={"margin-top":"25%"}
+                    ),                    
+                    md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
              style={"height": "87vh"}),
     ] ) 
@@ -59,18 +64,87 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
 @dashapp.callback(
     Output(component_id='my-output', component_property='children'),
-    Output(component_id='opt-groups', component_property='options'),
-    Output(component_id='opt-samples', component_property='options'),
     Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
-    Input("opt-datasets", "value"),
-    Input("opt-groups", "value"),
-    Input("opt-samples", "value"),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-samples", "value"),
     State("opt-genenames", "value"),
     State("opt-geneids", "value"),
     State(component_id='download_name', component_property='value'),
 )
 def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
+    if not validate_user_access(current_user,CURRENTAPP):
+        return None
+
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    
+    results_files=selected_results_files[["Set","Group","Reps"]]
+    results_files.columns=["Set","Group","Sample"]
+    results_files=results_files.drop_duplicates()      
+    results_files_=make_table(results_files,"results_files")
+
+    if datasets or groups or samples or  genenames or  geneids :
+        gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
+        gene_expression_=make_table(gene_expression,"gene_expression")#,fixed_columns={'headers': True, 'data': 2} )
+        gene_expression_bol=True
+    else:
+        gene_expression_bol=False
+
+    if gene_expression_bol:
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
+            dcc.Tab( [ gene_expression_], label="Gene expression", id="tab-geneexpression", style={"margin-top":"0%"})
+            ],  
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+    else:
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
+            ],  
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+    return out
+
+@dashapp.callback(
+    Output(component_id='opt-datasets', component_property='options'),
+    Output(component_id='opt-genenames', component_property='options'),
+    Output(component_id='opt-geneids', component_property='options'),
+    Input('session-id', 'data')
+    )
+def update_datasets(session_id):
+    if not validate_user_access(current_user,CURRENTAPP):
+        return None
+    results_files=read_results_files(cache)
+    datasets=list(set(results_files["Set"]))
+    datasets=make_options(datasets)
+
+    genes=read_genes(cache)
+
+    genenames=list(set(genes["gene_name"]))
+    genenames=make_options(genenames)
+
+    geneids=list(set(genes["gene_id"]))
+    geneids=make_options(geneids)
+
+    return datasets, genenames, geneids
+
+@dashapp.callback(
+    Output(component_id='opt-groups', component_property='options'),
+    Input('session-id', 'data'),
+    Input('opt-datasets', 'value') )
+def update_groups(session_id, datasets):
+    if not validate_user_access(current_user,CURRENTAPP):
+        return None
+    selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)    
+    groups_=list(set(selected_results_files["Group"]))
+    groups_=make_options(groups_)
+    return groups_
+
+@dashapp.callback(
+    Output(component_id='opt-samples', component_property='options'),
+    Input('session-id', 'data'),
+    Input('opt-datasets', 'value'),
+    Input('opt-groups', 'value') )
+def update_reps(session_id, datasets, groups):
     if not validate_user_access(current_user,CURRENTAPP):
         return None
     selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)    
@@ -81,50 +155,9 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     reps_=list(set(selected_results_files["Reps"]))
     reps_=make_options(reps_)
 
-    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-    
-    results_files_=selected_results_files[["Set","Group","Reps"]]
-    results_files_.columns=["Set","Group","Sample"]
-    results_files_=results_files_.drop_duplicates()      
+    return reps_
 
-    results_files_=dash_table.DataTable(
-        id='table',
-        columns=[{"name": i, "id": i} for i in results_files_.columns],
-        data=results_files_.to_dict('records'),
-        fixed_rows={ 'headers': True, 'data': 0 },
-        style_cell={
-            'whiteSpace': 'normal'
-        },
-        virtualization=True,
-        style_table={'height': 800, 'overflowY': 'auto'},
-        page_size=50
-        # page_action='none'
-        )
-    
-    # if not active_tab:
-        # active_tab="tab-samples"
-    out=dbc.Tabs(
-        [
-           dbc.Tab(results_files_, label="Samples", tab_id="tab-samples"), 
-           dbc.Tab(label="Gene expression", tab_id="tab-geneexpression"), 
-        ],
-        id="card-tabs",
-        active_tab="tab-samples"
-        # card=True
-    )
-    return out, groups_, reps_
 
-@dashapp.callback(
-    Output(component_id='opt-datasets', component_property='options'),
-    Input('session-id', 'data'),
-    )
-def update_datasets(session_id):
-    if not validate_user_access(current_user,CURRENTAPP):
-        return None
-    results_files=read_results_files(cache)
-    datasets=list(set(results_files["Set"]))
-    datasets=make_options(datasets)
-    return datasets
 
 # this call back prevents the side bar from being shortly 
 # show / exposed to users without access to this App

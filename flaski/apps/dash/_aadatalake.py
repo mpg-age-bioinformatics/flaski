@@ -5,33 +5,44 @@ import pandas as pd
 path_to_files="/flaski_private/aarnaseqlake/"
 
 def read_results_files(cache,path_to_files=path_to_files):
-    @cache.memoize(60*2) # 2 hours
+    @cache.memoize(60*60*2) # 2 hours
     def _read_results_files(path_to_files=path_to_files):
         df=pd.read_csv(path_to_files+"files2ids.tsv",sep="\t")
         return df.to_json()
     return pd.read_json(_read_results_files())
 
 def read_gene_expression(cache,path_to_files=path_to_files):
-    @cache.memoize(60*2)
+    @cache.memoize(60*60*2)
     def _read_gene_expression(path_to_files=path_to_files):
+        print("GE!!!")
+        import sys
+        sys.stdout.flush()
         df=pd.read_csv(path_to_files+"gene_expression.tsv",sep="\t",index_col=[0])
         return df.to_json()
     return pd.read_json(_read_gene_expression())
 
 def read_genes(cache,path_to_files=path_to_files):
-    @cache.memoize(60*2)
+    @cache.memoize(60*60*2)
     def _read_genes(path_to_files=path_to_files):
         df=pd.read_csv(path_to_files+"genes.tsv",sep="\t")
         return df.to_json()
     return pd.read_json(_read_genes())
 
 def read_significant_genes(cache, path_to_files=path_to_files):
-    @cache.memoize(60*2)
+    @cache.memoize(60*60*2)
     def _read_significant_genes(path_to_files=path_to_files):
         df=pd.read_csv(path_to_files+"significant.genes.tsv",sep="\t")
         return df.to_json()
     return pd.read_json(_read_significant_genes())
 
+
+def nFormat(x):
+    if float(x) == 0:
+        return str(x)
+    elif ( float(x) < 0.01 ) & ( float(x) > -0.01 ) :
+        return str('{:.3e}'.format(float(x)))
+    else:
+        return str('{:.3f}'.format(float(x)))
 
 def filter_samples(datasets=None, reps=None, groups=None, cache=None):
     results_files=read_results_files(cache)
@@ -69,21 +80,30 @@ def filter_genes(selected_gene_names, selected_gene_ids, cache):
         selected_genes=selected_genes[ selected_genes["gene_id"].isin(selected_gene_ids) ]
     return selected_genes
 
-def filter_gene_expression(ids2labels,selected_genes,cache):
-    gedf=read_gene_expression(cache)
-    selected_ge=gedf[list(ids2labels.keys())]
-    selected_ge=selected_ge.astype(float)
-    cols=selected_ge.columns.tolist()
-    selected_ge["sum"]=selected_ge.sum(axis=1)
-    selected_ge=selected_ge[selected_ge["sum"]>0]
-    selected_ge=selected_ge.drop(["sum"],axis=1)
-    selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
-    selected_ge=selected_ge.dropna(subset=cols,how="all")
-    selected_ge=selected_ge.drop(["name_id"],axis=1)
-    selected_ge.reset_index(inplace=True,drop=True)
-    selected_ge.rename(columns=ids2labels,inplace=True)
-
-    return selected_ge
+def filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids, cache):
+    @cache.memoize(60*60*2)
+    def _filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids):
+        gedf=read_gene_expression(cache)
+        selected_genes=filter_genes(selected_gene_names, selected_gene_ids, cache)
+        selected_ge=gedf[list(ids2labels.keys())]
+        selected_ge=selected_ge.astype(float)
+        cols=selected_ge.columns.tolist()
+        selected_ge["sum"]=selected_ge.sum(axis=1)
+        selected_ge=selected_ge[selected_ge["sum"]>0]
+        selected_ge=selected_ge.drop(["sum"],axis=1)
+        selected_ge=pd.merge(selected_genes, selected_ge, left_on=["name_id"], right_index=True,how="left")
+        selected_ge=selected_ge.dropna(subset=cols,how="all")
+        selected_ge=selected_ge.drop(["name_id"],axis=1)
+        selected_ge.reset_index(inplace=True,drop=True)
+        selected_ge.rename(columns=ids2labels,inplace=True)
+        for c in selected_ge.columns.tolist()[2:]:
+            selected_ge[c]=selected_ge[c].apply(lambda x: nFormat(x) )
+        rename=selected_ge.columns.tolist()[2:]
+        rename=[ s.replace("_", " ")  for s in rename ]
+        rename=selected_ge.columns.tolist()[:2]+rename
+        selected_ge.columns=rename
+        return selected_ge.to_json()
+    return pd.read_json(_filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids))
 
 
 
