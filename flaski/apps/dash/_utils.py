@@ -48,16 +48,16 @@ def parse_table(contents,filename,last_modified,session_id,cache):
         return df.to_json()
     return pd.read_json(_parse_table(contents,filename,last_modified,session_id,cache))
 
-def validate_user_access(current_user, app, cache):
-    @cache.memoize(300)
+def validate_user_access(current_user, app):
+    # @cache.memoize(300)
     def check_current_user(current_user,app):
         apps=current_user.user_apps
-        if "dashapp" not in [ s["link"] for s in apps ] :
+        if app not in [ s["link"] for s in apps ] :
             return False
         reset_info=check_session_app(session,app,apps)
         if reset_info:
             # flash(reset_info,'error')
-            session["app"]="dashapp"
+            session["app"]=app
         return True
     return check_current_user(current_user,app)
 
