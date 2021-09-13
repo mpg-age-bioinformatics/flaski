@@ -11,6 +11,7 @@ from flaski.routines import check_session_app
 import traceback
 from flaski.email import send_exception_email
 from datetime import datetime
+import dash_table
 
 def make_options(valuesin):
     opts=[]
@@ -170,3 +171,37 @@ def make_footer():
         )
     ]
     return footer
+
+def make_table(df,id,page_size=50,fixed_columns=False):
+
+    def create_conditional_style(df):
+        style=[]
+        for col in df.columns:
+            name_length = len(col)
+            pixel = 50 + round(name_length*7)
+            pixel = str(pixel) + "px"
+            style.append({'if': {'column_id': col}, 'minWidth': pixel})
+
+        return style
+    width_style=create_conditional_style(df)
+    print(width_style)
+    
+    report_table=dash_table.DataTable(
+        id=id,
+        columns=[{"name": i, "id": i} for i in df.columns],
+        data=df.to_dict('records'),
+        fixed_rows={ 'headers': True, 'data': 0 },
+        fixed_columns=fixed_columns, 
+        style_cell={
+            'whiteSpace': 'normal'
+        },
+        virtualization=True,
+        style_table={'height': 800, 'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
+        style_header={'backgroundColor': '#5474d8','color': 'white','fontWeight': 'bold'},
+        style_data_conditional=[
+        { 'if': {'row_index': 'odd'}, 'backgroundColor': 'rgb(242,242,242)'}
+        ]+width_style,
+        page_size=page_size
+        # page_action='none'
+        )
+    return report_table
