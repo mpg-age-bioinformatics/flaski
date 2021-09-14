@@ -6,9 +6,9 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table, META_TAGS
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
-    filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge
+    filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge, make_volcano_plot, make_ma_plot
 import uuid
 from werkzeug.utils import secure_filename
 
@@ -117,12 +117,14 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     
     ## differential gene expression
     dge_bol=False
+    volcano_plot=None
     if not samples:
         dge_datasets=list(set(selected_results_files["Set"]))
         if len(dge_datasets) == 1 :
             dge_groups=list(set(selected_results_files["Group"]))
             if len(dge_groups) == 2:
                 dge=read_dge(dge_datasets[0], dge_groups, cache)
+                dge_plots=dge.copy()
                 if genenames:
                     dge=dge[dge["gene name"].isin(genenames)]                    
                 if geneids:
@@ -135,38 +137,76 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                                     dcc.Download(id="download-dge")
                                 ]
                             )
+
+                annotate_genes=[]
+                if genenames:
+                    genenames_=dge[dge["gene name"].isin(genenames)]["gene name"].tolist()
+                    annotate_genes=annotate_genes+genenames_
+                if geneids:
+                    genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
+                    annotate_genes=annotate_genes+genenames_                
+
+                volcano_plot, volcano_pa=make_volcano_plot(dge_plots, dge_datasets[0], annotate_genes)
+                volcano_plot=dcc.Graph(figure=volcano_plot, style={"width":"100%","overflow-x":"auto"})
+
+                ma_plot, ma_pa=make_ma_plot(dge_plots, dge_datasets[0],annotate_genes )
+                ma_plot=dcc.Graph(figure=ma_plot, style={"width":"100%","overflow-x":"auto"})
+
                 dge_bol=True
 
+
+
     if dge_bol:
+
+        minwidth=["Samples","Expression","DGE","Volcano","MA"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples], 
                     label="Samples", id="tab-samples",
-                    style={"margin-top":"0%"}), 
+                    style={"margin-top":"0%"}),
             dcc.Tab( [ gene_expression_, download_geneexp], 
                     label="Expression", id="tab-geneexpression", 
                     style={"margin-top":"0%"}),
             dcc.Tab( [ dge_, download_dge], 
                     label="DGE", id="tab-dge", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ volcano_plot ], 
+                    label="Volcano", id="tab-volcano", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ ma_plot ], 
+                    label="MA", id="tab-ma", 
                     style={"margin-top":"0%"})
             ],  
             mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
             
     elif gene_expression_bol:
+
+        minwidth=["Samples","Expression"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples
             ], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
             dcc.Tab( [ gene_expression_, download_geneexp], label="Expression", id="tab-geneexpression", style={"margin-top":"0%"})
             ],  
             mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
 
     else:
-        out=[ dcc.Tabs( [ 
+        minwidth=["Samples"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+        out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples ], 
             label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
-            ],  
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )] 
+            ],
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+    
     return out
 
 @dashapp.callback(

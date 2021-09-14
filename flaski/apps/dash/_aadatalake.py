@@ -1,6 +1,9 @@
 import pandas as pd
 # from flaski.routines import fuzzy_search
-
+from flaski.apps.main.iscatterplot import make_figure as make_scatter
+from flaski.apps.main.iscatterplot import figure_defaults as defaults_scatter
+import numpy as np
+import re
 
 path_to_files="/flaski_private/aarnaseqlake/"
 
@@ -105,16 +108,15 @@ def filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids, c
         return selected_ge.to_json()
     return pd.read_json(_filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids))
 
-# def read_metadata():
 def read_metadata(cache,path_to_files=path_to_files):
-    # @cache.memoize(60*60*2) # 2 hours
+    @cache.memoize(60*60*2) # 2 hours
     def _read_metadata(path_to_files=path_to_files):
         df=pd.read_csv(path_to_files+"metadata.tsv",sep="\t")
         return df.to_json()
     return pd.read_json(_read_metadata())
 
 def read_dge(dataset, groups, cache, html=True,path_to_files=path_to_files):
-    # @cache.memoize(60*60*2) # 2 hours
+    @cache.memoize(60*60*2) # 2 hours
     def _read_dge(dataset,groups,cache, html, path_to_files=path_to_files):
         metadata=read_metadata(cache)
         # print(metadata.head(),dataset,groups )
@@ -139,6 +141,103 @@ def read_dge(dataset, groups, cache, html=True,path_to_files=path_to_files):
         selected_dge=selected_dge.rename(columns=mapcols)
         return selected_dge.to_json()
     return pd.read_json(_read_dge(dataset,groups,cache,html=html))
+
+def find_fc(df):
+    df_=df[:1]
+    samples_names=df_.columns.tolist()[2:-5]
+    groups=list(set([ s[:-2] for s in samples_names ]))
+    group_1=groups[0]
+    group_2=groups[1]
+
+    group_1_list=[ s for s in samples_names if bool(re.match(re.compile(group_1+" ."), s  ) )  ]
+    group_2_list=[ s for s in samples_names if bool(re.match(re.compile(group_2+" ."), s  ) )  ]
+
+    group_1_values=np.mean([ df_[s].tolist()[0] for s in group_1_list  ])
+    group_2_values=np.mean([ df_[s].tolist()[0] for s in group_2_list  ])
+
+    fc_=group_2_values/group_1_values
+    fc=df_["log2 FC"].tolist()[0]
+    if fc * fc_ > 0:
+        return "log2(%s/%s)" %(group_2,group_1)
+    else:
+        return "log2(%s/%s)" %(group_1,group_2)
+
+def make_volcano_plot(df,dataset, annotate):
+
+    df_=df.copy()
+    fc=find_fc(df_)
+
+    def check_sig(x):
+        try:
+            if float(x) < 0.05:
+                return "red"
+            else:
+                return "black"
+        except:
+            return "black"
+
+    df_["sig"]=df_["padj"].apply( lambda x: check_sig(x) )
+    df_["-log10(p adj.)"]=df_["padj"].apply(lambda x: np.log10(x)*-1 )
+    df_[fc]=df_["log2 FC"]
+
+    df_.loc[df_["sig"]=="red", "group"] = "significant"
+    df_.loc[df_["sig"]=="black", "group"] = "not significant"
+
+    pa=defaults_scatter()
+    pa["xvals"]=fc
+    pa["yvals"]="-log10(p adj.)"
+    pa["title"]=dataset
+    pa["markerc_col"]="sig"
+    pa["xlabel"]=fc
+    pa["ylabel"]="-log10(p adj.)"
+    pa["marker_alpha"]="0.5"
+    pa["labels_col_value"]="gene name"
+    pa["fixed_labels"]=annotate
+    pa["labels_alpha"]=1
+
+    fig=make_scatter(df_,pa)
+    return fig, pa
+
+def make_ma_plot(df,dataset, annotate):
+    df_=df.copy()
+    fc=find_fc(df_)
+
+    def check_sig(x):
+        try:
+            if float(x) < 0.05:
+                return "red"
+            else:
+                return "black"
+        except:
+            return "black"
+
+    df_["sig"]=df_["padj"].apply( lambda x: check_sig(x) )
+    df_["log10(base mean)"]=df_["base Mean"].apply(lambda x: np.log10(x) )
+    df_[fc]=df_["log2 FC"]
+
+    df_.loc[df_["sig"]=="red", "group"] = "significant"
+    df_.loc[df_["sig"]=="black", "group"] = "not significant"
+
+    pa=defaults_scatter()
+    pa["xvals"]="log10(base mean)"
+    pa["yvals"]=fc
+    pa["title"]=dataset
+    pa["markerc_col"]="sig"
+    pa["xlabel"]="log10(base mean)"
+    pa["ylabel"]=fc #"-log10(p adj.)"
+    pa["marker_alpha"]="0.5"
+    pa["labels_col_value"]="gene name"
+    pa["fixed_labels"]=annotate
+    pa["labels_alpha"]=1
+
+    fig=make_scatter(df_,pa)
+    return fig, pa
+
+
+
+
+
+
 
 
 
