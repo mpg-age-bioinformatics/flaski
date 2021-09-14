@@ -46,12 +46,18 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
         dcc.Store(data=str(uuid.uuid4()), id='session-id'),
         dbc.Row(
             [
-                dbc.Col( id="side_bar", md=3, style={"height": "100%",'overflow': 'scroll'} ),
-                dbc.Col( dcc.Loading(
+                dbc.Col( dcc.Loading( 
                         id="loading-output-1",
                         type="default",
-                        children=html.Div(id="my-output"
-                        ),style={"margin-top":"25%"}
+                        children=html.Div(id="side_bar"),
+                        style={"margin-top":"0%"}
+                    ),                    
+                    md=3, style={"height": "100%",'overflow': 'scroll'} ),               
+                dbc.Col( dcc.Loading(
+                        id="loading-output-2",
+                        type="default",
+                        children=html.Div(id="my-output"),
+                        style={"margin-top":"50%","height": "100%"}
                     ),                    
                     md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
