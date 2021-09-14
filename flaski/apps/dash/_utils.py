@@ -183,8 +183,9 @@ def make_table(df,id,page_size=50,fixed_columns=False):
             style.append({'if': {'column_id': col}, 'minWidth': pixel})
 
         return style
-    width_style=create_conditional_style(df)
-    print(width_style)
+    # width_style=create_conditional_style(df)
+    width_style=[]
+    # print(width_style)
     
     report_table=dash_table.DataTable(
         id=id,
@@ -196,7 +197,7 @@ def make_table(df,id,page_size=50,fixed_columns=False):
             'whiteSpace': 'normal'
         },
         virtualization=True,
-        style_table={'height': 800, 'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
+        style_table={"height": "100%", 'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
         style_header={'backgroundColor': '#5474d8','color': 'white','fontWeight': 'bold'},
         style_data_conditional=[
         { 'if': {'row_index': 'odd'}, 'backgroundColor': 'rgb(242,242,242)'}
