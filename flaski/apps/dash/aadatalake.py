@@ -10,6 +10,7 @@ from ._utils import handle_dash_exception, parse_table, protect_dashviews, valid
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat
 import uuid
+from werkzeug.utils import secure_filename
 
 # import pandas as pd
 import os
@@ -17,7 +18,7 @@ import os
 CURRENTAPP="aadatalake"
 navbar_title="RNAseq data lake"
 
-dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , server=app, external_stylesheets=[dbc.themes.BOOTSTRAP])
+dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
 protect_dashviews(dashapp)
 
 cache = Cache(dashapp.server, config={
@@ -61,7 +62,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
                     ),                    
                     md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
-             style={"height": "87vh"}),
+             style={"min-height": "87vh"}), # "height":"87vh"
     ] ) 
     ] + make_footer()
 )
@@ -90,25 +91,80 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     results_files=results_files.drop_duplicates()      
     results_files_=make_table(results_files,"results_files")
 
+    download_samples=html.Div( 
+        [
+            html.Button(id='btn-samples', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+            dcc.Download(id="download-samples")
+        ]
+    )
+
+
     if datasets or groups or samples or  genenames or  geneids :
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
         gene_expression_=make_table(gene_expression,"gene_expression")#,fixed_columns={'headers': True, 'data': 2} )
+        download_geneexp=html.Div( 
+            [
+                html.Button(id='btn-geneexp', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+                dcc.Download(id="download-geneexp")
+            ]
+        )
+
         gene_expression_bol=True
     else:
         gene_expression_bol=False
 
     if gene_expression_bol:
         out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
-            dcc.Tab( [ gene_expression_], label="Gene expression", id="tab-geneexpression", style={"margin-top":"0%"})
+            dcc.Tab([ results_files_, download_samples
+            ], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
+            dcc.Tab( [ gene_expression_, download_geneexp], label="Gene expression", id="tab-geneexpression", style={"margin-top":"0%"})
             ],  
             style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
     else:
-        out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
+        out=[ dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples ], 
+            label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
             ],  
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )] 
     return out
+
+@dashapp.callback(
+    Output("download-samples", "data"),
+    Input("btn-samples", "n_clicks"),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-samples", "value"),
+    State('download_name', 'value'),
+    prevent_initial_call=True,
+)
+def download_samples(n_clicks,datasets, groups, samples, fileprefix):
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    results_files=selected_results_files[["Set","Group","Reps"]]
+    results_files.columns=["Set","Group","Sample"]
+    results_files=results_files.drop_duplicates()
+    fileprefix=secure_filename(str(fileprefix))
+    filename="%s.samples.xlsx" %fileprefix
+    return dcc.send_data_frame(results_files.to_excel, filename, sheet_name="samples", index=False)
+
+
+
+@dashapp.callback(
+    Output("download-geneexp", "data"),
+    Input("btn-geneexp", "n_clicks"),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-samples", "value"),
+    State("opt-genenames", "value"),
+    State("opt-geneids", "value"),
+    State('download_name', 'value'),
+    prevent_initial_call=True,
+)
+def download_geneexp(n_clicks,datasets, groups, samples, genenames, geneids, fileprefix):
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
+    fileprefix=secure_filename(str(fileprefix))
+    filename="%s.gene_expression.xlsx" %fileprefix
+    return dcc.send_data_frame(gene_expression.to_excel, filename, sheet_name="gene exp.", index=False)
 
 @dashapp.callback(
     Output(component_id='opt-datasets', component_property='options'),
