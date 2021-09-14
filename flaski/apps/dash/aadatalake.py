@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table, META_TAGS
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat
 import uuid
@@ -18,7 +18,7 @@ import os
 CURRENTAPP="aadatalake"
 navbar_title="RNAseq data lake"
 
-dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
 protect_dashviews(dashapp)
 
 cache = Cache(dashapp.server, config={
@@ -36,7 +36,7 @@ controls = [
     html.Label('Download name',style={"margin-top":10}), dcc.Input(id='download_name', value="data.lake", type='text') ]
 
 side_bar=[ dbc.Card(controls, body=True),
-            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4} )
+            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4, "margin-bottom":4} )
          ]
 
 # Define Layout
