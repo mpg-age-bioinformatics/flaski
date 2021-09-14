@@ -33,7 +33,7 @@ controls = [
     html.Label('Samples',style={"margin-top":10}), dcc.Dropdown( id='opt-samples', multi=True),
     html.Label('Gene names',style={"margin-top":10}), dcc.Dropdown( id='opt-genenames', multi=True),
     html.Label('Gene IDs',style={"margin-top":10}), dcc.Dropdown( id='opt-geneids', multi=True),
-    html.Label('Download name',style={"margin-top":10}), dcc.Input(id='download_name', value="data.lake", type='text') ]
+    html.Label('Download file prefix',style={"margin-top":10}), dcc.Input(id='download_name', value="data.lake", type='text') ]
 
 side_bar=[ dbc.Card(controls, body=True),
             html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4, "margin-bottom":4} )
@@ -204,6 +204,35 @@ def download_geneexp(n_clicks,datasets, groups, samples, genenames, geneids, fil
     fileprefix=secure_filename(str(fileprefix))
     filename="%s.gene_expression.xlsx" %fileprefix
     return dcc.send_data_frame(gene_expression.to_excel, filename, sheet_name="gene exp.", index=False)
+
+@dashapp.callback(
+    Output("download-dge", "data"),
+    Input("btn-dge", "n_clicks"),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-samples", "value"),
+    State("opt-genenames", "value"),
+    State("opt-geneids", "value"),
+    State('download_name', 'value'),
+    prevent_initial_call=True,
+)
+def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, fileprefix):
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
+
+    if not samples:
+        dge_datasets=list(set(selected_results_files["Set"]))
+        if len(dge_datasets) == 1 :
+            dge_groups=list(set(selected_results_files["Group"]))
+            if len(dge_groups) == 2:
+                dge=read_dge(dge_datasets[0], dge_groups, cache, html=False)
+                if genenames:
+                    dge=dge[dge["gene name"].isin(genenames)]                    
+                if geneids:
+                    dge=dge[dge["gene id"].isin(geneids)]
+    fileprefix=secure_filename(str(fileprefix))
+    filename="%s.dge.xlsx" %fileprefix
+    return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge", index=False)
 
 @dashapp.callback(
     Output(component_id='opt-datasets', component_property='options'),

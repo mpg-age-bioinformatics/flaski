@@ -113,9 +113,9 @@ def read_metadata(cache,path_to_files=path_to_files):
         return df.to_json()
     return pd.read_json(_read_metadata())
 
-def read_dge(dataset, groups, cache, out="html",path_to_files=path_to_files):
+def read_dge(dataset, groups, cache, html=True,path_to_files=path_to_files):
     # @cache.memoize(60*60*2) # 2 hours
-    def _read_dge(dataset,groups,cache, out, path_to_files=path_to_files):
+    def _read_dge(dataset,groups,cache, html, path_to_files=path_to_files):
         metadata=read_metadata(cache)
         # print(metadata.head(),dataset,groups )
         metadata=metadata[ (metadata["Set"] == dataset ) & \
@@ -126,15 +126,19 @@ def read_dge(dataset, groups, cache, out="html",path_to_files=path_to_files):
         selected_dge["padj"]=selected_dge["padj"].astype(float)
         selected_dge=selected_dge.sort_values(by=["padj"],ascending=True)
         cols=selected_dge.columns.tolist()
-        if out == "html":
+        if html:
             for c in cols[2:]:
                 selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
         cols=[ s.replace("_", " ") for s in cols ]
         selected_dge.columns=cols
+        samples_names=cols[2:-5]
+        samples_names.sort()
+        cols=cols[:2]+samples_names+cols[-5:]
+        selected_dge=selected_dge[cols]
         mapcols={"baseMean":"base Mean","log2FoldChange":"log2 FC","lfcSE":"lfc SE","pvalue":"p value"}
         selected_dge=selected_dge.rename(columns=mapcols)
         return selected_dge.to_json()
-    return pd.read_json(_read_dge(dataset,groups,cache,out=out))
+    return pd.read_json(_read_dge(dataset,groups,cache,html=html))
 
 
 
