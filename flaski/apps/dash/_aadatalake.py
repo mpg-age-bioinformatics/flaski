@@ -105,6 +105,36 @@ def filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids, c
         return selected_ge.to_json()
     return pd.read_json(_filter_gene_expression(ids2labels, selected_gene_names, selected_gene_ids))
 
+# def read_metadata():
+def read_metadata(cache,path_to_files=path_to_files):
+    # @cache.memoize(60*60*2) # 2 hours
+    def _read_metadata(path_to_files=path_to_files):
+        df=pd.read_csv(path_to_files+"metadata.tsv",sep="\t")
+        return df.to_json()
+    return pd.read_json(_read_metadata())
+
+def read_dge(dataset, groups, cache, out="html",path_to_files=path_to_files):
+    # @cache.memoize(60*60*2) # 2 hours
+    def _read_dge(dataset,groups,cache, out, path_to_files=path_to_files):
+        metadata=read_metadata(cache)
+        # print(metadata.head(),dataset,groups )
+        metadata=metadata[ (metadata["Set"] == dataset ) & \
+            (metadata["Group_1"].isin(groups) ) & \
+            (metadata["Group_2"].isin(groups) ) ]
+        dge_file=metadata["File"].tolist()[0]
+        selected_dge=pd.read_csv(path_to_files+"pairwise/"+dge_file,sep="\t")
+        selected_dge["padj"]=selected_dge["padj"].astype(float)
+        selected_dge=selected_dge.sort_values(by=["padj"],ascending=True)
+        cols=selected_dge.columns.tolist()
+        if out == "html":
+            for c in cols[2:]:
+                selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
+        cols=[ s.replace("_", " ") for s in cols ]
+        selected_dge.columns=cols
+        mapcols={"baseMean":"base Mean","log2FoldChange":"log2 FC","lfcSE":"lfc SE","pvalue":"p value"}
+        selected_dge=selected_dge.rename(columns=mapcols)
+        return selected_dge.to_json()
+    return pd.read_json(_read_dge(dataset,groups,cache,out=out))
 
 
 

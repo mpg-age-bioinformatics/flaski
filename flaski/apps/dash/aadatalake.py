@@ -8,7 +8,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table, META_TAGS
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
-    filter_samples, filter_genes, filter_gene_expression, nFormat
+    filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge
 import uuid
 from werkzeug.utils import secure_filename
 
@@ -86,12 +86,12 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
     
+    ## samples
     results_files=selected_results_files[["Set","Group","Reps"]]
     results_files.columns=["Set","Group","Sample"]
     results_files=results_files.drop_duplicates()      
     results_files_=make_table(results_files,"results_files")
     # results_files_ = dbc.Table.from_dataframe(results_files, striped=True, bordered=True, hover=True)
-
     download_samples=html.Div( 
         [
             html.Button(id='btn-samples', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
@@ -99,24 +99,60 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         ]
     )
 
-
+    ## gene expression
     if datasets or groups or samples or  genenames or  geneids :
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
         gene_expression_=make_table(gene_expression,"gene_expression")#,fixed_columns={'headers': True, 'data': 2} )
         # gene_expression_ = dbc.Table.from_dataframe(gene_expression, striped=True, bordered=True, hover=True)
-
         download_geneexp=html.Div( 
             [
                 html.Button(id='btn-geneexp', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
                 dcc.Download(id="download-geneexp")
             ]
         )
-
         gene_expression_bol=True
     else:
         gene_expression_bol=False
 
-    if gene_expression_bol:
+    
+    ## differential gene expression
+    dge_bol=False
+    if not samples:
+        dge_datasets=list(set(selected_results_files["Set"]))
+        if len(dge_datasets) == 1 :
+            dge_groups=list(set(selected_results_files["Group"]))
+            if len(dge_groups) == 2:
+                dge=read_dge(dge_datasets[0], dge_groups, cache)
+                if genenames:
+                    dge=dge[dge["gene name"].isin(genenames)]                    
+                if geneids:
+                    dge=dge[dge["gene id"].isin(geneids)]
+
+                dge_=make_table(dge,"dge")
+                download_dge=html.Div( 
+                                [
+                                    html.Button(id='btn-dge', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+                                    dcc.Download(id="download-dge")
+                                ]
+                            )
+                dge_bol=True
+
+    if dge_bol:
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}), 
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ dge_, download_dge], 
+                    label="DGE", id="tab-dge", 
+                    style={"margin-top":"0%"})
+            ],  
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+            
+    elif gene_expression_bol:
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples
             ], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
@@ -124,6 +160,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
+
     else:
         out=[ dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples ], 
@@ -149,8 +186,6 @@ def download_samples(n_clicks,datasets, groups, samples, fileprefix):
     fileprefix=secure_filename(str(fileprefix))
     filename="%s.samples.xlsx" %fileprefix
     return dcc.send_data_frame(results_files.to_excel, filename, sheet_name="samples", index=False)
-
-
 
 @dashapp.callback(
     Output("download-geneexp", "data"),
@@ -223,8 +258,6 @@ def update_reps(session_id, datasets, groups):
 
     return reps_
 
-
-
 # this call back prevents the side bar from being shortly 
 # show / exposed to users without access to this App
 @dashapp.callback( Output('app_access', 'children'),
@@ -235,7 +268,7 @@ def get_side_bar(session_id):
     if not validate_user_access(current_user,CURRENTAPP):
         return dcc.Location(pathname="/index", id="index"), None, None
     else:
-        navbar=make_navbar_(navbar_title, current_user, cache)
+        navbar=make_navbar(navbar_title, current_user, cache)
         return None, side_bar, navbar
 
 @dashapp.callback(
