@@ -235,7 +235,7 @@ def get_side_bar(session_id):
     if not validate_user_access(current_user,CURRENTAPP):
         return dcc.Location(pathname="/index", id="index"), None, None
     else:
-        navbar=make_navbar(navbar_title, current_user, cache)
+        navbar=make_navbar_(navbar_title, current_user, cache)
         return None, side_bar, navbar
 
 @dashapp.callback(
