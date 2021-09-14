@@ -90,6 +90,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     results_files.columns=["Set","Group","Sample"]
     results_files=results_files.drop_duplicates()      
     results_files_=make_table(results_files,"results_files")
+    # results_files_ = dbc.Table.from_dataframe(results_files, striped=True, bordered=True, hover=True)
 
     download_samples=html.Div( 
         [
@@ -102,6 +103,8 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     if datasets or groups or samples or  genenames or  geneids :
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
         gene_expression_=make_table(gene_expression,"gene_expression")#,fixed_columns={'headers': True, 'data': 2} )
+        # gene_expression_ = dbc.Table.from_dataframe(gene_expression, striped=True, bordered=True, hover=True)
+
         download_geneexp=html.Div( 
             [
                 html.Button(id='btn-geneexp', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
@@ -117,8 +120,9 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples
             ], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
-            dcc.Tab( [ gene_expression_, download_geneexp], label="Gene expression", id="tab-geneexpression", style={"margin-top":"0%"})
+            dcc.Tab( [ gene_expression_, download_geneexp], label="Expression", id="tab-geneexpression", style={"margin-top":"0%"})
             ],  
+            mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px"} )
     else:
         out=[ dcc.Tabs( [ 
