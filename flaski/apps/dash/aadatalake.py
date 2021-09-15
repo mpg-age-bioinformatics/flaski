@@ -14,6 +14,7 @@ from ._aadatalake import read_results_files, read_gene_expression, read_genes, r
         make_volcano_plot, make_ma_plot, make_pca_plot
 import uuid
 from werkzeug.utils import secure_filename
+import json
 
 # import pandas as pd
 import os
@@ -60,12 +61,11 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
                 dbc.Col( dcc.Loading(
                         id="loading-output-2",
                         type="default",
-                        children=html.Div(id="my-output"),
-                        style={"margin-top":"50%","height": "100%"}
-                    ),                    
+                        children=[ html.Div(id="my-output")],
+                        style={"margin-top":"50%","height": "100%"} ),
                     md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
             ], 
-             style={"min-height": "87vh"}), # "height":"87vh"
+             style={"min-height": "87vh"}),
     ] ) 
     ] + make_footer()
 )
@@ -161,7 +161,10 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
                 volcano_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".volcano" }}
                 volcano_plot, volcano_pa=make_volcano_plot(dge_plots, selected_sets[0], annotate_genes)
-                volcano_plot=dcc.Graph(figure=volcano_plot, config=volcano_config, style={"width":"100%","overflow-x":"auto"})
+                volcano_plot.update_layout(clickmode='event+select')
+                volcano_plot=dcc.Graph(figure=volcano_plot, config=volcano_config, style={"width":"100%","overflow-x":"auto"}, id="volcano_plot")
+                # volcano_plot_table=html.Div(id="volcano_plot_table")
+                
 
                 ma_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".ma" }}
                 ma_plot, ma_pa=make_ma_plot(dge_plots, selected_sets[0],annotate_genes )
@@ -197,7 +200,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             dcc.Tab( [ dge_, download_dge], 
                     label="DGE", id="tab-dge", 
                     style={"margin-top":"0%"}),
-            dcc.Tab( [ volcano_plot ], 
+            dcc.Tab( dbc.Row([ dbc.Col(volcano_plot, md=6), dbc.Col( html.Div(id="volcano-plot-table") , md=3) ] ) , 
                     label="Volcano", id="tab-volcano", 
                     style={"margin-top":"0%"}),
             dcc.Tab( [ ma_plot ], 
@@ -257,7 +260,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             dcc.Tab( [ dge_, download_dge], 
                     label="DGE", id="tab-dge", 
                     style={"margin-top":"0%"}),
-            dcc.Tab( [ volcano_plot ], 
+            dcc.Tab( dbc.Col([ volcano_plot, html.Div(id="volcano-plot-table") ]), 
                     label="Volcano", id="tab-volcano", 
                     style={"margin-top":"0%"}),
             dcc.Tab( [ ma_plot ], 
@@ -299,6 +302,21 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
     
     return out
+
+@dashapp.callback( 
+    Output('volcano-plot-table', 'children'),
+    Input('volcano_plot', 'clickData') 
+)
+def display_selected_data(clickData):
+    print(json.dumps(clickData, indent=2))
+    import sys
+    sys.stdout.flush()
+    if clickData:
+        return json.dumps(clickData, indent=2)
+    else:
+        return dcc.Markdown("""
+                **ClickData**
+            """)
 
 @dashapp.callback(
     Output("download-samples", "data"),
