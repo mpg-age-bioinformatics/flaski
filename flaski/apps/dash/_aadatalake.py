@@ -17,9 +17,6 @@ def read_results_files(cache,path_to_files=path_to_files):
 def read_gene_expression(cache,path_to_files=path_to_files):
     @cache.memoize(60*60*2)
     def _read_gene_expression(path_to_files=path_to_files):
-        print("GE!!!")
-        import sys
-        sys.stdout.flush()
         df=pd.read_csv(path_to_files+"gene_expression.tsv",sep="\t",index_col=[0])
         return df.to_json()
     return pd.read_json(_read_gene_expression())

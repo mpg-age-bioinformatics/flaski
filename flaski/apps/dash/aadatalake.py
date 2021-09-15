@@ -146,15 +146,15 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
                     annotate_genes=annotate_genes+genenames_                
 
+                volcano_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".volcano" }}
                 volcano_plot, volcano_pa=make_volcano_plot(dge_plots, dge_datasets[0], annotate_genes)
-                volcano_plot=dcc.Graph(figure=volcano_plot, style={"width":"100%","overflow-x":"auto"})
+                volcano_plot=dcc.Graph(figure=volcano_plot, config=volcano_config, style={"width":"100%","overflow-x":"auto"})
 
+                ma_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".ma" }}
                 ma_plot, ma_pa=make_ma_plot(dge_plots, dge_datasets[0],annotate_genes )
-                ma_plot=dcc.Graph(figure=ma_plot, style={"width":"100%","overflow-x":"auto"})
+                ma_plot=dcc.Graph(figure=ma_plot, config=ma_config, style={"width":"100%","overflow-x":"auto"})
 
                 dge_bol=True
-
-
 
     if dge_bol:
 
