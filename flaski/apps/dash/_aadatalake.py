@@ -194,9 +194,15 @@ def make_volcano_plot(df,dataset, annotate):
     pa["labels_col_value"]="gene name"
     pa["fixed_labels"]=annotate
     pa["labels_alpha"]=1
+    df_for_iscatter=df_.copy()
+
+    print(df_[ (df_["-log10(p adj.)"]>10 ) & (df_["-log10(p adj.)"]<15 ) ].head() )
+    print(df_[ (df_["-log10(p adj.)"]>10 ) & (df_["-log10(p adj.)"]<15 ) ][["gene id","padj"]].head())
+    import sys
+    sys.stdout.flush()
 
     fig=make_scatter(df_,pa)
-    return fig, pa
+    return fig, pa, df_for_iscatter
 
 def make_ma_plot(df,dataset, annotate):
     df_=df.copy()

@@ -1,6 +1,8 @@
+import re
 from flaski import app
 from flask_login import current_user
 from flask_caching import Cache
+from flaski.routines import check_session_app
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -15,8 +17,9 @@ from ._aadatalake import read_results_files, read_gene_expression, read_genes, r
 import uuid
 from werkzeug.utils import secure_filename
 import json
+from flask import session
 
-# import pandas as pd
+import pandas as pd
 import os
 
 CURRENTAPP="aadatalake"
@@ -48,6 +51,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     fluid=True,
     children=[
         html.Div(id="app_access"),
+        html.Div(id="redirect-iscatterplot"),
         dcc.Store(data=str(uuid.uuid4()), id='session-id'),
         dbc.Row(
             [
@@ -160,15 +164,13 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     annotate_genes=annotate_genes+genenames_                
 
                 volcano_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".volcano" }}
-                volcano_plot, volcano_pa=make_volcano_plot(dge_plots, selected_sets[0], annotate_genes)
+                volcano_plot, volcano_pa, volcano_df=make_volcano_plot(dge_plots, selected_sets[0], annotate_genes)
                 volcano_plot.update_layout(clickmode='event+select')
-                volcano_plot=dcc.Graph(figure=volcano_plot, config=volcano_config, style={"width":"100%","overflow-x":"auto"}, id="volcano_plot")
-                # volcano_plot_table=html.Div(id="volcano_plot_table")
-                
+                volcano_plot=dcc.Graph(figure=volcano_plot, config=volcano_config, style={"width":"100%","overflow-x":"auto"}, id="volcano_plot")                
 
                 ma_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".ma" }}
                 ma_plot, ma_pa=make_ma_plot(dge_plots, selected_sets[0],annotate_genes )
-                ma_plot=dcc.Graph(figure=ma_plot, config=ma_config, style={"width":"100%","overflow-x":"auto"})
+                ma_plot=dcc.Graph(figure=ma_plot, config=ma_config, style={"width":"100%","overflow-x":"auto"}, id="ma_plot")
 
                 dge_bol=True
 
@@ -184,7 +186,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         dge_=change_table_minWidth(dge_,minwidth)
 
         pca_plot=change_fig_minWidth(pca_plot,minwidth)
-        volcano_plot=change_fig_minWidth(volcano_plot,minwidth)
+        # volcano_plot=change_fig_minWidth(volcano_plot,minwidth)
         ma_plot=change_fig_minWidth(ma_plot,minwidth)
 
         out=dcc.Tabs( [ 
@@ -200,7 +202,13 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             dcc.Tab( [ dge_, download_dge], 
                     label="DGE", id="tab-dge", 
                     style={"margin-top":"0%"}),
-            dcc.Tab( dbc.Row([ dbc.Col(volcano_plot, md=6), dbc.Col( html.Div(id="volcano-plot-table") , md=3) ] ) , 
+            dcc.Tab( [ dbc.Row( [
+                             dbc.Col(volcano_plot), 
+                             dbc.Col( [ html.Div(id="volcano-plot-table") ]   
+                             ) ], 
+                             style={"minWidth":minwidth}),
+                    html.Div(id="volcano-bt"),
+                    ], 
                     label="Volcano", id="tab-volcano", 
                     style={"margin-top":"0%"}),
             dcc.Tab( [ ma_plot ], 
@@ -260,7 +268,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             dcc.Tab( [ dge_, download_dge], 
                     label="DGE", id="tab-dge", 
                     style={"margin-top":"0%"}),
-            dcc.Tab( dbc.Col([ volcano_plot, html.Div(id="volcano-plot-table") ]), 
+            dcc.Tab(  dbc.Col( [ volcano_plot, html.Div(id="volcano-plot-table" ) ] ), 
                     label="Volcano", id="tab-volcano", 
                     style={"margin-top":"0%"}),
             dcc.Tab( [ ma_plot ], 
@@ -305,18 +313,125 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
 @dashapp.callback( 
     Output('volcano-plot-table', 'children'),
-    Input('volcano_plot', 'clickData') 
+    Input('volcano_plot', 'selectedData') 
 )
-def display_selected_data(clickData):
-    print(json.dumps(clickData, indent=2))
-    import sys
-    sys.stdout.flush()
-    if clickData:
-        return json.dumps(clickData, indent=2)
+def display_volcano_data(selectedData):
+    if selectedData:
+        selected_genes=selectedData["points"]
+        selected_genes=[ s["text"] for s in selected_genes ]
+        df=pd.DataFrame({"Selected genes":selected_genes})
+        df=make_table(df,"selected_volcano")
+        st=df.style_table
+        st["width"]="50%"
+        st["margin-top"]="40px"
+        st["align"]="center"
+        st["margin-left"]="auto"
+        st["margin-right"]="auto"
+        df.style_table=st
+        df.style_cell={'whiteSpace': 'normal', 'textAlign': 'center'}
+        return df
+
+@dashapp.callback( 
+    Output('volcano-bt', 'children'),
+    Input('volcano_plot', 'selectedData') 
+)
+def display_volcano_bts(selectedData):
+    iscatter_volcano=html.Div( 
+        [
+            html.Button(id='btn-iscatter_volcano', n_clicks=0, children='iScatterplot', 
+            style={"margin-top":4, \
+                "margin-left":4,\
+                "margin-right":4,\
+                'background-color': "#5474d8", \
+                "color":"white"})
+        ])
+
+    if selectedData:
+        download_selected_volcano=html.Div( 
+                [
+                    html.Button(id='btn-selected_volcano', n_clicks=0, children='Excel', 
+                    style={"margin-top":4, \
+                        "margin-left":4,\
+                        "margin-right":4,\
+                        'background-color': "#5474d8", \
+                        "color":"white"}),
+                    dcc.Download(id="download-selected_volcano")
+                ])
+        return dbc.Row([iscatter_volcano, download_selected_volcano ])
     else:
-        return dcc.Markdown("""
-                **ClickData**
-            """)
+        return dbc.Row([iscatter_volcano])
+    
+@dashapp.callback(
+    Output("download-selected_volcano", "data"),
+    Input("btn-selected_volcano", "n_clicks"),
+    State('volcano_plot', 'selectedData'),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State('download_name', 'value'),
+    prevent_initial_call=True,
+)
+def download_selected_volcano(n_clicks,selectedData,datasets,groups,download_name):
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
+    selected_genes=selectedData["points"]
+    selected_genes=[ s["text"] for s in selected_genes ]
+    dge_datasets=list(set(selected_results_files["Set"]))
+    dge_groups=list(set(selected_results_files["Group"]))
+    dge=read_dge(dge_datasets[0], dge_groups, cache, html=False)
+    dge=dge[dge["gene name"].isin(selected_genes)]                    
+    fileprefix=secure_filename(str(download_name))
+    filename="%s.dge.volcano_selected.xlsx" %fileprefix
+
+    # selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
+    # dge_datasets=list(set(selected_results_files["Set"]))
+    # dge_groups=list(set(selected_results_files["Group"]))
+    # dge=read_dge(dge_datasets[0], dge_groups, cache, html=False)
+    # annotate_genes=[]
+    # # if genenames:
+    # #     genenames_=dge[dge["gene name"].isin(genenames)]["gene name"].tolist()
+    # #     annotate_genes=annotate_genes+genenames_
+    # # if geneids:
+    # #     genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
+    # #     annotate_genes=annotate_genes+genenames_     
+    # volcano_plot, volcano_pa, volcano_df=make_volcano_plot(dge, dge_datasets[0], annotate_genes)
+
+    return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge.volcano", index=False)
+
+@dashapp.callback(
+    Output("redirect-iscatterplot", 'children'),
+    Input("btn-iscatter_volcano", "n_clicks"),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-genenames", "value"),
+    State("opt-geneids", "value"),
+    prevent_initial_call=True,
+)
+def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
+    if n_clicks:
+        selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
+        dge_datasets=list(set(selected_results_files["Set"]))
+        dge_groups=list(set(selected_results_files["Group"]))
+        dge=read_dge(dge_datasets[0], dge_groups, cache, html=False)
+        annotate_genes=[]
+        if genenames:
+            genenames_=dge[dge["gene name"].isin(genenames)]["gene name"].tolist()
+            annotate_genes=annotate_genes+genenames_
+        if geneids:
+            genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
+            annotate_genes=annotate_genes+genenames_     
+        volcano_plot, volcano_pa, volcano_df=make_volcano_plot(dge, dge_datasets[0], annotate_genes)
+        reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
+
+        volcano_pa["xcols"]=volcano_df.columns.tolist()
+        volcano_pa["ycols"]=volcano_df.columns.tolist()
+        volcano_pa["groups"]=["None"]+volcano_df.columns.tolist()
+        volcano_pa["labels_col"]=volcano_df.columns.tolist()
+
+        session["filename"]="<from RNAseq lake>"
+        session["plot_arguments"]=volcano_pa
+        session["COMMIT"]=app.config['COMMIT']
+        session["app"]="iscatterplot"
+        session["df"]=volcano_df.to_json()
+        return dcc.Location(pathname="/iscatterplot", id="index")
 
 @dashapp.callback(
     Output("download-samples", "data"),
@@ -367,7 +482,7 @@ def download_geneexp(n_clicks,datasets, groups, samples, genenames, geneids, fil
 )
 def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, fileprefix):
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-    gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
+    # gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
 
     if not samples:
         dge_datasets=list(set(selected_results_files["Set"]))
