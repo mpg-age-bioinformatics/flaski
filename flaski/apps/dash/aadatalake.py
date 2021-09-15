@@ -6,7 +6,9 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width
+from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, \
+    make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
+    change_table_minWidth, change_fig_minWidth
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge, make_volcano_plot, make_ma_plot
 import uuid
@@ -161,6 +163,13 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         minwidth=["Samples","Expression","DGE","Volcano","MA"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+        dge_=change_table_minWidth(dge_,minwidth)
+
+        volcano_plot=change_fig_minWidth(volcano_plot,minwidth)
+        ma_plot=change_fig_minWidth(ma_plot,minwidth)
 
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples], 

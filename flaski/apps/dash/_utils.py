@@ -213,4 +213,17 @@ def make_table(df,id,page_size=50,fixed_columns=False):
         page_size=page_size
         # page_action='none'
         )
+
     return report_table
+
+def change_table_minWidth(tb,minwidth):
+    st=tb.style_table
+    st["minWidth"]=minwidth
+    tb.style_table=st
+    return tb
+
+def change_fig_minWidth(fig,minwidth):
+    st=fig.style
+    st["minWidth"]=minwidth
+    fig.style=st
+    return fig
