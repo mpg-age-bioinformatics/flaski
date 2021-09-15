@@ -2,6 +2,9 @@ import pandas as pd
 # from flaski.routines import fuzzy_search
 from flaski.apps.main.iscatterplot import make_figure as make_scatter
 from flaski.apps.main.iscatterplot import figure_defaults as defaults_scatter
+from flaski.apps.main.pca import make_figure as make_pca
+from flaski.apps.main.pca import figure_defaults as defaults_pca
+
 import numpy as np
 import re
 
@@ -230,8 +233,91 @@ def make_ma_plot(df,dataset, annotate):
     fig=make_scatter(df_,pa)
     return fig, pa
 
+def make_pca_plot(df,dataset):
+    df_=df.copy()
+    pa=defaults_pca()
+    pa["xvals"]="gene_id"
+    pa["yvals"]=df_.columns.tolist()[2:]
+    pa["scale_value"]="feature"
+    pa["percvar"]="20"
+    projected, features=make_pca(df_,pa)
+
+    cols=projected.columns.tolist()
+
+    def fix_comp(c):
+        label=c.split(" - ")[0]
+        c=c.split(" ")[-1].split("%")[0]
+        c=nFormat(c)
+        c=label+" - "+c+"%"
+        return c
+    
+    cols=[ cols[0], fix_comp( cols[1] ),  fix_comp( cols[2] )]
+    projected.columns=cols
+
+    samples=projected["row"].tolist()
+    groups=[ s[:-2] for s in samples ]
+    projected["Group"]=groups
+    groups=list(set(groups))
+    
+    COLORS=["blue","green","red","black"]
+    MARKERS_1=["circle", "square", "diamond", \
+        "triangle-up"] 
+    MARKERS_2=["triangle-down", "triangle-left", "triangle-right",\
+        "star", "asterisk", "hash", "y-up", "y-down" ,"y-left", "y-right" ]
+
+    color_markers=[]
+    for m in MARKERS_1 :
+        for c in COLORS:
+            color_markers.append([c,m])
+
+    for m in MARKERS_2 :
+        for c in COLORS:
+            color_markers.append([c,m])
+
+    groups=dict(zip(groups, color_markers[:len(groups)]))
+
+    pa=defaults_scatter()
+    pa["xvals"]=cols[1]
+    pa["yvals"]=cols[2]
+    pa["title"]=dataset
+    pa["markerc_col"]="sig"
+    pa["xlabel"]=cols[1]
+    pa["ylabel"]=cols[2]
+    pa["marker_alpha"]="1"
+    pa["labels_col_value"]="row"
+    pa["groups_value"]="Group"
+    pa["list_of_groups"]=list(groups.keys())
+
+    groups_settings=[]
+
+    for g in list(groups.keys()):
+        group_dic={"name":g,\
+            "markers":"7",\
+            "markersizes_col":"select a column..",\
+            "markerc":groups[g][0],\
+            "markerc_col":"select a column..",\
+            "markerc_write":pa["markerc_write"],\
+            "edge_linewidth":pa["edge_linewidth"],\
+            "edge_linewidth_col":"select a column..",\
+            "edgecolor":pa["edgecolor"],\
+            "edgecolor_col":"select a column..",\
+            "edgecolor_write":"",\
+            "marker":groups[g][1],\
+            "markerstyles_col":"select a column..",\
+            "marker_alpha":pa["marker_alpha"],\
+            "markeralpha_col_value":"select a column.."}
+
+        groups_settings.append(group_dic)
+
+    pa["groups_settings"]=groups_settings
+
+    fig=make_scatter(projected,pa)
+    return fig, pa
 
 
+    # # print(projected.head(),features.head())
+    # import sys
+    # sys.stdout.flush()
 
 
 

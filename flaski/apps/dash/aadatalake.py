@@ -10,7 +10,8 @@ from ._utils import handle_dash_exception, parse_table, protect_dashviews, valid
     make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
     change_table_minWidth, change_fig_minWidth
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
-    filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge, make_volcano_plot, make_ma_plot
+    filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge,\
+        make_volcano_plot, make_ma_plot, make_pca_plot
 import uuid
 from werkzeug.utils import secure_filename
 
@@ -104,6 +105,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     ## gene expression
     if datasets or groups or samples or  genenames or  geneids :
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
+        
         gene_expression_=make_table(gene_expression,"gene_expression")#,fixed_columns={'headers': True, 'data': 2} )
         # gene_expression_ = dbc.Table.from_dataframe(gene_expression, striped=True, bordered=True, hover=True)
         download_geneexp=html.Div( 
@@ -116,16 +118,25 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     else:
         gene_expression_bol=False
 
+    ## PCA
+    selected_sets=list(set(selected_results_files["Set"]))
+    if len(selected_sets) == 1 : 
+        pca_data=filter_gene_expression(ids2labels,None,None,cache)
+        pca_plot, pca_pa=make_pca_plot(pca_data,selected_sets[0])
+        pca_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".pca" }}
+        pca_plot=dcc.Graph(figure=pca_plot, config=pca_config, style={"width":"100%","overflow-x":"auto"})
+        pca_bol=True
+    else:
+        pca_bol=False
     
     ## differential gene expression
     dge_bol=False
     volcano_plot=None
     if not samples:
-        dge_datasets=list(set(selected_results_files["Set"]))
-        if len(dge_datasets) == 1 :
+        if len(selected_sets) == 1 :
             dge_groups=list(set(selected_results_files["Group"]))
             if len(dge_groups) == 2:
-                dge=read_dge(dge_datasets[0], dge_groups, cache)
+                dge=read_dge(selected_sets[0], dge_groups, cache)
                 dge_plots=dge.copy()
                 if genenames:
                     dge=dge[dge["gene name"].isin(genenames)]                    
@@ -149,18 +160,83 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     annotate_genes=annotate_genes+genenames_                
 
                 volcano_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".volcano" }}
-                volcano_plot, volcano_pa=make_volcano_plot(dge_plots, dge_datasets[0], annotate_genes)
+                volcano_plot, volcano_pa=make_volcano_plot(dge_plots, selected_sets[0], annotate_genes)
                 volcano_plot=dcc.Graph(figure=volcano_plot, config=volcano_config, style={"width":"100%","overflow-x":"auto"})
 
                 ma_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".ma" }}
-                ma_plot, ma_pa=make_ma_plot(dge_plots, dge_datasets[0],annotate_genes )
+                ma_plot, ma_pa=make_ma_plot(dge_plots, selected_sets[0],annotate_genes )
                 ma_plot=dcc.Graph(figure=ma_plot, config=ma_config, style={"width":"100%","overflow-x":"auto"})
 
                 dge_bol=True
 
-    if dge_bol:
 
-        minwidth=["Samples","Expression","DGE","Volcano","MA"]
+    if  ( dge_bol ) & ( pca_bol ) :
+
+        minwidth=["Samples","Expression", "PCA", "DGE","Volcano","MA"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+        dge_=change_table_minWidth(dge_,minwidth)
+
+        pca_plot=change_fig_minWidth(pca_plot,minwidth)
+        volcano_plot=change_fig_minWidth(volcano_plot,minwidth)
+        ma_plot=change_fig_minWidth(ma_plot,minwidth)
+
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ pca_plot ], 
+                    label="PCA", id="tab-pca", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ dge_, download_dge], 
+                    label="DGE", id="tab-dge", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ volcano_plot ], 
+                    label="Volcano", id="tab-volcano", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ ma_plot ], 
+                    label="MA", id="tab-ma", 
+                    style={"margin-top":"0%"})
+            ],  
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+
+    elif  pca_bol :
+
+        minwidth=["Samples","Expression", "PCA"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+
+        pca_plot=change_fig_minWidth(pca_plot,minwidth)
+
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ pca_plot ], 
+                    label="PCA", id="tab-pca", 
+                    style={"margin-top":"0%"})
+            ],  
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+    
+
+
+    elif  dge_bol  :
+
+        minwidth=["Samples","Expression", "DGE","Volcano","MA"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
 
@@ -197,6 +273,9 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
 
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples
             ], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
@@ -209,6 +288,9 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         minwidth=["Samples"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples ], 
             label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
