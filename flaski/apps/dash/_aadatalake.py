@@ -318,7 +318,7 @@ def make_annotated_col(x,annotate_genes):
     if x in annotate_genes:
         return x
     else:
-        return np.nan
+        return ""
 
 
     # # print(projected.head(),features.head())

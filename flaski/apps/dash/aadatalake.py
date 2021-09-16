@@ -404,7 +404,8 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         
         volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: make_annotated_col(x, annotate_genes) )
         volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
-        volcano_pa["labels_col_value"]="datalake_search"
+        volcano_pa["labels_col_value"]="select a column.."
+        volcano_df=volcano_df.drop(["___label___"],axis=1)
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=volcano_pa
@@ -500,8 +501,9 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         ma_pa["groups"]=["None"]+ma_df.columns.tolist()
 
         ma_df["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
+        ma_df=ma_df.drop(["___label___"],axis=1)
         ma_pa["labels_col"]=["select a column.."]+ma_df.columns.tolist()
-        ma_pa["labels_col_value"]="datalake_search"
+        "select a column.."
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=ma_pa
@@ -530,6 +532,7 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
         pca_pa["ycols"]=pca_df.columns.tolist()
         pca_pa["groups"]=["None"]+pca_df.columns.tolist()
         pca_pa["labels_col"]=["select a column.."]+pca_df.columns.tolist()
+        pca_pa["labels_col_value"]="select a column.."
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=pca_pa
