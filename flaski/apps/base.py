@@ -1,5 +1,7 @@
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
 from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot
+from flaski.apps.dash import aadatalake
+
 from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\

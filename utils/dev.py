@@ -1,4 +1,4 @@
-from flaski.apps.dash import dashapp, aadatalake
+from flaski.apps.dash import dashapp
 
 EXTERNAL_APPS=[ { "name":"Dash demo plot", 
                 "id":'dashapp_more',
