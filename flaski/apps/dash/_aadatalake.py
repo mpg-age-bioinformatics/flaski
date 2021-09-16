@@ -115,9 +115,9 @@ def read_metadata(cache,path_to_files=path_to_files):
         return df.to_json()
     return pd.read_json(_read_metadata())
 
-def read_dge(dataset, groups, cache, html=True,path_to_files=path_to_files):
+def read_dge(dataset, groups, cache,path_to_files=path_to_files):
     @cache.memoize(60*60*2) # 2 hours
-    def _read_dge(dataset,groups,cache, html, path_to_files=path_to_files):
+    def _read_dge(dataset,groups,cache, path_to_files=path_to_files):
         metadata=read_metadata(cache)
         # print(metadata.head(),dataset,groups )
         metadata=metadata[ (metadata["Set"] == dataset ) & \
@@ -128,9 +128,8 @@ def read_dge(dataset, groups, cache, html=True,path_to_files=path_to_files):
         selected_dge["padj"]=selected_dge["padj"].astype(float)
         selected_dge=selected_dge.sort_values(by=["padj"],ascending=True)
         cols=selected_dge.columns.tolist()
-        if html:
-            for c in cols[2:]:
-                selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
+        for c in cols[2:]:
+            selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
         cols=[ s.replace("_", " ") for s in cols ]
         selected_dge.columns=cols
         samples_names=cols[2:-5]
@@ -140,7 +139,7 @@ def read_dge(dataset, groups, cache, html=True,path_to_files=path_to_files):
         mapcols={"baseMean":"base Mean","log2FoldChange":"log2 FC","lfcSE":"lfc SE","pvalue":"p value"}
         selected_dge=selected_dge.rename(columns=mapcols)
         return selected_dge.to_json()
-    return pd.read_json(_read_dge(dataset,groups,cache,html=html))
+    return pd.read_json(_read_dge(dataset,groups,cache))
 
 def find_fc(df):
     df_=df[:1]
@@ -194,14 +193,9 @@ def make_volcano_plot(df,dataset, annotate):
     pa["labels_col_value"]="gene name"
     pa["fixed_labels"]=annotate
     pa["labels_alpha"]=1
-    # df_for_iscatter=df_.copy()
-
-    # print(df_[ (df_["-log10(p adj.)"]>10 ) & (df_["-log10(p adj.)"]<15 ) ].head() )
-    # print(df_[ (df_["-log10(p adj.)"]>10 ) & (df_["-log10(p adj.)"]<15 ) ][["gene id","padj"]].head())
-    # import sys
-    # sys.stdout.flush()
-
+    
     fig=make_scatter(df_,pa)
+
     return fig, pa, df_
 
 def make_ma_plot(df,dataset, annotate):
@@ -237,7 +231,7 @@ def make_ma_plot(df,dataset, annotate):
     pa["labels_alpha"]=1
 
     fig=make_scatter(df_,pa)
-    return fig, pa
+    return fig, pa, df_
 
 def make_pca_plot(df,dataset):
     df_=df.copy()
@@ -318,7 +312,7 @@ def make_pca_plot(df,dataset):
     pa["groups_settings"]=groups_settings
 
     fig=make_scatter(projected,pa)
-    return fig, pa
+    return fig, pa, projected
 
 
     # # print(projected.head(),features.head())
