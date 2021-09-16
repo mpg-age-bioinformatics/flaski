@@ -219,8 +219,6 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         dge_=change_table_minWidth(dge_,minwidth)
 
         pca_plot=change_fig_minWidth(pca_plot,minwidth)
-        # volcano_plot=change_fig_minWidth(volcano_plot,minwidth)
-        # ma_plot=change_fig_minWidth(ma_plot,minwidth)
 
         out=dcc.Tabs( [ 
             dcc.Tab([ results_files_, download_samples], 
@@ -269,19 +267,19 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         pca_plot=change_fig_minWidth(pca_plot,minwidth)
 
         out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_, download_samples], 
-                    label="Samples", id="tab-samples",
-                    style={"margin-top":"0%"}),
-            dcc.Tab( [ pca_plot ], 
-                    label="PCA", id="tab-pca", 
-                    style={"margin-top":"0%"}),
-            dcc.Tab( [ gene_expression_, download_geneexp], 
-                    label="Expression", id="tab-geneexpression", 
-                    style={"margin-top":"0%"}),
-            ],  
-            mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-            
+                    dcc.Tab([ results_files_, download_samples], 
+                            label="Samples", id="tab-samples",
+                            style={"margin-top":"0%"}),
+                    dcc.Tab( [ pca_plot, iscatter_pca ], 
+                            label="PCA", id="tab-pca", 
+                            style={"margin-top":"0%"}),
+                    dcc.Tab( [ gene_expression_, download_geneexp], 
+                            label="Expression", id="tab-geneexpression", 
+                            style={"margin-top":"0%"}),
+                    ],  
+                    mobile_breakpoint=0,
+                    style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+    
     elif gene_expression_bol:
 
         minwidth=["Samples","Expression"]
@@ -292,9 +290,12 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         gene_expression_=change_table_minWidth(gene_expression_,minwidth)
 
         out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_, download_samples
-            ], label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
-            dcc.Tab( [ gene_expression_, download_geneexp], label="Expression", id="tab-geneexpression", style={"margin-top":"0%"})
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -307,12 +308,13 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_, download_samples ], 
-            label="Samples", id="tab-samples",style={"margin-top":"0%"}), 
-            ],
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-    
+
     return out
 
 @dashapp.callback( 
