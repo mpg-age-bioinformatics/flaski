@@ -401,7 +401,10 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         volcano_pa["xcols"]=volcano_df.columns.tolist()
         volcano_pa["ycols"]=volcano_df.columns.tolist()
         volcano_pa["groups"]=["None"]+volcano_df.columns.tolist()
-        volcano_pa["labels_col"]=volcano_df.columns.tolist()
+        
+        volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: [ s for s in annotate_genes if s == x ][0] )
+        volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
+        volcano_pa["labels_col_value"]="datalake_search"
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=volcano_pa
@@ -476,7 +479,7 @@ def download_selected_ma(n_clicks,selectedData,datasets,groups,download_name):
     State("opt-geneids", "value"),
     prevent_initial_call=True,
 )
-def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
+def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
     if n_clicks:
         selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
         dge_datasets=list(set(selected_results_files["Set"]))
@@ -495,7 +498,10 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         ma_pa["xcols"]=ma_df.columns.tolist()
         ma_pa["ycols"]=ma_df.columns.tolist()
         ma_pa["groups"]=["None"]+ma_df.columns.tolist()
-        ma_pa["labels_col"]=ma_df.columns.tolist()
+
+        ma_pa["datalake_search"]=ma_pa["gene name"].apply(lambda x: [ s for s in annotate_genes if s == x ][0] )
+        ma_pa["labels_col"]=["select a column.."]+ma_pa.columns.tolist()
+        ma_pa["labels_col_value"]="datalake_search"
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=ma_pa
@@ -523,7 +529,7 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
         pca_pa["xcols"]=pca_df.columns.tolist()
         pca_pa["ycols"]=pca_df.columns.tolist()
         pca_pa["groups"]=["None"]+pca_df.columns.tolist()
-        pca_pa["labels_col"]=pca_df.columns.tolist()
+        pca_pa["labels_col"]=["select a column.."]+pca_df.columns.tolist()
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=pca_pa
