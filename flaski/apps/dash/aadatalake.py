@@ -499,7 +499,7 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         ma_pa["ycols"]=ma_df.columns.tolist()
         ma_pa["groups"]=["None"]+ma_df.columns.tolist()
 
-        ma_pa["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
+        ma_df["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
         ma_pa["labels_col"]=["select a column.."]+ma_df.columns.tolist()
         ma_pa["labels_col_value"]="datalake_search"
 
