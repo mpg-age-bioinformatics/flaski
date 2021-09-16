@@ -106,7 +106,7 @@ def make_figure(df,pa):
                 showlegend=pab["show_legend"],\
                 name=group) )
 
-        fig.update_layout(legend_title_text=str("test"), legend=dict( font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
+        fig.update_layout(legend_title_text=pa["groups_value"], legend=dict( font=dict( size=float(pa["legend_font_size"]), color="black" ) ) )
 
     
     elif pa["groups_value"]=="None":
