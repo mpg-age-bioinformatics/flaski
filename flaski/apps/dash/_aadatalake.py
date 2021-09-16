@@ -314,6 +314,12 @@ def make_pca_plot(df,dataset):
     fig=make_scatter(projected,pa)
     return fig, pa, projected
 
+def make_annotated_col(x,annotate_genes):
+    if x in annotate_genes:
+        return x
+    else:
+        return np.nan
+
 
     # # print(projected.head(),features.head())
     # import sys

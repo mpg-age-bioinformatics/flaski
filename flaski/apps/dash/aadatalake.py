@@ -13,7 +13,7 @@ from ._utils import handle_dash_exception, parse_table, protect_dashviews, valid
     change_table_minWidth, change_fig_minWidth
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge,\
-        make_volcano_plot, make_ma_plot, make_pca_plot
+        make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col
 import uuid
 from werkzeug.utils import secure_filename
 import json
@@ -402,7 +402,7 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         volcano_pa["ycols"]=volcano_df.columns.tolist()
         volcano_pa["groups"]=["None"]+volcano_df.columns.tolist()
         
-        volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: [ s for s in annotate_genes if s == x ][0] )
+        volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: make_annotated_col(x, annotate_genes) )
         volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
         volcano_pa["labels_col_value"]="datalake_search"
 
@@ -499,8 +499,8 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         ma_pa["ycols"]=ma_df.columns.tolist()
         ma_pa["groups"]=["None"]+ma_df.columns.tolist()
 
-        ma_pa["datalake_search"]=ma_pa["gene name"].apply(lambda x: [ s for s in annotate_genes if s == x ][0] )
-        ma_pa["labels_col"]=["select a column.."]+ma_pa.columns.tolist()
+        ma_pa["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
+        ma_pa["labels_col"]=["select a column.."]+ma_df.columns.tolist()
         ma_pa["labels_col_value"]="datalake_search"
 
         session["filename"]="<from RNAseq lake>"
