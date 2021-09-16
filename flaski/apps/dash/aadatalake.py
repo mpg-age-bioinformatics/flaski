@@ -503,7 +503,7 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         ma_df["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
         ma_df=ma_df.drop(["___label___"],axis=1)
         ma_pa["labels_col"]=["select a column.."]+ma_df.columns.tolist()
-        "select a column.."
+        ma_pa["labels_col_value"]="select a column.."
 
         session["filename"]="<from RNAseq lake>"
         session["plot_arguments"]=ma_pa
