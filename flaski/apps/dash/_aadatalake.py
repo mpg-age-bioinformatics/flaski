@@ -151,11 +151,16 @@ def find_fc(df):
     group_1_list=[ s for s in samples_names if bool(re.match(re.compile(group_1+" ."), s  ) )  ]
     group_2_list=[ s for s in samples_names if bool(re.match(re.compile(group_2+" ."), s  ) )  ]
 
-    group_1_values=np.mean([ df_[s].tolist()[0] for s in group_1_list  ])
-    group_2_values=np.mean([ df_[s].tolist()[0] for s in group_2_list  ])
+    group_1_values=np.mean([ float(df_[s].tolist()[0]) for s in group_1_list  ])
+    group_2_values=np.mean([ float(df_[s].tolist()[0]) for s in group_2_list  ])
 
-    fc_=group_2_values/group_1_values
-    fc=df_["log2 FC"].tolist()[0]
+    fc_=np.log2(group_2_values/group_1_values)
+    fc=float(df_["log2 FC"].tolist()[0])
+
+    print(fc_,fc)
+    import sys
+    sys.stdout.flush()
+
     if fc * fc_ > 0:
         return "log2(%s/%s)" %(group_2,group_1)
     else:
