@@ -157,10 +157,6 @@ def find_fc(df):
     fc_=np.log2(group_2_values/group_1_values)
     fc=float(df_["log2 FC"].tolist()[0])
 
-    print(fc_,fc)
-    import sys
-    sys.stdout.flush()
-
     if fc * fc_ > 0:
         return "log2(%s/%s)" %(group_2,group_1)
     else:
