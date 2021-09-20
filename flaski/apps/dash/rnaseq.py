@@ -11,7 +11,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, \
     make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
-    change_table_minWidth, change_fig_minWidth, GROUPS
+    change_table_minWidth, change_fig_minWidth, GROUPS, make_submission_file
 import uuid
 from werkzeug.utils import secure_filename
 import json
@@ -57,6 +57,24 @@ style_cell={
         'minWidth': '130px', 'width': '130px', 'maxWidth': '180px',
         'whiteSpace': 'normal'
     }
+
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
+    # @cache.memoize(60*60*2) # 2 hours
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
+        df=pd.DataFrame()
+        for row in rows:
+            if row['Read 1'] != "" :
+                df_=pd.DataFrame(row,index=[0])
+                df=pd.concat([df,df_])
+        df.reset_index(inplace=True, drop=True)
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc]}, index=list(range(7)))
+        df=df.to_json()
+        df_=df_.to_json()
+        filename=make_submission_file(".RNAseq.xlsx")
+
+        return {"filename": filename, "samples":df, "metadata":df_}
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
 
 input_df=make_table(input_df,'adding-rows-table')
 input_df.editable=True
@@ -166,12 +184,29 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     ] + make_footer()
 )
 
-# @dashapp.callback(
-#     Output('message', component_property='children'),
-#     Input('session-id', 'data'),
-#     Input('submit-button-state', 'n_clicks'),
-#     State('download_name', 'value') )
-# def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
+@dashapp.callback(
+    Output('message', component_property='children'),
+    Input('session-id', 'data'),
+    Input('submit-button-state', 'n_clicks'),
+    State('adding-rows-table', 'data'),
+    State('email', 'value'),
+    State('opt-group', 'value'),
+    State('folder', 'value'),
+    State('md5sums', 'value'),
+    State('project_title', 'value'),
+    State('opt-organism', 'value'),
+    State('opt-ercc', 'value') )
+def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
+    #{"filename": filename, "samples":df, "metadata":df_}
+    if os.path.isfile(subdic["filename"]):
+        msg=dcc.Markdown('''You have already submitted this data. Re-submission will not take place.''')
+        return msg
+    else:
+        msg=dcc.Markdown('''Submission successful. Please check your email for confirmation.''')
+        return msg
+
+
 
 @dashapp.callback(
     Output('adding-rows-table', 'data'),

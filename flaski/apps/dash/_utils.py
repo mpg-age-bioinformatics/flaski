@@ -12,6 +12,9 @@ import traceback
 from flaski.email import send_exception_email
 from datetime import datetime
 import dash_table
+import tempfile
+import os
+
 
 META_TAGS=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0, maximum-scale=1.2, minimum-scale=0.5,'} ]
 
@@ -248,3 +251,16 @@ def change_fig_minWidth(fig,minwidth):
     st["minWidth"]=minwidth
     fig.style=st
     return fig
+
+
+def timestamp():
+  now = datetime.now()
+  dt_string = now.strftime("%Y%m%d.%H%M%S.")
+  return dt_string
+
+def make_submission_file(suffix):
+  dt_string=timestamp()
+  new_file, filename = tempfile.mkstemp(suffix=suffix, prefix=dt_string )
+  os.close(new_file)
+  filename="/submissions/"+os.path.basename(filename)
+  return filename
