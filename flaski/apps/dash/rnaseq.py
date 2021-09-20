@@ -3,6 +3,7 @@ from flaski import app
 from flask_login import current_user
 from flask_caching import Cache
 from flaski.routines import check_session_app
+import dash_table
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -10,7 +11,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, \
     make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
-    change_table_minWidth, change_fig_minWidth
+    change_table_minWidth, change_fig_minWidth, GROUPS
 import uuid
 from werkzeug.utils import secure_filename
 import json
@@ -30,21 +31,112 @@ cache = Cache(dashapp.server, config={
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
 })
 
-controls = [ 
-    html.H5("Filters", style={"margin-top":10}), 
-    html.Label('Data sets'), dcc.Dropdown( id='opt-datasets', multi=True),
-    html.Label('Groups',style={"margin-top":10}), dcc.Dropdown( id='opt-groups', multi=True),
-    html.Label('Samples',style={"margin-top":10}), dcc.Dropdown( id='opt-samples', multi=True),
-    html.Label('Gene names',style={"margin-top":10}), dcc.Dropdown( id='opt-genenames', multi=True),
-    html.Label('Gene IDs',style={"margin-top":10}), dcc.Dropdown( id='opt-geneids', multi=True),
-    html.Label('Download file prefix',style={"margin-top":10}), dcc.Input(id='download_name', value="data.lake", type='text') ]
+input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
+example_input=pd.DataFrame( { "Sample":["mock treated 1","mock treated 2","mock treated 3",
+                                        "CDKN1A KD 1","CDKN1A KD 2","CDKN1A KD 3" ] ,
+                             "Group" : ['control','control','control','shRNA','shRNA','shRNA'] ,
+                             "Replicate": ['1','2','3','1','2','3'],
+                             "Read 1": [ "A006850092_131904_S2_L002_R1_001.fastq.gz,A003450092_131904_S2_L003_R1_001.fastq.gz",
+                                        "A006850092_131924_S12_L002_R1_001.fastq.gz",
+                                        "A006850092_131944_S22_L002_R1_001.fastq.gz",
+                                        "A006850092_131906_S3_L002_R1_001.fastq.gz",
+                                        "A006850094_131926_S3_L001_R1_001.fastq.gz",
+                                        "A006850092_131956_S28_L002_R1_001.fastq.gz"],
+                                        "Read 2": [ "A003450092_131904_S2_L002_R2_001.fastq.gz,A003450092_131904_S2_L003_R2_001.fastq.gz",
+                                        "A006850092_131924_S12_L002_R2_001.fastq.gz",
+                                        "A006850092_131944_S22_L002_R2_001.fastq.gz",
+                                        "A006850092_131906_S3_L002_R2_001.fastq.gz",
+                                        "A006850094_131926_S3_L001_R2_001.fastq.gz",
+                                        "A006850092_131956_S28_L002_R2_001.fastq.gz"],
+                            "Notes":  ["eg. 2 files / sample", "","","","","",]
+                            } )
 
-# controls = [ 
+style_cell={
+        'height': '100%',
+        # all three widths are needed
+        'minWidth': '130px', 'width': '130px', 'maxWidth': '180px',
+        'whiteSpace': 'normal'
+    }
 
-# ]
+input_df=make_table(input_df,'adding-rows-table')
+input_df.editable=True
+input_df.row_deletable=True
+input_df.style_cell=style_cell
 
-side_bar=[ dbc.Card(controls, body=True),
-            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "100%","margin-top":4, "margin-bottom":4} )
+example_input=make_table(example_input,'example-table')
+example_input.style_cell=style_cell
+
+groups_=make_options(GROUPS)
+organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
+organisms_=make_options(organisms)
+ercc_=make_options(["YES","NO"])
+
+arguments=[ dbc.Row( [
+                dbc.Col( html.Label('email') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('your email address'),md=3  ), 
+                ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('Group') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
+                ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('Folder name on store-age'),md=3  ), 
+                ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='md5sums', placeholder="md5sums.file.txt", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('File with md5sums'),md=3  ), 
+                ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('Project title') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('Give a name to your project'),md=3  ), 
+                ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('Organism') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-organism', options=organisms_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
+                ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
+                ], style={"margin-top":10,"margin-bottom":10}),        
+]
+
+readme=dcc.Markdown('''
+
+For submitting samples for RNAseq analysis you will need to copy your raw files into `store-age.age.mpg.de/coworking/group_bit_all/automation`. 
+
+Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` files are inside as well as your md5sums file (attention: only one md5sums file per project).
+
+All files will have to be on your project folder (ie. `my_proj_folder`) do not create further subfolders.
+
+Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
+
+Please check your email for confirmation of your submission.
+''', style={"width":"90%", "margin":"10px"} )
+
+controls = [
+    dcc.Tabs([
+        dcc.Tab( [ readme ], label="Readme", id="tab-readme") ,
+        dcc.Tab( [ input_df,
+            html.Button('Add Sample', id='editing-rows-button', n_clicks=0, style={"margin-top":4, "margin-bottom":4})
+            ],
+            label="Samples", id="tab-samples",
+            ),
+        dcc.Tab( [ example_input ],label="Samples (example)", id="tab-samples-example") ,
+        dcc.Tab( arguments,label="Info", id="tab-info" ) ,
+    ])
+]
+
+side_bar=[ dbc.Card(controls, body=False),
+            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
+            html.Div(id="message")
          ]
 
 # Define Layout
@@ -61,7 +153,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
                         children=html.Div(id="side_bar"),
                         style={"margin-top":"0%"}
                     ),                    
-                    style={"width": "90%", "height": "100%",'overflow': 'scroll'} ),               
+                    style={"width": "90%", "min-height": "100%","height": "100%",'overflow': 'scroll'} ),               
                 # dbc.Col( dcc.Loading(
                 #         id="loading-output-2",
                 #         type="default",
@@ -74,28 +166,22 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     ] + make_footer()
 )
 
+# @dashapp.callback(
+#     Output('message', component_property='children'),
+#     Input('session-id', 'data'),
+#     Input('submit-button-state', 'n_clicks'),
+#     State('download_name', 'value') )
+# def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
+
 @dashapp.callback(
-    Output(component_id='opt-datasets', component_property='options'),
-    Output(component_id='opt-genenames', component_property='options'),
-    Output(component_id='opt-geneids', component_property='options'),
-    Input('session-id', 'data')
-    )
-def update_datasets(session_id):
-    if not validate_user_access(current_user,CURRENTAPP):
-        return None
-    results_files=read_results_files(cache)
-    datasets=list(set(results_files["Set"]))
-    datasets=make_options(datasets)
-
-    genes=read_genes(cache)
-
-    genenames=list(set(genes["gene_name"]))
-    genenames=make_options(genenames)
-
-    geneids=list(set(genes["gene_id"]))
-    geneids=make_options(geneids)
-
-    return datasets, genenames, geneids
+    Output('adding-rows-table', 'data'),
+    Input('editing-rows-button', 'n_clicks'),
+    State('adding-rows-table', 'data'),
+    State('adding-rows-table', 'columns'))
+def add_row(n_clicks, rows, columns):
+    if n_clicks > 0:
+        rows.append({c['id']: '' for c in columns})
+    return rows
 
 # this call back prevents the side bar from being shortly 
 # show / exposed to users without access to this App

@@ -15,6 +15,27 @@ import dash_table
 
 META_TAGS=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0, maximum-scale=1.2, minimum-scale=0.5,'} ]
 
+GROUPS=["Adam_Antebi",\
+"Aleksandra_Filipovska",\
+"Bioinformatics",\
+"Constantinos_Demetriades",\
+"CRISPR_Screening",\
+"Dario_Valenzano",\
+"Ivan_Matic",\
+"James_Stewart",\
+"Lena_Pernas",\
+"Linda_Partridge",\
+"Martin_Denzel",\
+"Martin_Graef",\
+"Metabolomics",\
+"Nils_Larson",\
+"Peter_Tessarz",\
+"Phenotyping",\
+"Proteomics",\
+"Ron_Jachimowicz",\
+"Sara_Wickstroem",\
+"Thomas_Langer"]
+
 def make_options(valuesin):
     opts=[]
     for c in valuesin:
