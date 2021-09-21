@@ -282,6 +282,8 @@ Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` 
 All files will have to be on your project folder (eg. `my_proj_folder` in `Info` > `Folder`) do not create further subfolders.
 
 Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
+
+ If you have a control sample for normalization please specify the respecive sample in the "samples" sheet according to the "example".
         '''
     
     sra_samples='''
