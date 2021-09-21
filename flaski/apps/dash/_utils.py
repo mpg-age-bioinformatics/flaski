@@ -38,7 +38,8 @@ GROUPS=["Adam_Antebi",\
 "Proteomics",\
 "Ron_Jachimowicz",\
 "Sara_Wickstroem",\
-"Thomas_Langer"]
+"Thomas_Langer",\
+"External"]
 
 def make_options(valuesin):
     opts=[]
