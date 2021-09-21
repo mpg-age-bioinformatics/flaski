@@ -285,7 +285,7 @@ Please check your email for confirmation of your submission.
     else:
         if "@age.mpg.de" in current_user.email:
 
-            readme='''For submitting samples for RNAseq analysis you will need to copy your raw files into `store-age.age.mpg.de/coworking/group_bit_all/automation`.
+            readme='''For submitting samples for analysis you will need to copy your raw files into `store-age.age.mpg.de/coworking/group_bit_all/automation`.
             
             %s
 
