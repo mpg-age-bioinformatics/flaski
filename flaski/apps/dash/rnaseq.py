@@ -11,7 +11,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, \
     make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
-    change_table_minWidth, change_fig_minWidth, GROUPS, make_submission_file
+    change_table_minWidth, change_fig_minWidth, GROUPS, make_submission_file, validate_metadata
 import uuid
 from werkzeug.utils import secure_filename
 import json
@@ -198,15 +198,26 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-ercc', 'value') )
 def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
+    samples=pd.read_json(subdic["samples"])
+    metadata=pd.read_json(subdic["metadata"])
     #{"filename": filename, "samples":df, "metadata":df_}
+    validation=validate_metadata(metadata)
+    if validation:
+        msg='''
+#### !! ATTENTION !!
+
+'''+validation
+        return dcc.Markdown(msg, style={"margin-top":"15px"} )
+        
     if os.path.isfile(subdic["filename"]):
-        msg=dcc.Markdown('''You have already submitted this data. Re-submission will not take place.''')
-        return msg
+        msg='''You have already submitted this data. Re-submission will not take place.'''
     else:
-        msg=dcc.Markdown('''Submission successful. Please check your email for confirmation.''')
-        return msg
+        msg='''**Submission successful**. Please check your email for confirmation.'''
+    
 
 
+
+    return dcc.Markdown(msg, style={"margin-top":"10px"} )
 
 @dashapp.callback(
     Output('adding-rows-table', 'data'),

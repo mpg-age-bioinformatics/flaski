@@ -14,6 +14,7 @@ from datetime import datetime
 import dash_table
 import tempfile
 import os
+import re
 
 
 META_TAGS=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0, maximum-scale=1.2, minimum-scale=0.5,'} ]
@@ -264,3 +265,18 @@ def make_submission_file(suffix):
   os.close(new_file)
   filename="/submissions/"+os.path.basename(filename)
   return filename
+
+def validate_metadata(metadata):
+    email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
+    email=str(email).rstrip().lstrip()
+    email=email.split(",")
+    email=[ re.search("([^@|\s]+@[^@]+\.[^@|\s]+)",e,re.I) for e in email ]
+    email=[ e.group(1) for e in email if e ]
+    if not email :
+        msg="Contact email is not a valid email. Please provide a valid email in the 'email' field of your submission file."
+        return msg
+    nas=metadata[metadata["Value"].isna()]["Field"].tolist()
+    if nas:
+        msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
+        return msg
+    return None
