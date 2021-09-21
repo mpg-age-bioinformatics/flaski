@@ -15,9 +15,13 @@ def send_email(subject, sender, recipients, text_body, html_body, reply_to, atta
     msg.body = text_body
     msg.html = html_body
     if attachment:
+        if type(attachment) == str:
+            filename=attachment
+        else:
+            filename=attachment.filename
         with open(attachment_path, open_type) as f: 
             msg.attach(
-                secure_filename(attachment.filename),
+                secure_filename(filename),
                 attachment_type,
                 f.read() )
         

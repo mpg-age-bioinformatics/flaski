@@ -3,6 +3,7 @@ from flaski import app
 from flask_login import current_user
 from flask_caching import Cache
 from flaski.routines import check_session_app
+from flaski.email import send_submission_email
 import dash_table
 import dash
 from dash.dependencies import Input, Output, State
@@ -208,14 +209,18 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
 
 '''+validation
         return dcc.Markdown(msg, style={"margin-top":"15px"} )
-        
+
     if os.path.isfile(subdic["filename"]):
         msg='''You have already submitted this data. Re-submission will not take place.'''
     else:
         msg='''**Submission successful**. Please check your email for confirmation.'''
     
+    EXCout=pd.ExcelWriter(subdic["filename"])
+    samples.to_excel(EXCout,"samples",index=None)
+    metadata.to_excel(EXCout,"RNAseq",index=None)
+    EXCout.save()
 
-
+    send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
 
     return dcc.Markdown(msg, style={"margin-top":"10px"} )
 
