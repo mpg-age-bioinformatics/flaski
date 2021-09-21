@@ -183,19 +183,20 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
     apps=read_private_apps(current_user.email,app)
-    apps=[ s["link"] for s in apps ] 
+    apps=[ s["link"] for s in apps ]
+    # if not validate_user_access(current_user,CURRENTAPP):
+    #         return dcc.Location(pathname="/index", id="index"), None, None
     if CURRENTAPP not in apps:
         return dcc.Markdown('''
         
 #### !! You have no access to this App !!
 
         ''', style={"margin-top":"15px"} )
-
-    # if not validate_user_access(current_user,CURRENTAPP):
-    #         return dcc.Location(pathname="/index", id="index"), None, None
     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
+    # print(subdic["filename"])
+
     #{"filename": filename, "samples":df, "metadata":df_}
     validation=validate_metadata(metadata)
     if validation:
@@ -210,13 +211,18 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
     else:
         msg='''**Submission successful**. Please check your email for confirmation.'''
     
-    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] != "External" :
-        EXCout=pd.ExcelWriter(subdic["filename"])
-        samples.to_excel(EXCout,"samples",index=None)
-        metadata.to_excel(EXCout,"RNAseq",index=None)
-        EXCout.save()
+    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
+        subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
+
+    EXCout=pd.ExcelWriter(subdic["filename"])
+    samples.to_excel(EXCout,"samples",index=None)
+    metadata.to_excel(EXCout,"RNAseq",index=None)
+    EXCout.save()
 
     send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+
+    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
+        os.remove(subdic["filename"])
 
     return dcc.Markdown(msg, style={"margin-top":"10px"} )
 
