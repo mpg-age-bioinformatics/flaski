@@ -23,18 +23,22 @@ def check_pipelines(EXC, TAG):
   status=False
   attachment_path=None
   # dictionary of expected sheet names per TAG
-  expected_sheets={ 'RNAseq': ['RNAseq', 'samples'],\
-    'intronRet' : ['intronRet', 'samples'],\
-    'alternativeSplicing' : ['alternativeSplicing', 'samples'],\
-    'ATAC_seq' : ['ATAC_seq', 'samples', 'input'],\
-    'circRNA' : ['circRNA', 'samples'],\
-    'riboseq' : ['riboseq', 'samples', 'matching'],\
-    'variantCalling' : ['variantCalling', 'samples'],\
-    'miRNAseq' : ['miRNAseq', 'samples'],\
-    '16S' : ['16S', 'samples'],\
+  expected_sheets={ 'riboseq' : ['riboseq', 'samples', 'matching'],\
     'GSEA' : ['GSEA', 'samples', 'ExpMatrix', 'GeneSets'],\
-    'motif_enrichment' : ['motif_enrichment', 'samples'],\
-    'IRfinder':['IRfinder', 'samples']}
+    'motif_enrichment' : ['motif_enrichment', 'samples']}
+
+  # 'RNAseq': ['RNAseq', 'samples'],\
+  # 'intronRet' : ['intronRet', 'samples'],\
+  # 'alternativeSplicing' : ['alternativeSplicing', 'samples'],\
+  # 'circRNA' : ['circRNA', 'samples'],\
+  # 'miRNAseq' : ['miRNAseq', 'samples'],\
+  # '16S' : ['16S', 'samples'],\
+  # 'IRfinder':['IRfinder', 'samples']
+  # 'ATAC_seq' : ['ATAC_seq', 'samples', 'input'],\
+  # 'variantCalling' : ['variantCalling', 'samples'],\
+
+
+
   # loop over all expected sheets and check if they are present, if not, send email
   for sheet in expected_sheets[TAG]:
     if sheet not in EXC.sheet_names:
