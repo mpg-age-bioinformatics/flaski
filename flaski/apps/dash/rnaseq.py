@@ -2,6 +2,7 @@ from flaski import app
 from flask_login import current_user
 from flask_caching import Cache
 from flaski.email import send_submission_email
+from flaski.routines import read_private_apps
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -83,6 +84,7 @@ example_input.style_cell=style_cell
 
 # generate dropdown options
 groups_=make_options(GROUPS)
+external_=make_options(["External"])
 organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
 organisms_=make_options(organisms)
 ercc_=make_options(["YES","NO"])
@@ -101,7 +103,7 @@ arguments=[ dbc.Row( [
             dbc.Row( [
                 dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Folder name on store-age'),md=3  ), 
+                dbc.Col( html.Label('Folder containing your files'),md=3  ), 
                 ], style={"margin-top":10}),
             dbc.Row( [
                 dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right" }), 
@@ -125,24 +127,10 @@ arguments=[ dbc.Row( [
                 ], style={"margin-top":10,"margin-bottom":10}),        
 ]
 
-# readme section
-readme=dcc.Markdown('''
-
-For submitting samples for RNAseq analysis you will need to copy your raw files into `store-age.age.mpg.de/coworking/group_bit_all/automation`. 
-
-Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` files are inside as well as your md5sums file (attention: only one md5sums file per project).
-
-All files will have to be on your project folder (ie. `my_proj_folder`) do not create further subfolders.
-
-Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
-
-Please check your email for confirmation of your submission.
-''', style={"width":"90%", "margin":"10px"} )
-
 # input 
 controls = [
     dcc.Tabs([
-        dcc.Tab( [ readme ], label="Readme", id="tab-readme") ,
+        dcc.Tab( label="Readme", id="tab-readme") ,
         dcc.Tab( [ input_df,
             html.Button('Add Sample', id='editing-rows-button', n_clicks=0, style={"margin-top":4, "margin-bottom":4})
             ],
@@ -194,8 +182,17 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-ercc', 'value'),
     prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
-    if not validate_user_access(current_user,CURRENTAPP):
-            return dcc.Location(pathname="/index", id="index"), None, None
+    apps=read_private_apps(current_user.email,app)
+    apps=[ s["link"] for s in apps ] 
+    if CURRENTAPP not in apps:
+        return dcc.Markdown('''
+        
+#### !! You have no access to this App !!
+
+        ''', style={"margin-top":"15px"} )
+
+    # if not validate_user_access(current_user,CURRENTAPP):
+    #         return dcc.Location(pathname="/index", id="index"), None, None
     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
@@ -213,10 +210,11 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
     else:
         msg='''**Submission successful**. Please check your email for confirmation.'''
     
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"RNAseq",index=None)
-    EXCout.save()
+    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] != "External" :
+        EXCout=pd.ExcelWriter(subdic["filename"])
+        samples.to_excel(EXCout,"samples",index=None)
+        metadata.to_excel(EXCout,"RNAseq",index=None)
+        EXCout.save()
 
     send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
 
@@ -234,7 +232,7 @@ def add_row(n_clicks, rows, columns):
     return rows
 
 # this call back prevents the side bar from being shortly 
-# show / exposed to users without access to this App
+# shown / exposed to users without access to this App
 @dashapp.callback( Output('app_access', 'children'),
                    Output('main_input', 'children'),
                    Output('navbar','children'),
@@ -245,6 +243,66 @@ def get_side_bar(session_id):
     else:
         navbar=make_navbar(navbar_title, current_user, cache)
         return None, main_input, navbar
+
+
+# options and values based on in-house vs external users
+@dashapp.callback( Output("tab-readme",'children'),
+                   Output("opt-group","options"),
+                   Output("opt-group","value"),
+                   Input('session-id', 'data') )
+def make_readme(session_id):
+    apps=read_private_apps(current_user.email,app)
+    apps=[ s["link"] for s in apps ] 
+
+    readme_common='''
+
+Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` files are inside as well as your md5sums file (attention: only one md5sums file per project).
+
+All files will have to be on your project folder (eg. `my_proj_folder` in `Info` > `Folder`) do not create further subfolders.
+
+Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
+        '''
+    
+    sra_samples='''
+If you want to analyse **GEO/SRA** data you can do this without downloading the respective files by giving in 
+the SRA run number instead of the file name. If you are analysing paired end data and only one run number 
+exists please give in the same run number in `Read 2`. In the `Folder` and `md5sums` fields you will need to 
+give in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI). 
+    '''
+
+    if CURRENTAPP not in apps:
+        readme='''You have no access to this App. Once you have been given access more information will be displayed on how to transfer your raw data.
+        
+        %s
+
+Please check your email for confirmation of your submission.
+        ''' %(readme_common)
+    else:
+        if "@age.mpg.de" in current_user.email:
+
+            readme='''For submitting samples for RNAseq analysis you will need to copy your raw files into `store-age.age.mpg.de/coworking/group_bit_all/automation`.
+            
+            %s
+
+            %s
+
+Please check your email for confirmation of your submission.
+
+            ''' %(readme_common,sra_samples)
+        else:
+            readme='''In `Info` > `Folder` please type *TAPE*.
+
+Please check your email for confirmation of your submission.
+        '''
+
+    readme=dcc.Markdown(readme, style={"width":"90%", "margin":"10px"} )
+    
+    if "@age.mpg.de" in current_user.email:
+        return readme, groups_, None
+    else:
+        return readme, external_, "External"
+
+
 
 # update user email on email field on start
 @dashapp.callback( Output('email','value'),
