@@ -1,23 +1,15 @@
-import re
 from flaski import app
 from flask_login import current_user
 from flask_caching import Cache
-from flaski.routines import check_session_app
 from flaski.email import send_submission_email
-import dash_table
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, \
-    make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
-    change_table_minWidth, change_fig_minWidth, GROUPS, make_submission_file, validate_metadata
+from ._utils import handle_dash_exception, protect_dashviews, validate_user_access, \
+    make_navbar, make_footer, make_options, make_table, META_TAGS, GROUPS, make_submission_file, validate_metadata
 import uuid
-from werkzeug.utils import secure_filename
-import json
-from flask import session
-
 import pandas as pd
 import os
 
@@ -32,6 +24,27 @@ cache = Cache(dashapp.server, config={
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
 })
 
+# Read in users input and generate submission file.
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
+    @cache.memoize(60*60*2) # 2 hours
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
+        df=pd.DataFrame()
+        for row in rows:
+            if row['Read 1'] != "" :
+                df_=pd.DataFrame(row,index=[0])
+                df=pd.concat([df,df_])
+        df.reset_index(inplace=True, drop=True)
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc]}, index=list(range(7)))
+        df=df.to_json()
+        df_=df_.to_json()
+        filename=make_submission_file(".RNAseq.xlsx")
+
+        return {"filename": filename, "samples":df, "metadata":df_}
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
+
+
+# base samples input dataframe and example dataframe
 input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
 example_input=pd.DataFrame( { "Sample":["mock treated 1","mock treated 2","mock treated 3",
                                         "CDKN1A KD 1","CDKN1A KD 2","CDKN1A KD 3" ] ,
@@ -52,30 +65,13 @@ example_input=pd.DataFrame( { "Sample":["mock treated 1","mock treated 2","mock 
                             "Notes":  ["eg. 2 files / sample", "","","","","",]
                             } )
 
+# improve tables styling
 style_cell={
         'height': '100%',
         # all three widths are needed
         'minWidth': '130px', 'width': '130px', 'maxWidth': '180px',
         'whiteSpace': 'normal'
     }
-
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
-    # @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
-        df=pd.DataFrame()
-        for row in rows:
-            if row['Read 1'] != "" :
-                df_=pd.DataFrame(row,index=[0])
-                df=pd.concat([df,df_])
-        df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc]}, index=list(range(7)))
-        df=df.to_json()
-        df_=df_.to_json()
-        filename=make_submission_file(".RNAseq.xlsx")
-
-        return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
 
 input_df=make_table(input_df,'adding-rows-table')
 input_df.editable=True
@@ -85,11 +81,13 @@ input_df.style_cell=style_cell
 example_input=make_table(example_input,'example-table')
 example_input.style_cell=style_cell
 
+# generate dropdown options
 groups_=make_options(GROUPS)
 organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
 organisms_=make_options(organisms)
 ercc_=make_options(["YES","NO"])
 
+# arguments 
 arguments=[ dbc.Row( [
                 dbc.Col( html.Label('email') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
@@ -127,6 +125,7 @@ arguments=[ dbc.Row( [
                 ], style={"margin-top":10,"margin-bottom":10}),        
 ]
 
+# readme section
 readme=dcc.Markdown('''
 
 For submitting samples for RNAseq analysis you will need to copy your raw files into `store-age.age.mpg.de/coworking/group_bit_all/automation`. 
@@ -140,6 +139,7 @@ Once all the files have been copied, edit the `Samples` and `Info` tabs here and
 Please check your email for confirmation of your submission.
 ''', style={"width":"90%", "margin":"10px"} )
 
+# input 
 controls = [
     dcc.Tabs([
         dcc.Tab( [ readme ], label="Readme", id="tab-readme") ,
@@ -153,7 +153,7 @@ controls = [
     ])
 ]
 
-side_bar=[ dbc.Card(controls, body=False),
+main_input=[ dbc.Card(controls, body=False),
             html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
             html.Div(id="message")
          ]
@@ -169,22 +169,17 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
                 dbc.Col( dcc.Loading( 
                         id="loading-output-1",
                         type="default",
-                        children=html.Div(id="side_bar"),
+                        children=html.Div(id="main_input"),
                         style={"margin-top":"0%"}
                     ),                    
-                    style={"width": "90%", "min-height": "100%","height": "100%",'overflow': 'scroll'} ),               
-                # dbc.Col( dcc.Loading(
-                #         id="loading-output-2",
-                #         type="default",
-                #         children=[ html.Div(id="my-output")],
-                #         style={"margin-top":"50%","height": "100%"} ),
-                #     md=9, style={"height": "100%","width": "100%",'overflow': 'scroll'})
+                    style={"width": "90%", "min-height": "100%","height": "100%",'overflow': 'scroll'} )
             ], 
              style={"min-height": "87vh"}),
     ] ) 
     ] + make_footer()
 )
 
+# main submission call
 @dashapp.callback(
     Output('message', component_property='children'),
     Input('session-id', 'data'),
@@ -196,8 +191,11 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('md5sums', 'value'),
     State('project_title', 'value'),
     State('opt-organism', 'value'),
-    State('opt-ercc', 'value') )
+    State('opt-ercc', 'value'),
+    prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
+    if not validate_user_access(current_user,CURRENTAPP):
+            return dcc.Location(pathname="/index", id="index"), None, None
     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
@@ -224,6 +222,7 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
 
     return dcc.Markdown(msg, style={"margin-top":"10px"} )
 
+# add rows buttom 
 @dashapp.callback(
     Output('adding-rows-table', 'data'),
     Input('editing-rows-button', 'n_clicks'),
@@ -237,16 +236,23 @@ def add_row(n_clicks, rows, columns):
 # this call back prevents the side bar from being shortly 
 # show / exposed to users without access to this App
 @dashapp.callback( Output('app_access', 'children'),
-                   Output('side_bar', 'children'),
+                   Output('main_input', 'children'),
                    Output('navbar','children'),
                    Input('session-id', 'data') )
 def get_side_bar(session_id):
     if not validate_user_access(current_user,CURRENTAPP):
-        return dcc.Location(pathname="/index", id="index"), None, None
+        return dcc.Location(pathname="/index", id="index"), None, None, None
     else:
         navbar=make_navbar(navbar_title, current_user, cache)
-        return None, side_bar, navbar
+        return None, main_input, navbar
 
+# update user email on email field on start
+@dashapp.callback( Output('email','value'),
+                   Input('session-id', 'data') )
+def set_email(session_id):
+    return current_user.email
+
+# navbar toggle for colapsed status
 @dashapp.callback(
         Output("navbar-collapse", "is_open"),
         [Input("navbar-toggler", "n_clicks")],
@@ -255,27 +261,3 @@ def toggle_navbar_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
-
-# if __name__ == '__main__':
-#     app.run_server(host='0.0.0.0', debug=True, port=8050)
-
-# #### HANDLING LARGE AMOUNT OF ARGUMENTS ####
-# #### this will work for inputs with only one present in the list of Inputs+States
-# ## all callback elements with `State` will be updated only once submit is pressed
-# ## all callback elements wiht `Input` will be updated everytime the value gets changed 
-# inputs=[Input('submit-button-state', 'n_clicks')]
-# states=[State('upload-data', 'contents'),
-#     State("opt-xcol", "search_value"),
-#     State(component_id='multiplier', component_property='value'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified') ]
-# @app.callback(
-#     Output(component_id='my-output', component_property='children'),
-#     inputs,
-#     states
-#     )      
-# def update_output(*args):
-#     input_names = [item.component_id for item in inputs + states]
-#     kwargs_dict = dict(zip(input_names, args))
-#     print(kwargs_dict)
-#     multiplier=kwargs_dict["multiplier"]
