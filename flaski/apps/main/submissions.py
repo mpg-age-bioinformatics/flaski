@@ -23,8 +23,9 @@ def check_pipelines(EXC, TAG):
   status=False
   attachment_path=None
   # dictionary of expected sheet names per TAG
-  expected_sheets={ 'riboseq' : ['riboseq', 'samples', 'matching'] }
-
+  expected_sheets={  } 
+  
+  #'riboseq' : ['riboseq', 'samples', 'matching'] }
   # 'RNAseq': ['RNAseq', 'samples'],\
   # 'intronRet' : ['intronRet', 'samples'],\
   # 'alternativeSplicing' : ['alternativeSplicing', 'samples'],\
@@ -78,7 +79,7 @@ def submission_check(inputfile):
   status=False
   attachment_path=None
 
-  valid_submissions=["RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq', '16S', 'GSEA', 'motif_enrichment', 'IRfinder']
+  valid_submissions=[]#"RNAseq", "intronRet", "variantCalling", "alternativeSplicing" , 'ATAC_seq', 'circRNA', 'riboseq', 'miRNAseq', '16S', 'GSEA', 'motif_enrichment', 'IRfinder']
 
   filename = secure_filename(inputfile.filename)
   fileread = inputfile.read()

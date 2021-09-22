@@ -1,5 +1,5 @@
 from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, \
-    mirna,sixteens ,irfinder, chip, atac, varcal, motifenr, gsea
+    mirna,sixteens ,irfinder, chip, atac, varcal, motifenr, gsea, riboseq
 
 EXTERNAL_APPS=[ { "name":"Dash demo plot", 
                 "id":'dashapp_more',
@@ -65,6 +65,11 @@ EXTERNAL_APPS=[ { "name":"Dash demo plot",
                 "id":'gsea_more',
                 "link":'gsea' ,
                 "java":"javascript:ReverseDisplay('gsea_more')", 
-                "description":"Gene Set Enrichment Analysis submission form."} ]
+                "description":"Gene Set Enrichment Analysis submission form."},
+                {"name":"Ribo-Seq submission", 
+                "id":'riboseq_more',
+                "link":'riboseq' ,
+                "java":"javascript:ReverseDisplay('riboseq_more')", 
+                "description":"Ribo-Seq submission form."} ]
                 
 EXT_DEFAULTS_DIC={}
