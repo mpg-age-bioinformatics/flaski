@@ -1,7 +1,7 @@
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
 from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot
 from flaski.apps.dash import aadatalake
-from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, motifenr, gsea, riboseq
+from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, gsea, riboseq
 from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
@@ -74,11 +74,6 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         "link":'varcal' ,
         "java":"javascript:ReverseDisplay('varcal_more')", 
         "description":"Variant calling submission form.", "submission":"yes"},\
-        {"name":"Motif enrichment analysis", 
-        "id":'motifenr_more',
-        "link":'motifenr' ,
-        "java":"javascript:ReverseDisplay('motifenr_more')", 
-        "description":"Motif enrichment analysis submission form.", "submission":"yes"},\
         {"name":"Gene Set Enrichment Analysis", 
         "id":'gsea_more',
         "link":'gsea' ,
