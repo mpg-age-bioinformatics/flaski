@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.models import User, UserLogging
 from flaski.email import send_exception_email
-from flaski.routines import check_session_app, handle_exception, read_request, fuzzy_search
+from flaski.routines import check_session_app, handle_exception, read_request, fuzzy_search, separate_apps
 
 from fuzzywuzzy import process
 
@@ -55,6 +55,10 @@ def kegg(download=None):
     # return render_template('/index.html' ,apps=apps)
 
     reset_info=check_session_app(session,"kegg",apps)
+
+    submissions, apps=separate_apps(current_user.user_apps)
+
+
     if reset_info:
         flash(reset_info,'error')
         # INITIATE SESSION

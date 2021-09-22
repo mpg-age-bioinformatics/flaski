@@ -15,6 +15,19 @@ markup_message = Markup('<br><br>Check out our YouTube tutorials <a href="https:
 # from flaski.models import UserLogging
 # from flaski import app as app_
 
+def separate_apps(lin):
+    submissions=[]
+    no_submissions=[]
+    for dic in lin:
+        if "submission" in list(dic.keys()) :
+            if dic["submission"]=="yes":
+                submissions.append(dic)
+            else:
+                no_submissions.append(dic)
+        else:
+            no_submissions.append(dic)
+    return submissions, no_submissions
+
 def fuzzy_search(query_value,available_values):
     x=query_value.split(",")
     x=" ".join(x)

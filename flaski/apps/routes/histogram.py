@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.histogram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file
+from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_tables, allowed_file, read_argument_file, read_session_file, separate_apps
 from flaski.email import send_exception_email
 
 
@@ -51,6 +51,8 @@ def histogram(download=None):
     plot_arguments=None  
 
     reset_info=check_session_app(session,"histogram",apps)
+    submissions, apps=separate_apps(current_user.user_apps)
+
     
     if reset_info:
 

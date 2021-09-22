@@ -60,7 +60,7 @@ p.big {
 </style>
 </head>
 
-  <script type="text/javascript" language="JavaScript"><!--
+  <!-- <script type="text/javascript" language="JavaScript">
 function HideContent(d) {
 document.getElementById(d).style.display = "none";
 }
@@ -71,10 +71,10 @@ function ReverseDisplay(d) {
 if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
 else { document.getElementById(d).style.display = "none"; }
 }
-//--></script>
+</script> -->
 
 
-  <script type="text/javascript" language="JavaScript"><!--
+  <!-- <script type="text/javascript" language="JavaScript">
 function HideContent(d) {
 document.getElementById(d).style.display = "none";
 }
@@ -85,7 +85,7 @@ function ReverseDisplay(d) {
 if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
 else { document.getElementById(d).style.display = "none"; }
 }
-//--></script>
+</script> -->
 
 <style type="text/css">
 a.white {
@@ -93,7 +93,7 @@ color: White ;
 }
 </style>
 
-  <script type="text/javascript" language="JavaScript"><!--
+<!-- <script type="text/javascript" language="JavaScript">
 function HideContent(d) {
 document.getElementById(d).style.display = "none";
 }
@@ -104,9 +104,9 @@ function ReverseDisplay(d) {
 if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
 else { document.getElementById(d).style.display = "none"; }
 }
-//--></script>
+</script> -->
 
-  <script type="text/javascript" language="JavaScript"><!--
+<script type="text/javascript" language="JavaScript">
 function HideContent(d) {
 document.getElementById(d).style.display = "none";
 }
@@ -117,7 +117,7 @@ function ReverseDisplay(d) {
 if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
 else { document.getElementById(d).style.display = "none"; }
 }
-//--></script>
+</script>
 
 <style type="text/css">
 a.white {
@@ -155,44 +155,80 @@ color: White ;
           <div class="row">
 
             {% for app in apps %}
-
-            <div class="col-md-3 col-sm-6">
+            <div class="col-md-3 col-sm-6" style="height:250px;" }>
               <div class="service-item">
                 <span class="fa-stack fa-4x">
                   <i class="fa fa-circle fa-stack-2x" href="/{{app.link}}"></i>
                   <a href="/{{app.link}}" class="fa fa-flask fa-stack-1x text-primary"></a>
-                  <!--i class="fa fa-flask fa-stack-1x text-primary" href="/{{app.link}}"></i-->
                 </span>
-                <a href="/{{app.link}}"> <h4 style="padding-bottom: 10px; color: white; ">
-                  <strong>{{ app.name }}</strong>
-                </h4></a>
-                <!--p--><!--Lorem ipsum dolor sit amet, consectetur adipisicing elit.--><!--/p-->
+                <a href="/{{app.link}}">
+                  <h4 style="padding-bottom: 10px; color: white; ">
+                    <strong>{{ app.name }}</strong>
+                  </h4>
+                </a>
                 <a href="{{ app.java }}"  class="btn btn-light">Show/Hide</a> <!--"javascript:ReverseDisplay('analytics_more')"-->
               </div>
             </div>
-
             {% endfor %}
 
             {% for app in apps %}
-
 	          <div id="{{ app.id }}" class="col-lg-12 text-center" style="display:none;">
-	          <p class="lead"><h2><b>{{ app.name }}</b></h2>
+	            <p class="lead"><h2><b>{{ app.name }}</b></h2>
+                <div class="service-item">
+                  <span class="fa-stack fa-4x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <a href="/{{app.link}}" class="fa fa-flask fa-stack-1x text-primary"></a>
+                  </span>
+                </div>
+              </p>
+	            <p class="lead">{{ app.description }}<br><br><br></p>
+              <br><br>
+            </div>
+            {% endfor %}
+          </div>
+
+        <!-- /.row (nested) -->
+        <hr class="small">
+
+        <p style="padding-bottom:20px;padding-top:5px;" ><font size="6px"><b>Analysis submission forms</b></font></p>
+
+        <div class="row">
+
+          {% for app in submissions %}
+          <div class="col-md-3 col-sm-6" style="height:250px;" }>
+            <div class="service-item">
+              <span class="fa-stack fa-4x">
+                <i class="fa fa-circle fa-stack-2x" href="/{{app.link}}"></i>
+                <a href="/{{app.link}}" class="fa fa-flask fa-stack-1x text-primary"></a>
+              </span>
+              <a href="/{{app.link}}">
+                <h4 style="padding-bottom: 10px; color: white; ">
+                  <strong>{{ app.name }}</strong>
+                </h4>
+              </a>
+              <a href="{{ app.java }}"  class="btn btn-light">Show/Hide</a> <!--"javascript:ReverseDisplay('analytics_more')"-->
+            </div>
+          </div>
+          {% endfor %}
+
+          {% for app in submissions %}
+          <div id="{{ app.id }}" class="col-lg-12 text-center" style="display:none;">
+            <p class="lead"><h2><b>{{ app.name }}</b></h2>
               <div class="service-item">
                 <span class="fa-stack fa-4x">
                   <i class="fa fa-circle fa-stack-2x"></i>
                   <a href="/{{app.link}}" class="fa fa-flask fa-stack-1x text-primary"></a>
-                  <!--i class="fa fa-flask fa-stack-1x text-primary"></i-->
                 </span>
               </div>
-	            <p class="lead">{{ app.description }}<br><br><br></p>
-          <br><br>
+            </p>
+            <p class="lead">{{ app.description }}<br><br><br></p>
+            <br><br>
           </div>
           {% endfor %}
-
-
         </div>
-        <!-- /.row (nested) -->
+
         <hr class="small">
+
 
         {% if userlogged == "no" %}
 

@@ -9,7 +9,7 @@ from flaski import db
 from werkzeug.urls import url_parse
 from flaski.apps.main.venndiagram import make_figure, figure_defaults
 from flaski.models import User, UserLogging
-from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_argument_file, read_session_file
+from flaski.routines import session_to_file, check_session_app, handle_exception, read_request, read_argument_file, read_session_file, separate_apps
 
 import os
 import io
@@ -49,6 +49,9 @@ def venndiagram(download=None):
     plot_arguments=None  
 
     reset_info=check_session_app(session,"venndiagram",apps)
+
+    submissions, apps=separate_apps(current_user.user_apps)
+
 
     if reset_info:
         flash(reset_info,'error')

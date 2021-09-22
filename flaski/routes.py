@@ -11,7 +11,7 @@ from werkzeug.urls import url_parse
 from flaski.forms import ResetPasswordRequestForm
 from flaski.email import send_password_reset_email, send_validate_email, send_help_email
 from flaski.forms import ResetPasswordForm
-from flaski.routines import session_to_file
+from flaski.routines import session_to_file, separate_apps
 #from app.token import generate_confirmation_token, confirm_token
 #from flaski.plots.figures.scatterplot import make_figure, figure_defaults
 from flaski.routines import read_private_apps, reset_all
@@ -72,13 +72,17 @@ def add_header(r):
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
-        current_user.user_apps=FREEAPPS+read_private_apps(current_user.email,app)
+        private_apps=read_private_apps(current_user.email,app)
+        current_user.user_apps=FREEAPPS+[ s for s in private_apps if s not in FREEAPPS ]
         db.session.add(current_user)
         db.session.commit()
-        apps=current_user.user_apps
-        return render_template('index.html',userlogged="yes", apps=apps, ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
+
+        submissions, no_submissions=separate_apps(current_user.user_apps)
+
+        return render_template('index.html',userlogged="yes", apps=no_submissions, submissions=submissions,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])
     else:
-        return render_template('index.html',userlogged="no",apps=FREEAPPS,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
+        submissions, no_submissions=separate_apps(FREEAPPS)
+        return render_template('index.html',userlogged="no",apps=no_submissions, submissions=submissions,ashtag=app.config['COMMIT'][:7], instance=app.config['INSTANCE'])  # https://flaski.mpg.de/%7B%7B%20url_for('scatterplot')%20%7D%7D
     #return redirect(url_for('login'))
 
 # @app.route('/login',defaults={'width': None, 'height': None}, methods=['GET', 'POST'])
