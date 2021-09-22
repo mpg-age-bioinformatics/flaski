@@ -1,7 +1,7 @@
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
 from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot
 from flaski.apps.dash import aadatalake
-
+from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, motifenr, gsea, riboseq
 from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
@@ -23,7 +23,73 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         { "name":"KEGG", "id":'kegg_more',"link":'kegg' ,"java":"javascript:ReverseDisplay('kegg_more')", "description":"A KEGG mapping and plotting app."} ,\
         { "name":"Life Span", "id":'lifespan_more',"link":'lifespan' ,"java":"javascript:ReverseDisplay('lifespan_more')", "description":"A Survival Analysis app."},\
         { "name":"Circular bars plot", "id":'circularbarplots_more',"link":'circularbarplots' ,"java":"javascript:ReverseDisplay('circularbarplots_more')", "description":"A Circular bars plot app."},\
-        { "name":"iGSEA plot", "id":'igseaplot_more',"link":'igseaplot' ,"java":"javascript:ReverseDisplay('igseaplot_more')", "description":"An app to customize GSEA plots."} ]
+        { "name":"iGSEA plot", "id":'igseaplot_more',"link":'igseaplot' ,"java":"javascript:ReverseDisplay('igseaplot_more')", "description":"An app to customize GSEA plots."}, \
+        { "name":"RNAseq", 
+        "id":'rnaseq_more',
+        "link":'rnaseq' ,
+        "java":"javascript:ReverseDisplay('rnaseq_more')", 
+        "description":"RNAseq submission form.", "submission":"yes"},\
+        { "name":"Alternative splicing", 
+        "id":'asplicing_more',
+        "link":'asplicing' ,
+        "java":"javascript:ReverseDisplay('asplicing_more')", 
+        "description":"Alt. splicing submission form.", "submission":"yes"},\
+        { "name":"Intron retention", 
+        "id":'intronret_more',
+        "link":'intronret' ,
+        "java":"javascript:ReverseDisplay('intronret_more')", 
+        "description":"Intron retention submission form.", "submission":"yes"} ,\
+        { "name":"Circular RNA", 
+        "id":'circrna_more',
+        "link":'circrna' ,
+        "java":"javascript:ReverseDisplay('circrna_more')", 
+        "description":"Circular RNA submission form.", "submission":"yes"} ,\
+        { "name":"miRNA", 
+        "id":'mirna_more',
+        "link":'mirna' ,
+        "java":"javascript:ReverseDisplay('mirna_more')", 
+        "description":"miRNA submission form.", "submission":"yes"} ,\
+        { "name":"16S", 
+        "id":'sixteens_more',
+        "link":'sixteens' ,
+        "java":"javascript:ReverseDisplay('sixteens_more')", 
+        "description":"16S submission form.", "submission":"yes"},\
+        { "name":"IRfinder", 
+        "id":'irfinder_more',
+        "link":'irfinder' ,
+        "java":"javascript:ReverseDisplay('irfinder_more')", 
+        "description":"IRfinder submission form.", "submission":"yes"},\
+        { "name":"ChIP", 
+        "id":'chip_more',
+        "link":'chip' ,
+        "java":"javascript:ReverseDisplay('chip_more')", 
+        "description":"ChIP submission form.", "submission":"yes"},\
+        { "name":"ATACseq", 
+        "id":'atac_more',
+        "link":'atac' ,
+        "java":"javascript:ReverseDisplay('atac_more')", 
+        "description":"ATACseq submission form.", "submission":"yes"},\
+        { "name":"Variant calling", 
+        "id":'varcal_more',
+        "link":'varcal' ,
+        "java":"javascript:ReverseDisplay('varcal_more')", 
+        "description":"Variant calling submission form.", "submission":"yes"},\
+        {"name":"Motif enrichment analysis", 
+        "id":'motifenr_more',
+        "link":'motifenr' ,
+        "java":"javascript:ReverseDisplay('motifenr_more')", 
+        "description":"Motif enrichment analysis submission form.", "submission":"yes"},\
+        {"name":"Gene Set Enrichment Analysis", 
+        "id":'gsea_more',
+        "link":'gsea' ,
+        "java":"javascript:ReverseDisplay('gsea_more')", 
+        "description":"Gene Set Enrichment Analysis submission form.", "submission":"yes"},\
+        {"name":"Ribo-Seq", 
+        "id":'riboseq_more',
+        "link":'riboseq' ,
+        "java":"javascript:ReverseDisplay('riboseq_more')", 
+        "description":"Ribo-Seq submission form.", "submission":"yes"} 
+]
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
 

@@ -7,7 +7,7 @@ import base64
 import io
 from flask_login import login_required
 from flask import session
-from flaski.routines import check_session_app
+from flaski.routines import check_session_app, separate_apps
 import traceback
 from flaski.email import send_exception_email
 from datetime import datetime
@@ -124,7 +124,7 @@ def make_navbar(app_name, current_user, cache):
         "align":"center", 
         "color":"#acbae8"})
 
-        apps=current_user.user_apps
+        submissions, apps=separate_apps(current_user.user_apps)
 
         dropdown_items=[]
         for a in apps :

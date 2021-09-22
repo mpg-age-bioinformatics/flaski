@@ -2,7 +2,7 @@ from flaski import app
 from flask_login import current_user
 from flask_caching import Cache
 from flaski.email import send_submission_email
-from flaski.routines import read_private_apps
+from flaski.routines import read_private_apps, separate_apps
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
