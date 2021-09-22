@@ -23,9 +23,7 @@ def check_pipelines(EXC, TAG):
   status=False
   attachment_path=None
   # dictionary of expected sheet names per TAG
-  expected_sheets={ 'riboseq' : ['riboseq', 'samples', 'matching'],\
-    'GSEA' : ['GSEA', 'samples', 'ExpMatrix', 'GeneSets'],\
-    'motif_enrichment' : ['motif_enrichment', 'samples']}
+  expected_sheets={ 'riboseq' : ['riboseq', 'samples', 'matching'] }
 
   # 'RNAseq': ['RNAseq', 'samples'],\
   # 'intronRet' : ['intronRet', 'samples'],\
@@ -36,6 +34,8 @@ def check_pipelines(EXC, TAG):
   # 'IRfinder':['IRfinder', 'samples']
   # 'ATAC_seq' : ['ATAC_seq', 'samples', 'input'],\
   # 'variantCalling' : ['variantCalling', 'samples'],\
+  # 'motif_enrichment' : ['motif_enrichment', 'samples'] needs to be worked on
+    # 'GSEA' : ['GSEA', 'samples', 'ExpMatrix', 'GeneSets'] }
 
 
 

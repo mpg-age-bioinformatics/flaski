@@ -1,4 +1,5 @@
-from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal
+from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, \
+    mirna,sixteens ,irfinder, chip, atac, varcal, motifenr, gsea
 
 EXTERNAL_APPS=[ { "name":"Dash demo plot", 
                 "id":'dashapp_more',
@@ -54,6 +55,16 @@ EXTERNAL_APPS=[ { "name":"Dash demo plot",
                 "id":'varcal_more',
                 "link":'varcal' ,
                 "java":"javascript:ReverseDisplay('varcal_more')", 
-                "description":"Variant calling submission form."} ]
+                "description":"Variant calling submission form."},
+                {"name":"Motif enrichment analysis submission", 
+                "id":'motifenr_more',
+                "link":'motifenr' ,
+                "java":"javascript:ReverseDisplay('motifenr_more')", 
+                "description":"Motif enrichment analysis submission form."},
+                {"name":"Gene Set Enrichment Analysis submission", 
+                "id":'gsea_more',
+                "link":'gsea' ,
+                "java":"javascript:ReverseDisplay('gsea_more')", 
+                "description":"Gene Set Enrichment Analysis submission form."} ]
                 
 EXT_DEFAULTS_DIC={}
