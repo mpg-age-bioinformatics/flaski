@@ -15,7 +15,7 @@ import pandas as pd
 import os
 
 CURRENTAPP="gsea"
-navbar_title="Gene Set Enrichment Analysis submission"
+navbar_title="GSEA submission"
 
 dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
 protect_dashviews(dashapp)

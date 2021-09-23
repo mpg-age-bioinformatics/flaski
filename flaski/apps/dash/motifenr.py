@@ -15,7 +15,7 @@ import pandas as pd
 import os
 
 CURRENTAPP="motifenr"
-navbar_title="Motif enrichment analysis submission form."
+navbar_title="Motif enrichment submission form"
 
 dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
 protect_dashviews(dashapp)

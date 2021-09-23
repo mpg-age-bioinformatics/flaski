@@ -144,7 +144,8 @@ def make_navbar(app_name, current_user, cache):
                         dbc.Row(
                             [                         
                                 dbc.Col( html.A( html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode()) , height="30px", style={ "margin-bottom":5}), href="/index")),
-                                dbc.Col( dbc.NavbarBrand("Flaski.Dash  |  %s" %str(app_name), className="ml-2") ),
+                                # dbc.Col( dbc.NavbarBrand("Flaski.Dash", className="ml-2") ),
+                                dbc.Col( dbc.NavbarBrand( app_name, className="ml-2") ),
                                 dbc.Col( dbc.NavbarToggler(id="navbar-toggler", className="ml-auto" ))
                             ],
                             align="center",

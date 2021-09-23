@@ -15,7 +15,7 @@ import pandas as pd
 import os
 
 CURRENTAPP="circrna"
-navbar_title="Circ. RNA submission form"
+navbar_title="Circular RNA submission form"
 
 dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
 protect_dashviews(dashapp)
@@ -277,7 +277,7 @@ give in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI).
     '''
 
     if CURRENTAPP not in apps:
-        readme='''You have no access to this App. Once you have been given access more information will be displayed on how to transfer your raw data.
+        readme='''**You have no access to this App.** Once you have been given access more information will be displayed on how to transfer your raw data.
         
         %s
 

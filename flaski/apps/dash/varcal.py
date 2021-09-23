@@ -294,7 +294,7 @@ give in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI).
     '''
 
     if CURRENTAPP not in apps:
-        readme='''You have no access to this App. Once you have been given access more information will be displayed on how to transfer your raw data.
+        readme='''**You have no access to this App.** Once you have been given access more information will be displayed on how to transfer your raw data.
         
         %s
 
