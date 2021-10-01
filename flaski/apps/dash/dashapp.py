@@ -13,6 +13,8 @@ import uuid
 # import pandas as pd
 import os
 
+# https://dash-bootstrap-components.opensource.faculty.ai/docs/components/collapse/
+
 CURRENTAPP="dashapp"
 navbar_title="Demo Dash App"
 

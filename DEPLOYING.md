@@ -11,6 +11,8 @@ openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout ~/flaski_data/c
 openssl dhparam -out ~/flaski_data/certificates/dhparam.pem 2048
 ```
 
+On a Mac double click on the cert.pem file to open it and add it to the Keychain. In key chain double click on the certificate to change Trust : When using this certificate : Always trust. 
+
 If running flaski on development mode make sure that you change the variable `FLASK_ENV` to `development` in `docker-compose.yml`.
 
 Export secret variables:

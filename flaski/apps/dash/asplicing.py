@@ -185,11 +185,7 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ] 
     if CURRENTAPP not in apps:
-        return dcc.Markdown('''
-        
-#### !! You have no access to this App !!
-
-        ''', style={"margin-top":"15px"} )
+        return dbc.Alert('''You do not have access to this App.''',color="danger")
 
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None

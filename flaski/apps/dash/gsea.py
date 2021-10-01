@@ -324,11 +324,8 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None
     if CURRENTAPP not in apps:
-        return dcc.Markdown('''
-        
-#### !! You have no access to this App !!
+        return dbc.Alert('''You do not have access to this App.''',color="danger")
 
-        ''', style={"margin-top":"15px"} )
     subdic=generate_submission_file(rows, expression, genessets,  email,group,project_title,organism,ref)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
