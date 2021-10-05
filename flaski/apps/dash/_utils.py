@@ -21,6 +21,7 @@ META_TAGS=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.
 
 GROUPS=["Adam_Antebi",\
 "Aleksandra_Filipovska",\
+"Anne_Schaefer",\
 "Bioinformatics",\
 "Constantinos_Demetriades",\
 "CRISPR_Screening",\
