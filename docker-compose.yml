@@ -52,13 +52,14 @@ services:
   restart: always
   volumes:
    - data:/myapp_data/users
+   - ./static/dog-solid.png:/myapp/myapp/static/favicon.ico
+   - ./static/dog-solid.png:/myapp/myapp/static/logo.png
    - ./routes/apps:/myapp/myapp/routes/apps
    - ./routes/_routes.py:/myapp/myapp/routes/_routes.py
    - ./routes/_impressum.py:/myapp/myapp/routes/_impressum.py
    - ./routes/_vars.py:/myapp/myapp/routes/_vars.py
    - ./routes/_privacy.py:/myapp/myapp/routes/_privacy.py
    - ./routes/_about.py:/myapp/myapp/routes/_about.py
-  #  - ./:/${APP_NAME}
    - ~/flaski3_private:/myapp_private:ro
   environment:
    - APP_NAME=myapp
