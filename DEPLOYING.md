@@ -85,6 +85,7 @@ git add -A .
 git commit -m "<describe your changes here>"
 git push origin HEAD:master
 ```
+
 then tell the main project to start tracking the updated version:
 ```
 cd ~/flaski-3.0.0
