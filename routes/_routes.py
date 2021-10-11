@@ -1,0 +1,1 @@
+from myapp.routes.apps import scatterplot
