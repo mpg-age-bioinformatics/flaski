@@ -39,6 +39,7 @@ elif [ "${1}" == "nightly" ] ;
         # docker system prune -f 
 
         text=":: !FAILED! "
+        git submodule update --recursive --remote && \
         docker buildx create --use && \
         docker buildx build --platform linux/amd64,linux/arm64 --no-cache --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" -t ${repoName}:nightly . --push && \
         docker buildx build --platform linux/amd64,linux/arm64 --cache-from ${repoName}:nightly --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" -t ${repoName}:latest . --push && \
@@ -109,6 +110,7 @@ elif [ "${1}" == "aarch64" ] ;
         MYAPP_VERSION=$(git rev-parse --short HEAD)
         echo ":: git #${MYAPP_VERSION}"
         text=":: !FAILED! "
+        git submodule update --recursive --remote && \
         docker build --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" --no-cache -t ${repoName}:nightly-aarch64 . && \
         text=":: "
         echo "${text}build flaski:nightly-aarch64"
