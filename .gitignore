@@ -27,3 +27,5 @@ pyflaski/pyflaski.egg-info/
 *.swp
 .DS_Store
 *~$*.xlsx
+
+build.log
