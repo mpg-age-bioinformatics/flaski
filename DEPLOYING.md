@@ -57,3 +57,30 @@ To run this server, open a second terminal session and run the following command
 ```bash
 docker-compose exec server python3 -m smtpd -n -c DebuggingServer localhost:8025
 ```
+
+### pyflaski
+
+pyflaski was added as a submodule of flaski:
+```
+cd flaski-3.0.0
+git submodule add git@github.com:mpg-age-bioinformatics/pyflaski.git pyflaski
+git submodule init pyflaski
+```
+To update from the remote:
+```
+git submodule update pyflaski
+```
+Commiting changes:
+```
+cd ~/flaski-3.0.0/pyflaski
+git add -A . 
+git commit -m "<describe your changes here>"
+git push origin HEAD:master
+```
+then tell the main project to start tracking the updated version:
+```
+cd ~/flaski-3.0.0
+git add pyflaski
+git commit -m pyflaski
+git push
+```

@@ -54,6 +54,7 @@ services:
    - data:/myapp_data/users
    - ./static/dog-solid.png:/myapp/myapp/static/favicon.ico
    - ./static/dog-solid.png:/myapp/myapp/static/logo.png
+   - ./pyflaski/pyflaski:/myapp/pyflaski
    - ./routes/apps:/myapp/myapp/routes/apps
    - ./routes/_routes.py:/myapp/myapp/routes/_routes.py
    - ./routes/_impressum.py:/myapp/myapp/routes/_impressum.py

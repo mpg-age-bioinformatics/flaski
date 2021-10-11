@@ -1,0 +1,3 @@
+[submodule "pyflaski"]
+	path = pyflaski
+	url = git@github.com:mpg-age-bioinformatics/pyflaski.git
