@@ -4,13 +4,10 @@ services:
 
  init:
   container_name: init
-  image: mpgagebioinformatics/myapp:stable
-  # build:
-  #   context: ./
-  #   dockerfile: services/server/Dockerfile
-  #   args:
-  #     MYAPP_VERSION: dev
-  #     UPGRADE_REQS: "no"
+  # image: mpgagebioinformatics/myapp:stable
+  build:
+    context: ./
+    dockerfile: Dockerfile
   user: root
   entrypoint: /myapp/services/init/entrypoint.sh
   volumes:
@@ -40,15 +37,10 @@ services:
 
  server:
   container_name: server
-  image: mpgagebioinformatics/myapp:stable
-  # ports:
-  #   - 8887:8888 #jupyterhub
-  # build:
-  #   context: ./
-  #   dockerfile: services/server/Dockerfile
-  #   args:
-  #     MYAPP_VERSION: dev
-  #     UPGRADE_REQS: "no"
+  # image: mpgagebioinformatics/myapp:stable
+  build:
+    context: ./
+    dockerfile: Dockerfile
   restart: always
   volumes:
    - data:/myapp_data/users
@@ -90,12 +82,9 @@ services:
  backup:
   container_name: backup
   image: mpgagebioinformatics/myapp:stable
-  # build:
-  #   context: ./
-  #   dockerfile: ./services/server/Dockerfile
-  #   args:
-  #     MYAPP_VERSION: dev
-  #     UPGRADE_REQS: "no"
+  build:
+    context: ./
+    dockerfile: Dockerfile
   user: root
   entrypoint: /myapp/services/backup/entrypoint.sh
   depends_on:

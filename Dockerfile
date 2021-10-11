@@ -4,6 +4,11 @@ FROM mpgagebioinformatics/myapp:stable
 
 LABEL maintainer "bioinformatics@age.mpg.de"
 
+USER root
+
+COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
+RUN pip3 install -r /pyflaski.requirements.txt
+
 COPY ./static/dog-solid.png /myapp/myapp/static/favicon.ico
 COPY ./static/dog-solid.png /myapp/myapp/static/logo.png
 COPY ./pyflaski/pyflaski /myapp/pyflaski
@@ -13,3 +18,5 @@ COPY ./routes/_impressum.py /myapp/myapp/routes/_impressum.py
 COPY ./routes/_vars.py /myapp/myapp/routes/_vars.py
 COPY ./routes/_privacy.py /myapp/myapp/routes/_privacy.py
 COPY ./routes/_about.py /myapp/myapp/routes/_about.py
+
+USER myapp
