@@ -111,6 +111,7 @@ elif [ "${1}" == "aarch64" ] ;
         echo ":: git #${MYAPP_VERSION}"
         text=":: !FAILED! "
         git submodule update --recursive --remote && \
+        git tag mpgagebioinformatics/myapp:nightly-aarch64 mpgagebioinformatics/myapp:stable && \
         docker build --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" --no-cache -t ${repoName}:nightly-aarch64 . && \
         text=":: "
         echo "${text}build flaski:nightly-aarch64"
