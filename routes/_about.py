@@ -1,8 +1,6 @@
 _about='''
 Flaski is a flask and dash based collection of web apps for life sciences. 
 
-![flaski](/pyflaski/Flaski.Readme.1.png)
-
 Flaski provides:
 
 - interactive data analysis
