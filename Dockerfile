@@ -4,6 +4,9 @@ FROM mpgagebioinformatics/myapp:stable
 
 LABEL maintainer "bioinformatics@age.mpg.de"
 
+ARG MYAPP_VERSION
+ENV MYAPP_VERSION ${MYAPP_VERSION}
+
 USER root
 
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt

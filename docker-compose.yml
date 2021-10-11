@@ -8,6 +8,8 @@ services:
   build:
     context: ./
     dockerfile: Dockerfile
+    args:
+      MYAPP_VERSION: dev
   user: root
   entrypoint: /myapp/services/init/entrypoint.sh
   volumes:
@@ -41,6 +43,8 @@ services:
   build:
     context: ./
     dockerfile: Dockerfile
+    args:
+      MYAPP_VERSION: dev
   restart: always
   volumes:
    - data:/myapp_data/users
@@ -85,6 +89,8 @@ services:
   build:
     context: ./
     dockerfile: Dockerfile
+    args:
+      MYAPP_VERSION: dev
   user: root
   entrypoint: /myapp/services/backup/entrypoint.sh
   depends_on:
