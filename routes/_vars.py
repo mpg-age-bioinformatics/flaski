@@ -15,8 +15,14 @@ user_navbar_links={
     "Logout":"/logout/"
 }
 
-other_nav_dropdowns=[]
-
+other_nav_dropdowns =[ 
+    { \
+        "Apps": \
+            {
+                "Scatter plot":"/scatterplot/",\
+            } \
+    } \
+]
 ###################################
 # _PRIVATE_ROUTES=['home'] ## only users added to this route on the admin board / User model will have access
 # _PUBLIC_VIEWS=[] ## can be used to set specific rights within the app eg. deactiva Submit buttons.
