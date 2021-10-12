@@ -102,7 +102,70 @@ def make_app_content(pathname):
                     justify="betweem",
                     no_gutters=True,
                 ),
-                html.H5("Arguments", style={"margin-top":10 }),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Figure", color="black", id="figure-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody("This is the content of group ...",style={ "padding":"6px"}),
+                            id="collapse-figure-card",
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                ),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Axes", color="black", id="axes-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody("This is the content of group ...",style={ "padding":"6px"}),
+                            id="collapse-axes-card",
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                ),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Marker", color="black", id="marker-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody("This is the content of group ...",style={ "padding":"6px"}),
+                            id="collapse-marker-card",
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                ),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Labels", color="black", id="labels-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody("This is the content of group ...",style={ "padding":"6px"}),
+                            id="collapse-labels-card",
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                )
             ],
             body=True,
             style={"width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"4px"}
@@ -159,6 +222,32 @@ def make_fig_output(pathname):
     fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
     fig=dcc.Graph(figure=fig,config=fig_config)
     return fig
+
+
+@dashapp.callback(
+    [Output(f"collapse-{i}", "is_open") for i in  [ "figure-card" ,"axes-card", "marker-card", "labels-card" ] ],
+    [Input(f"{i}", "n_clicks") for i in [ "figure-card" ,"axes-card", "marker-card", "labels-card" ] ],
+    [State(f"collapse-{i}", "is_open") for i in [ "figure-card" ,"axes-card", "marker-card", "labels-card" ] ],
+)
+def toggle_accordion(n1, n2, n3, n4, is_open1, is_open2, is_open3, is_open4):
+    ctx = dash.callback_context
+
+    cards=[ "figure-card" ,"axes-card", "marker-card", "labels-card" ]
+
+    if not ctx.triggered:
+        return False, False, False, False
+    else:
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if button_id == cards[0] and n1:
+        return not is_open1, False, False, False
+    elif button_id == cards[1] and n2:
+        return False, not is_open2, False, False
+    elif button_id == cards[2] and n3:
+        return False, False, not is_open3, False
+    elif button_id == cards[3] and n4:
+        return False, False, False, not is_open4
+    return False, False, False
 
 
 @dashapp.callback(
