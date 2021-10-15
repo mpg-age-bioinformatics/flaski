@@ -3,7 +3,7 @@ from flask_login import current_user
 from flask_caching import Cache
 import dash
 from dash import dcc, html
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
 from myapp.routes.apps._utils import parse_table, make_options
@@ -130,7 +130,7 @@ def make_app_content(pathname):
                     [
                         dbc.CardHeader(
                             html.H2(
-                                dbc.Button( "Figure", color="black", id="figure-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                                dbc.Button( "Figure", color="black", id={'type':"dynamic-card","index":"figure"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
                             ),
                             style={ "height":"40px","padding":"0px"}
                         ),
@@ -234,7 +234,7 @@ def make_app_content(pathname):
                                 ]
                                 ,style=card_body_style
                             ),
-                            id="collapse-figure-card",
+                            id={'type':"collapse-dynamic-card","index":"figure"},
                             is_open=False,
                         ),
                     ],
@@ -244,7 +244,7 @@ def make_app_content(pathname):
                     [
                         dbc.CardHeader(
                             html.H2(
-                                dbc.Button( "Axes", color="black", id="axes-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                                dbc.Button( "Axes", color="black", id={'type':"dynamic-card","index":"axes"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
                             ),
                             style={ "height":"40px","padding":"0px"}
                         ),
@@ -629,34 +629,18 @@ def make_app_content(pathname):
                                 ],
                                 style=card_body_style
                             ),
-                            id="collapse-axes-card",
+                            id={'type':"collapse-dynamic-card","index":"axes"},
                             is_open=False,
                         ),
                     ],
                     style={"margin-top":"2px","margin-bottom":"2px"} 
                 ),
                 html.Div(id="marker-cards"),
-                # dbc.Card(
-                #     [
-                #         dbc.CardHeader(
-                #             html.H2(
-                #                 dbc.Button( "Marker", color="black", id="marker-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
-                #             ),
-                #             style={ "height":"40px","padding":"0px"}
-                #         ),
-                #         dbc.Collapse(
-                #             dbc.CardBody("This is the content of group ...",style={ "padding":"6px"}),
-                #             id="collapse-marker-card",
-                #             is_open=False,
-                #         ),
-                #     ],
-                #     style={"margin-top":"2px","margin-bottom":"2px"} 
-                # ),
                 dbc.Card(
                     [
                         dbc.CardHeader(
                             html.H2(
-                                dbc.Button( "Labels", color="black", id="labels-card", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                                dbc.Button( "Labels", color="black", id={'type':"dynamic-card","index":"labels"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
                             ),
                             style={ "height":"40px","padding":"0px"}
                         ),
@@ -722,7 +706,7 @@ def make_app_content(pathname):
                                                     [
                                                         dbc.Label("arrows",html_for='labels_arrows_value',style={"margin-top":"5px","width":"64px"}),
                                                         dbc.Col(
-                                                            dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=pa["labels_arrows_value"], placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style )
+                                                            dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style )
                                                         )
                                                     ],
                                                 ),
@@ -749,7 +733,7 @@ def make_app_content(pathname):
                                 ############################################                                
                                 ]
                                 ,style=card_body_style),
-                            id="collapse-labels-card",
+                            id={'type':"collapse-dynamic-card","index":"labels"},
                             is_open=False,
                         ),
                     ],
@@ -757,13 +741,13 @@ def make_app_content(pathname):
                 )
             ],
             body=True,
-            style={"width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"4px"}#,"max-width":"375px","min-width":"375px"}
+            style={"min-width":"375px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"4px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
         ),
         dbc.Button(
                     'Submit',
                     id='submit-button-state', 
                     n_clicks=0, 
-                    style={"width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
+                    style={"min-width":"375px","width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
                 )
     ]
 
@@ -775,7 +759,7 @@ def make_app_content(pathname):
                         side_bar,
                         sm=12,md=6,lg=5,xl=4,
                         align="top",
-                        style={"padding":"2px"}
+                        style={"padding":"2px","overflow":"scroll"},
                     ),
                     dbc.Col(
                         id="fig-output",
@@ -814,29 +798,46 @@ def read_input_file(contents,filename,last_modified,session_id):
 
 @dashapp.callback( 
     Output('labels-section', 'children'),
+    Input('session-id','data'),
     Input('labels_col_value','value'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('session-id', 'data'),
-    prevent_initial_call=True)
-def update_labels_field(col,contents,filename,last_modified,session_id):
-    df=parse_table(contents,filename,last_modified,current_user.id,cache)
-    labels=df[col].tolist()
-    labels_=make_options(labels)
-    labels_section=dbc.FormGroup(
-        [
-            dbc.Col( 
-                dbc.Label("Labels", style={"margin-top":"5px"}),
-                width=2   
-            ),
-            dbc.Col(
-                dcc.Dropdown( options=labels_, value=[],placeholder="labels", id='fixed_labels', multi=True),
-                width=10
-            )
-        ],
-        row=True
-    )
+    State('upload-data', 'last_modified')
+)
+def update_labels_field(session_id,col,contents,filename,last_modified):
+    if col:
+        df=parse_table(contents,filename,last_modified,current_user.id,cache)
+        labels=df[col].tolist()
+        labels_=make_options(labels)
+        labels_section=dbc.FormGroup(
+            [
+                dbc.Col( 
+                    dbc.Label("Labels", style={"margin-top":"5px"}),
+                    width=2   
+                ),
+                dbc.Col(
+                    dcc.Dropdown( options=labels_, value=[],placeholder="labels", id='fixed_labels', multi=True),
+                    width=10
+                )
+            ],
+            row=True
+        )
+    else:
+        labels_section=dbc.FormGroup(
+            [
+                dbc.Col( 
+                    dbc.Label("Labels", style={"margin-top":"5px"}),
+                    width=2   
+                ),
+                dbc.Col(
+                    dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
+                    width=10
+                )
+            ],
+            row=True,
+            style= {'display': 'none'}
+        )
+
     return labels_section
 
 @dashapp.callback( 
@@ -848,18 +849,167 @@ def update_labels_field(col,contents,filename,last_modified,session_id):
     State('upload-data', 'last_modified'),
     )
 def generate_markers(session_id,groups,contents,filename,last_modified):
+    pa=figure_defaults()
     def make_card(card_header,card_id):
         card=dbc.Card(
             [
                 dbc.CardHeader(
                     html.H2(
-                        dbc.Button( card_header, color="black", id=f"marker-card-{str(card_id)}", n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                        dbc.Button( card_header, color="black", id={'type':"dynamic-card","index":str(card_id)}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
                     ),
                     style={ "height":"40px","padding":"0px"}
                 ),
                 dbc.Collapse(
-                    dbc.CardBody("This is the content of group ...",style={ "padding":"6px"}),
-                    id=f"collapse-marker-card-{str(card_id)}",
+                    dbc.CardBody(
+                        [
+                        ############################################
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("shape",style={"margin-top":"5px", "width":"45px"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["markerstyles"]), value=pa["marker"], placeholder="marker", id={'type':"marker","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                )
+                                            ],
+                                        ),
+                                        width=8,
+                                        style={ "padding-right":"16px"}
+                                    ),
+                                    dbc.Col(
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("size",style=card_label_style),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["marker_size"]), value=pa["markers"], placeholder="size", id={'type':"markers","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                )
+                                            ],
+                                        ),
+                                        width=4,
+                                        style={ "padding-left":"16px"}
+                                    )
+                                ],
+                                no_gutters=True,
+                                style={ "padding-left":"16px"}
+                            ),
+                       ############################################
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("color",style={"margin-top":"5px", "width":"45px"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["marker_color"]), value=pa["markerc"], placeholder="size", id={'type':"markerc","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            )
+                                        ],
+                                    ),
+                                    width=6,
+                                ),
+                                dbc.Col(
+                                        [
+                                            dcc.Input(id={'type':"markerc_write","index":str(card_id)}, placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
+                                        ],
+                                    width=6,
+                                )
+                            ],
+                            no_gutters=True,
+                            style={ "padding-left":"16px"}
+                        ),
+                       ############################################
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("alpha",style={"margin-top":"5px", "width":"45px"}),
+                                            dbc.Col(
+                                                dcc.Input(id={'type':"marker_alpha","index":str(card_id)}, value=pa["marker_alpha"],placeholder="value", type='text', style={"height":"35px","width":"100%"} ),
+                                            )
+                                        ],
+                                    ),
+                                    width=3,
+                                ),
+                            ],
+                            no_gutters=True,
+                            style={ "padding-left":"16px"}
+                        ),
+                       ############################################
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("Line:",style=card_label_style),
+                                        ],
+                                    ),
+                                    width=12,
+                                ),
+                            ],
+                            no_gutters=True,
+                            style={ "padding-left":"16px"}
+                        ),
+                       ############################################
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                        ],
+                                    ),
+                                    width=1,
+                                ),
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("width",style={"margin-top":"5px", "width":"45px"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=pa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            )
+                                        ],
+                                    ),
+                                    width=5,
+                                ),
+                            ],
+                            no_gutters=True,
+                            style={ "padding-left":"16px"}
+                        ),
+                       ############################################
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                        ],
+                                    ),
+                                    width=1,
+                                ),
+                                dbc.Col(
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("color",style={"margin-top":"5px", "width":"45px"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["edge_colors"]), value=pa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            )
+                                        ],
+                                    ),
+                                    width=5,
+                                ),
+                                dbc.Col(
+                                        [
+                                            dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
+                                        ],
+                                    width=6,
+                                )
+                            ],
+                            no_gutters=True,
+                            style={ "padding-left":"16px"}
+                        ),
+                       ############################################
+                        ],
+                        style=card_body_style),
+                    id={'type':"collapse-dynamic-card","index":str(card_id)},
                     is_open=False,
                 ),
             ],
@@ -879,51 +1029,124 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
             cards.append(card)
     return cards
 
+
+states=[State('xvals', 'value'),
+    State('yvals', 'value'),
+    State('groups_value', 'value'),
+    State('fig_width', 'value'),
+    State('fig_height', 'value'),
+    State('title', 'value'),
+    State('titles', 'value'),
+    State('show_legend', 'value'),
+    State('legend_font_size', 'value'),
+    State('xlabel', 'value'),
+    State('xlabels', 'value'),
+    State('ylabel', 'value'),
+    State('ylabels', 'value'),
+    State('show_axis', 'value'),
+    State('axis_line_width', 'value'),
+    State('tick_axis', 'value'),
+    State('ticks_length', 'value'),
+    State('ticks_direction_value', 'value'),
+    State('xticks_fontsize', 'value'),
+    State('xticks_rotation', 'value'),
+    State('yticks_fontsize', 'value'),
+    State('yticks_rotation', 'value'),
+    State('x_lower_limit', 'value'),
+    State('x_upper_limit', 'value'),
+    State('y_lower_limit', 'value'),
+    State('y_upper_limit', 'value'),
+    State('grid_value', 'value'),
+    State('grid_linewidth', 'value'),
+    State('grid_color_value', 'value'),
+    State('grid_color_text', 'value'),
+    State('hline', 'value'),
+    State('hline_linewidth', 'value'),
+    State('hline_linestyle_value', 'value'),
+    State('hline_color_value', 'value'),
+    State('hline_color_text', 'value'),
+    State('vline', 'value'),
+    State('vline_linewidth', 'value'),
+    State('vline_linestyle_value', 'value'),
+    State('vline_color_value', 'value'),
+    State('vline_color_text', 'value'),
+    State('labels_col_value', 'value'),
+    State('labels_font_size', 'value'),
+    State('labels_font_color_value', 'value'),
+    State('labels_arrows_value', 'value'),
+    State('labels_colors_value', 'value'),
+    State('fixed_labels', 'value'),
+    State( { 'type': 'marker', 'index': ALL }, "value"),
+    State( { 'type': 'markers', 'index': ALL }, "value"),
+    State( { 'type': 'markerc', 'index': ALL }, "value"),
+    State( { 'type': 'markerc_write', 'index': ALL }, "value"),
+    State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
+    State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]
+
 @dashapp.callback( 
     Output('fig-output', 'children'),
-    Input('session-id', 'data'))
-def make_fig_output(session_id):
-    import plotly.graph_objects as go
-    fig = go.Figure( )
-    fig.update_layout( )
-    fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
-    fig.update_layout(
-            title={
-                'text': "Demo plotly title",
-                'xanchor': 'left',
-                'yanchor': 'top' ,
-                "font": {"size": 25, "color":"black"  } } )
+    Input("submit-button-state", "n_clicks"),
+    [ State('session-id', 'data'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified')] + states,
+    prevent_initial_call=True
+    )
+def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
+    input_names = [item.component_id for item in states]
+
+    df=parse_table(contents,filename,last_modified,current_user.id,cache)
+
+    pa=figure_defaults()
+    for k, a in zip(input_names,args) :
+        if type(k) != dict :
+            pa[k]=a
+
+    if pa["groups_value"]:
+        groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
+        pa["list_of_groups"]=groups
+        groups_settings_={}
+        for i, g in enumerate(groups):
+            groups_settings_[i]={"name":g}
+
+        for k, a in zip(input_names,args):
+            if type(k) == dict :
+                k_=k['type']
+                for i, a_ in enumerate(a) :
+                    groups_settings_[i][k_]=a_
+
+        groups_settings = []
+        for i in list(groups_settings_.keys()):
+            groups_settings.append(groups_settings_[i])
+
+        pa["groups_settings"]=groups_settings
+
+    # try:
+    fig=make_figure(df,pa)
+    # import plotly.graph_objects as go
+    # fig = go.Figure( )
+    # fig.update_layout( )
+    # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
+    # fig.update_layout(
+    #         title={
+    #             'text': "Demo plotly title",
+    #             'xanchor': 'left',
+    #             'yanchor': 'top' ,
+    #             "font": {"size": 25, "color":"black"  } } )
     fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
     fig=dcc.Graph(figure=fig,config=fig_config)
     return fig
 
 @dashapp.callback(
-    [Output(f"collapse-{i}", "is_open") for i in  [ "figure-card" ,"axes-card", "marker-card-0", "labels-card" ] ],
-    [Input(f"{i}", "n_clicks") for i in [ "figure-card" ,"axes-card", "marker-card-0", "labels-card" ] ],
-    [State(f"collapse-{i}", "is_open") for i in [ "figure-card" ,"axes-card", "marker-card-0", "labels-card" ] ],
+    Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
+    Input( { 'type': 'dynamic-card', 'index': MATCH }, "n_clicks"),
+    State( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
     prevent_initial_call=True
 )
-def toggle_accordion(n1, n2, n3, n4, is_open1, is_open2, is_open3, is_open4):
-
-    ctx = dash.callback_context
-
-    cards=[ "figure-card" ,"axes-card", "marker-card-0", "labels-card" ]
-
-    if not ctx.triggered:
-        return False, False, False, False
-    else:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    if button_id == cards[0] and n1:
-        return not is_open1, False, False, False
-    elif button_id == cards[1] and n2:
-        return False, not is_open2, False, False
-    elif button_id == cards[2] and n3:
-        return False, False, not is_open3, False
-    elif button_id == cards[3] and n4:
-        return False, False, False, not is_open4
-    return False, False, False, False
-
+def toggle_accordion(n, is_open):
+    return not is_open
 
 @dashapp.callback(
     Output("navbar-collapse", "is_open"),
