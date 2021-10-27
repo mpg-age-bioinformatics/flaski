@@ -762,10 +762,16 @@ def make_app_content(pathname):
                         style={"padding":"2px","overflow":"scroll"},
                     ),
                     dbc.Col(
-                        id="fig-output",
+                        dcc.Loading(
+                            id="loading-fig-output",
+                            type="default",
+                            children=html.Div(id="fig-output"),
+                            style={"height":"100%"}
+                        ),
+                        id="col-fig-output",
                         sm=12,md=6,lg=7,xl=8,
                         align="top",
-                        style={"padding":"2px"}
+                        style={"height":"100%"}
                     ),
                 ],
             align="start",
@@ -1142,6 +1148,7 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
     #             "font": {"size": 25, "color":"black"  } } )
     fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
     fig=dcc.Graph(figure=fig,config=fig_config)
+
     return fig
 
 @dashapp.callback(
