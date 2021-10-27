@@ -1,5 +1,8 @@
 import io
+import os
+import json
 import base64
+import tempfile
 import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import dcc, html
@@ -34,34 +37,33 @@ def make_options(valuesin):
         opts.append( {"label":c, "value":c} )
     return opts
 
-def make_except_toast(text,id,e, help,user, eapp):
-    tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
+    if e:
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
 
-    emsg_html=tb_str.split("\n")
-    send_email(
-        '[Flaski] exception: %s ' %eapp,
-        sender=app.config['MAIL_USERNAME'],
-        recipients=app.config['ADMINS'],
-        text_body=render_template(
-            'email/app_exception.txt',
-            user=user, 
-            eapp=eapp, 
-            emsg=tb_str, 
-            etime=str(datetime.now())
-        ),
-        html_body=render_template(
-            'email/app_exception.html',
-            user=user, 
-            eapp=eapp, 
-            emsg=emsg_html, 
-            etime=str(datetime.now())
-        ),
-        reply_to=user.email 
-    )
+        emsg_html=tb_str.split("\n")
+        send_email(
+            '[Flaski] exception: %s ' %eapp,
+            sender=app.config['MAIL_USERNAME'],
+            recipients=app.config['ADMINS'],
+            text_body=render_template(
+                'email/app_exception.txt',
+                user=user, 
+                eapp=eapp, 
+                emsg=tb_str, 
+                etime=str(datetime.now())
+            ),
+            html_body=render_template(
+                'email/app_exception.html',
+                user=user, 
+                eapp=eapp, 
+                emsg=emsg_html, 
+                etime=str(datetime.now())
+            ),
+            reply_to=user.email 
+        )
 
-    toast=dbc.Toast(
-        [
-            text,
+        text=[ text,
             dcc.Markdown(f'```{e}```'),
             "Something went wrong, we have been notified. If you would like to share your session with us and get help on this issue please press 'Ice Cream'.",
             dbc.Collapse(
@@ -74,11 +76,20 @@ def make_except_toast(text,id,e, help,user, eapp):
                 id={'type':'collapse-toast-traceback','index':id},
                 is_open=False,
                 style={"margin-top":"10px","margin-bottom":"10px"}
-            ),
+            )
+        ]
+        is_open=True
+    else:
+        text=[]
+        is_open=False
+
+
+    toast=dbc.Toast( text+
+        [
             html.Div(
                 [
                     dbc.Button("expand", outline=True, color="dark",id={'type':'toggler-toast-traceback','index':id},size="sm", style={"margin-right":"2px"} ),
-                    dbc.Button("Ice Cream", outline=True, color="dark",id={'type':f'help-{help}-toast-traceback','index':id},size="sm", style={"margin-left":"2px"} )
+                    dbc.Button("Ice Cream", outline=True, color="dark",id={'type':'help-toast-traceback','index':id},size="sm", style={"margin-left":"2px"} )
                 ],
                 className="d-grid gap-2 d-md-flex justify-content-md-end",
                 style={"margin-top":"10px"} 
@@ -86,10 +97,30 @@ def make_except_toast(text,id,e, help,user, eapp):
         ],
         id={'type':'toast-error','index':id},
         header="Exception",
-        is_open=True,
+        is_open=is_open,
         dismissable=True,
         icon="danger",
         # top: 66 positions the toast below the navbar
-        style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
+        # style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
     )
     return toast
+
+def ask_for_help(session_data,user):
+    tb_str=session_data["traceback"]
+    session_data=session_data["session_data"]
+    app_name=list(session_data["app"].keys())[0]
+    
+    share_folder=os.path.join(app.config["USERS_DATA"], 'shared_sessions')
+    if not os.path.isdir(share_folder):
+        os.makedirs(share_folder)
+    session_file=tempfile.NamedTemporaryFile(dir=share_folder, suffix=".ses")
+    with open(session_file,"w") as fout:
+        json.dump(session_data, fout)
+    send_email('[Flaski] help needed: %s ' %app_name,
+        sender=app.config['MAIL_USERNAME'],
+        recipients=app.config['ADMINS'],
+        text_body=render_template('email/app_help.txt',
+                                    user=user, eapp=app_name, emsg=tb_str, etime=str(datetime.now()), session_file=session_file),
+        html_body=render_template('email/app_help.html',
+                                    user=user, eapp=app_name, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file),\
+        reply_to=user.email )      

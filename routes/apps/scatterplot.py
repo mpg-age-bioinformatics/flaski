@@ -4,14 +4,14 @@ from flask_caching import Cache
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
+from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_table, make_options, make_except_toast
+from myapp.routes.apps._utils import parse_table, make_options, make_except_toast, ask_for_help
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
-
-
+import traceback
 
 dashapp = dash.Dash("scatterplot",url_base_pathname='/scatterplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
@@ -42,6 +42,7 @@ card_body_style={ "padding":"2px", "padding-top":"4px"}
 def make_layout(pathname):
     protected_content=html.Div(
         [
+            dcc.Store( id='session-data' ),
             make_navbar_logged("Scatter plot",current_user),
             html.Div(id="app-content"),
             navbar_A,
@@ -770,10 +771,21 @@ def make_app_content(pathname):
                                 children=html.Div(id="fig-output"),
                                 style={"height":"100%"}
                             ),
-                            html.Div(id="toast-read_input_file"),
-                            html.Div(id="toast-update_labels_field"),
-                            html.Div(id="toast-generate_markers"),
-                            html.Div(id="toast-make_fig_output"),                        
+                            # html.Div( make_except_toast(id="read_input_file"), id="toast-read_input_file"  ),
+                            # html.Div( make_except_toast(id="update_labels_field"), id="toast-update_labels_field"  ),
+                            # html.Div( make_except_toast(id="generate_markers"), id="toast-generate_markers" ),
+                            # html.Div( make_except_toast(id="make_fig_output"), id="toast-make_fig_output" ),
+                            html.Div(
+                                [
+                                    html.Div( id="toast-read_input_file"  ),
+                                    html.Div( id="toast-update_labels_field"  ),
+                                    html.Div( id="toast-generate_markers" ),
+                                    html.Div( id="toast-make_fig_output" ),
+                                    html.Div(id="toast-email"),  
+                                ],
+                                style={"position": "fixed", "top": 66, "right": 10, "width": 350}
+                            )
+                      
                         ],
                         id="col-fig-output",
                         sm=12,md=6,lg=7,xl=8,
@@ -817,7 +829,7 @@ def read_input_file(contents,filename,last_modified,session_id):
         return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None
 
     except Exception as e:
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, "simple",current_user,"scatterplot")
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"scatterplot")
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast
    
 
@@ -867,7 +879,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
 
         return labels_section, None
     except Exception as e:
-        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, "simple",current_user,"scatterplot")
+        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"scatterplot")
         return dash.no_update, toast
 
 @dashapp.callback( 
@@ -1063,7 +1075,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
         return cards, None
 
     except Exception as e:
-        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, "simple",current_user,"scatterplot")
+        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"scatterplot")
         return dash.no_update, toast
 
 
@@ -1125,6 +1137,7 @@ states=[State('xvals', 'value'),
 @dashapp.callback( 
     Output('fig-output', 'children'),
     Output( 'toast-make_fig_output','children'),
+    Output('session-data','data'),
     Input("submit-button-state", "n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -1162,8 +1175,14 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
 
             pa["groups_settings"]=groups_settings
 
-        # try:
-        fig=make_figure(df,pa)
+        session_data={ "session_data": {"app": { "satterplot": {"filename":filename ,"df":df.to_json(),"pa":pa} } } }
+
+    except Exception as e:
+        toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"scatterplot")
+        return dash.no_update, toast, None
+    
+    try:
+        fig=make_figure_(df,pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )
         # fig.update_layout( )
@@ -1177,10 +1196,12 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
         fig=dcc.Graph(figure=fig,config=fig_config)
 
-        return fig, None  
+        return fig, None
+
     except Exception as e:
-        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, "simple",current_user,"scatterplot")
-        return dash.no_update, toast
+        session_data["traceback"]=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"scatterplot")
+        return dash.no_update, toast, session_data
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
@@ -1203,6 +1224,38 @@ def toggle_toast_traceback(n,is_open):
         return not is_open , "collapse"
     else:
         return not is_open , "expand"
+
+@dashapp.callback(
+    Output( { 'type': 'toast-error', 'index': ALL }, "is_open" ),
+    Output( 'toast-email' , "children" ),
+    Output( { 'type': 'toast-error', 'index': ALL }, "n_clicks" ),
+    Input( { 'type': 'help-toast-traceback', 'index': ALL }, "n_clicks" ),
+    State( "session-data", "data"),
+    prevent_initial_call=True
+)
+def help_email(n,data):
+    closed=[ False for s in n ]
+    n=[ s for s in n if s ]
+    clicks=[ 0 for s in n ]
+    n=[ s for s in n if s > 0 ]
+    if n : 
+        toast=dbc.Toast(
+            [
+                "We have received your request for help and will get back to you as soon as possible.",
+            ],
+            id={'type':'success-email','index':"email"},
+            header="Help",
+            is_open=True,
+            dismissable=True,
+            icon="success",
+        )
+
+        ask_for_help(session_data,current_user)
+
+        return closed, toast, clicks
+    else:
+        
+        raise PreventUpdate
 
 @dashapp.callback(
     Output("navbar-collapse", "is_open"),

@@ -24,5 +24,6 @@ COPY ./routes/_privacy.py /myapp/myapp/routes/_privacy.py
 COPY ./routes/_about.py /myapp/myapp/routes/_about.py
 COPY ./email/app_exception.html /myapp/myapp/templates/email/app_exception.html
 COPY ./email/app_exception.txt /myapp/myapp/templates/email/app_exception.txt
-
+COPY ./email/app_help.html /myapp/myapp/templates/email/app_help.html
+COPY ./email/app_help.txt /myapp/myapp/templates/email/app_help.txt
 USER myapp

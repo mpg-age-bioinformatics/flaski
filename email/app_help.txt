@@ -1,0 +1,13 @@
+{{eapp}}
+
+{{emsg}}
+
+{{user.firstname}} {{user.lastname}}: {{user.email}}
+
+{{etime}}
+
+{{session_file}}
+
+Flaski
+
+(txt)
