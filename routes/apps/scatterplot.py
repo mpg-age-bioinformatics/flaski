@@ -145,7 +145,7 @@ def make_app_content(pathname):
                                                     [
                                                         dbc.Label("Width",style={"margin-top":"5px","width":"55px"}),
                                                         dbc.Col(
-                                                            dcc.Input(id='fig_width', placeholder="width", type='text', style=card_input_style ) ,
+                                                            dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style=card_input_style ) ,
                                                         )
                                                     ],
                                                 ),
@@ -157,7 +157,7 @@ def make_app_content(pathname):
                                                     [
                                                         dbc.Label("Height",style={"margin-top":"5px","width":"55px"}),
                                                         dbc.Col(
-                                                            dcc.Input(id='fig_height', placeholder="height", type='text',style=card_input_style  ) ,
+                                                            dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style=card_input_style  ) ,
                                                         )
                                                     ],
                                                 ),
@@ -785,6 +785,7 @@ def make_app_content(pathname):
     Output('yvals', 'value'),
     Output('groups_value', 'options'),
     Output('labels_col_value', 'options'),
+    Output('upload-data','children'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
@@ -794,7 +795,11 @@ def read_input_file(contents,filename,last_modified,session_id):
     df=parse_table(contents,filename,last_modified,current_user.id,cache)
     cols=df.columns.tolist()
     cols_=make_options(cols)
-    return cols_, cols[0], cols_, cols[1], cols_, cols_
+    upload_text=html.Div(
+        [ html.A(filename) ], 
+        style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+    )
+    return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text
 
 @dashapp.callback( 
     Output('labels-section', 'children'),
