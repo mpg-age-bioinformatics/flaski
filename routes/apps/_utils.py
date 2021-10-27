@@ -1,6 +1,7 @@
 import io
 import base64
 import pandas as pd
+import dash_bootstrap_components as dbc
 
 def parse_table(contents,filename,last_modified,session_id,cache):
     @cache.memoize(timeout=3600)
@@ -26,3 +27,16 @@ def make_options(valuesin):
     for c in valuesin:
         opts.append( {"label":c, "value":c} )
     return opts
+
+def make_except_toast(header,text,id):
+    toast=dbc.Toast(
+        text,
+        id=id,
+        header=header,
+        is_open=True,
+        dismissable=True,
+        icon="danger",
+        # top: 66 positions the toast below the navbar
+        style={"position": "fixed", "top": 66, "right": 10, "width": 350},
+    )
+    return toast

@@ -6,10 +6,12 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_table, make_options
+from myapp.routes.apps._utils import parse_table, make_options, make_except_toast
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
+import traceback
+
 
 
 dashapp = dash.Dash("scatterplot",url_base_pathname='/scatterplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
@@ -43,7 +45,7 @@ def make_layout(pathname):
         [
             make_navbar_logged("Scatter plot",current_user),
             html.Div(id="app-content"),
-            navbar_A
+            navbar_A,
         ],
         style={"height":"100vh","verticalAlign":"center"}
     )
@@ -762,12 +764,18 @@ def make_app_content(pathname):
                         style={"padding":"2px","overflow":"scroll"},
                     ),
                     dbc.Col(
-                        dcc.Loading(
-                            id="loading-fig-output",
-                            type="default",
-                            children=html.Div(id="fig-output"),
-                            style={"height":"100%"}
-                        ),
+                        [
+                            dcc.Loading(
+                                id="loading-fig-output",
+                                type="default",
+                                children=html.Div(id="fig-output"),
+                                style={"height":"100%"}
+                            ),
+                            html.Div(id="toast-read_input_file"),
+                            html.Div(id="toast-update_labels_field"),
+                            html.Div(id="toast-generate_markers"),
+                            html.Div(id="toast-make_fig_output"),                        
+                        ],
                         id="col-fig-output",
                         sm=12,md=6,lg=7,xl=8,
                         align="top",
@@ -792,23 +800,72 @@ def make_app_content(pathname):
     Output('groups_value', 'options'),
     Output('labels_col_value', 'options'),
     Output('upload-data','children'),
+    Output('toast-read_input_file','children'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('session-id', 'data'),
     prevent_initial_call=True)
 def read_input_file(contents,filename,last_modified,session_id):
-    df=parse_table(contents,filename,last_modified,current_user.id,cache)
-    cols=df.columns.tolist()
-    cols_=make_options(cols)
-    upload_text=html.Div(
-        [ html.A(filename) ], 
-        style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-    )
-    return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text
+    try:
+        df=parse_table(contents,filename,last_modified,current_user.id,cache)
+        cols=df.columns.tolist()
+        cols_=make_options(cols)
+        upload_text=html.Div(
+            [ html.A(filename) ], 
+            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+        )      
+        return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None
+
+    except Exception as e:
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        children=[
+            "There was a problem reading your input file:",
+            dcc.Markdown(f'```{e}```'),
+            dbc.Collapse(
+                dbc.Card(
+                    dbc.CardBody(
+                        dcc.Markdown(f'```{tb_str}```'),
+                    ),
+                    color="light",
+                ),
+                id="collapse-read_input_file",
+                is_open=False,
+                style={"margin-top":"10px","margin-bottom":"10px"}
+            ),
+            html.Div(
+                [
+                    dbc.Button("expand", outline=True, color="dark",id="toggler-read_input_file",size="sm", style={"margin-right":"2px"} ),
+                    dbc.Button("help", outline=True, color="dark",id="help-read_input_file",size="sm", style={"margin-left":"2px"} )
+                ],
+                className="d-grid gap-2 d-md-flex justify-content-md-end",
+            ),
+        ]
+
+        toast=make_except_toast("Failure",children,"read_input_file-toast")
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast
+
+@dashapp.callback(
+    Output('collapse-read_input_file', 'is_open'),
+    Output("toggler-read_input_file","children"),
+    Input("toggler-read_input_file","n_clicks"),
+    State('collapse-read_input_file', 'is_open'),
+    prevent_initial_callbacks=True)
+def toggle_read_input_file(n_clicks, is_open):
+    if n_clicks:
+        if is_open:
+            text="expand"
+        else:
+            text="collapse"
+        return not is_open, text
+    else:
+        return dash.no_update, dash.no_update
+
+    
 
 @dashapp.callback( 
     Output('labels-section', 'children'),
+    Output('toast-update_labels_field','children'),
     Input('session-id','data'),
     Input('labels_col_value','value'),
     State('upload-data', 'contents'),
@@ -816,43 +873,48 @@ def read_input_file(contents,filename,last_modified,session_id):
     State('upload-data', 'last_modified')
 )
 def update_labels_field(session_id,col,contents,filename,last_modified):
-    if col:
-        df=parse_table(contents,filename,last_modified,current_user.id,cache)
-        labels=df[col].tolist()
-        labels_=make_options(labels)
-        labels_section=dbc.FormGroup(
-            [
-                dbc.Col( 
-                    dbc.Label("Labels", style={"margin-top":"5px"}),
-                    width=2   
-                ),
-                dbc.Col(
-                    dcc.Dropdown( options=labels_, value=[],placeholder="labels", id='fixed_labels', multi=True),
-                    width=10
-                )
-            ],
-            row=True
-        )
-    else:
-        labels_section=dbc.FormGroup(
-            [
-                dbc.Col( 
-                    dbc.Label("Labels", style={"margin-top":"5px"}),
-                    width=2   
-                ),
-                dbc.Col(
-                    dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
-                    width=10
-                )
-            ],
-            row=True,
-            style= {'display': 'none'}
-        )
+    try:
+        if col:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache)
+            labels=df[col].tolist()
+            labels_=make_options(labels)
+            labels_section=dbc.FormGroup(
+                [
+                    dbc.Col( 
+                        dbc.Label("Labels", style={"margin-top":"5px"}),
+                        width=2   
+                    ),
+                    dbc.Col(
+                        dcc.Dropdown( options=labels_, value=[],placeholder="labels", id='fixed_labels', multi=True),
+                        width=10
+                    )
+                ],
+                row=True
+            )
+        else:
+            labels_section=dbc.FormGroup(
+                [
+                    dbc.Col( 
+                        dbc.Label("Labels", style={"margin-top":"5px"}),
+                        width=2   
+                    ),
+                    dbc.Col(
+                        dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
+                        width=10
+                    )
+                ],
+                row=True,
+                style= {'display': 'none'}
+            )
 
-    return labels_section
+        return labels_section, None
+    except:
+        toast=make_except_toast("Failure","There was a problem updating the labels field.","update_labels_field-toast")
+        return dash.no_update, toast
 
 @dashapp.callback( 
     Output('marker-cards', 'children'),
+    Output('toast-generate_markers','children'),
     Input('session-id', 'data'),
     Input('groups_value', 'value'),
     State('upload-data', 'contents'),
@@ -1029,16 +1091,22 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
 
         return card
 
-    if not groups:
-        cards=[ make_card("Marker",0 ) ]
-    else:
-        cards=[]
-        df=parse_table(contents,filename,last_modified,current_user.id,cache)
-        groups_=df[[groups]].drop_duplicates()[groups].tolist()
-        for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
-            card=make_card(g, i)
-            cards.append(card)
-    return cards
+    try:
+
+        if not groups:
+            cards=[ make_card("Marker",0 ) ]
+        else:
+            cards=[]
+            df=parse_table(contents,filename,last_modified,current_user.id,cache)
+            groups_=df[[groups]].drop_duplicates()[groups].tolist()
+            for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
+                card=make_card(g, i)
+                cards.append(card)
+        return cards, None
+
+    except:
+        toast=make_except_toast("Failure","There was a problem generating the marker's card.","generate_markers-toast")
+        return dash.no_update, toast
 
 
 states=[State('xvals', 'value'),
@@ -1098,6 +1166,7 @@ states=[State('xvals', 'value'),
 
 @dashapp.callback( 
     Output('fig-output', 'children'),
+    Output( 'toast-make_fig_output','children'),
     Input("submit-button-state", "n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -1106,50 +1175,54 @@ states=[State('xvals', 'value'),
     prevent_initial_call=True
     )
 def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
-    input_names = [item.component_id for item in states]
+    try:
+        input_names = [item.component_id for item in states]
 
-    df=parse_table(contents,filename,last_modified,current_user.id,cache)
+        df=parse_table(contents,filename,last_modified,current_user.id,cache)
 
-    pa=figure_defaults()
-    for k, a in zip(input_names,args) :
-        if type(k) != dict :
-            pa[k]=a
+        pa=figure_defaults()
+        for k, a in zip(input_names,args) :
+            if type(k) != dict :
+                pa[k]=a
 
-    if pa["groups_value"]:
-        groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
-        pa["list_of_groups"]=groups
-        groups_settings_={}
-        for i, g in enumerate(groups):
-            groups_settings_[i]={"name":g}
+        if pa["groups_value"]:
+            groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
+            pa["list_of_groups"]=groups
+            groups_settings_={}
+            for i, g in enumerate(groups):
+                groups_settings_[i]={"name":g}
 
-        for k, a in zip(input_names,args):
-            if type(k) == dict :
-                k_=k['type']
-                for i, a_ in enumerate(a) :
-                    groups_settings_[i][k_]=a_
+            for k, a in zip(input_names,args):
+                if type(k) == dict :
+                    k_=k['type']
+                    for i, a_ in enumerate(a) :
+                        groups_settings_[i][k_]=a_
 
-        groups_settings = []
-        for i in list(groups_settings_.keys()):
-            groups_settings.append(groups_settings_[i])
+            groups_settings = []
+            for i in list(groups_settings_.keys()):
+                groups_settings.append(groups_settings_[i])
 
-        pa["groups_settings"]=groups_settings
+            pa["groups_settings"]=groups_settings
 
-    # try:
-    fig=make_figure(df,pa)
-    # import plotly.graph_objects as go
-    # fig = go.Figure( )
-    # fig.update_layout( )
-    # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
-    # fig.update_layout(
-    #         title={
-    #             'text': "Demo plotly title",
-    #             'xanchor': 'left',
-    #             'yanchor': 'top' ,
-    #             "font": {"size": 25, "color":"black"  } } )
-    fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-    fig=dcc.Graph(figure=fig,config=fig_config)
+        # try:
+        fig=make_figure(df,pa)
+        # import plotly.graph_objects as go
+        # fig = go.Figure( )
+        # fig.update_layout( )
+        # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
+        # fig.update_layout(
+        #         title={
+        #             'text': "Demo plotly title",
+        #             'xanchor': 'left',
+        #             'yanchor': 'top' ,
+        #             "font": {"size": 25, "color":"black"  } } )
+        fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
+        fig=dcc.Graph(figure=fig,config=fig_config)
 
-    return fig
+        return fig, None  
+    except:
+        toast=make_except_toast("Failure","There was a problem generating your output.","make_fig_output-toast")
+        return dash.no_update, toast
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
