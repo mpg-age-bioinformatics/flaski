@@ -22,5 +22,7 @@ COPY ./routes/_impressum.py /myapp/myapp/routes/_impressum.py
 COPY ./routes/_vars.py /myapp/myapp/routes/_vars.py
 COPY ./routes/_privacy.py /myapp/myapp/routes/_privacy.py
 COPY ./routes/_about.py /myapp/myapp/routes/_about.py
+COPY ./email/app_exception.html /myapp/myapp/templates/email/app_exception.html
+COPY ./email/app_exception.txt /myapp/myapp/templates/email/app_exception.txt
 
 USER myapp

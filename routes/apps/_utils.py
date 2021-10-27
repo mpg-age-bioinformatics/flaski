@@ -4,10 +4,13 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 import traceback
-
+from myapp.email import send_email
+from myapp import app
+from datetime import datetime
+from flask import render_template
 
 def parse_table(contents,filename,last_modified,session_id,cache):
-    @cache.memoize(timeout=3600)
+    # @cache.memoize(timeout=3600)
     def _parse_table(contents,filename,last_modified,session_id,cache):
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
@@ -31,8 +34,31 @@ def make_options(valuesin):
         opts.append( {"label":c, "value":c} )
     return opts
 
-def make_except_toast(text,id,e, help):
+def make_except_toast(text,id,e, help,user, eapp):
     tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+
+    emsg_html=tb_str.split("\n")
+    send_email(
+        '[Flaski] exception: %s ' %eapp,
+        sender=app.config['MAIL_USERNAME'],
+        recipients=app.config['ADMINS'],
+        text_body=render_template(
+            'email/app_exception.txt',
+            user=user, 
+            eapp=eapp, 
+            emsg=tb_str, 
+            etime=str(datetime.now())
+        ),
+        html_body=render_template(
+            'email/app_exception.html',
+            user=user, 
+            eapp=eapp, 
+            emsg=emsg_html, 
+            etime=str(datetime.now())
+        ),
+        reply_to=user.email 
+    )
+
     toast=dbc.Toast(
         [
             text,

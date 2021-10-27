@@ -24,9 +24,9 @@ cache = Cache(dashapp.server, config={
 
 dashapp.layout=html.Div( 
     [ 
-        dcc.Store(data=str(uuid.uuid4()), id='session-id'),
-        dcc.Location(id='url', refresh=False),
-        html.Div(id="protected-content"),
+        dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
+        dcc.Location( id='url', refresh=False ),
+        html.Div( id="protected-content" ),
     ] 
 )
 
@@ -817,7 +817,7 @@ def read_input_file(contents,filename,last_modified,session_id):
         return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None
 
     except Exception as e:
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, "simple")
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, "simple",current_user,"scatterplot")
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast
    
 
@@ -867,7 +867,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
 
         return labels_section, None
     except Exception as e:
-        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, "simple")
+        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, "simple",current_user,"scatterplot")
         return dash.no_update, toast
 
 @dashapp.callback( 
@@ -1063,7 +1063,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
         return cards, None
 
     except Exception as e:
-        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, "simple")
+        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, "simple",current_user,"scatterplot")
         return dash.no_update, toast
 
 
@@ -1179,8 +1179,7 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
 
         return fig, None  
     except Exception as e:
-        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, "simple")
-        # toast=make_except_toast("Failure","There was a problem generating your output.","make_fig_output-toast")
+        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, "simple",current_user,"scatterplot")
         return dash.no_update, toast
 
 @dashapp.callback(
