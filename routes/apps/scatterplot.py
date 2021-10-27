@@ -1233,7 +1233,7 @@ def toggle_toast_traceback(n,is_open):
     State( "session-data", "data"),
     prevent_initial_call=True
 )
-def help_email(n,data):
+def help_email(n,session_data):
     closed=[ False for s in n ]
     n=[ s for s in n if s ]
     clicks=[ 0 for s in n ]
