@@ -2,6 +2,9 @@ import io
 import base64
 import pandas as pd
 import dash_bootstrap_components as dbc
+from dash import dcc, html
+import traceback
+
 
 def parse_table(contents,filename,last_modified,session_id,cache):
     @cache.memoize(timeout=3600)
@@ -28,15 +31,39 @@ def make_options(valuesin):
         opts.append( {"label":c, "value":c} )
     return opts
 
-def make_except_toast(header,text,id):
+def make_except_toast(text,id,e, help):
+    tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
     toast=dbc.Toast(
-        text,
-        id=id,
-        header=header,
+        [
+            text,
+            dcc.Markdown(f'```{e}```'),
+            "Something went wrong, we have been notified. If you would like to share your session with us and get help on this issue please press 'Ice Cream'.",
+            dbc.Collapse(
+                dbc.Card(
+                    dbc.CardBody(
+                        dcc.Markdown(f'```{tb_str}```'),
+                    ),
+                    color="light",
+                ),
+                id={'type':'collapse-toast-traceback','index':id},
+                is_open=False,
+                style={"margin-top":"10px","margin-bottom":"10px"}
+            ),
+            html.Div(
+                [
+                    dbc.Button("expand", outline=True, color="dark",id={'type':'toggler-toast-traceback','index':id},size="sm", style={"margin-right":"2px"} ),
+                    dbc.Button("Ice Cream", outline=True, color="dark",id={'type':f'help-{help}-toast-traceback','index':id},size="sm", style={"margin-left":"2px"} )
+                ],
+                className="d-grid gap-2 d-md-flex justify-content-md-end",
+                style={"margin-top":"10px"} 
+            ),
+        ],
+        id={'type':'toast-error','index':id},
+        header="Exception",
         is_open=True,
         dismissable=True,
         icon="danger",
         # top: 66 positions the toast below the navbar
-        style={"position": "fixed", "top": 66, "right": 10, "width": 350},
+        style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
     )
     return toast

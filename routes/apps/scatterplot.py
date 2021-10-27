@@ -10,7 +10,6 @@ from myapp.routes.apps._utils import parse_table, make_options, make_except_toas
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
-import traceback
 
 
 
@@ -818,50 +817,9 @@ def read_input_file(contents,filename,last_modified,session_id):
         return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None
 
     except Exception as e:
-        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-        children=[
-            "There was a problem reading your input file:",
-            dcc.Markdown(f'```{e}```'),
-            dbc.Collapse(
-                dbc.Card(
-                    dbc.CardBody(
-                        dcc.Markdown(f'```{tb_str}```'),
-                    ),
-                    color="light",
-                ),
-                id="collapse-read_input_file",
-                is_open=False,
-                style={"margin-top":"10px","margin-bottom":"10px"}
-            ),
-            html.Div(
-                [
-                    dbc.Button("expand", outline=True, color="dark",id="toggler-read_input_file",size="sm", style={"margin-right":"2px"} ),
-                    dbc.Button("help", outline=True, color="dark",id="help-read_input_file",size="sm", style={"margin-left":"2px"} )
-                ],
-                className="d-grid gap-2 d-md-flex justify-content-md-end",
-            ),
-        ]
-
-        toast=make_except_toast("Failure",children,"read_input_file-toast")
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, "simple")
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast
-
-@dashapp.callback(
-    Output('collapse-read_input_file', 'is_open'),
-    Output("toggler-read_input_file","children"),
-    Input("toggler-read_input_file","n_clicks"),
-    State('collapse-read_input_file', 'is_open'),
-    prevent_initial_callbacks=True)
-def toggle_read_input_file(n_clicks, is_open):
-    if n_clicks:
-        if is_open:
-            text="expand"
-        else:
-            text="collapse"
-        return not is_open, text
-    else:
-        return dash.no_update, dash.no_update
-
-    
+   
 
 @dashapp.callback( 
     Output('labels-section', 'children'),
@@ -908,8 +866,8 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
             )
 
         return labels_section, None
-    except:
-        toast=make_except_toast("Failure","There was a problem updating the labels field.","update_labels_field-toast")
+    except Exception as e:
+        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, "simple")
         return dash.no_update, toast
 
 @dashapp.callback( 
@@ -1104,8 +1062,8 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                 cards.append(card)
         return cards, None
 
-    except:
-        toast=make_except_toast("Failure","There was a problem generating the marker's card.","generate_markers-toast")
+    except Exception as e:
+        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, "simple")
         return dash.no_update, toast
 
 
@@ -1220,8 +1178,9 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         fig=dcc.Graph(figure=fig,config=fig_config)
 
         return fig, None  
-    except:
-        toast=make_except_toast("Failure","There was a problem generating your output.","make_fig_output-toast")
+    except Exception as e:
+        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, "simple")
+        # toast=make_except_toast("Failure","There was a problem generating your output.","make_fig_output-toast")
         return dash.no_update, toast
 
 @dashapp.callback(
@@ -1232,6 +1191,19 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
 )
 def toggle_accordion(n, is_open):
     return not is_open
+
+@dashapp.callback(
+    Output( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
+    Output( { 'type': 'toggler-toast-traceback', 'index': MATCH }, "children"),
+    Input( { 'type': 'toggler-toast-traceback', 'index': MATCH }, "n_clicks"),
+    State( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
+    prevent_initial_call=True
+)
+def toggle_toast_traceback(n,is_open):
+    if not is_open:
+        return not is_open , "collapse"
+    else:
+        return not is_open , "expand"
 
 @dashapp.callback(
     Output("navbar-collapse", "is_open"),
