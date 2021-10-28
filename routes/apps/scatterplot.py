@@ -1242,16 +1242,17 @@ def toggle_toast_traceback(n,is_open):
     Output( 'toast-email' , "children" ),
     Output( { 'type': 'toast-error', 'index': ALL }, "n_clicks" ),
     Input( { 'type': 'help-toast-traceback', 'index': ALL }, "n_clicks" ),
-    # State()
+    State({ "type":"traceback", "index":ALL }, "data"),
     State( "session-data", "data"),
     prevent_initial_call=True
 )
-def help_email(n,session_data):
+def help_email(n,tb_str, session_data):
     closed=[ False for s in n ]
     n=[ s for s in n if s ]
     clicks=[ 0 for s in n ]
     n=[ s for s in n if s > 0 ]
     if n : 
+
         toast=dbc.Toast(
             [
                 "We have received your request for help and will get back to you as soon as possible.",
@@ -1263,7 +1264,13 @@ def help_email(n,session_data):
             icon="success",
         )
 
-        ask_for_help("something",current_user, "scatterplot")
+        if tb_str :
+            tb_str= [ s for s in tb_str if s ]
+            tb_str="\n\n***********************************\n\n".join(tb_str)
+        else:
+            tb_str="! traceback could not be found"
+
+        ask_for_help(tb_str,current_user, "scatterplot", session_data)
 
         return closed, toast, clicks
     else:
