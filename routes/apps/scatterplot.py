@@ -778,9 +778,13 @@ def make_app_content(pathname):
                             html.Div(
                                 [
                                     html.Div( id="toast-read_input_file"  ),
+                                    dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
                                     html.Div( id="toast-update_labels_field"  ),
+                                    dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
                                     html.Div( id="toast-generate_markers" ),
+                                    dcc.Store( id={ "type":"traceback", "index":"generate_markers" }), 
                                     html.Div( id="toast-make_fig_output" ),
+                                    dcc.Store( id={ "type":"traceback", "index":"make_fig_output" }), 
                                     html.Div(id="toast-email"),  
                                 ],
                                 style={"position": "fixed", "top": 66, "right": 10, "width": 350}
@@ -812,6 +816,7 @@ def make_app_content(pathname):
     Output('labels_col_value', 'options'),
     Output('upload-data','children'),
     Output('toast-read_input_file','children'),
+    Output({ "type":"traceback", "index":"read_input_file" },'data'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
@@ -826,16 +831,18 @@ def read_input_file(contents,filename,last_modified,session_id):
             [ html.A(filename) ], 
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         )      
-        return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None
+        return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None, None
 
     except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"scatterplot")
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str
    
 
 @dashapp.callback( 
     Output('labels-section', 'children'),
     Output('toast-update_labels_field','children'),
+    Output({ "type":"traceback", "index":"update_labels_field" },'data'),
     Input('session-id','data'),
     Input('labels_col_value','value'),
     State('upload-data', 'contents'),
@@ -877,14 +884,16 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
                 style= {'display': 'none'}
             )
 
-        return labels_section, None
+        return labels_section, None, None
     except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"scatterplot")
-        return dash.no_update, toast
+        return dash.no_update, toast, tb_str
 
 @dashapp.callback( 
     Output('marker-cards', 'children'),
     Output('toast-generate_markers','children'),
+    Output({ "type":"traceback", "index":"generate_markers" },'data'),
     Input('session-id', 'data'),
     Input('groups_value', 'value'),
     State('upload-data', 'contents'),
@@ -1072,11 +1081,12 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
             for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
                 card=make_card(g, i)
                 cards.append(card)
-        return cards, None
+        return cards, None, None
 
     except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"scatterplot")
-        return dash.no_update, toast
+        return dash.no_update, toast, tb_str
 
 
 states=[State('xvals', 'value'),
@@ -1138,6 +1148,7 @@ states=[State('xvals', 'value'),
     Output('fig-output', 'children'),
     Output( 'toast-make_fig_output','children'),
     Output('session-data','data'),
+    Output({ "type":"traceback", "index":"make_fig_output" },'data'),
     Input("submit-button-state", "n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -1178,8 +1189,9 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         session_data={ "session_data": {"app": { "satterplot": {"filename":filename ,"df":df.to_json(),"pa":pa} } } }
 
     except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, None
+        return dash.no_update, toast, None, tb_str
     
     try:
         fig=make_figure_(df,pa)
@@ -1196,12 +1208,12 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
         fig=dcc.Graph(figure=fig,config=fig_config)
 
-        return fig, None
+        return fig, None, None, None
 
     except Exception as e:
-        session_data["traceback"]=''.join(traceback.format_exception(None, e, e.__traceback__))
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, session_data
+        return dash.no_update, toast, session_data, tb_str
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
@@ -1230,6 +1242,7 @@ def toggle_toast_traceback(n,is_open):
     Output( 'toast-email' , "children" ),
     Output( { 'type': 'toast-error', 'index': ALL }, "n_clicks" ),
     Input( { 'type': 'help-toast-traceback', 'index': ALL }, "n_clicks" ),
+    # State()
     State( "session-data", "data"),
     prevent_initial_call=True
 )
@@ -1250,7 +1263,7 @@ def help_email(n,session_data):
             icon="success",
         )
 
-        ask_for_help(session_data,current_user)
+        ask_for_help("something",current_user, "scatterplot")
 
         return closed, toast, clicks
     else:

@@ -105,22 +105,24 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
     )
     return toast
 
-def ask_for_help(session_data,user):
-    tb_str=session_data["traceback"]
-    session_data=session_data["session_data"]
-    app_name=list(session_data["app"].keys())[0]
+def ask_for_help(tb_str, user, current_app, session_data=None ):
     
-    share_folder=os.path.join(app.config["USERS_DATA"], 'shared_sessions')
-    if not os.path.isdir(share_folder):
-        os.makedirs(share_folder)
-    session_file=tempfile.NamedTemporaryFile(dir=share_folder, suffix=".ses")
-    with open(session_file,"w") as fout:
-        json.dump(session_data, fout)
-    send_email('[Flaski] help needed: %s ' %app_name,
+    if session_data:
+        session_data=session_data["session_data"]
+        share_folder=os.path.join(app.config["USERS_DATA"], 'shared_sessions')
+        if not os.path.isdir(share_folder):
+            os.makedirs(share_folder)
+        session_file=tempfile.NamedTemporaryFile(dir=share_folder, suffix=".ses")
+        with open(session_file,"w") as fout:
+            json.dump(session_data, fout)
+    else:
+        session_file="no session file for this Exception"
+
+    send_email('[Flaski] help needed: %s ' %current_app,
         sender=app.config['MAIL_USERNAME'],
         recipients=app.config['ADMINS'],
         text_body=render_template('email/app_help.txt',
-                                    user=user, eapp=app_name, emsg=tb_str, etime=str(datetime.now()), session_file=session_file),
+                                    user=user, eapp=current_app, emsg=tb_str, etime=str(datetime.now()), session_file=session_file),
         html_body=render_template('email/app_help.html',
-                                    user=user, eapp=app_name, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file),\
+                                    user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file),\
         reply_to=user.email )      
