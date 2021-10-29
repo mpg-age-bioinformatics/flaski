@@ -1,5 +1,5 @@
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
-from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot
+from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot, idendrogram
 from flaski.apps.dash import aadatalake
 from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, gsea, riboseq
 from flaski.apps.external import *
