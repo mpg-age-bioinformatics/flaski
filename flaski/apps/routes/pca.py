@@ -194,62 +194,82 @@ def pca(download=None):
     else:
         if download == "download":
 
-            plot_arguments=session["plot_arguments"]
+            try:
 
-            # READ INPUT DATA FROM SESSION JSON
-            df_pca=pd.read_json(session["df_pca"])
-            features=pd.read_json(session["features"])
+                plot_arguments=session["plot_arguments"]
 
-            # CALL FIGURE FUNCTION
+                # READ INPUT DATA FROM SESSION JSON
+                df_pca=pd.read_json(session["df_pca"])
+                features=pd.read_json(session["features"])
 
-            eventlog = UserLogging(email=current_user.email,action="download table pca values")
-            db.session.add(eventlog)
-            db.session.commit()
+                # CALL FIGURE FUNCTION
 
-            if plot_arguments["downloadf"] == "xlsx":
-                excelfile = io.BytesIO()
-                EXC=pd.ExcelWriter(excelfile)
-                df_pca.to_excel(EXC,sheet_name="pca", index=None)
-                features.to_excel(EXC,sheet_name="features", index=None)
-                EXC.save()
-                excelfile.seek(0)
-                return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx",as_attachment=True)
+                eventlog = UserLogging(email=current_user.email,action="download table pca values")
+                db.session.add(eventlog)
+                db.session.commit()
 
-            elif plot_arguments["downloadf"] == "tsv":               
-                return Response(df_pca.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["downloadn"]})
+                if plot_arguments["downloadf"] == "xlsx":
+                    excelfile = io.BytesIO()
+                    EXC=pd.ExcelWriter(excelfile)
+                    df_pca.to_excel(EXC,sheet_name="pca", index=None)
+                    features.to_excel(EXC,sheet_name="features", index=None)
+                    EXC.save()
+                    excelfile.seek(0)
+                    return send_file(excelfile, attachment_filename=plot_arguments["downloadn"]+".xlsx",as_attachment=True)
+
+                elif plot_arguments["downloadf"] == "tsv":               
+                    return Response(df_pca.to_csv(sep="\t"), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=%s.tsv" %plot_arguments["downloadn"]})
+
+            except Exception as e:
+                tb_str=handle_exception(e,user=current_user,eapp="pca",session=session)
+                filename=session["filename"]
+                flash(tb_str,'traceback')
+                if not plot_arguments:
+                    plot_arguments=session["plot_arguments"]
+                return render_template('/apps/pca.html', filename=filename, apps=apps, **plot_arguments)                
         
         if download == "scatter":
 
-            # READ INPUT DATA FROM SESSION JSON
-            df_pca=pd.read_json(session["df_pca"])
+            try:
 
-            reset_info=check_session_app(session,"iscatterplot",apps)
-            if reset_info:
-                flash(reset_info,'error')
+                # READ INPUT DATA FROM SESSION JSON
+                df_pca=pd.read_json(session["df_pca"])
 
-            # INITIATE SESSION
-            session["filename"]="<from PCA>"
-            plot_arguments=iscatterplot.figure_defaults()
-            session["COMMIT"]=app.config['COMMIT']
-            session["app"]="iscatterplot"
+                reset_info=check_session_app(session,"iscatterplot",apps)
+                if reset_info:
+                    flash(reset_info,'error')
 
-            df_pca=df_pca.astype(str)
-            session["df"]=df_pca.to_json()
+                # INITIATE SESSION
+                session["filename"]="<from PCA>"
+                plot_arguments=iscatterplot.figure_defaults()
+                session["COMMIT"]=app.config['COMMIT']
+                session["app"]="iscatterplot"
 
-            plot_arguments["xcols"]=df_pca.columns.tolist()
-            plot_arguments["ycols"]=df_pca.columns.tolist()
-            plot_arguments["groups"]=plot_arguments["groups"]+df_pca.columns.tolist()
-            plot_arguments["labels_col"]=df_pca.columns.tolist()
+                df_pca=df_pca.astype(str)
+                session["df"]=df_pca.to_json()
 
-            plot_arguments["xvals"]=df_pca.columns.tolist()[1]
-            plot_arguments["yvals"]=df_pca.columns.tolist()[2]
-            plot_arguments["labels_col_value"]=df_pca.columns.tolist()[0]
-            plot_arguments["title"]="PCA"
-            plot_arguments["xlabel"]=df_pca.columns.tolist()[1].split(" - ")[0]+" - "+nFormat(float(df_pca.columns.tolist()[1].split(" - ")[-1].split("%")[0]))+"%"
-            plot_arguments["ylabel"]=df_pca.columns.tolist()[2].split(" - ")[0]+" - "+nFormat(float(df_pca.columns.tolist()[2].split(" - ")[-1].split("%")[0]))+"%"
+                plot_arguments["xcols"]=df_pca.columns.tolist()
+                plot_arguments["ycols"]=df_pca.columns.tolist()
+                plot_arguments["groups"]=plot_arguments["groups"]+df_pca.columns.tolist()
+                plot_arguments["labels_col"]=df_pca.columns.tolist()
 
-            session["plot_arguments"]=plot_arguments
+                plot_arguments["xvals"]=df_pca.columns.tolist()[1]
+                plot_arguments["yvals"]=df_pca.columns.tolist()[2]
+                plot_arguments["labels_col_value"]=df_pca.columns.tolist()[0]
+                plot_arguments["title"]="PCA"
+                plot_arguments["xlabel"]=df_pca.columns.tolist()[1].split(" - ")[0]+" - "+nFormat(float(df_pca.columns.tolist()[1].split(" - ")[-1].split("%")[0]))+"%"
+                plot_arguments["ylabel"]=df_pca.columns.tolist()[2].split(" - ")[0]+" - "+nFormat(float(df_pca.columns.tolist()[2].split(" - ")[-1].split("%")[0]))+"%"
 
-            return render_template('/apps/iscatterplot.html', filename=session["filename"], apps=apps, **plot_arguments)
+                session["plot_arguments"]=plot_arguments
+
+                return render_template('/apps/iscatterplot.html', filename=session["filename"], apps=apps, **plot_arguments)
+                              
+            except Exception as e:
+                tb_str=handle_exception(e,user=current_user,eapp="pca",session=session)
+                filename=session["filename"]
+                flash(tb_str,'traceback')
+                if not plot_arguments:
+                    plot_arguments=session["plot_arguments"]
+                return render_template('/apps/pca.html', filename=filename, apps=apps, **plot_arguments)  
 
         return render_template('apps/pca.html',  filename=session["filename"], apps=apps, **session["plot_arguments"])            
