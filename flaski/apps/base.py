@@ -1,7 +1,7 @@
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
 from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot, idendrogram
 from flaski.apps.dash import aadatalake
-from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, gsea, riboseq
+from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, gsea, riboseq, alphafold
 from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
@@ -83,7 +83,12 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         "id":'riboseq_more',
         "link":'riboseq' ,
         "java":"javascript:ReverseDisplay('riboseq_more')", 
-        "description":"Ribo-Seq submission form.", "submission":"yes"} 
+        "description":"Ribo-Seq submission form.", "submission":"yes"} ,\
+        {"name":"AlphaFold", 
+        "id":'alphafold_more',
+        "link":'alphafold' ,
+        "java":"javascript:ReverseDisplay('alphafold_more')", 
+        "description":"AlphaFold.", "submission":"yes"} 
 ]
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
