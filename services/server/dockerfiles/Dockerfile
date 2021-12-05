@@ -4,8 +4,8 @@ FROM flaski/flaski:1.7.2
 
 USER root
 
-RUN mkdir /submissions
-RUN chown -R flaski:flaski /submissions
+RUN mkdir /submissions /mpcdf
+RUN chown -R flaski:flaski /submissions /mpcdf
 
 # remove old flaski files
 RUN rm -rf /flaski

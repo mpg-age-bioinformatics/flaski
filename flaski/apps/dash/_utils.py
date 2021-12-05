@@ -42,6 +42,29 @@ GROUPS=["Adam_Antebi",\
 "Thomas_Langer",\
 "External"]
 
+GROUPS_INITALS={"Adam_Antebi":"AA",\
+"Aleksandra_Filipovska":"AF",\
+"Anne_Schaefer":"AS",\
+"Bioinformatics":"bit",\
+"Constantinos_Demetriades":"CD",\
+"CRISPR_Screening":"CS",\
+"Dario_Valenzano":"DV",\
+"Ivan_Matic":"IM",\
+"James_Stewart":"JS",\
+"Lena_Pernas":"LP",\
+"Linda_Partridge":"LP",\
+"Martin_Denzel":"MD",\
+"Martin_Graef":"MG",\
+"Metabolomics":"Met",\
+"Nils_Larson":"NL",\
+"Peter_Tessarz":"PT",\
+"Phenotyping":"Phe",\
+"Proteomics":"Prt",\
+"Ron_Jachimowicz":"RJ",\
+"Sara_Wickstroem":"SW",\
+"Thomas_Langer":"TL",\
+"External":"ext"}
+
 def make_options(valuesin):
     opts=[]
     for c in valuesin:

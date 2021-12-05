@@ -9,7 +9,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from ._utils import handle_dash_exception, protect_dashviews, validate_user_access, \
-    make_navbar, make_footer, make_options, make_table, META_TAGS, GROUPS, make_submission_file
+    make_navbar, make_footer, make_options, make_table, META_TAGS, GROUPS, GROUPS_INITALS,  make_submission_file
 import uuid
 import pandas as pd
 import os        
@@ -48,7 +48,13 @@ def make_submission_json(email,group, name, sequence):
         filename=make_submission_file(".alphafold.json", folder="mpcdf")
         name=secure_filename(name)
         name=name.replace(" ","_")
-        return {"filename":filename,"email": email, "group":group, "name":name, "sequence":sequence}
+        email=email.replace(" ", ",")
+        email=email.split(",")
+        email=[ e for e in email if e ]
+        email=",".join(email)
+        sequence=sequence.replace(" ", "")
+        sequence=secure_filename(sequence)
+        return {"filename":filename,"email": email, "group_name":group, "group_initials":GROUPS_INITALS[group],"name_fasta_header":name, "sequence_fasta":sequence}
     return _make_submission_json(email,group, name, sequence)
 
 # arguments 
@@ -126,28 +132,34 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('name', 'value'),
     State('sequence', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, email,group,folder,name,sequence):
+def update_output(session_id, n_clicks, email,group,name,sequence):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None
+
     if CURRENTAPP not in apps:
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
     subdic=make_submission_json( email,group, name, sequence)
 
-    if os.path.isfile(subdic["filename"]):
+    if os.path.isfile(subdic["filename"].replace("json","tsv")):
         msg='''You have already submitted this data. Re-submission will not take place.'''
     else:
+        df=pd.DataFrame(subdic, index=[0] ) 
+        df=df.transpose()
+        df.reset_index(inplace=True, drop=False)
+        df.to_csv(subdic["filename"].replace("json","tsv"), sep="\t", index=None, header=False)
+
         msg='''**Submission successful**. Please check your email for confirmation.'''
     
-    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
-        subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
+        if subdic["group_name"] == "External" :
+            subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
 
-    send_submission_email(user=current_user, submission_type="alphafold", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="alphafold", submission_file=os.path.basename(subdic["filename"].replace("json","tsv")), attachment_path=subdic["filename"].replace("json","tsv"))
 
-    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
-        os.remove(subdic["filename"])
+        if subdic["group_name"] == "External" :
+            os.remove(subdic["filename"])
 
     return dcc.Markdown(msg, style={"margin-top":"10px"} )
 
