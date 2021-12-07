@@ -175,12 +175,12 @@ arguments=[ dbc.Row( [
                 ], style={"margin-top":10,"margin-bottom":10}),
             dbc.Row( [
                 dbc.Col( html.Label('Study design') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-studydesign', options=pair_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( dcc.Dropdown( id='opt-studydesign', options=study_, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('Do you have matched ribo/rna seq or just ribo seq'),md=6  ), 
                 ], style={"margin-top":10,"margin-bottom":10}),
             dbc.Row( [
                 dbc.Col( html.Label('Strand') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-strand', options=pair_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( dcc.Dropdown( id='opt-strand', options=strand_, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('Most sequencing will be fr-firststrand or unstranded'),md=6  ), 
                 ], style={"margin-top":10,"margin-bottom":10}),
             dbc.Row( [
