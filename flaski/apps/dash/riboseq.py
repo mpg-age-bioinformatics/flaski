@@ -54,7 +54,7 @@ def generate_submission_file(rows, matching, email,group,folder,md5sums,project_
         df_=df_.to_json()
         filename=make_submission_file(".riboseq.xlsx")
 
-        return {"filename": filename, "samples":df, "metadata":df_}
+        return {"filename": filename, "samples":df, "metadata":df_, "matching":mdf}
     return _generate_submission_file(rows,matching,  email,group,folder,md5sums,project_title,organism,ercc,\
         adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
 
