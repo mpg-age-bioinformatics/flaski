@@ -27,10 +27,10 @@ cache = Cache(dashapp.server, config={
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, matching, email,group,folder,md5sums,project_title,organism,ercc,\
-    adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
+    adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(rows, matching,email,group,folder,md5sums,project_title,organism,ercc,\
-        adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
+        adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
@@ -49,14 +49,14 @@ def generate_submission_file(rows, matching, email,group,folder,md5sums,project_
                                 "Adapter sequence","Fastq quality","RiboSeq","RNASeq","study_design","Strand",\
                                  "Fragment Size", "Plot Rfeet pictures"   ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc,\
-                              adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet]}, index=list(range(15)))
+                              adapter,fastqquality, ribopair,rnapair,studydesign,strand,fragsize,rfeet]}, index=list(range(15)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".riboseq.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
     return _generate_submission_file(rows,matching,  email,group,folder,md5sums,project_title,organism,ercc,\
-        adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
+        adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
 
 
 
@@ -120,6 +120,7 @@ pair_=make_options(["single","paired"])
 study_=make_options(["ribo_rna_matched","ribo_only"])
 strand_=make_options(["fr-firststrand","fr-secondstrand","unstranded"])
 yesno_=make_options(["yes","no"])
+fastqquality_=make_options(["sanger","solexa","i1.3","i1.5","i1.8"])
 
 
 # arguments 
@@ -163,6 +164,11 @@ arguments=[ dbc.Row( [
                 dbc.Col( dcc.Input(id='adapter', placeholder="ACTGTGCCGGAA", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label('adapter sequence to be removed'),md=6  ), 
                 ], style={"margin-top":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('Fastq Q.') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-fastqquality', options=fastqquality_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Fastq Quality'),md=6  ), 
+                ], style={"margin-top":10,"margin-bottom":10}),
             dbc.Row( [
                 dbc.Col( html.Label('RiboSeq') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-ribopair', options=pair_, style={ "width":"100%"}),md=3 ),
@@ -256,6 +262,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
     State('adapter', 'value'),
+    State('opt-fastqquality', 'value'),
     State('opt-ribopair', 'value'),
     State('opt-rnapair', 'value'),
     State('opt-studydesign', 'value'),
@@ -264,7 +271,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-rfeet', 'value'),
     prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc,\
-    adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
+    adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
@@ -273,7 +280,7 @@ def update_output(session_id, n_clicks, rows, matching_tb, email,group,folder,md
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
     subdic=generate_submission_file(rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc,\
-        adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
+        adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     matching=pd.read_json(subdic["matching"])
