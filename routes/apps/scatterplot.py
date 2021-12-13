@@ -13,7 +13,9 @@ import os
 import uuid
 import traceback
 
-dashapp = dash.Dash("scatterplot",url_base_pathname='/scatterplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+
+dashapp = dash.Dash("scatterplot",url_base_pathname='/scatterplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -788,8 +790,34 @@ def make_app_content(pathname):
                                     html.Div(id="toast-email"),  
                                 ],
                                 style={"position": "fixed", "top": 66, "right": 10, "width": 350}
+                            ),
+
+                            # dbc.Button(
+                            #     'PDF',
+                            #     
+                            #     n_clicks=0, 
+                            #     style={"max-width":"100px","width":"100%","margin-top":"4px","margin-bottom":"4px"}#,"max-width":"375px","min-width":"375px"}
+                            # )
+                            dbc.Button(
+                                html.Span(
+                                    [ 
+                                        html.I(className="fas fas fa-file-pdf"),
+                                        " PDF" 
+                                    ]
+                                ),
+                                id='download-pdf', 
+                                style={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} # 'none' / 'inline-block'
+                            ),
+                            dbc.Button(
+                                html.Span(
+                                    [ 
+                                        html.I(className="fas fas fa-file-export"),
+                                        " Session" 
+                                    ]
+                                ),
+                                id='download-session', 
+                                style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'none'}
                             )
-                      
                         ],
                         id="col-fig-output",
                         sm=12,md=6,lg=7,xl=8,
@@ -1149,6 +1177,8 @@ states=[State('xvals', 'value'),
     Output( 'toast-make_fig_output','children'),
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
+    Output('download-pdf', 'style'), 
+    Output('download-session', 'style'), 
     Input("submit-button-state", "n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -1157,6 +1187,8 @@ states=[State('xvals', 'value'),
     prevent_initial_call=True
     )
 def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
+    download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
+    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
     try:
         input_names = [item.component_id for item in states]
 
@@ -1191,10 +1223,10 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, None, tb_str
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide
     
     try:
-        fig=make_figure_(df,pa)
+        fig=make_figure(df,pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )
         # fig.update_layout( )
@@ -1208,12 +1240,12 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
         fig=dcc.Graph(figure=fig,config=fig_config)
 
-        return fig, None, None, None
+        return fig, None, session_data, None, download_buttons_style_show, download_buttons_style_show
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, session_data, tb_str
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
