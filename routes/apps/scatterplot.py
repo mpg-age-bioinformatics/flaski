@@ -12,6 +12,13 @@ from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
 import traceback
+import io
+import pandas as pd
+import time
+import plotly.express as px
+from plotly.io import write_image
+import plotly.graph_objects as go
+
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
@@ -745,13 +752,77 @@ def make_app_content(pathname):
                 )
             ],
             body=True,
-            style={"min-width":"375px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"4px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
+            style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"4px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
+        ),
+        dbc.Row(
+            [
+                dbc.Col( 
+                    [
+                        dbc.Button(
+                            html.Span(
+                                [ 
+                                    html.I(className="fas fa-file-export"),
+                                    " Export" 
+                                ]
+                            ),
+                            id='export-session-btn', 
+                            style={"width":"100%"}
+                        ),
+                        dcc.Download(id="export-session")
+                    ],
+                    id="export-session-div",
+                    width=4,
+                    style={"padding-right":"2px"}
+
+                ),
+                dbc.Col(
+                    [
+                        dbc.Button(
+                            html.Span(
+                                [ 
+                                    html.I(className="far fa-lg fa-save"), #, style={"size":"12px"}
+                                    " Save" 
+                                ]
+                            ),
+                            id='save-session-btn', 
+                            style={"width":"100%"}
+                        ),
+                        dcc.Download(id="save-session")
+                    ],
+                    id="save-session-div",
+                    width=4,
+                    style={"padding-left":"2px", "padding-right":"2px"}
+                ),
+
+                dbc.Col( 
+                    [
+                        dbc.Button(
+                            html.Span(
+                                [ 
+                                    html.I(className="fas fa-lg fa-save"),
+                                    " Save as.." 
+                                ]
+                            ),
+                            id='saveas-session-btn', 
+                            style={"width":"100%"}
+                        ),
+                        dcc.Download(id="saveas-session")
+                    ],
+                    id="saveas-session-div",
+                    width=4,
+                    style={"padding-left":"2px"}
+
+                ),
+            ],
+            style={ "min-width":"372px",},
+            # className="g-0",    
+            # style={ "margin-left":"0px" , "margin-right":"0px"}
         ),
         dbc.Button(
                     'Submit',
                     id='submit-button-state', 
                     n_clicks=0, 
-                    style={"min-width":"375px","width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
+                    style={"min-width":"372px","width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
                 )
     ]
 
@@ -770,13 +841,28 @@ def make_app_content(pathname):
                             dcc.Loading(
                                 id="loading-fig-output",
                                 type="default",
-                                children=html.Div(id="fig-output"),
+                                children=[
+                                    html.Div(id="fig-output"),
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="fas fas fa-file-pdf"),
+                                                        " PDF" 
+                                                    ]
+                                                ),
+                                                id='download-pdf-btn', 
+                                                style={"max-width":"150px","width":"100%"}
+                                            ),
+                                            dcc.Download(id="download-pdf")
+                                        ],
+                                        id="download-pdf-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'none'} # 'none' / 'inline-block'
+                                    )
+                                ],
                                 style={"height":"100%"}
                             ),
-                            # html.Div( make_except_toast(id="read_input_file"), id="toast-read_input_file"  ),
-                            # html.Div( make_except_toast(id="update_labels_field"), id="toast-update_labels_field"  ),
-                            # html.Div( make_except_toast(id="generate_markers"), id="toast-generate_markers" ),
-                            # html.Div( make_except_toast(id="make_fig_output"), id="toast-make_fig_output" ),
                             html.Div(
                                 [
                                     html.Div( id="toast-read_input_file"  ),
@@ -791,39 +877,18 @@ def make_app_content(pathname):
                                 ],
                                 style={"position": "fixed", "top": 66, "right": 10, "width": 350}
                             ),
-
-                            # dbc.Button(
-                            #     'PDF',
-                            #     
-                            #     n_clicks=0, 
-                            #     style={"max-width":"100px","width":"100%","margin-top":"4px","margin-bottom":"4px"}#,"max-width":"375px","min-width":"375px"}
-                            # )
-                            dbc.Button(
-                                html.Span(
-                                    [ 
-                                        html.I(className="fas fas fa-file-pdf"),
-                                        " PDF" 
-                                    ]
-                                ),
-                                id='download-pdf', 
-                                style={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} # 'none' / 'inline-block'
-                            ),
-                            dbc.Button(
-                                html.Span(
-                                    [ 
-                                        html.I(className="fas fas fa-file-export"),
-                                        " Session" 
-                                    ]
-                                ),
-                                id='download-session', 
-                                style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'none'}
-                            )
                         ],
                         id="col-fig-output",
                         sm=12,md=6,lg=7,xl=8,
                         align="top",
                         style={"height":"100%"}
                     ),
+
+                    #### centered modals need to come here
+                    #### https://dash-bootstrap-components.opensource.faculty.ai/docs/components/modal/
+                    #### 1x for pdf file name - matching to line 1320 ie. download_pdf()
+                    #### 1x for export file name
+
                 ],
             align="start",
             justify="left",
@@ -1177,8 +1242,7 @@ states=[State('xvals', 'value'),
     Output( 'toast-make_fig_output','children'),
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
-    Output('download-pdf', 'style'), 
-    Output('download-session', 'style'), 
+    Output('download-pdf-div', 'style'), 
     Input("submit-button-state", "n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -1223,7 +1287,7 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide
     
     try:
         fig=make_figure(df,pa)
@@ -1238,14 +1302,35 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         #             'yanchor': 'top' ,
         #             "font": {"size": 25, "color":"black"  } } )
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-        fig=dcc.Graph(figure=fig,config=fig_config)
+        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph")
 
-        return fig, None, session_data, None, download_buttons_style_show, download_buttons_style_show
+        # changed
+        # return fig, None, session_data, None, download_buttons_style_show
+        # as session data is no longer required for downloading the figure
+
+        return fig, None, None, None, download_buttons_style_show
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide
+
+@dashapp.callback(
+    Output('download-pdf', 'data'),
+    Input('download-pdf-btn',"n_clicks"),
+    State('graph', 'figure'),
+    prevent_initial_call=True
+)
+def download_pdf(n_clicks,graph):
+    def write_image(figure, graph=graph):
+        ## This section is for bypassing the mathjax bug on inscription on the final plot
+        fig=px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])        
+        fig.write_image(figure, format="pdf")
+        time.sleep(2)
+        ## 
+        fig=go.Figure(graph)
+        fig.write_image(figure, format="pdf")
+    return dcc.send_bytes(write_image, "some_name.pdf")
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
