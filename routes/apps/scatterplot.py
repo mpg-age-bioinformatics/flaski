@@ -931,7 +931,7 @@ def make_app_content(pathname):
             align="start",
             justify="left",
             no_gutters=True,
-            style={"height":"87vh","width":"100%"}
+            style={"height":"86vh","width":"100%","overflow":"scroll"}
             ),
         ]
     )
