@@ -16,8 +16,10 @@ import io
 import pandas as pd
 import time
 import plotly.express as px
-from plotly.io import write_image
+# from plotly.io import write_image
 import plotly.graph_objects as go
+from werkzeug.utils import secure_filename
+
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -884,6 +886,42 @@ def make_app_content(pathname):
                         style={"height":"100%"}
                     ),
 
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
+                            dbc.ModalBody(
+                                [
+                                    dcc.Input(id='pdf-filename', value="scatterplot.pdf", type='text', style={"width":"100%"})
+                                ]
+                            ),
+                            dbc.ModalFooter(
+                                dbc.Button(
+                                    "Download", id="pdf-filename-download", className="ms-auto", n_clicks=0
+                                )
+                            ),
+                        ],
+                        id="pdf-filename-modal",
+                        is_open=False,
+                    ),
+
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
+                            dbc.ModalBody(
+                                [
+                                    dcc.Input(id='export-filename', value="scatterplot.ses", type='text', style={"width":"100%"})
+                                ]
+                            ),
+                            dbc.ModalFooter(
+                                dbc.Button(
+                                    "Download", id="export-filename-download", className="ms-auto", n_clicks=0
+                                )
+                            ),
+                        ],
+                        id="export-filename-modal",
+                        is_open=False,
+                    ),
+
                     #### centered modals need to come here
                     #### https://dash-bootstrap-components.opensource.faculty.ai/docs/components/modal/
                     #### 1x for pdf file name - matching to line 1320 ie. download_pdf()
@@ -1244,13 +1282,23 @@ states=[State('xvals', 'value'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
     Output('download-pdf-div', 'style'), 
     Input("submit-button-state", "n_clicks"),
+    Input("export-filename-download","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
+def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modified,*args):
+    ## This function can be used for the export, save, and save as by making use of 
+    ## Determining which Input has fired with dash.callback_context
+    ## in https://dash.plotly.com/advanced-callbacks
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        button_id = 'No clicks yet'
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
     download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
     download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
     try:
@@ -1288,6 +1336,25 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"scatterplot")
         return dash.no_update, toast, None, tb_str, download_buttons_style_hide
+
+    # button_id,  submit-button-state, export-filename-download
+
+    if  button_id ==   "export-filename-download" :
+
+
+        # def write_image(figure, graph=graph):
+        #     ## This section is for bypassing the mathjax bug on inscription on the final plot
+        #     fig=px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])        
+        #     fig.write_image(figure, format="pdf")
+        #     time.sleep(2)
+        #     ## 
+        #     fig=go.Figure(graph)
+        #     fig.write_image(figure, format="pdf")
+        # return dcc.send_bytes(write_image, pdf_filename)
+
+        print("Exporting")
+
+        return None, None, None, None, download_buttons_style_hide
     
     try:
         fig=make_figure(df,pa)
@@ -1316,12 +1383,42 @@ def make_fig_output(n_clicks,session_id,contents,filename,last_modified,*args):
         return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide
 
 @dashapp.callback(
-    Output('download-pdf', 'data'),
-    Input('download-pdf-btn',"n_clicks"),
-    State('graph', 'figure'),
+    Output('export-filename-modal', 'is_open'),
+    [ Input('export-session-btn',"n_clicks"),Input("export-filename-download", "n_clicks")],
+    [ State("export-filename-modal", "is_open")], 
     prevent_initial_call=True
 )
-def download_pdf(n_clicks,graph):
+def download_export_filename(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+@dashapp.callback(
+    Output('pdf-filename-modal', 'is_open'),
+    [ Input('download-pdf-btn',"n_clicks"),Input("pdf-filename-download", "n_clicks")],
+    [ State("pdf-filename-modal", "is_open")], 
+    prevent_initial_call=True
+)
+def download_pdf_filename(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+@dashapp.callback(
+    Output('download-pdf', 'data'),
+    Input('pdf-filename-download',"n_clicks"),
+    State('graph', 'figure'),
+    State("pdf-filename", "value"),
+    prevent_initial_call=True
+)
+def download_pdf(n_clicks,graph, pdf_filename):
+    if not pdf_filename:
+        pdf_filename="scatterplot.pdf"
+    pdf_filename=secure_filename(pdf_filename)
+    if pdf_filename.split(".")[-1] != "pdf":
+        pdf_filename=f'{pdf_filename}.pdf'
+
+    ### needs logging
     def write_image(figure, graph=graph):
         ## This section is for bypassing the mathjax bug on inscription on the final plot
         fig=px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])        
@@ -1330,7 +1427,7 @@ def download_pdf(n_clicks,graph):
         ## 
         fig=go.Figure(graph)
         fig.write_image(figure, format="pdf")
-    return dcc.send_bytes(write_image, "some_name.pdf")
+    return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
