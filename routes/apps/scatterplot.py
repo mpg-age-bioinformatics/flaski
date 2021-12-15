@@ -12,7 +12,7 @@ from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
 import traceback
-import io
+import json
 import pandas as pd
 import time
 import plotly.express as px
@@ -906,10 +906,10 @@ def make_app_content(pathname):
 
                     dbc.Modal(
                         [
-                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
+                            dbc.ModalHeader("File name"), 
                             dbc.ModalBody(
                                 [
-                                    dcc.Input(id='export-filename', value="scatterplot.ses", type='text', style={"width":"100%"})
+                                    dcc.Input(id='export-filename', value="scatterplot.json", type='text', style={"width":"100%"})
                                 ]
                             ),
                             dbc.ModalFooter(
@@ -920,13 +920,7 @@ def make_app_content(pathname):
                         ],
                         id="export-filename-modal",
                         is_open=False,
-                    ),
-
-                    #### centered modals need to come here
-                    #### https://dash-bootstrap-components.opensource.faculty.ai/docs/components/modal/
-                    #### 1x for pdf file name - matching to line 1320 ie. download_pdf()
-                    #### 1x for export file name
-
+                    )
                 ],
             align="start",
             justify="left",
@@ -1280,16 +1274,18 @@ states=[State('xvals', 'value'),
     Output( 'toast-make_fig_output','children'),
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
-    Output('download-pdf-div', 'style'), 
+    Output('download-pdf-div', 'style'),
+    Output('export-session','data'),
     Input("submit-button-state", "n_clicks"),
     Input("export-filename-download","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
-    State('upload-data', 'last_modified')] + states,
+    State('upload-data', 'last_modified'),
+    State('export-filename','value')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modified,*args):
+def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modified,export_filename,*args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -1331,30 +1327,27 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
             pa["groups_settings"]=groups_settings
 
         session_data={ "session_data": {"app": { "satterplot": {"filename":filename ,"df":df.to_json(),"pa":pa} } } }
-
+        session_data["APP_VERSION"]=app.config['APP_VERSION']
+        
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
 
     # button_id,  submit-button-state, export-filename-download
 
-    if  button_id ==   "export-filename-download" :
+    if button_id == "export-filename-download" :
+        if not export_filename:
+            export_filename="scatterplot.pdf"
+        export_filename=secure_filename(export_filename)
+        if export_filename.split(".")[-1] != "json":
+            export_filename=f'{export_filename}.json'  
 
+        def write_json(export_filename,session_data=session_data):
+            export_filename.write(json.dumps(session_data).encode())
+            # export_filename.seek(0)
 
-        # def write_image(figure, graph=graph):
-        #     ## This section is for bypassing the mathjax bug on inscription on the final plot
-        #     fig=px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])        
-        #     fig.write_image(figure, format="pdf")
-        #     time.sleep(2)
-        #     ## 
-        #     fig=go.Figure(graph)
-        #     fig.write_image(figure, format="pdf")
-        # return dcc.send_bytes(write_image, pdf_filename)
-
-        print("Exporting")
-
-        return None, None, None, None, download_buttons_style_hide
+        return None, None, None, None, download_buttons_style_hide, dcc.send_bytes(write_json, export_filename)
     
     try:
         fig=make_figure(df,pa)
@@ -1375,12 +1368,12 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
         # return fig, None, session_data, None, download_buttons_style_show
         # as session data is no longer required for downloading the figure
 
-        return fig, None, None, None, download_buttons_style_show
+        return fig, None, None, None, download_buttons_style_show, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"scatterplot")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
 
 @dashapp.callback(
     Output('export-filename-modal', 'is_open'),
