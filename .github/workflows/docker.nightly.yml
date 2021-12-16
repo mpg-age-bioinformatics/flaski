@@ -18,6 +18,8 @@ jobs:
         docker push docker.io/flaski/flaski:nightly
         docker push docker.io/mpgagebioinformatics/flaski2:nightly
 
+    # security scanning is done nightly on docker.io/mpgagebioinformatics/flaski2:nightly
+
 
     # - name: Checkout repository
     #   uses: actions/checkout@v2
