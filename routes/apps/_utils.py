@@ -12,7 +12,35 @@ from myapp import app
 from datetime import datetime
 from flask import render_template
 
-def parse_table(contents,filename,last_modified,session_id,cache):
+def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
+    # @cache.memoize(timeout=3600)
+    def _parse_import_json(contents,filename,last_modified,session_id,cache,appname):
+        content_type, content_string = contents.split(',')
+        decoded=base64.b64decode(content_string)
+        decoded=decoded.decode('utf-8')
+        session_import=json.loads(decoded)
+
+        # with open("/myapp_data/users/test.json", 'w') as f:
+        #     json.dump(session_import, f)
+
+        # # ENCODING EXAMPLE
+        # dumped=json.dumps(session_import)
+        # encoded=base64.b64encode(dumped.encode('utf-8'))
+        # encoded=encoded.decode('utf-8')
+        # contents=f'data:application/json;base64,{encoded}'
+        # with open("/myapp_data/users/test.str", "w") as f:
+        #     f.write(contents)
+
+        # with open("/myapp_data/users/test.str", "r") as f:
+        #     contents=f.readlines()[0]
+        # print("A", contents[:200])
+
+        session_import=session_import["session_data"]["app"][appname]
+
+        return session_import
+    return _parse_import_json(contents,filename,last_modified,session_id,cache,appname)
+
+def parse_table(contents,filename,last_modified,session_id,cache,appname):
     # @cache.memoize(timeout=3600)
     def _parse_table(contents,filename,last_modified,session_id,cache):
         content_type, content_string = contents.split(',')
@@ -29,6 +57,10 @@ def parse_table(contents,filename,last_modified,session_id,cache):
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
         return df.to_json()
+    if filename.split(".")[-1] == "json" :
+        import_json=parse_import_json(contents,filename,last_modified,session_id,cache,appname)
+        df=import_json["df"]
+        return pd.read_json(df)
     return pd.read_json(_parse_table(contents,filename,last_modified,session_id,cache))
 
 def make_options(valuesin):

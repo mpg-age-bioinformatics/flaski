@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_table, make_options, make_except_toast, ask_for_help
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
@@ -54,6 +54,9 @@ def make_layout(pathname):
     protected_content=html.Div(
         [
             dcc.Store( id='session-data' ),
+            dcc.Store( id='json-import' ),
+            dcc.Store( id= 'update_labels_field-import')
+            dcc.Store( id='generate_markers-import')
             make_navbar_logged("Scatter plot",current_user),
             html.Div(id="app-content"),
             navbar_A,
@@ -931,37 +934,124 @@ def make_app_content(pathname):
     )
     return app_content
 
+# example reading session from server storage
+# @dashapp.callback( 
+#     Output('upload-data', 'contents'),
+#     Output('upload-data', 'filename'),
+#     Output('upload-data', 'last_modified'),
+#     Input('session-id', 'data'))
+# def read_session_from_file(session_id):
+#     import base64
+#     with open("/myapp_data/users/test.json", 'r') as f:
+#         session_import=json.load(f)
+#     last_modified=session_import["session_data"]["app"]["scatterplot"]["last_modified"]
+#     session_import=json.dumps(session_import)
+#     session_import=base64.b64encode(session_import.encode('utf-8'))
+#     session_import=session_import.decode('utf-8')
+#     session_import=f'data:application/json;base64,{session_import}'
+
+#     return session_import, "loaded.json", last_modified
+
+read_input_updates=[
+    'groups_value',
+    'fig_width',
+    'fig_height',
+    'title',
+    'titles',
+    'show_legend',
+    'legend_font_size',
+    'xlabel',
+    'xlabels',
+    'ylabel',
+    'ylabels',
+    'show_axis',
+    'axis_line_width',
+    'tick_axis',
+    'ticks_length',
+    'ticks_direction_value',
+    'xticks_fontsize',
+    'xticks_rotation',
+    'yticks_fontsize',
+    'yticks_rotation',
+    'x_lower_limit',
+    'x_upper_limit',
+    'y_lower_limit',
+    'y_upper_limit',
+    'grid_value',
+    'grid_linewidth',
+    'grid_color_value',
+    'grid_color_text',
+    'hline',
+    'hline_linewidth',
+    'hline_linestyle_value',
+    'hline_color_value',
+    'hline_color_text',
+    'vline_linewidth',
+    'vline_linestyle_value',
+    'vline_color_value',
+    'vline_color_text',
+    'labels_col_value',
+    'labels_font_size',
+    'labels_font_color_value',
+    'labels_arrows_value',
+    'labels_colors_value'
+]
+
+read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 
 @dashapp.callback( 
-    Output('xvals', 'options'),
-    Output('xvals', 'value'),
+    [ Output('xvals', 'options'),
     Output('yvals', 'options'),
-    Output('yvals', 'value'),
     Output('groups_value', 'options'),
     Output('labels_col_value', 'options'),
     Output('upload-data','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
+    Output("json-import",'data'),
+    Output('xvals', 'value'),
+    Output('yvals', 'value')] + read_input_updates_outputs ,
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('session-id', 'data'),
     prevent_initial_call=True)
 def read_input_file(contents,filename,last_modified,session_id):
+    if not filename :
+        raise dash.exceptions.PreventUpdate
+
+    pa_outputs=[ dash.no_update for k in  read_input_updates ]
     try:
-        df=parse_table(contents,filename,last_modified,current_user.id,cache)
-        cols=df.columns.tolist()
-        cols_=make_options(cols)
+        if filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
+            df=pd.read_json(app_data["df"])
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+            filename=app_data["filename"]
+            xvals=app_data['pa']["xvals"]
+            yvals=app_data['pa']["yvals"]
+
+            pa=app_data["pa"]
+
+            pa_outputs=[pa[k] for k in  read_input_updates ]
+
+        else:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
+            app_data=dash.no_update
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+            xvals=cols[0]
+            yvals=cols[1]
+
         upload_text=html.Div(
             [ html.A(filename) ], 
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-        )      
-        return cols_, cols[0], cols_, cols[1], cols_, cols_, upload_text, None, None
+        )     
+        return [ cols_, cols_, cols_, cols_, upload_text, None, None, app_data,  xvals, yvals] + pa_outputs
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"scatterplot")
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str
+        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update, dash.no_update ] + pa_outputs
    
 
 @dashapp.callback( 
@@ -977,9 +1067,17 @@ def read_input_file(contents,filename,last_modified,session_id):
 def update_labels_field(session_id,col,contents,filename,last_modified):
     try:
         if col:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache)
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
             labels=df[col].tolist()
             labels_=make_options(labels)
+
+            if filename.split(".")[-1] == "json" :
+                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
+                fixed_labels=app_data['pa']["fixed_labels"]
+            else:
+                fixed_labels=[]
+
+
             labels_section=dbc.FormGroup(
                 [
                     dbc.Col( 
@@ -987,7 +1085,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
                         width=2   
                     ),
                     dbc.Col(
-                        dcc.Dropdown( options=labels_, value=[],placeholder="labels", id='fixed_labels', multi=True),
+                        dcc.Dropdown( options=labels_, value=fixed_labels,placeholder="labels", id='fixed_labels', multi=True),
                         width=10
                     )
                 ],
@@ -1027,7 +1125,12 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
     )
 def generate_markers(session_id,groups,contents,filename,last_modified):
     pa=figure_defaults()
-    def make_card(card_header,card_id):
+    if filename :
+        if filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
+            pa=app_data['pa']
+        
+    def make_card(card_header,card_id,pa,gpa):
         card=dbc.Card(
             [
                 dbc.CardHeader(
@@ -1047,7 +1150,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                             [
                                                 dbc.Label("shape",style={"margin-top":"5px", "width":"45px"}),
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["markerstyles"]), value=pa["marker"], placeholder="marker", id={'type':"marker","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                    dcc.Dropdown( options=make_options(pa["markerstyles"]), value=gpa["marker"], placeholder="marker", id={'type':"marker","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                                 )
                                             ],
                                         ),
@@ -1059,7 +1162,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                             [
                                                 dbc.Label("size",style=card_label_style),
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["marker_size"]), value=pa["markers"], placeholder="size", id={'type':"markers","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                    dcc.Dropdown( options=make_options(pa["marker_size"]), value=gpa["markers"], placeholder="size", id={'type':"markers","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                                 )
                                             ],
                                         ),
@@ -1078,7 +1181,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                         [
                                             dbc.Label("color",style={"margin-top":"5px", "width":"45px"}),
                                             dbc.Col(
-                                                dcc.Dropdown( options=make_options(pa["marker_color"]), value=pa["markerc"], placeholder="size", id={'type':"markerc","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                dcc.Dropdown( options=make_options(pa["marker_color"]), value=gpa["markerc"], placeholder="size", id={'type':"markerc","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             )
                                         ],
                                     ),
@@ -1086,7 +1189,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                 ),
                                 dbc.Col(
                                         [
-                                            dcc.Input(id={'type':"markerc_write","index":str(card_id)}, placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
+                                            dcc.Input(id={'type':"markerc_write","index":str(card_id)},value=gpa["markerc_write"], placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
                                         ],
                                     width=6,
                                 )
@@ -1102,7 +1205,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                         [
                                             dbc.Label("alpha",style={"margin-top":"5px", "width":"45px"}),
                                             dbc.Col(
-                                                dcc.Input(id={'type':"marker_alpha","index":str(card_id)}, value=pa["marker_alpha"],placeholder="value", type='text', style={"height":"35px","width":"100%"} ),
+                                                dcc.Input(id={'type':"marker_alpha","index":str(card_id)}, value=gpa["marker_alpha"],placeholder="value", type='text', style={"height":"35px","width":"100%"} ),
                                             )
                                         ],
                                     ),
@@ -1142,7 +1245,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                         [
                                             dbc.Label("width",style={"margin-top":"5px", "width":"45px"}),
                                             dbc.Col(
-                                                dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=pa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=gpa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             )
                                         ],
                                     ),
@@ -1167,7 +1270,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                         [
                                             dbc.Label("color",style={"margin-top":"5px", "width":"45px"}),
                                             dbc.Col(
-                                                dcc.Dropdown( options=make_options(pa["edge_colors"]), value=pa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                                dcc.Dropdown( options=make_options(pa["edge_colors"]), value=gpa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             )
                                         ],
                                     ),
@@ -1175,7 +1278,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                                 ),
                                 dbc.Col(
                                         [
-                                            dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
+                                            dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, value=gpa["edgecolor_write"], placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
                                         ],
                                     width=6,
                                 )
@@ -1198,13 +1301,17 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
     try:
 
         if not groups:
-            cards=[ make_card("Marker",0 ) ]
+            cards=[ make_card("Marker",0, pa, pa ) ]
         else:
             cards=[]
-            df=parse_table(contents,filename,last_modified,current_user.id,cache)
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
             groups_=df[[groups]].drop_duplicates()[groups].tolist()
             for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
-                card=make_card(g, i)
+                if filename.split(".")[-1] == "json":
+                    pa_=pa["groups_settings"][i]
+                    card=make_card(g, i, pa, pa_)
+                else:
+                    card=make_card(g, i, pa, pa)
                 cards.append(card)
         return cards, None, None
 
@@ -1300,7 +1407,7 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
     try:
         input_names = [item.component_id for item in states]
 
-        df=parse_table(contents,filename,last_modified,current_user.id,cache)
+        df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
 
         pa=figure_defaults()
         for k, a in zip(input_names,args) :
@@ -1326,7 +1433,7 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
 
             pa["groups_settings"]=groups_settings
 
-        session_data={ "session_data": {"app": { "satterplot": {"filename":filename ,"df":df.to_json(),"pa":pa} } } }
+        session_data={ "session_data": {"app": { "scatterplot": {"filename":filename ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
     except Exception as e:

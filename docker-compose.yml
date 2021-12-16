@@ -44,7 +44,7 @@ services:
     context: ./
     dockerfile: Dockerfile
     args:
-      MYAPP_VERSION: dev
+      APP_VERSION: dev
   restart: always
   volumes:
    - data:/myapp_data/users
