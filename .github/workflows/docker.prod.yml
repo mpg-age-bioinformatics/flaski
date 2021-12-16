@@ -20,9 +20,18 @@ jobs:
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:latest
         docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:${CURRENT_TAG}
         docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:dev
+
+        docker tag docker.io/flaski/flaski:latest docker.io/mpgagebioinformatics/flaski2:latest
+        docker tag docker.io/flaski/flaski:dev docker.io/mpgagebioinformatics/flaski2:dev
+        docker tag docker.io/flaski/flaski:${CURRENT_TAG} docker.io/mpgagebioinformatics/flaski2:${CURRENT_TAG}
+        
         docker push docker.io/flaski/flaski:latest
         docker push docker.io/flaski/flaski:${CURRENT_TAG}
         docker push docker.io/flaski/flaski:dev
+
+        docker push docker.io/mpgagebioinformatics/flaski2:latest
+        docker push docker.io/mpgagebioinformatics/flaski2:${CURRENT_TAG}
+        docker push docker.io/mpgagebioinformatics/flaski2:dev
 
     # - name: Log into registry ${{ env.REGISTRY }}
     #   uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
