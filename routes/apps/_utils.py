@@ -69,6 +69,46 @@ def make_options(valuesin):
         opts.append( {"label":c, "value":c} )
     return opts
 
+
+def check_user_path(filename,current_user) :
+    user_id=str(current_user.id)
+    users_data=app.config['USERS_DATA']
+    user_path=f'{users_data}{user_id}/'
+    if user_path == filename[:len(user_path)] :
+        file_path = filename.split(user_path)[-1]
+        if not os.path.isdir(user_path):
+            os.makedirs(user_path)
+    else:
+        file_path=None
+    return user_path, file_path
+
+def make_save_toast(filename,id):
+    toast=dbc.Toast( f'{filename}',
+        id={'type':'toast-error','index':id},
+        header="Save",
+        is_open=True,
+        dismissable=True,
+        icon="success",
+        duration=1900,
+        # top: 66 positions the toast below the navbar
+        # style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
+    )
+    return toast
+
+def save_session(session_data, filename,current_user, func ):
+    if filename.split(".")[-1] == "json" :
+        ## check that path is user path
+        user_path, file_path= check_user_path(filename,current_user)
+        if file_path :
+            with open(filename,"w") as json_file:
+                json.dump(session_data, json_file)
+            toast=make_save_toast(file_path,func)
+        else:
+            raise Exception("Target does not belong to user.")
+    else:
+        raise Exception("Not a session file.")
+    return toast
+
 def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
     if e:
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))

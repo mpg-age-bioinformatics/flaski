@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session 
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
@@ -53,10 +53,6 @@ card_body_style={ "padding":"2px", "padding-top":"4px"}
 def make_layout(pathname):
     protected_content=html.Div(
         [
-            dcc.Store( id='session-data' ),
-            dcc.Store( id='json-import' ),
-            dcc.Store( id= 'update_labels_field-import')
-            dcc.Store( id='generate_markers-import')
             make_navbar_logged("Scatter plot",current_user),
             html.Div(id="app-content"),
             navbar_A,
@@ -77,7 +73,7 @@ def make_app_content(pathname):
                     dcc.Upload(
                         id='upload-data',
                         children=html.Div(
-                            [ 'Drag and Drop or ',html.A('Select File') ], 
+                            [ 'Drag and Drop or ',html.A('Select File',id='upload-data-text') ],
                             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
                         ),
                         style={
@@ -833,6 +829,10 @@ def make_app_content(pathname):
 
     app_content=html.Div(
         [
+            dcc.Store( id='session-data' ),
+            # dcc.Store( id='json-import' ),
+            dcc.Store( id='update_labels_field-import'),
+            dcc.Store( id='generate_markers-import'),
             dbc.Row( 
                 [
                     dbc.Col(
@@ -941,6 +941,9 @@ def make_app_content(pathname):
 #     Output('upload-data', 'last_modified'),
 #     Input('session-id', 'data'))
 # def read_session_from_file(session_id):
+#     # check if filename on redis session
+#     # needs doing
+#     # if yes, read session file and delete entry from redis session
 #     import base64
 #     with open("/myapp_data/users/test.json", 'r') as f:
 #         session_import=json.load(f)
@@ -1007,7 +1010,7 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     Output('upload-data','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
-    Output("json-import",'data'),
+    # Output("json-import",'data'),
     Output('xvals', 'value'),
     Output('yvals', 'value')] + read_input_updates_outputs ,
     Input('upload-data', 'contents'),
@@ -1043,37 +1046,40 @@ def read_input_file(contents,filename,last_modified,session_id):
             yvals=cols[1]
 
         upload_text=html.Div(
-            [ html.A(filename) ], 
+            [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         )     
-        return [ cols_, cols_, cols_, cols_, upload_text, None, None, app_data,  xvals, yvals] + pa_outputs
+        return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"scatterplot")
-        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update, dash.no_update ] + pa_outputs
+        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
 
 @dashapp.callback( 
     Output('labels-section', 'children'),
     Output('toast-update_labels_field','children'),
     Output({ "type":"traceback", "index":"update_labels_field" },'data'),
+    Output('update_labels_field-import', 'data'),
     Input('session-id','data'),
     Input('labels_col_value','value'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
-    State('upload-data', 'last_modified')
+    State('upload-data', 'last_modified'),
+    State('update_labels_field-import', 'data'),
 )
-def update_labels_field(session_id,col,contents,filename,last_modified):
+def update_labels_field(session_id,col,contents,filename,last_modified,update_labels_field_import):
     try:
         if col:
             df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
-            labels=df[col].tolist()
+            labels=df[[col]].drop_duplicates()[col].tolist()
             labels_=make_options(labels)
 
-            if filename.split(".")[-1] == "json" :
+            if ( filename.split(".")[-1] == "json" ) and ( not update_labels_field_import ) :
                 app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
                 fixed_labels=app_data['pa']["fixed_labels"]
+                update_labels_field_import=True
             else:
                 fixed_labels=[]
 
@@ -1107,28 +1113,31 @@ def update_labels_field(session_id,col,contents,filename,last_modified):
                 style= {'display': 'none'}
             )
 
-        return labels_section, None, None
+        return labels_section, None, None, update_labels_field_import
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"scatterplot")
-        return dash.no_update, toast, tb_str
+        return dash.no_update, toast, tb_str, dash.no_update
 
 @dashapp.callback( 
     Output('marker-cards', 'children'),
     Output('toast-generate_markers','children'),
     Output({ "type":"traceback", "index":"generate_markers" },'data'),
+    Output('generate_markers-import', 'data'),
     Input('session-id', 'data'),
     Input('groups_value', 'value'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
+    State('generate_markers-import', 'data'),
     )
-def generate_markers(session_id,groups,contents,filename,last_modified):
+def generate_markers(session_id,groups,contents,filename,last_modified,generate_markers_import):
     pa=figure_defaults()
     if filename :
-        if filename.split(".")[-1] == "json":
+        if ( filename.split(".")[-1] == "json") and ( not generate_markers_import ):
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
             pa=app_data['pa']
+            generate_markers_import=True
         
     def make_card(card_header,card_id,pa,gpa):
         card=dbc.Card(
@@ -1313,12 +1322,12 @@ def generate_markers(session_id,groups,contents,filename,last_modified):
                 else:
                     card=make_card(g, i, pa, pa)
                 cards.append(card)
-        return cards, None, None
+        return cards, None, None, generate_markers_import
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"scatterplot")
-        return dash.no_update, toast, tb_str
+        return dash.no_update, toast, tb_str, dash.no_update
 
 
 states=[State('xvals', 'value'),
@@ -1374,7 +1383,7 @@ states=[State('xvals', 'value'),
     State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
     State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
     State( { 'type': 'edgecolor', 'index': ALL }, "value"),
-    State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]
+    State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]    
 
 @dashapp.callback( 
     Output('fig-output', 'children'),
@@ -1385,14 +1394,17 @@ states=[State('xvals', 'value'),
     Output('export-session','data'),
     Input("submit-button-state", "n_clicks"),
     Input("export-filename-download","n_clicks"),
+    Input("save-session-btn","n_clicks"),
+    Input("saveas-session-btn","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
-    State('export-filename','value')] + states,
+    State('export-filename','value'),
+    State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modified,export_filename,*args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -1433,7 +1445,7 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
 
             pa["groups_settings"]=groups_settings
 
-        session_data={ "session_data": {"app": { "scatterplot": {"filename":filename ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
+        session_data={ "session_data": {"app": { "scatterplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
     except Exception as e:
@@ -1445,7 +1457,7 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
 
     if button_id == "export-filename-download" :
         if not export_filename:
-            export_filename="scatterplot.pdf"
+            export_filename="scatterplot.json"
         export_filename=secure_filename(export_filename)
         if export_filename.split(".")[-1] != "json":
             export_filename=f'{export_filename}.json'  
@@ -1454,7 +1466,28 @@ def make_fig_output(n_clicks,export_click,session_id,contents,filename,last_modi
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return None, None, None, None, download_buttons_style_hide, dcc.send_bytes(write_json, export_filename)
+        return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
+    if button_id == "save-session-btn" :
+        try:
+            if filename.split(".")[-1] == "json" :
+                toast=save_session(session_data, filename,current_user, "make_fig_output" )
+                return dash.no_update, toast, None, None, dash.no_update, None
+            else:
+                print("SAVE TO REDIS")
+                # save session_data to redis session
+                # redirect to as a save as to file server
+
+        except Exception as e:
+            tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+            toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"scatterplot")
+            return dash.no_update, toast, None, tb_str, dash.no_update, None
+
+        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
+    # if button_id == "saveas-session-btn" :
+        # write session_data to session file if 
+        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
         fig=make_figure(df,pa)

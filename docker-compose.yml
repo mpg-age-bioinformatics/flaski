@@ -47,7 +47,7 @@ services:
       APP_VERSION: dev
   restart: always
   volumes:
-   - data:/myapp_data/users
+   - data:/myapp_data/users/
    - ./static/dog-solid.png:/myapp/myapp/static/favicon.ico
    - ./static/dog-solid.png:/myapp/myapp/static/logo.png
    - ./pyflaski/pyflaski:/myapp/pyflaski
@@ -66,6 +66,7 @@ services:
    - APP_NAME=myapp
    - APP_TITLE=flaski
    - APP_URL=https://0.0.0.0
+   - USERS_DATA=/myapp_data/users/
    - LOGS=/var/log/myapp/
    - SECRET_KEY=${SECRET_KEY}
    - REDIS_ADDRESS=redis:6379/0
