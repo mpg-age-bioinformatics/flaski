@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session 
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
@@ -940,20 +940,12 @@ def make_app_content(pathname):
 #     Output('upload-data', 'filename'),
 #     Output('upload-data', 'last_modified'),
 #     Input('session-id', 'data'))
-# def read_session_from_file(session_id):
+# def read_session_redis(session_id):
 #     # check if filename on redis session
 #     # needs doing
-#     # if yes, read session file and delete entry from redis session
-#     import base64
-#     with open("/myapp_data/users/test.json", 'r') as f:
-#         session_import=json.load(f)
-#     last_modified=session_import["session_data"]["app"]["scatterplot"]["last_modified"]
-#     session_import=json.dumps(session_import)
-#     session_import=base64.b64encode(session_import.encode('utf-8'))
-#     session_import=session_import.decode('utf-8')
-#     session_import=f'data:application/json;base64,{session_import}'
-
-#     return session_import, "loaded.json", last_modified
+#     # if yes, read sessiond ata from redis session
+#     # imp=..
+#     return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
 
 read_input_updates=[
     'groups_value',

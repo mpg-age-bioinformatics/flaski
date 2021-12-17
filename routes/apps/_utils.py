@@ -82,10 +82,10 @@ def check_user_path(filename,current_user) :
         file_path=None
     return user_path, file_path
 
-def make_save_toast(filename,id):
+def make_save_toast(filename,id, header="Save"):
     toast=dbc.Toast( f'{filename}',
         id={'type':'toast-error','index':id},
-        header="Save",
+        header=header,
         is_open=True,
         dismissable=True,
         icon="success",
@@ -108,6 +108,32 @@ def save_session(session_data, filename,current_user, func ):
     else:
         raise Exception("Not a session file.")
     return toast
+
+def load_session( filename,current_user ):
+    if filename.split(".")[-1] == "json" :
+        ## check that path is user path
+        user_path, file_path= check_user_path(filename,current_user)
+        if file_path :
+            with open(filename,"r") as json_file:
+                session_data=json.load( json_file )
+            # toast=make_save_toast(file_path,func,header="Load")
+        else:
+            raise Exception("Target does not belong to user.")
+    else:
+        raise Exception("Not a session file.")
+
+    return session_data
+
+def encode_session_file(filename, current_user ):
+    session_import=load_session( filename, current_user )
+    app_name=session_import["session_data"]
+    app_name=list(app_name.keys())[0]
+    last_modified=session_import["session_data"]["app"][app_name]["last_modified"]
+    session_import=json.dumps(session_import)
+    session_import=base64.b64encode(session_import.encode('utf-8'))
+    session_import=session_import.decode('utf-8')
+    session_import=f'data:application/json;base64,{session_import}'
+    return { "session_import":session_import, "last_modified":last_modified, "app_name":app_name, "sessionfilename": filename }
 
 def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
     if e:
