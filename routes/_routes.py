@@ -1,1 +1,1 @@
-from myapp.routes.apps import scatterplot
+from myapp.routes.apps import storage, scatterplot

@@ -3,6 +3,7 @@ _PUBLIC_VIEWS=[]
 
 user_navbar_links={
     "Home":"/home/",\
+    "Storage":"/storage/",\
     "separator_1":"-",\
     "General":"__title__",\
     "About":"/about/",\
