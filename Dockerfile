@@ -13,6 +13,9 @@ USER root
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
 RUN pip3 install -r /pyflaski.requirements.txt
 
+COPY requirements.txt /requirements.txt
+RUN pip3 install -r /requirements.txt
+
 COPY ./static/dog-solid.png /myapp/myapp/static/favicon.ico
 COPY ./static/dog-solid.png /myapp/myapp/static/logo.png
 COPY ./pyflaski/pyflaski /myapp/pyflaski

@@ -41,9 +41,12 @@ dashapp.layout=html.Div(
     ] 
 )
 
-card_label_style={"margin-top":"5px"}
-card_input_style={"width":"100%","height":"35px"}
-card_body_style={ "padding":"2px", "padding-top":"4px"}
+card_label_style={"margin-right":"2px"}
+card_label_style_={"margin-left":"5px","margin-right":"2px"}
+
+card_input_style={"height":"35px","width":"100%"}
+# card_input_style_={"height":"35px","width":"100%","margin-right":"10px"}
+card_body_style={ "padding":"2px", "padding-top":"2px"}
 # card_body_style={ "padding":"2px", "padding-top":"4px","padding-left":"18px"}
 
 
@@ -89,39 +92,39 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            dbc.FormGroup(
+                            # dbc.FormGroup(
                                 [
                                     dbc.Label("x values"),
                                     dcc.Dropdown( placeholder="x values", id='xvals', multi=False)
-                                ]
-                            ),
+                                ],
+                            # ),
                             width=4,
                             style={"padding-right":"4px"}
                         ),
                         dbc.Col(
-                            dbc.FormGroup(
+                            # dbc.FormGroup(
                                 [
                                     dbc.Label("y values" ),
                                     dcc.Dropdown( placeholder="y values", id='yvals', multi=False)
-                                ]
-                            ),
+                                ],
+                            # ),
                             width=4,
                             style={"padding-left":"2px","padding-right":"2px"}
                         ),
                         dbc.Col(
-                            dbc.FormGroup(
+                            # dbc.FormGroup(
                                 [
                                     dbc.Label("Groups"),
                                     dcc.Dropdown( placeholder="groups", id='groups_value', multi=False)
-                                ]
-                            ),
+                                ],
+                            # ),
                             width=4,
                             style={"padding-left":"4px"}
                         ),
                     ],
                     align="start",
                     justify="betweem",
-                    no_gutters=True,
+                    className="g-0",
                 ),
                 html.Div(id="labels-section"),
                 # dbc.FormGroup(
@@ -150,97 +153,72 @@ def make_app_content(pathname):
                             dbc.CardBody(
                                 [
                                     ## example card body row
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Width",style={"margin-top":"5px","width":"55px"}),
-                                                        dbc.Col(
-                                                            dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style=card_input_style ) ,
-                                                        )
-                                                    ],
-                                                ),
-                                                width=6,
-                                                style={ "padding-right":"16px"}
-                                            ),
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Height",style={"margin-top":"5px","width":"55px"}),
-                                                        dbc.Col(
-                                                            dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style=card_input_style  ) ,
-                                                        )
-                                                    ],
-                                                ),
-                                                width=6,
-                                                style={ "padding-left":"16px"}
-                                            )
-                                        ],
-                                        no_gutters=True,
-                                        style={ "padding-left":"16px"}
-                                    ),
+                                    # dbc.Row(
+                                    #     [
+
+                                    #         dbc.Label("Width", width="auto",style={"margin-right":"2px"}),
+                                    #         dbc.Col(
+                                    #             dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style=card_input_style),
+                                    #             style={"margin-right":"5px"}
+                                    #         ),
+                                    #         dbc.Label("Height", width="auto",style={"margin-right":"2px", "margin-left":"5px"}),
+                                    #         dbc.Col(
+                                    #             dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style=card_input_style  ) ,
+                                    #         ),
+        
+                                    #     ],
+                                    #     className="g-0",
+                                    # ),
                                     ## end of example card body row
                                     dbc.Row(
                                         [
+
+                                            dbc.Label("Width",html_for="fig_width", style={"margin-top":"4px","margin-right":"2px","width":"55px"}), #"height":"35px",
                                             dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Title",html_for="title",style={"margin-top":"5px","width":"55px"}),
-                                                        dbc.Col(
-                                                            dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style=card_input_style ) ,
-                                                        )
-                                                    ],
-                                                ),
-                                                width=8,
-                                                style={ "padding-right":"16px"}
+                                                dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style={"height":"35px","width":"100%"}),
+                                                style={"margin-right":"5px"}
                                             ),
+                                            dbc.Label("Height", html_for="fig_height",style={"margin-left":"5px","margin-top":"4px","margin-right":"2px","width":"55px"}),
                                             dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("size",html_for="titles",style=card_label_style),
-                                                        dbc.Col(
-                                                            dcc.Dropdown( options=make_options(pa["title_size"]), value=pa["titles"],placeholder="size", id='titles', multi=False, clearable=False),
-                                                        )
-                                                    ],
-                                                ),
-                                                width=4,
-                                                style={ "padding-left":"16px"}
-                                            )
+                                                dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style={"height":"35px","width":"100%"}  ) ,
+                                            ),
+        
                                         ],
-                                        no_gutters=True,
-                                        style={ "padding-left":"16px"}
+                                        className="g-0",
                                     ),
                                     ############################
                                     dbc.Row(
                                         [
+                                            dbc.Label("Title",html_for="title",style={"margin-top":"4px","margin-right":"2px","width":"55px"}), #"margin-top":"8px",
                                             dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Legend",html_for="show_legend",style={"margin-top":"5px","width":"55px"}),
-                                                        dbc.Col(
-                                                            dcc.Checklist(options=[ {'label':' show legend', 'value':'show_legend'} ], value=pa["show_legend"], id='show_legend', style=card_label_style ),
-                                                        )
-                                                    ],
-                                                ),
-                                                width=8,
-                                                style={ "padding-right":"16px"}
+                                                dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style={"height":"35px","width":"340px"} ) ,
+                                                style={"margin-right":"5px"},
                                             ),
+                                            dbc.Label("size",html_for="titles", style={"margin-top":"4px","margin-left":"5px","margin-right":"2px","width":"55px","text-align":"right"}),
                                             dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("size",style=card_label_style),
-                                                        dbc.Col(
-                                                            dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["legend_font_size"], placeholder="size", id='legend_font_size', multi=False, clearable=False),
-                                                        )
-                                                    ],
-                                                ),
-                                                width=4,
-                                                style={ "padding-left":"16px"}
+                                                dcc.Dropdown( options=make_options(pa["title_size"]), value=pa["titles"],placeholder="size", id='titles', multi=False, clearable=False, style={"width":"55px"}),
                                             )
                                         ],
-                                        no_gutters=True,
-                                        style={ "padding-left":"16px"}
+                                        className="g-0",
+                                    ),
+                                    ############################
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("Legend",html_for="show_legend", style={"margin-top":"4px","margin-right":"2px","width":"55px"}),
+                                            dbc.Col(
+                                                dcc.Checklist(options=[ {'label':' show legend', 'value':'show_legend'} ], value=pa["show_legend"], id='show_legend', style={"margin-top":"4px","height":"35px"} ),
+                                                style={ "width":"100px"}
+                                                # className="me-3",
+                                                # width=3
+                                            ),
+                                            dbc.Label("size",style={"margin-top":"4px","margin-left":"5px","margin-right":"2px","width":"55px","text-align":"right"}),
+                                            dbc.Col(
+                                                dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["legend_font_size"], placeholder="size", id='legend_font_size', multi=False, clearable=False, style={"width":"55px"}),
+                                                # className="me-3",
+                                            )
+                                        ],
+                                        # justify="start",
+                                        className="g-0",
                                     ),
                                 ######### END OF CARD #########
                                 ]
@@ -291,7 +269,7 @@ def make_app_content(pathname):
                                                 style={ "padding-left":"16px"}
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                         style={ "padding-left":"16px"}
                                     ),
                                 ############################################
@@ -322,7 +300,7 @@ def make_app_content(pathname):
                                                 style={ "padding-left":"16px"}
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                         style={ "padding-left":"16px"}
                                     ),
                                 ############################################
@@ -344,7 +322,7 @@ def make_app_content(pathname):
                                                 ),
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                 ############################################
                                     dbc.Row(
@@ -356,7 +334,7 @@ def make_app_content(pathname):
                                                 width=2
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                 ############################################
                                     dbc.Row(
@@ -375,7 +353,7 @@ def make_app_content(pathname):
                                                 ),
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                 ############################################
                                     dbc.Row(
@@ -396,7 +374,7 @@ def make_app_content(pathname):
                                                 width=3
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                 ############################################
                                     dbc.Row(
@@ -424,7 +402,7 @@ def make_app_content(pathname):
                                                 width=2
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                 ############################################
                                     dbc.Row(
@@ -452,7 +430,7 @@ def make_app_content(pathname):
                                                 width=2
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -480,7 +458,7 @@ def make_app_content(pathname):
                                                 width=2
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################
                                     dbc.Row(
@@ -508,7 +486,7 @@ def make_app_content(pathname):
                                                 width=2
                                             )
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -536,7 +514,7 @@ def make_app_content(pathname):
                                                 width=2,
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -555,7 +533,7 @@ def make_app_content(pathname):
                                                 style={"padding-left":"4px"}
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -575,7 +553,7 @@ def make_app_content(pathname):
                                                 dcc.Dropdown( options=make_options(pa["hline_linestyle"]), value=pa["hline_linestyle_value"],placeholder="value", id='hline_linestyle_value', multi=False, clearable=False, style={"height":"35px","width":"100%","margin":"0px"} ),
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -595,7 +573,7 @@ def make_app_content(pathname):
                                                 style={"padding-left":"4px"}
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -615,7 +593,7 @@ def make_app_content(pathname):
                                                 dcc.Dropdown( options=make_options(pa["vline_linestyle"]), value=pa["vline_linestyle_value"], placeholder="value", id='vline_linestyle_value', multi=False, clearable=False, style={"height":"35px","width":"100%","margin":"0px"} ),
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
                                     dbc.Row(
@@ -634,7 +612,7 @@ def make_app_content(pathname):
                                                 style={"padding-left":"4px"}
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                     ),
                                     ############################################ 
 
@@ -676,7 +654,7 @@ def make_app_content(pathname):
                                                 # style={ "padding-right":"16px"}
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                         style={ "padding-left":"16px"}
                                     ),
                                 ############################################
@@ -707,7 +685,7 @@ def make_app_content(pathname):
                                                 style={ "padding-left":"16px"}
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                         style={ "padding-left":"16px"}
                                     ),
                                 ############################################
@@ -739,7 +717,7 @@ def make_app_content(pathname):
                                                 style={ "padding-left":"16px"}
                                             ),
                                         ],
-                                        no_gutters=True,
+                                        className="g-0",
                                         style={ "padding-left":"16px"}
                                     )
                                 ############################################                                
@@ -753,7 +731,7 @@ def make_app_content(pathname):
                 )
             ],
             body=True,
-            style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"4px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
+            style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
         ),
         dbc.Row(
             [
@@ -766,6 +744,7 @@ def make_app_content(pathname):
                                     " Export" 
                                 ]
                             ),
+                            color="secondary",
                             id='export-session-btn', 
                             style={"width":"100%"}
                         ),
@@ -786,6 +765,7 @@ def make_app_content(pathname):
                                 ]
                             ),
                             id='save-session-btn', 
+                            color="secondary",
                             style={"width":"100%"}
                         ),
                         dcc.Download(id="save-session")
@@ -805,6 +785,7 @@ def make_app_content(pathname):
                                 ]
                             ),
                             id='saveas-session-btn', 
+                            color="secondary",
                             style={"width":"100%"}
                         ),
                         dcc.Download(id="saveas-session")
@@ -822,6 +803,7 @@ def make_app_content(pathname):
         dbc.Button(
                     'Submit',
                     id='submit-button-state', 
+                    color="secondary",
                     n_clicks=0, 
                     style={"min-width":"372px","width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
                 )
@@ -839,7 +821,7 @@ def make_app_content(pathname):
                         side_bar,
                         sm=12,md=6,lg=5,xl=4,
                         align="top",
-                        style={"padding":"2px","overflow":"scroll"},
+                        style={"padding":"0px","overflow":"scroll"},
                     ),
                     dbc.Col(
                         [
@@ -927,7 +909,7 @@ def make_app_content(pathname):
                 ],
             align="start",
             justify="left",
-            no_gutters=True,
+            className="g-0",
             style={"height":"86vh","width":"100%","overflow":"scroll"}
             ),
         ]
@@ -1076,7 +1058,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
                 fixed_labels=[]
 
 
-            labels_section=dbc.FormGroup(
+            labels_section=dbc.Row(
                 [
                     dbc.Col( 
                         dbc.Label("Labels", style={"margin-top":"5px"}),
@@ -1087,10 +1069,10 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
                         width=10
                     )
                 ],
-                row=True
+                # row=True
             )
         else:
-            labels_section=dbc.FormGroup(
+            labels_section=dbc.Row(
                 [
                     dbc.Col( 
                         dbc.Label("Labels", style={"margin-top":"5px"}),
@@ -1101,7 +1083,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
                         width=10
                     )
                 ],
-                row=True,
+                # row=True,
                 style= {'display': 'none'}
             )
 
@@ -1171,7 +1153,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                         style={ "padding-left":"16px"}
                                     )
                                 ],
-                                no_gutters=True,
+                                className="g-0",
                                 style={ "padding-left":"16px"}
                             ),
                        ############################################
@@ -1195,7 +1177,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     width=6,
                                 )
                             ],
-                            no_gutters=True,
+                            className="g-0",
                             style={ "padding-left":"16px"}
                         ),
                        ############################################
@@ -1213,7 +1195,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     width=3,
                                 ),
                             ],
-                            no_gutters=True,
+                            className="g-0",
                             style={ "padding-left":"16px"}
                         ),
                        ############################################
@@ -1228,7 +1210,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     width=12,
                                 ),
                             ],
-                            no_gutters=True,
+                            className="g-0",
                             style={ "padding-left":"16px"}
                         ),
                        ############################################
@@ -1253,7 +1235,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     width=5,
                                 ),
                             ],
-                            no_gutters=True,
+                            className="g-0",
                             style={ "padding-left":"16px"}
                         ),
                        ############################################
@@ -1284,7 +1266,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     width=6,
                                 )
                             ],
-                            no_gutters=True,
+                            className="g-0",
                             style={ "padding-left":"16px"}
                         ),
                        ############################################
