@@ -676,7 +676,7 @@ def make_app_content(pathname):
                                 style=card_body_style
                             ),
                             id={'type':"collapse-dynamic-card","index":"labels"},
-                            is_open=True,
+                            is_open=False,
                         ),
                     ],
                     style={"margin-top":"2px","margin-bottom":"2px"} 
