@@ -46,7 +46,7 @@ card_label_style_={"margin-left":"5px","margin-right":"2px"}
 
 card_input_style={"height":"35px","width":"100%"}
 # card_input_style_={"height":"35px","width":"100%","margin-right":"10px"}
-card_body_style={ "padding":"2px", "padding-top":"2px"}
+card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
 # card_body_style={ "padding":"2px", "padding-top":"4px","padding-left":"18px"}
 
 
@@ -173,52 +173,51 @@ def make_app_content(pathname):
                                     dbc.Row(
                                         [
 
-                                            dbc.Label("Width",html_for="fig_width", style={"margin-top":"4px","margin-right":"2px","width":"55px"}), #"height":"35px",
+                                            dbc.Label("Width",html_for="fig_width", style={"margin-top":"10px","width":"64px"}), #"height":"35px",
                                             dbc.Col(
                                                 dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style={"height":"35px","width":"100%"}),
                                                 style={"margin-right":"5px"}
                                             ),
-                                            dbc.Label("Height", html_for="fig_height",style={"margin-left":"5px","margin-top":"4px","margin-right":"2px","width":"55px"}),
+                                            dbc.Label("Height", html_for="fig_height",style={"margin-left":"5px","margin-top":"10px","width":"64px","text-align":"right"}),
                                             dbc.Col(
                                                 dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style={"height":"35px","width":"100%"}  ) ,
                                             ),
         
                                         ],
-                                        className="g-0",
+                                        className="g-1",
                                     ),
                                     ############################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Title",html_for="title",style={"margin-top":"4px","margin-right":"2px","width":"55px"}), #"margin-top":"8px",
+                                            dbc.Label("Title",width="auto",html_for="title",style={"margin-top":"0px","width":"64px"}), #"margin-top":"8px",
                                             dbc.Col(
-                                                dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style={"height":"35px","width":"340px"} ) ,
+                                                dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style={"height":"35px","min-width":"169px","width":"100%"} ) ,
                                                 style={"margin-right":"5px"},
                                             ),
-                                            dbc.Label("size",html_for="titles", style={"margin-top":"4px","margin-left":"5px","margin-right":"2px","width":"55px","text-align":"right"}),
+                                            dbc.Label("size",html_for="titles",width="auto", style={"text-align":"right","margin-left":"5px"}),
                                             dbc.Col(
                                                 dcc.Dropdown( options=make_options(pa["title_size"]), value=pa["titles"],placeholder="size", id='titles', multi=False, clearable=False, style={"width":"55px"}),
                                             )
                                         ],
-                                        className="g-0",
-                                    ),
+                                        className="g-1",
+                                        justify="between"
+                                    ),                                
                                     ############################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Legend",html_for="show_legend", style={"margin-top":"4px","margin-right":"2px","width":"55px"}),
+                                            dbc.Label("Legend",html_for="show_legend", style={"margin-top":"10px","width":"64px"}),
                                             dbc.Col(
-                                                dcc.Checklist(options=[ {'label':' show legend', 'value':'show_legend'} ], value=pa["show_legend"], id='show_legend', style={"margin-top":"4px","height":"35px"} ),
-                                                style={ "width":"100px"}
+                                                dcc.Checklist(options=[ {'label':' show legend', 'value':'show_legend'} ], value=pa["show_legend"], id='show_legend', style={"margin-top":"6px","height":"35px"} ),
                                                 # className="me-3",
-                                                # width=3
+                                                # width=5
                                             ),
-                                            dbc.Label("size",style={"margin-top":"4px","margin-left":"5px","margin-right":"2px","width":"55px","text-align":"right"}),
+                                            dbc.Label("size",width="auto", style={"text-align":"right","margin-top":"0px"}), #style={"margin-top":"4px","margin-left":"5px","margin-right":"2px","width":"55px","text-align":"right"}),
                                             dbc.Col(
                                                 dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["legend_font_size"], placeholder="size", id='legend_font_size', multi=False, clearable=False, style={"width":"55px"}),
-                                                # className="me-3",
                                             )
                                         ],
                                         # justify="start",
-                                        className="g-0",
+                                        className="g-1",
                                     ),
                                 ######### END OF CARD #########
                                 ]
@@ -245,13 +244,15 @@ def make_app_content(pathname):
                                         ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("x label",html_for='xlabel',width="auto"),
+                                                dbc.Label("x label",html_for='xlabel',width=2),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["xlabel"],id='xlabel', placeholder="x label", type='text',style={"width":"260px","height":"35px","margin-right":"5px"}),
+                                                    dcc.Input(value=pa["xlabel"],id='xlabel', placeholder="x label", type='text',style=card_input_style),
+                                                    width=6
                                                 ),
-                                                dbc.Label("size",html_for='xlabels',width="auto",style={"margin-left":"5px"}),
+                                                dbc.Label("size",html_for='xlabels',width=2,style={ "textAlign":"right"}),
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["title_size"]), value=pa["xlabels"], placeholder="size", id='xlabels', multi=False, clearable=False, style={"height":"35px"}),
+                                                    dcc.Dropdown( options=make_options(pa["title_size"]), value=pa["xlabels"], placeholder="size", id='xlabels', multi=False, clearable=False, style=card_input_style),
+                                                    width=2
                                                 )
                                             ],
                                             className="g-1",
@@ -259,13 +260,15 @@ def make_app_content(pathname):
                                         ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("y label",html_for='ylabel',width="auto"),
+                                                dbc.Label("y label",html_for='ylabel',width=2),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["ylabel"] ,id='ylabel', placeholder="y label", type='text', style={"width":"260px","height":"35px","margin-right":"5px"} ) ,
+                                                    dcc.Input(value=pa["ylabel"] ,id='ylabel', placeholder="y label", type='text', style=card_input_style) ,
+                                                    width=6,
                                                 ),
-                                                dbc.Label("size",html_for='ylabels',width="auto",style={"margin-left":"5px"}),
+                                                dbc.Label("size",html_for='ylabels',width=2,style={"textAlign":"right"}),
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["title_size"]),value=pa["ylabels"],placeholder="size", id='ylabels', multi=False, clearable=False,style={"height":"35px"}),
+                                                    dcc.Dropdown( options=make_options(pa["title_size"]),value=pa["ylabels"],placeholder="size", id='ylabels', multi=False, clearable=False,style=card_input_style),
+                                                    width=2
                                                 )
                                             ],
                                             className="g-1",
@@ -274,7 +277,7 @@ def make_app_content(pathname):
                                         ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Axis:",html_for="show_axis",style={"width":"52px"}),
+                                                dbc.Label("Axis:",html_for="show_axis", width=2),
                                                 dbc.Col(
                                                     dcc.Checklist(
                                                         options=[
@@ -285,7 +288,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_axis"],
                                                         labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
-                                                        style={"height":"35px","margin-top":"2px"},
+                                                        style={"height":"35px","margin-top":"10px"},
                                                         id="show_axis"
                                                     ),
                                                 )
@@ -295,7 +298,7 @@ def make_app_content(pathname):
                                     ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("",style={"width":"52px"}),
+                                                dbc.Label("",width=2),
                                                 dbc.Label("width",width="auto"),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["axis_line_width"], id='axis_line_width', placeholder="width", type='text', style=card_input_style ) ,
@@ -307,7 +310,7 @@ def make_app_content(pathname):
                                     ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Ticks:",html_for="tick_axis",style={"width":"52px"}),
+                                                dbc.Label("Ticks:",html_for="tick_axis",width=2),
                                                 dbc.Col(
                                                     dcc.Checklist(
                                                         options=[
@@ -326,17 +329,30 @@ def make_app_content(pathname):
                                     ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("",style={"width":"74px"}),
-                                                dbc.Label("length",html_for='ticks_length',style={"width":"100px","textAlign":"right","margin-top":"10px"}),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["ticks_length"], id='ticks_length', placeholder="length", type='text', style={"height":"35px","width":"70px"} ) ,
+                                                    dbc.Label(""),
+                                                    width=2
                                                 ),
-                                                dbc.Label("direction",html_for='ticks_direction_value',style={"textAlign":"right","width":"100px","margin-top":"10px"}), # style={"textAlign":"right","padding-right":"2px"}
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["ticks_direction"]), value=pa["ticks_direction_value"], id="ticks_direction_value",placeholder="direction", multi=False, clearable=False, style={ "width":"70px"}),
+                                                    dbc.Label("length",html_for='ticks_length',style={"margin-top":"5px"}),
+                                                    width=3,
+                                                    style={"textAlign":"right","padding-right":"2px"}
+                                                ),
+                                                dbc.Col(
+                                                    dcc.Input(value=pa["ticks_length"], id='ticks_length', placeholder="length", type='text',style=card_input_style ) ,
+                                                    width=2
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Label("direction",html_for='ticks_direction_value',style={"margin-top":"5px"}), # style={"textAlign":"right","padding-right":"2px"}
+                                                    width=3,
+                                                    style={"textAlign":"right","padding-right":"2px"}
+                                                ),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["ticks_direction"]), value=pa["ticks_direction_value"], id="ticks_direction_value",placeholder="direction", multi=False, clearable=False, style=card_input_style),
+                                                    width=2
                                                 )
                                             ],
-                                            className="g-1",
+                                            className="g-0",
                                         ),
                                     ############################################
                                         dbc.Row(
@@ -346,7 +362,7 @@ def make_app_content(pathname):
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("font size", style=card_label_style),
+                                                    dbc.Label("font size", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -355,7 +371,7 @@ def make_app_content(pathname):
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("rotation", style=card_label_style),
+                                                    dbc.Label("rotation", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -370,11 +386,11 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("y ticks", style=card_label_style),
+                                                    dbc.Label("y ticks", style={"margin-top":"5px"}),
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("font size", style=card_label_style),
+                                                    dbc.Label("font size", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -383,7 +399,7 @@ def make_app_content(pathname):
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("rotation", style=card_label_style),
+                                                    dbc.Label("rotation", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -398,11 +414,11 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("x limits", style=card_label_style),
+                                                    dbc.Label("x limits", style={"margin-top":"5px"}),
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("lower", style=card_label_style),
+                                                    dbc.Label("lower", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -411,7 +427,7 @@ def make_app_content(pathname):
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("upper", style=card_label_style),
+                                                    dbc.Label("upper", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -426,11 +442,11 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("y limits", style=card_label_style),
+                                                    dbc.Label("y limits", style={"margin-top":"5px"}),
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("lower", style=card_label_style),
+                                                    dbc.Label("lower", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -439,7 +455,7 @@ def make_app_content(pathname):
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("upper", style=card_label_style),
+                                                    dbc.Label("upper", style={"margin-top":"5px"}),
                                                     width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -454,35 +470,36 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("Grid:", html_for="grid_value",style=card_label_style),
+                                                    dbc.Label("Grid:", html_for="grid_value",style={"margin-top":"5px"}),
                                                     width=2
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("type", style=card_label_style),
-                                                    width=3,
+                                                    dbc.Label("type", style={"margin-top":"5px"}),
+                                                    width=2,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["grid"]), placeholder="select", id='grid_value', multi=False, style=card_input_style ),
-                                                    width=2
+                                                    width=3
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("width", style=card_label_style),
-                                                    width=3,
+                                                    dbc.Label("width", style={"margin-top":"5px"}),
+                                                    width=2,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["grid_linewidth"],id='grid_linewidth', placeholder="value", type='text', style=card_input_style ),
-                                                    width=2,
+                                                    width=3,
                                                 ),
                                             ],
-                                            className="g-0",
+                                            className="g-1",
                                         ),
-                                        ############################################ 
+                                        ############################################  PICK UP HERE DOING THE GRID COLOR ROW AS THE TICKS LENGTH AND DIRECTION ABOVE
                                         dbc.Row(
                                             [
+                                                dbc.Label("",width=2),
                                                 dbc.Col(
-                                                    dbc.Label("color", style=card_label_style),
+                                                    dbc.Label("color", style={"margin-top":"5px"}),
                                                     width=2,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
@@ -491,35 +508,37 @@ def make_app_content(pathname):
                                                     width=3
                                                 ),
                                                 dbc.Col(
-                                                    dcc.Input(id='grid_color_text', placeholder=".. or, write color name", type='text', style={"width":"100%","height":"35px"} ),
-                                                    style={"padding-left":"4px"}
+                                                    dcc.Input(id='grid_color_text', placeholder=".. or, write color name", type='text', style=card_input_style),
+                                                    # style={"padding-left":"4px"}
                                                 ),
                                             ],
-                                            className="g-0",
+                                            className="g-1",
                                         ),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Col([
-                                                    dbc.Label("hline:", html_for="hline",style={"margin-top":"5px","padding-right":"2px"}),
-                                                    dcc.Input(id='hline', placeholder="value", type='text', style={"height":"35px","width":"50%"} )],
-                                                    width=4,
-                                                ),
-                                                dbc.Col( [
-                                                    dbc.Label("width", html_for="hline_linewidth", style={"margin-top":"5px","padding-right":"2px"}),
-                                                    dcc.Input(value=pa["hline_linewidth"],id='hline_linewidth', placeholder="value", type='text', style={"height":"35px","width":"50%"} )],
-                                                    width=4,
-                                                ),
-                                                dbc.Label("style", html_for="hline_linestyle_value",style={"margin-top":"5px","padding-right":"2px"}),
+                                                dbc.Label("hline:", width=2, html_for="hline"),
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["hline_linestyle"]), value=pa["hline_linestyle_value"],placeholder="value", id='hline_linestyle_value', multi=False, clearable=False, style={"height":"35px","width":"100%","margin":"0px"} ),
+                                                    dcc.Input(id='hline', placeholder="value", type='text', style=card_input_style ),
+                                                    width=2,
+                                                ),
+                                                dbc.Label("width",  width=2, html_for="hline_linewidth",style={ "textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Input(value=pa["hline_linewidth"], id='hline_linewidth', placeholder="value", type='text', style=card_input_style ),
+                                                    width=2,
+                                                ),
+                                                dbc.Label("style",  width=2, html_for="hline_linestyle_value",style={ "textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["hline_linestyle"]), value=pa["hline_linestyle_value"],placeholder="value", id='hline_linestyle_value', multi=False, clearable=False, style=card_input_style ), #,"width":"50%"
+                                                    width=2,
                                                 ),
                                             ],
-                                            className="g-0",
+                                            className="g-1",
                                         ),
                                         ############################################ 
                                         dbc.Row(
                                             [
+                                                dbc.Label("",width=1),
                                                 dbc.Col(
                                                     dbc.Label("color", style={"margin-top":"5px"}),
                                                     width=2,
@@ -531,50 +550,56 @@ def make_app_content(pathname):
                                                 ),
 
                                                 dbc.Col(
-                                                    dcc.Input(id='hline_color_text', placeholder=".. or, write color name", type='text', style={"width":"100%","height":"35px"} ),
-                                                    style={"padding-left":"4px"}
+                                                    dcc.Input(id='hline_color_text', placeholder=".. or, write color name", type='text', style=card_input_style ),
                                                 ),
                                             ],
-                                            className="g-0",
+                                            className="g-1",
+                                        ),
+                                        ############################################ 
+                                        dbc.Row(
+                                            [   dbc.Label("vline:", width=2, html_for="vline"),
+                                                dbc.Col(
+                                                    [
+                                                        dcc.Input(id='vline', placeholder="value", type='text', style=card_input_style),
+                                                    ], 
+                                                    width=2
+                                                ),
+                                                dbc.Label("width", width=2,html_for="vline_linewidth", style={ "textAlign":"right"}),
+                                                dbc.Col(
+                                                     [
+                                                        dcc.Input(value=pa["vline_linewidth"],id='vline_linewidth', placeholder="value", type='text', style=card_input_style ),
+                                                     ],
+                                                     width=2
+                                                ),
+                                                dbc.Label("style", width=2, html_for="vline_linestyle_value", style={ "textAlign":"right"}),
+                                                dbc.Col(
+                                                    [
+                                                        dcc.Dropdown( options=make_options(pa["vline_linestyle"]), value=pa["vline_linestyle_value"], placeholder="value", id='vline_linestyle_value', multi=False, clearable=False, style=card_input_style),
+                                                    ],
+                                                    width=2
+                                                )
+                                            ],
+                                            className="g-1",
                                         ),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Col([
-                                                    dbc.Label("vline:", html_for="vline",style={"margin-top":"5px","padding-right":"2px"}),
-                                                    dcc.Input(id='vline', placeholder="value", type='text', style={"height":"35px","width":"50%"} )],
-                                                    width=4,
-                                                ),
-                                                dbc.Col( [
-                                                    dbc.Label("width", html_for="vline_linewidth", style={"margin-top":"5px","padding-right":"2px"}),
-                                                    dcc.Input(value=pa["vline_linewidth"],id='vline_linewidth', placeholder="value", type='text', style={"height":"35px","width":"50%"} )],
-                                                    width=4,
-                                                ),
-                                                dbc.Label("style", html_for="vline_linestyle_value",style={"margin-top":"5px","padding-right":"2px"}),
+                                                dbc.Label("",width=1),
                                                 dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["vline_linestyle"]), value=pa["vline_linestyle_value"], placeholder="value", id='vline_linestyle_value', multi=False, clearable=False, style={"height":"35px","width":"100%","margin":"0px"} ),
-                                                ),
-                                            ],
-                                            className="g-0",
-                                        ),
-                                        ############################################ 
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.Label("color", style=card_label_style),
+                                                    dbc.Label("color"),
                                                     width=2,
-                                                    style={"textAlign":"right","padding-right":"2px"}
+                                                    style={"textAlign":"right","padding-right":"2px","margin-top":"5px"}
                                                 ),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["vline_colors"]), value=pa["vline_color_value"], placeholder="select", id='vline_color_value', multi=False, clearable=False, style=card_input_style ) ,
                                                     width=3
                                                 ),
                                                 dbc.Col(
-                                                    dcc.Input(id='vline_color_text', placeholder=".. or, write color name", type='text', style={"width":"100%","height":"35px"} ),
-                                                    style={"padding-left":"4px"}
+                                                    dcc.Input(id='vline_color_text', placeholder=".. or, write color name", type='text', style=card_input_style ),
+                                                    # style={"padding-left":"4px"}
                                                 ),
                                             ],
-                                            className="g-0",
+                                            className="g-1",
                                         ),
                                         ############################################ 
 
@@ -583,10 +608,10 @@ def make_app_content(pathname):
                                 style=card_body_style
                             ),
                             id={'type':"collapse-dynamic-card","index":"axes"},
-                            is_open=True,
+                            is_open=False,
                         ),
                     ],
-                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                    style={"margin-top":"2px","margin-bottom":"2px", "padding":"0px", "margin":"0px"} 
                 ),
                 html.Div(id="marker-cards"),
                 dbc.Card(
@@ -599,95 +624,59 @@ def make_app_content(pathname):
                         ),
                         dbc.Collapse(
                             dbc.CardBody(
-                                [
-                                ############################################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Labels",html_for='labels_col_value',style={"margin-top":"5px","width":"64px"}),
-                                                        dbc.Col(
-                                                            dcc.Dropdown( placeholder="select a column..", id='labels_col_value', multi=False, style=card_input_style )
-                                                            # dcc.Input(id='labels_col_value', placeholder=, type='text', style=card_input_style ) ,
-                                                        )
-                                                    ],
+                                dbc.Form(
+                                    [
+                                        ############################################
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Labels col.",html_for='labels_col_value',width=3),
+                                                dbc.Col(
+                                                    dcc.Dropdown( placeholder="select a column..", id='labels_col_value', multi=False, style=card_input_style ),
+                                                    width=9
+                                                    # dcc.Input(id='labels_col_value', placeholder=, type='text', style=card_input_style ) ,
+                                                )
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        ############################################
+                                        dbc.Row(
+                                            [   
+                                                dbc.Label("font size",html_for='labels_font_size',width=3),
+                                                dbc.Col(
+                                                    dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["labels_font_size"],id='labels_font_size', placeholder="size", style=card_input_style ) ,
+                                                    width=3
                                                 ),
-                                                width=12,
-                                                # style={ "padding-right":"16px"}
-                                            ),
-                                        ],
-                                        className="g-0",
-                                        style={ "padding-left":"16px"}
-                                    ),
-                                ############################################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("font size",html_for='labels_font_size',style={"margin-top":"5px","width":"64px"}),
-                                                        dbc.Col(
-                                                            dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["labels_font_size"],id='labels_font_size', placeholder="size", style=card_input_style ) ,
-                                                        )
-                                                    ],
+                                                dbc.Label("color",html_for='labels_font_color_value',width=3, style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["labels_font_color"]), value=pa["labels_font_color_value"], placeholder="color", id='labels_font_color_value', multi=False,clearable=False, style=card_input_style ),
+                                                    width=3
+                                                )
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        ############################################
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("arrows",html_for='labels_arrows_value',width=3),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style ),
+                                                    width=3,
                                                 ),
-                                                width=6,
-                                                style={ "padding-right":"16px"}
-                                            ),
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("color",html_for='labels_font_color_value',style={"margin-top":"5px","width":"50px","textAlign":"right"}),
-                                                        dbc.Col(
-                                                            dcc.Dropdown( options=make_options(pa["labels_font_color"]), value=pa["labels_font_color_value"], placeholder="color", id='labels_font_color_value', multi=False,clearable=False, style=card_input_style )
-                                                        )
-                                                    ],
-                                                ),
-                                                width=6,
-                                                style={ "padding-left":"16px"}
-                                            ),
-                                        ],
-                                        className="g-0",
-                                        style={ "padding-left":"16px"}
-                                    ),
-                                ############################################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("arrows",html_for='labels_arrows_value',style={"margin-top":"5px","width":"64px"}),
-                                                        dbc.Col(
-                                                            dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style )
-                                                        )
-                                                    ],
-                                                ),
-                                                width=6,
-                                                style={ "padding-right":"16px"}
-                                            ),
-                                            dbc.Col(
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("color",html_for='labels_colors_value',style={"margin-top":"5px","width":"50px","textAlign":"right"}),
-                                                        dbc.Col(
-                                                            dcc.Dropdown(options=make_options(pa["labels_colors"]), value=pa["labels_colors_value"], placeholder="color", id='labels_colors_value', multi=False, clearable=False,style=card_input_style )
-                                                        )
-                                                    ],
-                                                ),
-                                                width=6,
-
-                                                style={ "padding-left":"16px"}
-                                            ),
-                                        ],
-                                        className="g-0",
-                                        style={ "padding-left":"16px"}
-                                    )
-                                ############################################                                
-                                ]
-                                ,style=card_body_style),
+                                                dbc.Label("color",html_for='labels_colors_value',width=3,style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown(options=make_options(pa["labels_colors"]), value=pa["labels_colors_value"], placeholder="color", id='labels_colors_value', multi=False, clearable=False,style=card_input_style ),
+                                                    width=3,
+                                                )
+                                            ],
+                                        className="g-1",
+                                        )   
+                                        ############################################                                
+                                    ]
+                                ),
+                                style=card_body_style
+                            ),
                             id={'type':"collapse-dynamic-card","index":"labels"},
-                            is_open=False,
+                            is_open=True,
                         ),
                     ],
                     style={"margin-top":"2px","margin-bottom":"2px"} 
@@ -759,8 +748,8 @@ def make_app_content(pathname):
 
                 ),
             ],
-            style={ "min-width":"372px","max-width":"372px"},
-            # className="g-0",    
+            style={ "min-width":"372px","width":"100%"},
+            className="g-0",    
             # style={ "margin-left":"0px" , "margin-right":"0px"}
         ),
         dbc.Button(
