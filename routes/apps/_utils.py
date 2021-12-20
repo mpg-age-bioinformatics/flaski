@@ -73,7 +73,8 @@ def make_options(valuesin):
 def check_user_path(filename,current_user) :
     user_id=str(current_user.id)
     users_data=app.config['USERS_DATA']
-    user_path=f'{users_data}{user_id}/'
+    user_path=os.path.join(users_data, user_id)
+    user_path=f'{user_path}/'
     if user_path == filename[:len(user_path)] :
         file_path = filename.split(user_path)[-1]
         if not os.path.isdir(user_path):

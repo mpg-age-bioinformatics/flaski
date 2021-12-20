@@ -1,25 +1,27 @@
 from myapp import app
 from flask_login import current_user
 from flask_caching import Cache
+from flask import session
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, encode_session_file
 import os
 import uuid
-import traceback
-import json
+# import traceback
+# import json
 import pandas as pd
-import time
+# import time
 from werkzeug.utils import secure_filename
 import humanize
 from myapp.models import User
 import stat
 from datetime import datetime
-import dash_table
+# import dash_table
+import shutil
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -79,6 +81,8 @@ def make_finder(contents, contents_df, sortby, user_path):
         else:
             asc=False
         contents_df=contents_df.sort_values(by=[ sb ], ascending=asc)
+    else:
+        contents_df=contents_df.sort_values(by=[ "mod" ], ascending=True)
 
     files=os.listdir(user_path)
 
@@ -166,42 +170,81 @@ def make_layout(pathname):
     State('sortby', 'data'))
 def make_app_content(pathname,sortby):
 
-    # print("AAAAAA", pathname)
+    # ctx = dash.callback_context
+    # button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    # if button_id == "download-session" :
+    #     return dcc.Location(pathname="/storage/", id='index'), dash.no_update
 
     user_id=str(current_user.id)
     users_data=app.config['USERS_DATA']
     user_path=os.path.join(users_data, user_id)
+
+    if not os.path.isdir(user_path):
+        os.makedirs(user_path)
+
     ui_path=pathname.split("/storage/", 1)[-1]
 
     saveas=False
+    load=False
+    download=False
+    delete=False
 
-    # if ui_path :
-    #     if ui_path[:len("load/")] == "load/":
-    #         ## read file
-    #         ## load file into session
-    #         ## get app name
-    #         return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update
+    if ui_path :
+        if ui_path[:len("load/")] == "load/":
+            ui_path=ui_path.split("load/", 1)[-1]
+            load=True
 
-    #     elif ui_path[:len("download/")] == "download/":
-    #         return dash.no_update, <send_download>
+        elif ui_path[:len("download/")] == "download/":
+            ui_path=ui_path.split("download/", 1)[-1]
+            download=True
 
-    #     elif ui_path[:len("saveas/")] == "saveas/":
-    #         ui_path=ui_path.split("saveas/", 1)[-1]
-    #         saveas=True
+        elif ui_path[:len("delete/")] == "delete/":
+            ui_path=ui_path.split("delete/", 1)[-1]
+            delete=True
 
-    if ui_path:
-        if ui_path[-1] != "/":
-            ui_path=f'{ui_path}/'
-    # else:
-    #     ui_path="/"
+        elif ui_path[:len("saveas/")] == "saveas/":
+            ui_path=ui_path.split("saveas/", 1)[-1]
+            saveas=True
+            saveas = session["session_data"]
+            ## need to delete session_data from session
+
+    if ( ui_path ):
+        if ( not download ) & ( not load ) & ( not delete ):
+            if ui_path[-1] != "/":
+                ui_path=f'{ui_path}/'
+
     os_path=os.path.join(user_path, ui_path)
 
+    if load : 
+        if not os.path.isfile(os_path):
+            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update
+        session_data=encode_session_file(os_path, current_user )
+        load_app=session_data["app_name"]
+        session["session_data"]=session_data
+        return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update
 
-    # print("!!!!", os_path, user_path, ui_path )
+    if download : 
+        if not os.path.isfile( os_path ):
+            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update
+        ui_path=ui_path.split( os.path.basename(os_path) )[0]
+        ui_path=f'/storage/{ui_path}'
+        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dcc.send_file( os_path )
 
-    #if not os.path.isdir(os_path):
-        ## issue
-        ## redirect to os_path
+    if delete : 
+        if not os.path.exists( os_path ):
+            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update
+        if os.path.isdir(os_path):
+            shutil.rmtree(os_path)
+        if os.path.isfile(os_path):
+            os.remove(os_path)
+
+        ui_path="/".join( ui_path.split("/")[:-1] )
+        ui_path=f'/storage/{ui_path}'
+
+        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update
+
+    if not os.path.isdir( os_path ):
+        return dcc.Location(pathname="/storage/", id='index'), dash.no_update
 
     ### demo dev section
     # def touch_file(filepath):
@@ -217,13 +260,11 @@ def make_app_content(pathname,sortby):
     # touch_file(f'{os_path}test_dir/test_subdir/test.file.4.json')
     ### 
 
-    if not os.path.isdir(user_path):
-        os.makedirs(user_path)
     total_user=get_size(user_path)
     user=User.query.filter_by(id=current_user.id).first()
     disk_quota=user.disk_quota
     disc_per=total_user/disk_quota*100
-    # print(disc_per)
+
     if disc_per < 1:
         disc_per=1
 
@@ -251,15 +292,11 @@ def make_app_content(pathname,sortby):
         )
         return ic
 
-    # https://dash-bootstrap-components.opensource.faculty.ai/docs/components/breadcrumb/
-
     ignored = ['.bzr', '$RECYCLE.BIN', '.DAV', '.DS_Store', '.git', '.hg', '.htaccess', '.htpasswd', '.Spotlight-V100', '.svn', '__MACOSX', 'ehthumbs.db', 'robots.txt', 'Thumbs.db', 'thumbs.tps']
     hide_dotfile="yes"
     contents = {}
     contents_df=pd.DataFrame()
     total = {'size': get_size(os_path), 'dir': 0, 'file': 0}
-    # print("os_path", os_path)
-    # print("ui_path", ui_path)
     for filename in os.listdir(os_path):
         if filename in ignored:
             continue
@@ -280,7 +317,6 @@ def make_app_content(pathname,sortby):
         info['Size']=humanize.naturalsize(sz)
         info["path"] = filepath
         info["ui_path"] = os.path.join(ui_path, filename)
-        # print(info["ui_path"])
         info["Delete"] = os.path.join("delete", ui_path, filename)
         info["Load"] = os.path.join("load", ui_path, filename)
         info["Download"] = os.path.join("download", ui_path, filename)
