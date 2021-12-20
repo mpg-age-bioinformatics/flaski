@@ -119,16 +119,27 @@ def make_app_content(pathname):
     user=User.query.filter_by(id=current_user.id).first()
     disk_quota=user.disk_quota
     disc_per=total_user/disk_quota*100
-    print(disc_per)
+    # print(disc_per)
     if disc_per < 1:
         disc_per=1
 
+    
     if disc_per > 75:
         progress_color="danger"
     elif disc_per > 50:
         progress_color="warning"
     else:
         progress_color="success"
+
+    if disc_per >= 30 :
+        prog_label=f'{humanize.naturalsize(total_user)}/{humanize.naturalsize(disk_quota)}'
+    elif disc_per >= 5 :
+        prog_label=f'{disc_per}%'
+    else:
+        prog_label=""
+
+    
+
 
     def make_icon(icon, href):
         ic=dcc.Link(
@@ -223,27 +234,26 @@ def make_app_content(pathname):
                 contents_df
             ]
         ),
-        body=False
+        body=False,
+        style={"overflow":"scroll"}
     )
-
-
 
     page=dbc.Row( 
         [
             dbc.Col( 
                 [ 
-                    dbc.Progress(label="25%", value=disc_per, color=progress_color, style={"height": "30px",'margin-bottom':"8px"}),
+                    dbc.Progress(label=prog_label, value=disc_per, color=progress_color, style={"height": "30px",'margin-bottom':"8px"}),
 
                     finder
                 ],
                 sm=12,md=12, lg=10, xl=8, 
                 align="center", 
-                style={ "margin-left":2, "margin-right":2 ,'margin-bottom':"50px"}
+                style={ "margin-left":2, "margin-right":2 ,'margin-bottom':"50px","overflow":"scroll"}
             ),
         ],
         align="center",
         justify="center",
-        style={"min-height": "95vh", 'verticalAlign': 'center'}
+        style={"min-height": "95vh", 'verticalAlign': 'center',"padding":"2px"}
     )
     return page
     
