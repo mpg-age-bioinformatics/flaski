@@ -136,7 +136,7 @@ def make_finder(contents, contents_df, sortby, user_path):
             ]
         ),
         body=False,
-        style={"overflow":"scroll"}
+        # style={"overflow":"scroll"}
     )
 
     return finder
@@ -147,6 +147,8 @@ def make_finder(contents, contents_df, sortby, user_path):
 def make_layout(pathname):
     protected_content=html.Div(
         [
+            # html.Div(id="goto-app")
+            dcc.Download( id="download-session" ),
             dcc.Store( data=None, id='sortby' ),
             dcc.Store( data=None, id='saveas' ),
             make_navbar_logged("Storage",current_user),
@@ -159,6 +161,7 @@ def make_layout(pathname):
 
 @dashapp.callback( 
     Output('app-content', 'children'),
+    Output("download-session",'data'), 
     Input('url', 'pathname'),
     State('sortby', 'data'))
 def make_app_content(pathname,sortby):
@@ -169,11 +172,23 @@ def make_app_content(pathname,sortby):
     users_data=app.config['USERS_DATA']
     user_path=os.path.join(users_data, user_id)
     ui_path=pathname.split("/storage/", 1)[-1]
+
     saveas=False
-    if ui_path :
-        if ui_path[:len("saveas/")] == "saveas/":
-            ui_path=ui_path.split("saveas/", 1)[-1]
-            saveas=True
+
+    # if ui_path :
+    #     if ui_path[:len("load/")] == "load/":
+    #         ## read file
+    #         ## load file into session
+    #         ## get app name
+    #         return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update
+
+    #     elif ui_path[:len("download/")] == "download/":
+    #         return dash.no_update, <send_download>
+
+    #     elif ui_path[:len("saveas/")] == "saveas/":
+    #         ui_path=ui_path.split("saveas/", 1)[-1]
+    #         saveas=True
+
     if ui_path:
         if ui_path[-1] != "/":
             ui_path=f'{ui_path}/'
@@ -193,12 +208,13 @@ def make_app_content(pathname,sortby):
     #     print(filepath)
     #     with open(filepath, "w") as f:
     #         f.write("test")
-    # if not os.path.isdir(f'{os_path}/test_dir/test_subdir'):
-    #     os.makedirs(f'{os_path}/test_dir/test_subdir')
-    # touch_file(f'{os_path}/test.file.1.json')
-    # touch_file(f'{os_path}/test_dir/test.file.2.json')
-    # touch_file(f'{os_path}/test_dir/test_subdir/test.file.3.json')
-    # touch_file(f'{os_path}/test_dir/test_subdir/test.file.4.json')
+    # if not os.path.isdir(f'{os_path}test_dir/test_subdir'):
+    #     os.makedirs(f'{os_path}test_dir/test_subdir')
+    # for i in range(100) :
+    #     touch_file(f'{os_path}test.file.{i}.json')
+    # touch_file(f'{os_path}test_dir/test.file.2.json')
+    # touch_file(f'{os_path}test_dir/test_subdir/test.file.3.json')
+    # touch_file(f'{os_path}test_dir/test_subdir/test.file.4.json')
     ### 
 
     if not os.path.isdir(user_path):
@@ -343,12 +359,13 @@ def make_app_content(pathname,sortby):
                             save_and_make,
                             html.Div( 
                                 finder,
-                                id="finder-div"
+                                id="finder-div",
+                                style={"overflow":"scroll", "height":"100%"}
                             )
                         ],
                         sm=12,md=12, lg=10, xl=8, 
                         align="top", 
-                        style={ "margin-left":2, "margin-right":2 ,'margin-bottom':"50px","overflow":"scroll"}
+                        style={ "margin-left":2, "margin-right":2 ,'margin-bottom':"50px"}
                     ),
                 ],
                 align="top",
@@ -359,7 +376,7 @@ def make_app_content(pathname,sortby):
         ]
 
     )
-    return page
+    return page, dash.no_update
 
 @dashapp.callback(
     Output('sortby', 'data'),
