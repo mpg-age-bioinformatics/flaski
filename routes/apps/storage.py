@@ -12,7 +12,7 @@ from myapp.routes.apps._utils import parse_import_json, parse_table, make_option
 import os
 import uuid
 # import traceback
-# import json
+import json
 import pandas as pd
 # import time
 from werkzeug.utils import secure_filename
@@ -82,7 +82,7 @@ def make_finder(contents, contents_df, sortby, user_path):
             asc=False
         contents_df=contents_df.sort_values(by=[ sb ], ascending=asc)
     else:
-        contents_df=contents_df.sort_values(by=[ "mod" ], ascending=True)
+        contents_df=contents_df.sort_values(by=[ "mod" ], ascending=False)
 
     files=os.listdir(user_path)
 
@@ -151,7 +151,7 @@ def make_finder(contents, contents_df, sortby, user_path):
 def make_layout(pathname):
     protected_content=html.Div(
         [
-            # html.Div(id="goto-app")
+            html.Div(id="mkdir-refresh"),
             dcc.Download( id="download-session" ),
             dcc.Store( data=None, id='sortby' ),
             dcc.Store( data=None, id='saveas' ),
@@ -166,6 +166,7 @@ def make_layout(pathname):
 @dashapp.callback( 
     Output('app-content', 'children'),
     Output("download-session",'data'), 
+    Output('saveas','data'),
     Input('url', 'pathname'),
     State('sortby', 'data'))
 def make_app_content(pathname,sortby):
@@ -188,6 +189,7 @@ def make_app_content(pathname,sortby):
     load=False
     download=False
     delete=False
+    session_data=dash.no_update
 
     if ui_path :
         if ui_path[:len("load/")] == "load/":
@@ -205,8 +207,9 @@ def make_app_content(pathname,sortby):
         elif ui_path[:len("saveas/")] == "saveas/":
             ui_path=ui_path.split("saveas/", 1)[-1]
             saveas=True
-            saveas = session["session_data"]
-            ## need to delete session_data from session
+            if "session_data" in list( session.keys() ) :
+                session_data = session["session_data"]
+                del(session["session_data"])
 
     if ( ui_path ):
         if ( not download ) & ( not load ) & ( not delete ):
@@ -217,22 +220,22 @@ def make_app_content(pathname,sortby):
 
     if load : 
         if not os.path.isfile(os_path):
-            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update
+            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update, session_data
         session_data=encode_session_file(os_path, current_user )
         load_app=session_data["app_name"]
         session["session_data"]=session_data
-        return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update
+        return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update, session_data
 
     if download : 
         if not os.path.isfile( os_path ):
-            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update
+            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update, session_data
         ui_path=ui_path.split( os.path.basename(os_path) )[0]
         ui_path=f'/storage/{ui_path}'
-        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dcc.send_file( os_path )
+        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dcc.send_file( os_path ), session_data
 
     if delete : 
         if not os.path.exists( os_path ):
-            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update
+            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update, session_data
         if os.path.isdir(os_path):
             shutil.rmtree(os_path)
         if os.path.isfile(os_path):
@@ -241,10 +244,10 @@ def make_app_content(pathname,sortby):
         ui_path="/".join( ui_path.split("/")[:-1] )
         ui_path=f'/storage/{ui_path}'
 
-        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update
+        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update, session_data
 
     if not os.path.isdir( os_path ):
-        return dcc.Location(pathname="/storage/", id='index'), dash.no_update
+        return dcc.Location(pathname="/storage/", id='index'), dash.no_update, session_data
 
     ### demo dev section
     # def touch_file(filepath):
@@ -295,7 +298,8 @@ def make_app_content(pathname,sortby):
     ignored = ['.bzr', '$RECYCLE.BIN', '.DAV', '.DS_Store', '.git', '.hg', '.htaccess', '.htpasswd', '.Spotlight-V100', '.svn', '__MACOSX', 'ehthumbs.db', 'robots.txt', 'Thumbs.db', 'thumbs.tps']
     hide_dotfile="yes"
     contents = {}
-    contents_df=pd.DataFrame()
+    contents_df=pd.DataFrame(columns=['Name',"mod",'Modified','type','original_size','Size',\
+        "path","ui_path","Delete","Load","Download"])
     total = {'size': get_size(os_path), 'dir': 0, 'file': 0}
     for filename in os.listdir(os_path):
         if filename in ignored:
@@ -352,12 +356,12 @@ def make_app_content(pathname,sortby):
     if saveas:
         save_and_make=dbc.Row(
             [
-                dbc.Col(dbc.Button("Save", color="secondary"), width='auto'),
+                dbc.Col(dbc.Button("Save", color="secondary", id="saveas-btn"), width='auto'),
                 dbc.Col(
                     dbc.Input(type="text", placeholder="filename", id="saveas_filename"),
                     className="me-2",
                 ),
-                dbc.Col(dbc.Button("Make", color="secondary"), width='auto'),
+                dbc.Col(dbc.Button("Make", color="secondary", id="mkdir-btn"), width='auto'),
                 dbc.Col(
                     dbc.Input(type="text", placeholder="dir name", id="makedir_dirname"),
                     className="me-2",
@@ -371,7 +375,13 @@ def make_app_content(pathname,sortby):
     else:
         save_and_make=dbc.Row(
             [
-                dbc.Col(dbc.Button("Make", color="secondary"), width='auto'),
+                dbc.Col(dbc.Button("Save", color="secondary", id="saveas-btn"), width='auto',style={'display': 'none'}),
+                dbc.Col(
+                    dbc.Input(type="text", placeholder="filename", id="saveas_filename"),
+                    className="me-2",
+                    style={'display': 'none'}
+                ),
+                dbc.Col(dbc.Button("Make", color="secondary", id="mkdir-btn"), width='auto'),
                 dbc.Col(
                     dbc.Input(type="text", placeholder="dir name", id="makedir_dirname"),
                     # className="me-2",
@@ -412,7 +422,7 @@ def make_app_content(pathname,sortby):
         ]
 
     )
-    return page, dash.no_update
+    return page, dash.no_update, session_data
 
 @dashapp.callback(
     Output('sortby', 'data'),
@@ -428,6 +438,16 @@ def update_table( f_name, f_size, f_modified, finder_data, sortby ):
 
     ctx = dash.callback_context
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if button_id == 'finder-name' :
+        if  not f_name :
+            return dash.no_update, dash.no_update
+    elif button_id == 'finder-size' :
+        if not f_size :
+            return dash.no_update, dash.no_update
+    elif button_id == 'finder-modified' :
+        if not f_modified :
+            return dash.no_update, dash.no_update
 
     buttons_dic={'finder-name':'Name',
         'finder-size':'original_size',
@@ -458,3 +478,160 @@ def update_table( f_name, f_size, f_modified, finder_data, sortby ):
     finder=make_finder(contents, contents_df, sortby_, user_path)
 
     return sortby_, finder
+
+
+@dashapp.callback(
+    Output( "mkdir-refresh", "children" ),
+    Output( 'url', 'pathname' ),
+    Input( "mkdir-btn", "n_clicks" ),
+    Input( "saveas-btn", "n_clicks" ),
+    State( "makedir_dirname", "value"),
+    State( "saveas_filename", "value"),
+    State( 'saveas', 'data'),
+    State( 'url', 'pathname' ),
+    prevent_initial_call=True
+)
+def saveas_makedir(mkdir_n,saveas_n, dirname, filename, session_data, pathname):
+
+    ctx = dash.callback_context
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if saveas_n :
+        if button_id == "saveas-btn" :
+            if not filename :
+                dirname_modal=dbc.Modal(
+                    [
+                        dbc.ModalHeader("File name"), 
+                        dbc.ModalBody(
+                            [
+                                "Please type in a file name before pressing 'Save'."
+                            ]
+                        ),
+                        dbc.ModalFooter(
+                            dbc.Button(
+                                "Close", id="dirname-close", color="secondary", className="ms-auto", n_clicks=0
+                            )
+                        ),
+                    ],
+                    id="dirname-modal",
+                    is_open=True,
+                )
+
+                return  dirname_modal, dash.no_update
+            
+            if not session_data :
+                dirname_modal=dbc.Modal(
+                    [
+                        dbc.ModalHeader("Session data"), 
+                        dbc.ModalBody(
+                            [
+                                "Could not find any data to save."
+                            ]
+                        ),
+                        dbc.ModalFooter(
+                            dbc.Button(
+                                "Close", id="dirname-close", color="secondary", className="ms-auto", n_clicks=0
+                            )
+                        ),
+                    ],
+                    id="dirname-modal",
+                    is_open=True,
+                )
+
+                return  dirname_modal, dash.no_update
+
+            
+            user_id=str(current_user.id)
+            users_data=app.config['USERS_DATA']
+            user_path=os.path.join(users_data, user_id)
+
+            if not os.path.isdir(user_path):
+                os.makedirs(user_path)
+
+            ui_path=pathname.split("/storage/", 1)[-1]
+
+            if ui_path[:len("saveas/")] == "saveas/":
+                ui_path=ui_path.split("saveas/", 1)[-1]
+
+            os_path=os.path.join( user_path, ui_path )
+
+            filename=secure_filename(filename)
+            if filename.split(".")[-1] != "json":
+                filename=f'{filename}.json'  
+
+            os_path=os.path.join(os_path, filename )
+
+            with open(os_path, "w") as file_out:
+                json.dump(session_data, file_out)
+
+            return dash.no_update, f'/storage/{ui_path}'
+
+    if  mkdir_n :
+        if button_id == "mkdir-btn" :
+            if not dirname :
+                dirname_modal=dbc.Modal(
+                    [
+                        dbc.ModalHeader("Directory name"), 
+                        dbc.ModalBody(
+                            [
+                                "Please type in a directory name before pressing 'Make'."
+                            ]
+                        ),
+                        dbc.ModalFooter(
+                            dbc.Button(
+                                "Close", id="dirname-close", color="secondary", className="ms-auto", n_clicks=0
+                            )
+                        ),
+                    ],
+                    id="dirname-modal",
+                    is_open=True,
+                )
+
+                return  dirname_modal, dash.no_update
+           
+            user_id=str(current_user.id)
+            users_data=app.config['USERS_DATA']
+            user_path=os.path.join(users_data, user_id)
+
+            if not os.path.isdir(user_path):
+                os.makedirs(user_path)
+
+            ui_path=pathname.split("/storage/", 1)[-1]
+
+            if ui_path[:len("saveas/")] == "saveas/":
+                ui_path=ui_path.split("saveas/", 1)[-1]
+
+            os_path=os.path.join( user_path, ui_path )
+
+            dirname=secure_filename(dirname)
+
+            os_path=os.path.join(os_path, dirname )
+
+            if not os.path.isdir(os_path):
+                os.makedirs(os_path)
+
+            return dash.no_update, pathname
+
+    return dash.no_update, dash.no_update
+
+
+@dashapp.callback(
+    Output('dirname-modal', 'is_open'),
+    [ Input('dirname-close',"n_clicks")],
+    [ State("dirname-modal", "is_open")], 
+    prevent_initial_call=True
+)
+def dirname_modal_handle(n1, is_open):
+    if n1 :
+        return not is_open
+    return is_open
+
+@dashapp.callback(
+    Output("navbar-collapse", "is_open"),
+    [Input("navbar-toggler", "n_clicks")],
+    [State("navbar-collapse", "is_open")],
+    )
+def toggle_navbar_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open

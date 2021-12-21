@@ -127,9 +127,10 @@ def load_session( filename,current_user ):
 
 def encode_session_file(filename, current_user ):
     session_import=load_session( filename, current_user )
-    app_name=session_import["session_data"]
-    app_name=list(app_name.keys())[0]
-    last_modified=session_import["session_data"]["app"][app_name]["last_modified"]
+    session_data=session_import["session_data"]
+    app_data=session_data["app"]
+    app_name=list(app_data.keys())[0]
+    last_modified=app_data[app_name]["last_modified"]
     session_import=json.dumps(session_import)
     session_import=base64.b64encode(session_import.encode('utf-8'))
     session_import=session_import.decode('utf-8')

@@ -1,6 +1,7 @@
 from myapp import app
 from flask_login import current_user
 from flask_caching import Cache
+from flask import session
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
@@ -870,17 +871,18 @@ def make_app_content(pathname):
     return app_content
 
 # example reading session from server storage
-# @dashapp.callback( 
-#     Output('upload-data', 'contents'),
-#     Output('upload-data', 'filename'),
-#     Output('upload-data', 'last_modified'),
-#     Input('session-id', 'data'))
-# def read_session_redis(session_id):
-#     # check if filename on redis session
-#     # needs doing
-#     # if yes, read sessiond ata from redis session
-#     # imp=..
-#     return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+@dashapp.callback( 
+    Output('upload-data', 'contents'),
+    Output('upload-data', 'filename'),
+    Output('upload-data', 'last_modified'),
+    Input('session-id', 'data'))
+def read_session_redis(session_id):
+    if "session_data" in list( session.keys() )  :
+        imp=session["session_data"]
+        del(session["session_data"])
+        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+    else:
+        return dash.no_update, dash.no_update, dash.no_update
 
 read_input_updates=[
     'groups_value',
@@ -1341,7 +1343,8 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
                 return dash.no_update, toast, None, None, dash.no_update, None
             else:
-                print("SAVE TO REDIS")
+                session["session_data"]=session_data
+                return dcc.Location(pathname="/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
@@ -1352,9 +1355,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
 
         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
-    # if button_id == "saveas-session-btn" :
-        # write session_data to session file if 
-        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+    if button_id == "saveas-session-btn" :
+        session["session_data"]=session_data
+        return dcc.Location(pathname="/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+          # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
         fig=make_figure(df,pa)
