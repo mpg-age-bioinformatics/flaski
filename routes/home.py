@@ -8,8 +8,7 @@ from myapp.email import send_validate_email
 from datetime import datetime
 from ._utils import META_TAGS, check_email, password_check, navbar_A, protect_dashviews, make_navbar_logged
 from flask_login import current_user
-from ._vars import other_nav_dropdowns
-
+from ._vars import other_nav_dropdowns, _PRIVATE_ROUTES, _PUBLIC_VIEWS
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
@@ -45,11 +44,20 @@ def make_layout(pathname):
 
         container_children.append(label_title)
 
+        # _PRIV=_PRIVATE_ROUTES + _PUBLIC_VIEWS
+
         links_dic=o[label]
         links_keys=list(links_dic.keys())
         i = 0
         row=[]
         for l in list( links_keys ) :
+            # app_route=links_dic[l].split("/")[1]
+            # if app_route in _PRIV :
+            #     user_apps=current_user.user_apps
+            #     view_apps=current_user.view_apps
+            #     if ( app_route not in user_apps ) and ( app_route not in view_apps ) :
+            #         continue
+
             link_icon=dbc.Col(
                 [
                     dcc.Link(
@@ -67,9 +75,7 @@ def make_layout(pathname):
                 style={"margin-top":"40px", "margin-bottom":"40px"} 
             )
             
-            row.append(link_icon)      
-            # for ii in range(20) :
-            #     row.append(link_icon)     
+            row.append(link_icon)        
             i=i+1
             if i == 4:
                 i=0
