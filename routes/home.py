@@ -68,8 +68,8 @@ def make_layout(pathname):
             )
             
             row.append(link_icon)      
-            for ii in range(20) :
-                row.append(link_icon)     
+            # for ii in range(20) :
+            #     row.append(link_icon)     
             i=i+1
             if i == 4:
                 i=0
