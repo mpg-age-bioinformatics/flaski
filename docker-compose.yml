@@ -53,6 +53,7 @@ services:
    - ./pyflaski/pyflaski:/myapp/pyflaski
    - ./routes/apps:/myapp/myapp/routes/apps
    - ./routes/_routes.py:/myapp/myapp/routes/_routes.py
+   - ./routes/home.py:/myapp/myapp/routes/home.py
    - ./routes/_impressum.py:/myapp/myapp/routes/_impressum.py
    - ./routes/_vars.py:/myapp/myapp/routes/_vars.py
    - ./routes/_privacy.py:/myapp/myapp/routes/_privacy.py
