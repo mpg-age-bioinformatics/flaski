@@ -3,12 +3,13 @@ import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from myapp.models import User
+from myapp.models import User, PrivateRoutes
 from myapp.email import send_validate_email
 from datetime import datetime
 from ._utils import META_TAGS, check_email, password_check, navbar_A, protect_dashviews, make_navbar_logged
 from flask_login import current_user
 from ._vars import other_nav_dropdowns, _PRIVATE_ROUTES, _PUBLIC_VIEWS
+
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
@@ -37,26 +38,27 @@ def make_layout(pathname):
                 ],
                 align="center",
             ),
-        align="center",
-        justify="center",
-        style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%"}
+            align="center",
+            justify="center",
+            style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%"}
         )
 
         container_children.append(label_title)
-
-        # _PRIV=_PRIVATE_ROUTES + _PUBLIC_VIEWS
 
         links_dic=o[label]
         links_keys=list(links_dic.keys())
         i = 0
         row=[]
         for l in list( links_keys ) :
-            # app_route=links_dic[l].split("/")[1]
-            # if app_route in _PRIV :
-            #     user_apps=current_user.user_apps
-            #     view_apps=current_user.view_apps
-            #     if ( app_route not in user_apps ) and ( app_route not in view_apps ) :
-            #         continue
+            app_route=links_dic[l].split("/")[1]
+            if app_route in _PRIVATE_ROUTES :
+                route_obj=PrivateRoutes.query.filter_by(route=app_route).first()
+                if not route_obj :
+                    continue
+                users=route_obj.users
+                uid=current_user.id
+                if uid not in users :
+                    continue
 
             link_icon=dbc.Col(
                 [
