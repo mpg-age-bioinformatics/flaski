@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backup
+  name: backup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: backup
+    spec:
+      containers:
+      - image: mpgagebioinformatics/myapp:latest
+        imagePullPolicy: Always
+        name: backup
+        command: ["/myapp/services/backup/backup.sh"]
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+        env:
+        - name: APP_NAME
+          value: myapp
+        - name: APP_TITLE
+          value: myapp
+        - name: FLASK_ENV
+          value: backup
+        - name: MYSQL_HOST
+          value: mariadb
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: MYSQL_PASSWORD
+        - name: MYSQL_USER
+          value: myapp
+        - name: MAX_BACKUPS
+          value: "15"
+        - name: INIT_BACKUP
+          value: "0"
+        - name: CRON_TIME
+          value: 44 13 * * *
+        resources: {}
+        volumeMounts:
+          - name: backup-volume-mount
+            mountPath: /backup
+          - name: users-volume-mount
+            mountPath: /myapp_data/users
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: dockerlogin
+      volumes:
+        - name: backup-volume-mount
+          persistentVolumeClaim:
+            claimName: bc-pvc
+        - name: users-volume-mount
+          persistentVolumeClaim:
+            claimName: users-pvc
+status: {}

@@ -1,0 +1,32 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: flaski-dev
+  # namespace: flaski-dev
+spec:
+  entryPoints: # We listen to requests coming from ports 80 and 443
+    - web
+  routes:
+    - match: Host(`flaski-dev.age.mpg.de`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: server # Requests will be forwarded to this service
+          port: 80
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: flaski-dev-tls
+  # namespace: flaski-dev
+spec:
+  entryPoints: # We listen to requests coming from ports 80 and 443
+    - websecure
+  routes:
+    - match: Host(`flaski-dev.age.mpg.de`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: server  # Requests will be forwarded to this service
+          port: 80
+  tls:
+    secretName: flaski-dev-tls

@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  selector:
+    app: server
+  ports:
+  - name: server
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+      - env:
+        - name: N_WORKERS
+          value: "4"
+        - name: ADMINS
+          value: jboucas@gmail.com
+        - name: APP_NAME
+          value: myapp
+        - name: APP_TITLE
+          value: myapp
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: SECRET_KEY
+          # value: MY_VERY_SAFE_SECRET_KEY
+        - name: APP_URL
+          value: https://0.0.0.0
+        - name: FLASK_ENV
+          value: production
+        - name: LOGS
+          value: /var/log/myapp/
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gmailpass
+              key: pass
+        - name: MAIL_PORT
+          value: "465"
+        - name: MAIL_SERVER
+          value: smtp.googlemail.com
+        - name: MAIL_USERNAME
+          value: nippesapps@gmail.com
+        - name: MAIL_USE_SSL
+          value: "1"
+        - name: MYSQL_HOST
+          value: mariadb
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: MYSQL_PASSWORD
+        #  value: mypass
+        - name: MYSQL_USER
+          value: myapp
+        - name: REDIS_ADDRESS
+          value: redis:6379/0
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secrets
+              key: REDIS_PASSWORD
+          # value: my_redis_password
+        image: mpgagebioinformatics/myapp:latest #hub.age.mpg.de/flaski/server
+        imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 8000
+        name: server
+        resources: {}
+        volumeMounts:
+        - name: users-volume-mount
+          mountPath: /myapp_data/users/
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: dockerlogin
+      volumes:
+      - name: users-volume-mount
+        persistentVolumeClaim:
+          claimName: users-pvc
+
+status: {}
