@@ -66,7 +66,7 @@ More info on: https://kubernetes.io/docs/tasks/configure-pod-container/pull-imag
 
 Create a secret for flaskis' mail account:
 ```bash
-kubectl create secret generic gmailpass --from-literal=pass='<password>'
+kubectl create secret generic flaskimailpass --from-literal=pass='<password>'
 ```
 Edit `secrets.yaml` and create required flaski secrets:
 ```bash
@@ -112,17 +112,24 @@ kubectl apply -f mariadb-deployment.yaml redis-deployment.yaml rsync-pod.yaml
 At this point, if you have data to be restored, you can bring it
 to the backup volume by 
 ```
-kubectl cp ~/myapp_backup/* rsync:/backup/
+./krsync -av --progress --stats ~/flaski3_backup/ rsync:/backup
 ```
 Afterwards, you can keep on launching your services:
 ```
-kubectl apply -f init-pod.yaml
+kubectl apply -f init-restore-pod.yaml
+```
+if you don't need to restore the database and table you can,
+```
+kubectl apply -f init-norestore-pod.yaml
+```
+furher services:
+```
 kubectl apply -f backup-cron.yaml
 kubectl apply -f server-deployment.yaml
 ```
 Inline:
 ```
-kubectl apply -f init-pod.yaml backup-cron.yaml server-deployment.yaml
+kubectl apply -f init-norestore-pod.yaml backup-cron.yaml server-deployment.yaml
 ```
 For traefik ingress use:
 ```
@@ -159,4 +166,12 @@ kubectl delete deployment <deployment name>
 To delete a service:
 ```bash
 kubectl delete service <service name>
+```
+Manual force run of cronjob:
+```
+kubectl create job --from=cronjob/backup backup
+```
+Backing up data to an external machine:
+```
+./krsync -av --delete --progress --stats rsync:/backup/ ~/flaski3_backup
 ```

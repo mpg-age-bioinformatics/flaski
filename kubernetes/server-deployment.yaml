@@ -21,7 +21,7 @@ metadata:
   labels:
     app: server
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: server
@@ -36,11 +36,11 @@ spec:
         - name: N_WORKERS
           value: "4"
         - name: ADMINS
-          value: jboucas@gmail.com
+          value: flaski@age.mpg.de
         - name: APP_NAME
           value: myapp
         - name: APP_TITLE
-          value: myapp
+          value: flaski(dev)
         - name: SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -48,7 +48,7 @@ spec:
               key: SECRET_KEY
           # value: MY_VERY_SAFE_SECRET_KEY
         - name: APP_URL
-          value: https://0.0.0.0
+          value: https://flaski-dev.age.mpg.de
         - name: FLASK_ENV
           value: production
         - name: LOGS
@@ -56,15 +56,15 @@ spec:
         - name: MAIL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: gmailpass
+              name: flaskimailpass
               key: pass
         - name: MAIL_PORT
-          value: "465"
+          value: "587"
         - name: MAIL_SERVER
-          value: smtp.googlemail.com
+          value: mail.age.mpg.de
         - name: MAIL_USERNAME
-          value: nippesapps@gmail.com
-        - name: MAIL_USE_SSL
+          value: flaski@age.mpg.de
+        - name: MAIL_USE_TLS
           value: "1"
         - name: MYSQL_HOST
           value: mariadb
@@ -86,7 +86,7 @@ spec:
               name: myapp-secrets
               key: REDIS_PASSWORD
           # value: my_redis_password
-        image: mpgagebioinformatics/myapp:latest #hub.age.mpg.de/flaski/server
+        image: mpgagebioinformatics/flaski:latest #hub.age.mpg.de/flaski/server
         imagePullPolicy: Always
         ports:
           - name: http

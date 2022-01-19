@@ -26,13 +26,13 @@ spec:
     - name: FLASK_ENV
       value: init
     - name: RESTORE_DB
-      value: "1"
+      value: "0"
     - name: RESTORE_USERS_DATA
       value: "0"
     - name: MAIL_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: gmailpass
+          name: flaskimailpass
           key: pass
     - name: MYSQL_HOST
       value: mariadb
@@ -58,7 +58,7 @@ spec:
           name: myapp-secrets
           key: REDIS_PASSWORD
     - name: ADMINS
-      value: jboucas@gmail.com
+      value: flaski@age.mpg.de
     resources: {}
     volumeMounts:
     - name: users-volume-mount
