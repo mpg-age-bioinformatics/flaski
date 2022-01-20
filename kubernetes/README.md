@@ -197,7 +197,16 @@ kubectl delete init && kubectl apply -f init-restore-pod.yaml
 ```
 Then set the new image and annonate the deployment:
 ```
-kubectl set image deployment server server=mpgagebioinformatics/flaski:latest 
+kubectl set image deployment server server=mpgagebioinformatics/flaski:<image_tag> 
+```
+Alternatively you also change the yaml file and do a:
+```
+kubectl apply -f server-deployment.yaml
+```
+If you are using <image tag> `latest` you can force a rollout by 
+(this will always force a rollout, even if no changes were made to the yaml or the image):
+```
+kubectl rollout restart deployment/server
 ```
 You can annotate a deployment with
 ```
@@ -225,6 +234,6 @@ kubectl rollout history deployment/server
 ```
 Get the description of revision:
 ```
-kubectl rollout history deployment/se3rver  --revision=3
+kubectl rollout history deployment/server  --revision=3
 ```
 
