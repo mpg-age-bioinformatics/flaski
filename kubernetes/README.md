@@ -175,3 +175,56 @@ Backing up data to an external machine:
 ```
 ./krsync -av --delete --progress --stats rsync:/backup/ ~/flaski3_backup
 ```
+
+## 4. Performing updates
+
+Ideally, make sure you have a backup of the user data and of your database:
+```
+kubectl create job --from=cronjob/backup backup
+```
+See which pods is associated with the job:
+```
+kubectl get pods
+kubectl logs <pod>
+```
+If changes to the mysql tables have been implemented make sure to update the init container:
+```
+kubectl delete init && kubectl apply -f init-norestore-pod.yaml
+```
+or, if you need to restore data:
+```
+kubectl delete init && kubectl apply -f init-restore-pod.yaml
+```
+Then set the new image and annonate the deployment:
+```
+kubectl set image deployment server server=mpgagebioinformatics/flaski:latest 
+```
+You can annotate a deployment with
+```
+kubectl annotate deployment server kubernetes.io/change-cause='some cause'
+```
+Rolling back the deployment:
+```
+kubectl rollout undo deployment/server
+```
+or, rollback to a specific revision eg.:
+````
+kubectl rollout undo deployment/server --to-revision=2
+```
+Check rollout status:
+```
+kubectl rollout status deployment/server
+```
+Get replicas:
+```
+kubectl get rs
+```
+Get rollout history:
+```
+kubectl rollout history deployment/server
+```
+Get the description of revision:
+```
+kubectl rollout history deployment/se3rver  --revision=3
+```
+

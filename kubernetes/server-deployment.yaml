@@ -21,18 +21,25 @@ metadata:
   labels:
     app: server
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: server
-  strategy: {}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: server
     spec:
       containers:
-      - env:
+      - name: server
+        image: mpgagebioinformatics/flaski:latest #hub.age.mpg.de/flaski/server
+        imagePullPolicy: Always
+        env:
         - name: N_WORKERS
           value: "4"
         - name: ADMINS
@@ -86,12 +93,9 @@ spec:
               name: myapp-secrets
               key: REDIS_PASSWORD
           # value: my_redis_password
-        image: mpgagebioinformatics/flaski:latest #hub.age.mpg.de/flaski/server
-        imagePullPolicy: Always
         ports:
           - name: http
             containerPort: 8000
-        name: server
         resources: {}
         volumeMounts:
         - name: users-volume-mount
