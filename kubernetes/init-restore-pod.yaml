@@ -58,7 +58,7 @@ spec:
           name: myapp-secrets
           key: REDIS_PASSWORD
     - name: ADMINS
-      value: jboucas@gmail.com
+      value: flaski@age.mpg.de
     resources: {}
     volumeMounts:
     - name: users-volume-mount

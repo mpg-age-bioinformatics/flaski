@@ -87,7 +87,8 @@ kubectl apply -f ceph-backup-volume-claim.yaml
 ```
 Inline:
 ```
-kubectl apply -f ceph-storageclass.yaml ceph-users-volume-claim.yaml ceph-db-volume-claim.yaml ceph-backup-volume-claim.yaml
+kubectl apply -f ceph-storageclass.yaml
+for f in $(ls ceph-*-volume-claim.yaml) ; do kubectl apply -f ${f} ; done
 ```
 
 Other generage the volumes and persistent volume claims for your local machine with:
@@ -104,10 +105,6 @@ Use deployments to start your pods:
 kubectl apply -f mariadb-deployment.yaml
 kubectl apply -f redis-deployment.yaml
 kubectl apply -f rsync-pod.yaml
-```
-Inline:
-```
-kubectl apply -f mariadb-deployment.yaml redis-deployment.yaml rsync-pod.yaml
 ```
 At this point, if you have data to be restored, you can bring it
 to the backup volume by 
@@ -126,10 +123,6 @@ furher services:
 ```
 kubectl apply -f backup-cron.yaml
 kubectl apply -f server-deployment.yaml
-```
-Inline:
-```
-kubectl apply -f init-norestore-pod.yaml backup-cron.yaml server-deployment.yaml
 ```
 For traefik ingress use:
 ```
