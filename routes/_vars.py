@@ -22,6 +22,7 @@ other_nav_dropdowns =[
             {
                 "Scatter plot":"/scatterplot/",\
                 "Heatmap":"/heatmap/",\
+                "Violin plot":"/violinplot/",\
             } \
     } \
 ]
