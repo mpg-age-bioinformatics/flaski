@@ -47,8 +47,8 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
 # base samples input dataframe and example dataframe
 input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
-example_input=pd.DataFrame( { "Sample":["mock treated 1","mock treated 2","mock treated 3",
-                                        "CDKN1A KD 1","CDKN1A KD 2","CDKN1A KD 3" ] ,
+example_input=pd.DataFrame( { "Sample":["A","B","C",
+                                        "D","E","F" ] ,
                              "Group" : ['control','control','control','shRNA','shRNA','shRNA'] ,
                              "Replicate": ['1','2','3','1','2','3'],
                              "Read 1": [ "A006850092_131904_S2_L002_R1_001.fastq.gz,A003450092_131904_S2_L003_R1_001.fastq.gz",

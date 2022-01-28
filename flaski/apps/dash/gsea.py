@@ -68,11 +68,11 @@ def generate_submission_file(rows, expression,genessets, email,group,project_tit
 
 # base samples input dataframe and example dataframe
 input_df=pd.DataFrame( columns=["Sample","Group","Replicate",] )
-example_input=pd.DataFrame( { "Sample":["mock treated 1","mock treated 2","mock treated 3",
-                                        "CDKN1A KD 1","CDKN1A KD 2","CDKN1A KD 3" ] ,
+example_input=pd.DataFrame( { "Sample":["A","B","C",
+                                        "D","E","F" ] ,
                              "Group" : ['control','control','control','shRNA','shRNA','shRNA'] ,
                              "Replicate": ['1','2','3','1','2','3'] } )
-exp_matrix="NAME	DESCRIPTION	mock treated 1	mock treated 2	mock treated 3	CDKN1A KD 1	CDKN1A KD 2	CDKN1A KD 3\n\
+exp_matrix="NAME	DESCRIPTION	A	B	C	D	E	F\n\
 NFKBIA	ENSG00000100906	1590.539243	1527.33925	1573.351161	16183.3712	16320.43434	15237.23716\n\
 PPP1R15A	ENSG00000087074	1218.545441	1121.411948	1163.753201	10086.79432	10447.23679	9197.93721\n\
 RNF169	ENSG00000166439	2252.321089	2332.640984	2199.113968	9131.24871	9296.763661	9077.958905\n\
