@@ -291,6 +291,8 @@ Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` 
 All files will have to be on your project folder (eg. `my_proj_folder` in `Info` > `Folder`) do not create further subfolders.
 
 Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
+
+Samples will be renamed to `Group_Replicate.fastq.gz`! Group -- Replicate combinations should be unique or files will be overwritten.
         '''
     
     sra_samples='''

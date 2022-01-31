@@ -280,6 +280,8 @@ All files will have to be on your project folder (eg. `my_proj_folder` in `Info`
 
 Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
 
+Samples will be renamed to `Group_Replicate.fastq.gz`! Group -- Replicate combinations should be unique or files will be overwritten.
+
  If you have a control sample for normalization please specify the respecive sample in the "samples" sheet according to the "example".
         '''
     

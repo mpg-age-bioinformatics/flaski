@@ -27,10 +27,10 @@ cache = Cache(dashapp.server, config={
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, matching, email,group,folder,md5sums,project_title,organism,ercc,\
-    adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
+    adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(rows, matching,email,group,folder,md5sums,project_title,organism,ercc,\
-        adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
+        adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
@@ -46,10 +46,10 @@ def generate_submission_file(rows, matching, email,group,folder,md5sums,project_
         mdf.reset_index(inplace=True, drop=True)
 
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC",\
-                                "Adapter sequence","Fastq quality","RiboSeq","RNASeq","study_design","Strand",\
+                                "Adapter sequence","RiboSeq","RNASeq","study_design","Strand",\
                                  "Fragment Size", "Plot Rfeet pictures"   ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc,\
-                              adapter,fastqquality, ribopair,rnapair,studydesign,strand,fragsize,rfeet]}, index=list(range(15)))
+                              adapter, ribopair,rnapair,studydesign,strand,fragsize,rfeet]}, index=list(range(14)))
         df=df.to_json()
         df_=df_.to_json()
         mdf=mdf.to_json()
@@ -57,33 +57,36 @@ def generate_submission_file(rows, matching, email,group,folder,md5sums,project_
 
         return {"filename": filename, "samples":df, "metadata":df_, "matching":mdf}
     return _generate_submission_file(rows,matching,  email,group,folder,md5sums,project_title,organism,ercc,\
-        adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
+        adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
 
 
 
 
 # base samples input dataframe and example dataframe
 input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
-example_input=pd.DataFrame( { "Sample":[ "RiboSeq_N2_1","RiboSeq_N2_2","RiboSeq_N2_3",\
-                                        "RiboSeq_meg34_1","RiboSeq_meg34_2","RiboSeq_meg34_3",\
-                                        "RNASeq_N2_1","RNASeq_N2_2","RNASeq_N2_3",\
-                                        "RNASeq_meg34_1","RNASeq_meg34_2","RNASeq_meg34_3" ] ,
-                             "Group" : ['N2_ribo','N2_ribo','N2_ribo','meg34_ribo','meg34_ribo','meg34_ribo',\
-                                        'N2_rna','N2_rna','N2_rna','meg34_rna','meg34_rna','meg34_rna'] ,
+example_input=pd.DataFrame( { "Sample":[ "R1","R2","R3",\
+                                        "R4","R5","R6",\
+                                        "T1","T2","T3",\
+                                        "T4","T5","T6" ] ,
+                             "Group" : ['WT_ribo','WT_ribo','WT_ribo','MUT_ribo','MUT_ribo','MUT_ribo',\
+                                        'WT_rna','WT_rna','WT_rna','MUT_rna','MUT_rna','MUT_rna'] ,
                              "Replicate": ['1','2','3','1','2','3','1','2','3','1','2','3'],
-                             "Read 1": [ "SRR10398489.fastq.gz","SRR10398490.fastq.gz","SRR10398491.fastq.gz","SRR10398492.fastq.gz",\
-                                        "SRR10398493.fastq.gz","SRR10398494.fastq.gz","SRR10398495.fastq.gz","SRR10398496.fastq.gz",\
-                                        "SRR10398497.fastq.gz","SRR10398498.fastq.gz","SRR10398499.fastq.gz","SRR10398500.fastq.gz"],
-                                        "Read 2": [ "","","","","","","","","","","",""],
+                             "Read 1": ["A006850135_148951_S1_L002_R1_001.fastq.gz","A006850135_148959_S5_L002_R1_001.fastq.gz","A006850135_148967_S9_L002_R1_001.fastq.gz",\
+                                        "A006850135_148953_S2_L002_R1_001.fastq.gz", "A006850135_148961_S6_L002_R1_001.fastq.gz","A006850135_148969_S10_L002_R1_001.fastq.gz",\
+                                        "A006850139_150187_S102_L003_R1_001.fastq.gz","A006850139_150196_S106_L003_R1_001.fastq.gz","A006850139_150204_S110_L003_R1_001.fastq.gz",\
+                                        "A006850139_150192_S104_L003_R1_001.fastq.gz","A006850139_150200_S108_L003_R1_001.fastq.gz","A006850139_150208_S112_L003_R1_001.fastq.gz,A006850143_150208_S61_L002_R1_001.fastq.gz"],
+                             "Read 2": ["","","","","","",\
+                                        "A006850139_150187_S102_L003_R2_001.fastq.gz","A006850139_150196_S106_L003_R2_001.fastq.gz","A006850139_150204_S110_L003_R2_001.fastq.gz",\
+                                        "A006850139_150192_S104_L003_R2_001.fastq.gz","A006850139_150200_S108_L003_R2_001.fastq.gz","A006850139_150208_S112_L003_R2_001.fastq.gz,A006850143_150208_S61_L002_R2_001.fastq.gz"],
                             } )
 
 matching_df=pd.DataFrame(columns=["SampleID","RiboSeq","RNASeq","Group"])
-example_matching=pd.DataFrame( { "SampleID":[ "N2_1","N2_2","N2_3", "meg34_1","meg34_2","meg34_3"],\
-                                 "RiboSeq" :["RiboSeq_N2_1","RiboSeq_N2_2","RiboSeq_N2_3",\
-                                             "RiboSeq_meg34_1","RiboSeq_meg34_2","RiboSeq_meg34_3"],\
-                                  "RNASeq":["RNASeq_N2_1","RNASeq_N2_2","RNASeq_N2_3",\
-                                            "RNASeq_meg34_1","RNASeq_meg34_2","RNASeq_meg34_3"],\
-                                  "Group": ["N2","N2","N2","meg34","meg34","meg34"] } )
+example_matching=pd.DataFrame( { "SampleID":[ "WT_1","WT_2","WT_3", "MUT_1","MUT_2","MUT_3"],\
+                                 "RiboSeq" :["R1","R2","R3",\
+                                             "R4","R5","R6"],\
+                                  "RNASeq":["T1","T2","T3",\
+                                            "T1","T2","T3"],\
+                                  "Group": ["WT","WT","WT","MUT","MUT","MUT"] } )
 
 # improve tables styling
 style_cell={
@@ -121,8 +124,6 @@ pair_=make_options(["single","paired"])
 study_=make_options(["ribo_rna_matched","ribo_only"])
 strand_=make_options(["fr-firststrand","fr-secondstrand","unstranded"])
 yesno_=make_options(["yes","no"])
-fastqquality_=make_options(["sanger","solexa","i1.3","i1.5","i1.8"])
-
 
 # arguments 
 arguments=[ dbc.Row( [
@@ -165,11 +166,6 @@ arguments=[ dbc.Row( [
                 dbc.Col( dcc.Input(id='adapter', placeholder="ACTGTGCCGGAA", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label('adapter sequence to be removed'),md=6  ), 
                 ], style={"margin-top":10}),
-            dbc.Row( [
-                dbc.Col( html.Label('Fastq Q.') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-fastqquality', options=fastqquality_, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Fastq Quality'),md=6  ), 
-                ], style={"margin-top":10,"margin-bottom":10}),
             dbc.Row( [
                 dbc.Col( html.Label('RiboSeq') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-ribopair', options=pair_, style={ "width":"100%"}),md=3 ),
@@ -263,7 +259,6 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
     State('adapter', 'value'),
-    State('opt-fastqquality', 'value'),
     State('opt-ribopair', 'value'),
     State('opt-rnapair', 'value'),
     State('opt-studydesign', 'value'),
@@ -272,7 +267,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-rfeet', 'value'),
     prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc,\
-    adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
+    adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
@@ -281,7 +276,7 @@ def update_output(session_id, n_clicks, rows, matching_tb, email,group,folder,md
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
     subdic=generate_submission_file(rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc,\
-        adapter,fastqquality,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
+        adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     matching=pd.read_json(subdic["matching"])
@@ -369,6 +364,8 @@ Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` 
 All files will have to be on your project folder (eg. `my_proj_folder` in `Info` > `Folder`) do not create further subfolders.
 
 Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
+
+Samples will be renamed to `Group_Replicate.fastq.gz`! Group -- Replicate combinations should be unique or files will be overwritten.
         '''
     
     sra_samples='''

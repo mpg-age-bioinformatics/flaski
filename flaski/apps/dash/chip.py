@@ -26,9 +26,9 @@ cache = Cache(dashapp.server, config={
 })
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,fastqual,macs2,mito):
+def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,fastqual,macs2,mito):
+    def _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito):
         df=pd.DataFrame()
         for row in rows_atac:
             if row['Read 1'] != "" :
@@ -44,27 +44,27 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
         dfi.reset_index(inplace=True, drop=True)
 
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC",
-                                   "seq","Adapter sequence", "Fastq quality", "Additional MACS2 parameter", "exclude mitochondria" ],\
+                                   "seq","Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria" ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc,\
-                                    seq, adapter,fastqual,macs2,mito]}, index=list(range(12)))
+                                    seq, adapter,macs2,mito]}, index=list(range(11)))
         df=df.to_json()
         dfi=dfi.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".ATAC_seq.xlsx")
 
         return {"filename": filename, "samples":df, "input":dfi , "metadata":df_}
-    return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,fastqual,macs2,mito)
+    return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito)
 
 
-samples_eg_list=["Hetero_TFAM_cGAS_1","Hetero_TFAM_IgG_1","WT_MEF_cGAS_1",\
-"WT_MEF_IgG_1","WT_TFAM_cGAS_1","WT_TFAM_IgG_1",\
-"YKO_MEF_cGAS_1","YKO_MEF_IgG_1","Hetero_TFAM_Input_1",\
-"WT_MEF_Input_1","WT_TFAM_Input_1","YKO_MEF_Input_1"]
-group_eg_list=[ "Hetero_TFAM_cGAS","Hetero_TFAM_IgG","WT_MEF_cGAS",\
-                "WT_MEF_IgG","WT_TFAM_cGAS","WT_TFAM_IgG",\
-                "YKO_MEF_cGAS","YKO_MEF_IgG","Hetero_TFAM_Input",\
-                "WT_MEF_Input","WT_TFAM_Input","YKO_MEF_Input" ]
-replicate_eg_list=["1","1","1","1","1","1","1","1","1","1","1","1"]
+samples_eg_list=["A","B","C",\
+"D","E","F",\
+"G","H","I",\
+"J","K","L"]
+group_eg_list=[ "WT_control","WT_control","MUT_control",\
+                "MUT_control","WT_treated","WT_treated",\
+                "MUT_treated","MUT_treated","WT_control_Input",\
+                "MUT_control_Input","WT_treated_Input","MUT_treated_Input" ]
+replicate_eg_list=["1","2","1","2","1","2","1","2","1","1","1","1"]
 
 
 
@@ -90,12 +90,12 @@ samples_eg_df=pd.DataFrame( { "Sample":samples_eg_list ,
                             } )
 
 input_df=pd.DataFrame(columns=["ChIP Sample", "Input Sample"])
-input_eg_df=pd.DataFrame( { "ChIP Sample" :["Hetero_TFAM_cGAS_1","Hetero_TFAM_IgG_1","WT_MEF_cGAS_1",\
-                                            "WT_MEF_IgG_1","WT_TFAM_cGAS_1",\
-                                            "WT_TFAM_IgG_1","YKO_MEF_cGAS_1","YKO_MEF_IgG_1"] ,\
-                            "Input Sample" :[ "Hetero_TFAM_Input_1","Hetero_TFAM_Input_1","WT_MEF_Input_1",\
-                                              "WT_MEF_Input_1","WT_TFAM_Input_1","WT_TFAM_Input_1",\
-                                              "YKO_MEF_Input_1","YKO_MEF_Input_1"] } )
+input_eg_df=pd.DataFrame( { "ChIP Sample" :["A","B","C",\
+                                            "D","E",\
+                                            "F","G","H"] ,\
+                            "Input Sample" :[ "I","I","J",\
+                                              "J","K","K",\
+                                              "L","L"] } )
 
 # improve tables styling
 style_cell={
@@ -129,7 +129,6 @@ organisms_=make_options(organisms)
 ercc_=make_options(["YES","NO"])
 yes_no_=make_options(["yes","no"])
 seq_=make_options(["single","paired"])
-fastqual_=make_options(["sanger","solexa","i1.3", "i1.5", "i1.8"])
 
 # arguments 
 arguments=[ dbc.Row( [
@@ -176,11 +175,6 @@ arguments=[ dbc.Row( [
                 dbc.Col( html.Label('Adapter sequence') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='adapter', placeholder="none", value="none", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label('potential adapter sequence to trim, e.g. transposase adapter'),md=6  ), 
-                ], style={"margin-top":10,"margin-bottom":10}), 
-            dbc.Row( [
-                dbc.Col( html.Label('Fastq quality') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-fastqqual', options=fastqual_, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Most sequencing comes with sanger encoded quality scores'),md=6  ), 
                 ], style={"margin-top":10,"margin-bottom":10}), 
             dbc.Row( [
                 dbc.Col( html.Label('Additional MACS2 parameter') ,md=3 , style={"textAlign":"right" }), 
@@ -256,11 +250,10 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-ercc', 'value'),
     State('opt-seq', 'value'),
     State('adapter', 'value'),
-    State('opt-fastqqual', 'value'),
     State('macs2', 'value'),
     State('opt-mito', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,fastqual,macs2,mito):
+def update_output(session_id, n_clicks, rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
@@ -268,7 +261,7 @@ def update_output(session_id, n_clicks, rows_atac, rows_input, email,group,folde
     if CURRENTAPP not in apps:
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
-    subdic=generate_submission_file(rows_atac, rows_input,  email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,fastqual,macs2,mito)
+    subdic=generate_submission_file(rows_atac, rows_input,  email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     inputdf=pd.read_json(subdic["input"])
@@ -356,6 +349,8 @@ Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` 
 All files will have to be on your project folder (eg. `my_proj_folder` in `Info` > `Folder`) do not create further subfolders.
 
 Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
+
+Samples will be renamed to `Group_Replicate.fastq.gz`! Group -- Replicate combinations should be unique or files will be overwritten.
         '''
     
     sra_samples='''
