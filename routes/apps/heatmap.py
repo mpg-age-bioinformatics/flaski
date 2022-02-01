@@ -1,3 +1,4 @@
+from urllib import response
 from plotly import optional_imports
 from myapp import app
 from flask_login import current_user
@@ -38,7 +39,7 @@ cache = Cache(dashapp.server, config={
 dashapp.layout=html.Div( 
     [ 
         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
-        dcc.Location( id='url', refresh=False ),
+        dcc.Location( id='url', refresh=True ),
         html.Div( id="protected-content" ),
     ] 
 )
@@ -179,12 +180,12 @@ def make_app_content(pathname):
 
                                             dbc.Label("Width",html_for="fig_width", style={"margin-top":"14px","width":"64px",}), #"height":"35px",
                                             dbc.Col(
-                                                dcc.Input(value=pa["fig_width"], id='fig_width', placeholder="eg. 600", type='text' , style={"height":"35px","width":"100%"} ),
+                                                dcc.Input( id='fig_width', placeholder="eg. 600", type='text' , style={"height":"35px","width":"100%"} ),
                                                 style={"margin-right":"5px","margin-top":"10px"}
                                             ),
                                             dbc.Label("Height", html_for="fig_height",style={"margin-left":"5px","margin-top":"14px","width":"64px","text-align":"right"}),
                                             dbc.Col(
-                                                dcc.Input(value=pa["fig_height"], id='fig_height', placeholder="eg. 600", type='text',style={"height":"35px","width":"100%"}) ,
+                                                dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style={"height":"35px","width":"100%"}) ,
                                                 style={"margin-right":"5px","margin-top":"10px"}
                                             ),
         
@@ -1010,10 +1011,8 @@ def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
-        #print("test_1")
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
-        #print("test_23")
         return dash.no_update, dash.no_update, dash.no_update
 
 read_input_updates=[
@@ -1064,7 +1063,7 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
     Output('xvals', 'value'),
-    Output('yvals', 'value'), #] + read_input_updates_outputs ,
+    Output('yvals', 'value'),
     Output('findrow', 'children'),]+ read_input_updates_outputs ,
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -1076,19 +1075,15 @@ def read_input_file(contents,filename,last_modified,session_id):
         raise dash.exceptions.PreventUpdate
 
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
-    #print(pa_outputs)
     try:
         if filename.split(".")[-1] == "json":
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "heatmap")
             df=pd.read_json(app_data["df"])
             cols=df.columns.tolist()
-            print(cols)
             cols_=make_options(cols)
             filename=app_data["filename"]
             xvals=app_data['pa']["xvals"]
-            print(xvals)
             yvals=app_data['pa']["yvals"]
-            print(yvals)
             available_rows=df[xvals].tolist()
             available_rows_=make_options(available_rows)
 
@@ -1123,7 +1118,6 @@ def read_input_file(contents,filename,last_modified,session_id):
 
 states=[State('xvals', 'value'),
     State('yvals', 'value'),
-    #State('available_rows', 'value'),
     State('findrow', 'value'),
     State('fig_width', 'value'),
     State('fig_height', 'value'),
@@ -1201,11 +1195,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
             if type(k) != dict :
                 pa[k]=a
 
-        ## To be removed later
-        for key in pa.keys():
-            value=pa[key]
-            print(key, ":", value)
-
         session_data={ "session_data": {"app": { "heatmap": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
@@ -1265,7 +1254,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         #             'yanchor': 'top' ,
         #             "font": {"size": 25, "color":"black"  } } )
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph")
+        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph", responsive=True)
 
         # changed
         # return fig, None, session_data, None, download_buttons_style_show

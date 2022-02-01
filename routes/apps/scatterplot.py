@@ -37,7 +37,7 @@ cache = Cache(dashapp.server, config={
 dashapp.layout=html.Div( 
     [ 
         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
-        dcc.Location( id='url', refresh=False ),
+        dcc.Location( id='url', refresh=True ),
         html.Div( id="protected-content" ),
     ] 
 )
