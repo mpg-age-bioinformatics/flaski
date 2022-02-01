@@ -47,10 +47,10 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
 # base samples input dataframe and example dataframe
 input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2", "Background Sample"] )
-example_input=pd.DataFrame( { "Sample":["AWT","cell line A treated 1","cell line A treated 2","cell line A treated 3",
-                                        "cell line B treated 1","cell line B treated 2","cell line B treated 3" ] ,
-                             "Group" : ['AWT','UVA','UVA','UVA','UVB','UVB','UVB'] ,
-                             "Replicate": ['1','1','2','3','1','2','3'],
+example_input=pd.DataFrame( { "Sample":["A","B","C","D",
+                                        "E","F","G" ] ,
+                             "Group" : ['WT','MUT','MUT','MUT','MUT','MUT','MUT'] ,
+                             "Replicate": ['1','1','2','3','4','5','6'],
                              "Read 1": [ "A006850092_131904_S2_L002_R1_001.fastq.gz",
                                         "A006850092_131904_S21_L002_R1_001.fastq.gz",
                                         "A006850092_131924_S12_L002_R1_001.fastq.gz",
@@ -65,7 +65,7 @@ example_input=pd.DataFrame( { "Sample":["AWT","cell line A treated 1","cell line
                                         "A006850092_131906_S3_L002_R2_001.fastq.gz",
                                         "A006850094_131926_S3_L001_R2_001.fastq.gz",
                                         "A006850092_131956_S28_L002_R2_001.fastq.gz"],
-                            "Background Sample":  ["", "AWT", "AWT","AWT", "","",""]
+                            "Background Sample":  ["", "A", "A","A", "A","A","A"]
                             } )
 
 # improve tables styling
