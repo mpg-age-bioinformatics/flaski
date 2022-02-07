@@ -136,7 +136,7 @@ arguments=[ dbc.Row( [
             dbc.Row( [
                 dbc.Col( html.Label('targeted Exoms') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='targeted', placeholder="mm10.exons.bed", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('If WES, then bedfile with targeted exons (ce11, dm6,mm10, hg38,saccer3, nfur1)'),md=6  ), 
+                dbc.Col( html.Label('If WES, then bedfile with targeted exons (ce11, dm6,mm10, hg38,saccer3, nfur1) or none if no bedfile is available'),md=6  ), 
                 ], style={"margin-top":10}),      
 ]
 
