@@ -24,6 +24,7 @@ other_nav_dropdowns =[
                 "Heatmap":"/heatmap/",\
                 "Violin plot":"/violinplot/",\
                 #"Venndiagram":"/venndiagram/",\
+                "Cell plot":"/cellplot/",\
             } \
     } \
 ]
