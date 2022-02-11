@@ -598,7 +598,7 @@ def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, filepre
         if len(dge_datasets) == 1 :
             dge_groups=list(set(selected_results_files["Group"]))
             if len(dge_groups) == 2:
-                dge=read_dge(dge_datasets[0], dge_groups, cache, html=False)
+                dge=read_dge(dge_datasets[0], dge_groups, cache)
                 if genenames:
                     dge=dge[dge["gene name"].isin(genenames)]                    
                 if geneids:
