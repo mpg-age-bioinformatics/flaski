@@ -86,7 +86,7 @@ patsy==0.1.0
 pexpect==4.8.0
 phantomjs==1.1.4
 pickleshare==0.7.5
-Pillow==8.3.2
+Pillow==9.0.1
 pip==19.2
 plotly==5.2.1
 prometheus-client==0.7.1
