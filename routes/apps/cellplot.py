@@ -97,7 +97,7 @@ def make_app_content(pathname):
                             # dbc.FormGroup(
                                 [
                                     dbc.Label("Terms"),
-                                    dcc.Dropdown( placeholder="termName", id='terms_column', multi=False)
+                                    dcc.Dropdown( placeholder="Term Names", id='terms_column', multi=False)
                                 ],
                             # ),
                             width=6,
@@ -107,7 +107,7 @@ def make_app_content(pathname):
                             # dbc.FormGroup(
                                 [
                                     dbc.Label("Gene Ids" ),
-                                    dcc.Dropdown( placeholder="geneIds", id='david_gene_ids', multi=False)
+                                    dcc.Dropdown( placeholder="Gene IDs", id='david_gene_ids', multi=False)
                                 ],
                             # ),
                             width=6,
@@ -124,7 +124,7 @@ def make_app_content(pathname):
                             # dbc.FormGroup(
                                 [
                                     dbc.Label("X-Axis"),
-                                    dcc.Dropdown( placeholder="ease", id='plotvalue', multi=False)
+                                    dcc.Dropdown( placeholder="PValue/ease", id='plotvalue', multi=False)
                                 ],
                             # ),
                             width=6,
@@ -148,26 +148,13 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            # dbc.FormGroup(
                                 [
                                     dbc.Label("Categories"),
                                     dcc.Dropdown( placeholder="Category", id='categories_column', multi=False)
                                 ],
-                            # ),
                             width=6,
                             style={"padding-right":"4px", "margin-top":"5px"}
                         ),
-                        # dbc.Col(
-                        #     # dbc.FormGroup(
-                        #         [
-                        #             dbc.Label("Categories to plot"),
-                        #             #dcc.Dropdown( placeholder="x values", id='categories_to_plot', multi=True)
-                        #             dcc.Dropdown( placeholder="x values", id='categories_to_plot_value', multi=False)
-                        #         ],
-                        #     # ),
-                        #     width=6,
-                        #     style={"padding-left":"4px", "margin-top":"5px"}
-                        # ),
                     ],
                     align="start",
                     justify="betweem",
@@ -177,22 +164,18 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            # dbc.FormGroup(
                                 [
                                     dbc.Label("Gene Expression"),
                                     dcc.Dropdown( placeholder="log2fc", id='annotation_column_value', multi=False)
                                 ],
-                            # ),
                             width=6,
                             style={"padding-right":"4px", "margin-top":"5px"}
                         ),
                         dbc.Col(
-                            # dbc.FormGroup(
                                 [
                                     dbc.Label("Gene Names"),
                                     dcc.Dropdown( placeholder="genes name", id='annotation2_column_value', multi=False)
                                 ],
-                            # ),
                             width=6,
                             style={"padding-left":"4px", "margin-top":"5px"}
                         ),
@@ -208,51 +191,61 @@ def make_app_content(pathname):
                 className="g-1",
                 ),
                 ############################
-                # dbc.Label("GENE EXPRESSION OUTPUT FILE"), #"height":"35px",
-                # html.Div(
-                #     dcc.Upload(
-                #         id='upload-data2',
-                #         children=html.Div(
-                #             [ 'Drag and Drop or ',html.A('Select File',id='upload-data2-text') ],
-                #             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-                #         ),
-                #         style={
-                #             'width': '100%',
-                #             'borderWidth': '1px',
-                #             'borderStyle': 'dashed',
-                #             'borderRadius': '5px',
-                #             "margin-bottom": "10px",
-                #         },
-                #         multiple=False,
-                #     ),
-                # ),
-                # dbc.Row(
-                #     [
-                #         dbc.Col(
-                #             # dbc.FormGroup(
-                #                 [
-                #                     dbc.Label("Gene Expression"),
-                #                     dcc.Dropdown( placeholder="log2fc", id='expression_values', multi=False)
-                #                 ],
-                #             # ),
-                #             width=6,
-                #             style={"padding-right":"4px", "margin-top":"5px", "margin-bottom":"10px"}
-                #         ),
-                #         dbc.Col(
-                #             # dbc.FormGroup(
-                #                 [
-                #                     dbc.Label("Gene Names"),
-                #                     dcc.Dropdown( placeholder="genes name", id='gene_name', multi=False)
-                #                 ],
-                #             # ),
-                #             width=6,
-                #             style={"padding-left":"4px", "margin-top":"5px", "margin-bottom":"10px"}
-                #         ),
-                #     ],
-                #     align="start",
-                #     justify="betweem",
-                #     className="g-0",
-                # ),
+                dbc.Label("GENE EXPRESSION OUTPUT FILE"), #"height":"35px",
+                html.Div(
+                    dcc.Upload(
+                        id='upload-data2',
+                        children=html.Div(
+                            [ 'Drag and Drop or ',html.A('Select File',id='upload-data2-text') ],
+                            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                        ),
+                        style={
+                            'width': '100%',
+                            'borderWidth': '1px',
+                            'borderStyle': 'dashed',
+                            'borderRadius': '5px',
+                            "margin-bottom": "10px",
+                        },
+                        multiple=False,
+                    ),
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            # dbc.FormGroup(
+                                [
+                                    dbc.Label("Gene Ids"),
+                                    dcc.Dropdown( placeholder="Gene IDs", id='gene_identifier', multi=False)
+                                ],
+                            # ),
+                            width=4,
+                            style={"padding-right":"4px", "margin-top":"5px", "margin-bottom":"10px"}
+                        ),
+                        dbc.Col(
+                            # dbc.FormGroup(
+                                [
+                                    dbc.Label("Gene Names"),
+                                    dcc.Dropdown( placeholder="genes name", id='gene_name', multi=False)
+                                ],
+                            # ),
+                            width=4,
+                            style={"padding-left":"2px", "padding-right":"2px", "margin-top":"5px", "margin-bottom":"10px"}
+                        ),
+                        dbc.Col(
+                            # dbc.FormGroup(
+                                [
+                                    dbc.Label("Gene Expression"),
+                                    dcc.Dropdown( placeholder="log2fc", id='expression_values', multi=False)
+                                ],
+                            # ),
+                            width=4,
+                            style={"padding-left":"4px", "margin-top":"5px", "margin-bottom":"10px"}
+                        ),
+                    ],
+                    align="start",
+                    justify="betweem",
+                    className="g-0",
+                ),
                 ############################
                 dbc.Card(
                     [
@@ -1034,6 +1027,8 @@ def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
+        from time import sleep
+        sleep(2)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update
@@ -1098,35 +1093,66 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     Output('david_gene_ids', 'options'),
     Output('plotvalue', 'options'),
     Output('categories_column', 'options'),
-    #Output('categories_to_plot_value', 'options'),
     Output('annotation_column_value', 'options'),
     Output('annotation2_column_value', 'options'),
+    Output('gene_identifier', 'options'),
+    Output('expression_values', 'options'),
+    Output('gene_name', 'options'),
     Output('upload-data','children'),
+    Output('upload-data2','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
     # Output("json-import",'data'),
-    # Output('terms_column', 'value'),
-    #Output('david_gene_ids', 'value')
+    Output('terms_column', 'value'),
+    Output('david_gene_ids', 'value'),
+    Output('plotvalue', 'value'),
+    Output('categories_column', 'value'),
+    Output('annotation_column_value', 'value'),
+    Output('annotation2_column_value', 'value'),
+    Output('gene_identifier', 'value'),
+    Output('expression_values', 'value'),
+    Output('gene_name', 'value'),
     ] + read_input_updates_outputs ,
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
+    Input('upload-data2', 'contents'),
+    State('upload-data2', 'filename'), 
     State('upload-data', 'last_modified'),
+    State('upload-data2', 'last_modified'),
     State('session-id', 'data'),
     prevent_initial_call=True)
-def read_input_file(contents,filename,last_modified,session_id):
+def read_input_file(contents,filename, contents2, filename2, last_modified, last_modified2,session_id):
     if not filename :
         raise dash.exceptions.PreventUpdate
-    print("HERE2")
+    read_json=False
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
     try:
         if filename.split(".")[-1] == "json":
+            read_json=True
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
+            #first dataframe
             df=pd.read_json(app_data["df"])
             cols=df.columns.tolist()
             cols_=make_options(cols)
+            # second dataframe
+            if app_data["df_ge"] != "none":
+                df2=pd.read_json(app_data["df_ge"])
+                cols2 = df2.columns.tolist()
+                cols2_= make_options(cols2)
+            else:
+                cols2_="None"
+            # rest of data
             filename=app_data["filename"]
-            #terms_column=app_data['pa']["terms_column"]
-            #david_gene_ids=app_data['pa']["david_gene_ids"]
+            filename2=app_data["filename2"]
+            terms_column=app_data['pa']["terms_column"]
+            david_gene_ids=app_data['pa']["david_gene_ids"]
+            plotvalue=app_data['pa']["plotvalue"]
+            categories_column=app_data['pa']["categories_column"]
+            annotation_column_value=app_data['pa']["annotation_column_value"]
+            annotation2_column_value=app_data['pa']["annotation2_column_value"]
+            gene_identifier=app_data['pa']["gene_identifier"]
+            expression_values=app_data['pa']["expression_values"]
+            gene_name=app_data['pa']["gene_name"]
 
             pa=app_data["pa"]
 
@@ -1137,16 +1163,45 @@ def read_input_file(contents,filename,last_modified,session_id):
             app_data=dash.no_update
             cols=df.columns.tolist()
             cols_=make_options(cols)
-            #cat= set(df["Category"].tolist())
-            #cat_=make_options(cat)
-            #terms_column=cols[0]
-            #david_gene_ids=cols[1]
-        print("HERE1")
+            terms_column=cols[1]
+            david_gene_ids=cols[5]
+            plotvalue=cols[4]
+            categories_column=cols[0]
+            annotation_column_value=None
+            annotation2_column_value=None
+            gene_identifier=None
+            expression_values=None
+            gene_name=None
+        
+        if not read_json:
+            if filename2:
+                df2=parse_table(contents2,filename2,last_modified2,current_user.id,cache,"cellplot")
+                app_data=dash.no_update
+                cols2=df2.columns.tolist()
+                cols2_=make_options(cols2)
+            else:
+                cols2_="None"
+
+
         upload_text=html.Div(
             [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         )
-        return [ cols_, cols_,cols_, cols_, cols_,cols_, upload_text, None, None] + pa_outputs
+        if filename2:
+            upload_text2=html.Div(
+                [ html.A(filename2, id='upload-data2-text') ],
+                 style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+            )
+        else:
+            upload_text2=html.Div(
+                ['Drag and Drop or ', html.A('Select File', id='upload-data2-text') ],
+                 style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+            )
+        
+        print(filename2)
+        print("HERE6")
+        return [ cols_, cols_,cols_, cols_, cols_,cols_, cols2_,cols2_,cols2_, upload_text, upload_text2, None, None, \
+            terms_column, david_gene_ids, plotvalue, categories_column, annotation_column_value, annotation2_column_value, gene_identifier, expression_values, gene_name ] + pa_outputs
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
@@ -1168,12 +1223,12 @@ def read_input_file(contents,filename,last_modified,session_id):
 def update_category_field(session_id,col,contents,filename,last_modified,update_category_field_import):
     try:
         if col:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"Cellplot")
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
             category=df[[col]].drop_duplicates()[col].tolist()
             category_=make_options(category)
 
             if ( filename.split(".")[-1] == "json" ) and ( not update_category_field_import ) :
-                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "Cellplot")
+                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
                 categories_to_plot_value=app_data['pa']["categories_to_plot_value"]
                 update_category_field_import=True
             else:
@@ -1185,7 +1240,7 @@ def update_category_field(session_id,col,contents,filename,last_modified,update_
                     [
                         dbc.Label("Categories to plot", width=2),
                         dbc.Col(
-                            dcc.Dropdown( options=category_, value=categories_to_plot_value,placeholder="category", id='categories_to_plot_value', multi=True),
+                            dcc.Dropdown( options=category_, value=category, id='categories_to_plot_value', multi=True),
                             width=10
                         )
                     ],
@@ -1212,7 +1267,7 @@ def update_category_field(session_id,col,contents,filename,last_modified,update_
         return category_section, None, None, update_category_field_import
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem updating the category field.","update_category_field", e, current_user,"Cellplot")
+        toast=make_except_toast("There was a problem updating the category field.","update_category_field", e, current_user,"cellplot")
         return dash.no_update, toast, tb_str, dash.no_update
 
 states=[
@@ -1224,8 +1279,9 @@ states=[
     State('categories_to_plot_value', 'value'),
     State('annotation_column_value', 'value'),
     State('annotation2_column_value', 'value'),
-    # State('expression_values', 'value'),
-    # State('gene_name', 'value'),
+    State('gene_identifier', 'value'),
+    State('expression_values', 'value'),
+    State('gene_name', 'value'),
     State('width', 'value'),
     State('height', 'value'),
     State('title', 'value'),
@@ -1282,11 +1338,15 @@ states=[
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
+    State('upload-data2', 'contents'),
+    State('upload-data2', 'filename'),
+    State('upload-data2', 'last_modified'),
     State('export-filename','value'),
-    State('upload-data-text', 'children')] + states,
+    State('upload-data-text', 'children'),
+    State('upload-data2-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,contents2,filename2,last_modified2,export_filename,upload_data_text, upload_data2_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -1303,32 +1363,32 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
 
         df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
 
+        if filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
+            if app_data["df_ge"] != "none":
+                df_ge=pd.read_json(app_data["df_ge"])
+            else:
+                df_ge="none"
+        elif filename2 :
+            df_ge=parse_table(contents2,filename2,last_modified2,current_user.id,cache,"cellplot")
+        else:
+            df_ge = "none"
+
         pa=figure_defaults()
         for k, a in zip(input_names,args) :
             if type(k) != dict :
                 pa[k]=a
 
-        # if pa["groups_value"]:
-        #     groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
-        #     pa["list_of_groups"]=groups
-        #     groups_settings_={}
-        #     for i, g in enumerate(groups):
-        #         groups_settings_[i]={"name":g}
 
-        #     for k, a in zip(input_names,args):
-        #         if type(k) == dict :
-        #             k_=k['type']
-        #             for i, a_ in enumerate(a) :
-        #                 groups_settings_[i][k_]=a_
 
-        #     groups_settings = []
-        #     for i in list(groups_settings_.keys()):
-        #         groups_settings.append(groups_settings_[i])
-
-        #     pa["groups_settings"]=groups_settings
-
-        session_data={ "session_data": {"app": { "cellplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
-        session_data["APP_VERSION"]=app.config['APP_VERSION']
+        df = df.astype(str)
+        if filename2:
+            session_data={ "session_data": {"app": { "cellplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa, 'filename2':upload_data2_text, "df_ge": df_ge.to_json()} } } }
+            session_data["APP_VERSION"]=app.config['APP_VERSION']
+        else:
+            session_data={ "session_data": {"app": { "cellplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa, 'filename2':upload_data2_text, "df_ge": df_ge} } } }
+            session_data["APP_VERSION"]=app.config['APP_VERSION']
+            
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
@@ -1374,7 +1434,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
-        df_ge = "none"
         fig=make_figure(df, df_ge, pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )

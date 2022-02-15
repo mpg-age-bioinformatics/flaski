@@ -56,6 +56,7 @@ def parse_table(contents,filename,last_modified,session_id,cache,appname):
         elif extension in ['xls', "xlsx"] :
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
+            df = df.astype(str)
         return df.to_json()
     if filename.split(".")[-1] == "json" :
         import_json=parse_import_json(contents,filename,last_modified,session_id,cache,appname)
