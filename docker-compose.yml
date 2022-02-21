@@ -21,6 +21,7 @@ services:
     - APP_NAME=myapp
     - APP_URL=https://0.0.0.0
     - FLASK_ENV=init
+    - DB_NAME=myapp
     - RESTORE_DB=1
     - RESTORE_USERS_DATA=1
     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -74,6 +75,7 @@ services:
    - SECRET_KEY=${SECRET_KEY}
    - REDIS_ADDRESS=redis:6379/0
    - REDIS_PASSWORD=${REDIS_PASSWORD}
+   - DB_NAME=myapp
    - MYSQL_USER=myapp
    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
    - MYSQL_HOST=mariadb
@@ -111,6 +113,7 @@ services:
   environment:
    - APP_NAME=myapp
    - APP_TITLE=flaski
+   - DB_NAME=myapp
    - MYSQL_USER=myapp
    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
    - MYSQL_HOST=mariadb
