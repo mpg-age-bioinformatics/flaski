@@ -147,16 +147,30 @@ def make_finder(contents, contents_df, sortby, user_path):
 
 @dashapp.callback(
     Output('protected-content', 'children'),
-    Input('session-id', 'data')) 
-def make_layout(pathname):
+    Input('session-id', 'data'),
+    State('url', 'pathname')) 
+def make_layout(sessionid, ui_path):
+    bar=make_navbar_logged("Storage",current_user)
+    if len(ui_path) > len("/storage/load/"):
+        if ui_path[:len("/storage/load/")] == "/storage/load/" :
+            bar=None
+    
     protected_content=html.Div(
         [
             html.Div(id="mkdir-refresh"),
             dcc.Download( id="download-session" ),
             dcc.Store( data=None, id='sortby' ),
             dcc.Store( data=None, id='saveas' ),
-            make_navbar_logged("Storage",current_user),
-            html.Div(id="app-content"),
+            bar,
+            dcc.Loading(
+                id="loading-output",
+                type="default",
+                children=[
+                    html.Div(id="app-content"),
+                    
+                ],
+                style={"height":"100%"}
+            ),
             navbar_A,
         ],
         style={"height":"100vh","verticalAlign":"center"}
@@ -224,6 +238,8 @@ def make_app_content(pathname,sortby):
         session_data=encode_session_file(os_path, current_user )
         load_app=session_data["app_name"]
         session["session_data"]=session_data
+        from time import sleep
+        sleep(2)
         return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update, session_data
 
     if download : 

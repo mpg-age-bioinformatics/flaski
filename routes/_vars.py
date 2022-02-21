@@ -22,6 +22,10 @@ other_nav_dropdowns =[
             {
                 "Scatter plot":"/scatterplot/",\
                 "Heatmap":"/heatmap/",\
+                "Violin plot":"/violinplot/",\
+                #"Venndiagram":"/venndiagram/",\
+                "Cell plot":"/cellplot/",\
+                "GSEA plot":"/gseaplot/",\
             } \
     } \
 ]
