@@ -9,6 +9,12 @@ import jwt
 from flaski import app
 from sqlalchemy.types import PickleType
 
+#flaski3/myapp
+class PrivateRoutes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    route = db.Column(db.String(64), index=True,unique=True)
+    users = db.Column(PickleType, index=True, unique=False)
+    users_domains = db.Column(PickleType, index=True, unique=False)
 
 class UserLogging(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +43,14 @@ class User(UserMixin, db.Model):
     notifyme=db.Column(db.Boolean, nullable=False, default=True)
     user_apps = db.Column( PickleType )
     administrator=db.Column(db.Boolean, nullable=False, default=False)
+    view_apps = db.Column( PickleType ) ## flaski3/myapp
+    domain = db.Column(db.String(120), index=True, unique=False) ## flaski3/myapp
+    administrator=db.Column(db.Boolean, nullable=False, default=False) ## flaski3/myapp
+    otp_secret = db.Column(db.String(16)) ## flaski3/myapp
+    otp_enabled = db.Column(db.Boolean, nullable=False, default=False) ## flaski3/myapp
+    otp_backup= db.Column(PickleType,default=False) ## flaski3/myapp
+
+
 
 
     def __repr__(self):
