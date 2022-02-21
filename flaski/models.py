@@ -10,11 +10,11 @@ from flaski import app
 from sqlalchemy.types import PickleType
 
 #flaski3/myapp
-class PrivateRoutes(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    route = db.Column(db.String(64), index=True,unique=True)
-    users = db.Column(PickleType, index=True, unique=False)
-    users_domains = db.Column(PickleType, index=True, unique=False)
+# class PrivateRoutes(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     route = db.Column(db.String(64), index=True,unique=True)
+#     users = db.Column(PickleType, index=True, unique=False)
+#     users_domains = db.Column(PickleType, index=True, unique=False)
 
 class UserLogging(db.Model):
     id = db.Column(db.Integer, primary_key=True)
