@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(64), index=True)
     lastname = db.Column(db.String(64), index=True)
+    username = db.Column(db.String(64), index=True,unique=True) # flaski3
     organization = db.Column(db.String(120), index=True)
     email = db.Column(db.String(120), index=True, unique=True)
     disk_quota = db.Column(db.Float, nullable=False, default=2.5e+8)
