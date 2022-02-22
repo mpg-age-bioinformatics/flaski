@@ -26,6 +26,7 @@ other_nav_dropdowns =[
                 #"Venndiagram":"/venndiagram/",\
                 "Cell plot":"/cellplot/",\
                 "GSEA plot":"/gseaplot/",\
+                "DAVID":"/david/",\
             } \
     } \
 ]
