@@ -1,4 +1,4 @@
-from myapp import app
+from myapp import app, PAGE_PREFIX
 from flask_login import current_user
 from flask_caching import Cache
 from flask import session
@@ -24,7 +24,7 @@ from werkzeug.utils import secure_filename
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
-dashapp = dash.Dash("violinplot",url_base_pathname='/violinplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash("violinplot",url_base_pathname=f'{PAGE_PREFIX}/violinplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -2795,7 +2795,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
                 return dash.no_update, toast, None, None, dash.no_update, None
             else:
                 session["session_data"]=session_data
-                return dcc.Location(pathname="/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
@@ -2808,7 +2808,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        return dcc.Location(pathname="/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
