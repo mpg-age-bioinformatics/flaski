@@ -3,7 +3,7 @@ from flask_login import current_user
 from flask_caching import Cache
 from flask import session
 import dash
-from dash import dcc, html
+from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
@@ -86,6 +86,7 @@ def make_app_content(pathname):
                             'borderStyle': 'dashed',
                             'borderRadius': '5px',
                             "margin-bottom": "10px",
+                            "display":"none"
                         },
                         multiple=False,
                     ),
@@ -684,9 +685,9 @@ def read_session_redis(session_id):
     else:
         return dash.no_update, dash.no_update, dash.no_update
 
-read_input_updates=[ ]
+# read_input_updates=[ ]
 
-read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
+# read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 
 # @dashapp.callback( 
 #     [ Output('xvals', 'options'),
@@ -810,15 +811,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
         return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
 
-    try:
-        user=pa["user"]
-        print(user)
-        
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
-
     # button_id,  submit-button-state, export-filename-download
 
     if button_id == "export-filename-download" :
@@ -860,6 +852,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
     try:
         fig=None
         david_results=run_david(pa)
+        df = david_results[0]
+        report_stats = david_results[1]
+
+        #app.layout = dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
         print("HERE3")
         # fig=make_figure(df,pa)
         # import plotly.graph_objects as go
