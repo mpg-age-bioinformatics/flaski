@@ -1,4 +1,4 @@
-from myapp import app
+from myapp import app, PAGE_PREFIX
 from flask_login import current_user
 from flask_caching import Cache
 from flask import session
@@ -26,7 +26,7 @@ import shutil
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
-dashapp = dash.Dash("storage",url_base_pathname='/storage/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash("storage",url_base_pathname=f'{PAGE_PREFIX}/storage/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -90,11 +90,12 @@ def make_finder(contents, contents_df, sortby, user_path):
     def make_icon(field, filename,ft=['dir','file'],contents=contents, icons=icons):
         info=contents[filename]
         if info["type"] in ft:
+            field_=info[field]
             ic=dcc.Link(
                 [
                     html.I(className=icons[field])
                 ],
-                href=info[field],
+                href=f'{PAGE_PREFIX}/storage/{field_}',
                 refresh=True
             )
         else:
@@ -105,11 +106,12 @@ def make_finder(contents, contents_df, sortby, user_path):
     def make_dir_links(filename,contents=contents):
         info=contents[filename]
         if info["type"] == "dir":
+            ui_path_=info['ui_path']
             dl=dcc.Link(
                 [
                     filename
                 ],
-                href=info['ui_path'], 
+                href=f'{PAGE_PREFIX}{ui_path_}', 
                 refresh=False
             )
         else:
@@ -151,8 +153,8 @@ def make_finder(contents, contents_df, sortby, user_path):
     State('url', 'pathname')) 
 def make_layout(sessionid, ui_path):
     bar=make_navbar_logged("Storage",current_user)
-    if len(ui_path) > len("/storage/load/"):
-        if ui_path[:len("/storage/load/")] == "/storage/load/" :
+    if len(ui_path) > len(f"{PAGE_PREFIX}/storage/load/"):
+        if ui_path[:len(f"{PAGE_PREFIX}/storage/load/")] == f"{PAGE_PREFIX}/storage/load/" :
             bar=None
     
     protected_content=html.Div(
@@ -197,7 +199,7 @@ def make_app_content(pathname,sortby):
     if not os.path.isdir(user_path):
         os.makedirs(user_path)
 
-    ui_path=pathname.split("/storage/", 1)[-1]
+    ui_path=pathname.split(f"{PAGE_PREFIX}/storage/", 1)[-1]
 
     saveas=False
     load=False
@@ -234,36 +236,36 @@ def make_app_content(pathname,sortby):
 
     if load : 
         if not os.path.isfile(os_path):
-            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update, session_data
+            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
         session_data=encode_session_file(os_path, current_user )
         load_app=session_data["app_name"]
         session["session_data"]=session_data
         from time import sleep
         sleep(2)
-        return dcc.Location(pathname=f"/{load_app}/", id='index'), dash.no_update, session_data
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/{load_app}/", id='index'), dash.no_update, session_data
 
     if download : 
         if not os.path.isfile( os_path ):
-            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update, session_data
+            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
         ui_path=ui_path.split( os.path.basename(os_path) )[0]
-        ui_path=f'/storage/{ui_path}'
+        ui_path=f'{PAGE_PREFIX}/storage/{ui_path}'
         return dcc.Location(pathname=ui_path, refresh=True, id='index'), dcc.send_file( os_path ), session_data
 
     if delete : 
         if not os.path.exists( os_path ):
-            return dcc.Location(pathname='/storage/', refresh=True, id='index'), dash.no_update, session_data
+            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
         if os.path.isdir(os_path):
             shutil.rmtree(os_path)
         if os.path.isfile(os_path):
             os.remove(os_path)
 
         ui_path="/".join( ui_path.split("/")[:-1] )
-        ui_path=f'/storage/{ui_path}'
+        ui_path=f'{PAGE_PREFIX}/storage/{ui_path}'
 
         return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update, session_data
 
     if not os.path.isdir( os_path ):
-        return dcc.Location(pathname="/storage/", id='index'), dash.no_update, session_data
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/", id='index'), dash.no_update, session_data
 
     ### demo dev section
     # def touch_file(filepath):
@@ -302,6 +304,8 @@ def make_app_content(pathname,sortby):
         prog_label=""
 
     def make_icon(icon, href):
+        # if PAGE_PREFIX:
+        #     href=f'{PAGE_PREFIX}/{href}'
         ic=dcc.Link(
             [
                 html.I(className=icon)
@@ -355,7 +359,7 @@ def make_app_content(pathname,sortby):
     else:
         home_active=False
 
-    home_path="/storage/"
+    home_path=f"{PAGE_PREFIX}/storage/"
     if saveas :
         home_path=f'{home_path}/{saveas}/'
 
@@ -564,7 +568,7 @@ def saveas_makedir(mkdir_n,saveas_n, dirname, filename, session_data, pathname):
             if not os.path.isdir(user_path):
                 os.makedirs(user_path)
 
-            ui_path=pathname.split("/storage/", 1)[-1]
+            ui_path=pathname.split(f"{PAGE_PREFIX}/storage/", 1)[-1]
 
             if ui_path[:len("saveas/")] == "saveas/":
                 ui_path=ui_path.split("saveas/", 1)[-1]
@@ -580,7 +584,7 @@ def saveas_makedir(mkdir_n,saveas_n, dirname, filename, session_data, pathname):
             with open(os_path, "w") as file_out:
                 json.dump(session_data, file_out)
 
-            return dash.no_update, f'/storage/{ui_path}'
+            return dash.no_update, f'{PAGE_PREFIX}/storage/{ui_path}'
 
     if  mkdir_n :
         if button_id == "mkdir-btn" :
@@ -612,7 +616,7 @@ def saveas_makedir(mkdir_n,saveas_n, dirname, filename, session_data, pathname):
             if not os.path.isdir(user_path):
                 os.makedirs(user_path)
 
-            ui_path=pathname.split("/storage/", 1)[-1]
+            ui_path=pathname.split(f"{PAGE_PREFIX}/storage/", 1)[-1]
 
             if ui_path[:len("saveas/")] == "saveas/":
                 ui_path=ui_path.split("saveas/", 1)[-1]

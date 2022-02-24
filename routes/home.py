@@ -1,4 +1,4 @@
-from myapp import app, db
+from myapp import app, db, PAGE_PREFIX
 import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, html
@@ -10,10 +10,9 @@ from ._utils import META_TAGS, check_email, password_check, navbar_A, protect_da
 from flask_login import current_user
 from ._vars import other_nav_dropdowns, _PRIVATE_ROUTES, _PUBLIC_VIEWS
 
-
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
-dashapp = dash.Dash("home",url_base_pathname='/home/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash("home",url_base_pathname=f'{PAGE_PREFIX}/home/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -59,7 +58,7 @@ def make_layout(pathname):
                 uid=current_user.id
                 if uid not in users :
                     continue
-
+            l_=links_dic[l]
             link_icon=dbc.Col(
                 [
                     dcc.Link(
@@ -67,7 +66,7 @@ def make_layout(pathname):
                             html.I(className="fas fa-3x fa-flask", ),
                             html.H4(l, style={"textAlign":"center"} ),
                         ],
-                        href=links_dic[l],
+                        href=f'{PAGE_PREFIX}{l_}',
                         refresh=True,
                         style={"color":"black","text-decoration": "none"}
                     )                        
