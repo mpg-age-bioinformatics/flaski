@@ -21,6 +21,7 @@ other_nav_dropdowns =[
         "Apps": \
             {
                 "Scatter plot":"/scatterplot/",\
+                "Line plot":"/lineplot/",\
                 "Heatmap":"/heatmap/",\
                 "Violin plot":"/violinplot/",\
                 #"Venndiagram":"/venndiagram/",\
