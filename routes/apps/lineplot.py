@@ -57,7 +57,7 @@ card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
 def make_layout(pathname):
     protected_content=html.Div(
         [
-            make_navbar_logged("Scatter plot",current_user),
+            make_navbar_logged("Line plot",current_user),
             html.Div(id="app-content"),
             navbar_A,
         ],
