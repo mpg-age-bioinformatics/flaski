@@ -244,7 +244,8 @@ def make_app_content(pathname):
                                                             {'label' : 'Rows   ' , 'value': 'row_cluster'}
                                                         ],
                                                         value=pa["show_clusters"],
-                                                        labelStyle={'display': 'inline-block',"margin-right":"25px"},#,"height":"35px"},
+                                                        inputStyle={"margin-right": "3px"},
+                                                        labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px"},
                                                         id="show_clusters"
                                                     ),
@@ -289,6 +290,7 @@ def make_app_content(pathname):
                                                                             {'label' : 'Rows' , 'value':'row_dendogram_dist'}
                                                     ],
                                                     value=pa["dendogram_dist"],
+                                                    inputStyle={"margin-right": "3px"},
                                                     labelStyle={'display': 'inline-block',"margin-right":"25px"},#,"height":"35px"},
                                                     style={"height":"35px","margin-top":"10px"},
                                                     id='dendogram_dist',
@@ -375,7 +377,7 @@ def make_app_content(pathname):
                             is_open=False,
                         ),
                     ],
-                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                    style={"margin-top":"2px","margin-bottom":"2px"}
                 ),
 
 
