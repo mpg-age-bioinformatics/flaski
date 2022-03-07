@@ -28,6 +28,8 @@ other_nav_dropdowns =[
                 "Cell plot":"/cellplot/",\
                 "GSEA plot":"/gseaplot/",\
                 "DAVID":"/david/",\
+                "Circular bar plot":"/circularbarplots/",\
+
             } \
     } \
 ]
