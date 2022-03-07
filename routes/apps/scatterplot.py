@@ -289,7 +289,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_axis"],
                                                         labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
-                                                        style={"height":"35px","margin-top":"10px"},
+                                                        style={"height":"35px","margin-top":"16px"},
                                                         id="show_axis"
                                                     ),
                                                 )
@@ -320,7 +320,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["tick_axis"],
                                                         labelStyle={'display': 'inline-block',"margin-right":"10px"},
-                                                        style={"height":"35px","margin-top":"2px"},
+                                                        style={"height":"35px","margin-top":"16px"},
                                                         id="tick_axis"
                                                     ),
                                                 )

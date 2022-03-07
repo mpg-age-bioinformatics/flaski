@@ -96,7 +96,7 @@ def make_app_content(pathname):
                     [
                         dbc.Col(
                                 [
-                                    dbc.Label("Row Names"),
+                                    dbc.Label("Row Names",style={"margin-bottom": "0px"}),
                                     dcc.Dropdown( placeholder="Row names column", id='xvals', multi=False)
                                 ],
                         ),
@@ -109,9 +109,10 @@ def make_app_content(pathname):
                     [
                         dbc.Col(
                                 [
-                                    dbc.Label("Data Columns" ),
+                                    dbc.Label("Data Columns",style={"margin-bottom": "0px"} ),
                                     dcc.Dropdown( placeholder="Sample columns", id='yvals', multi=True)
                                 ],
+                                style={"margin-top": "10px"}
                         ),
                     ],
                     align="start",
@@ -122,9 +123,10 @@ def make_app_content(pathname):
                     [
                         dbc.Col(
                                 [
-                                    dbc.Label("Rows" ),
+                                    dbc.Label("Rows" ,style={"margin-bottom": "0px"}),
                                     dcc.Dropdown(placeholder="Row values", id='findrow', multi=True  , value=pa["findrow"] )
                                 ],
+                                style={"margin-top": "10px"}
                         ),
                     ],
                     align="start",
@@ -315,7 +317,7 @@ def make_app_content(pathname):
                                             [
                                                 dbc.Col(
                                                     dbc.Label("Columns:", html_for="col_color_threshold", style={"margin-top":"5px"}),
-                                                    width=2,
+                                                    width=3,
                                                     style={"textAlign":"left","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
@@ -325,7 +327,7 @@ def make_app_content(pathname):
                                                 ),
                                                 dbc.Col(
                                                     dbc.Label("Rows:", html_for="row_color_threshold", style={"margin-top":"5px"}),
-                                                    width=2,
+                                                    width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
@@ -348,8 +350,8 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("Columns", html_for="row_dendogram_ratio", style={"margin-top":"5px"}),
-                                                    width=2,
+                                                    dbc.Label("Columns:", html_for="row_dendogram_ratio", style={"margin-top":"5px"}),
+                                                    width=3,
                                                     style={"textAlign":"left","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
@@ -357,8 +359,8 @@ def make_app_content(pathname):
                                                     width=3
                                                 ),
                                                 dbc.Col(
-                                                    dbc.Label("Rows", html_for="col_dendogram_ratio", style={"margin-top":"5px"}),
-                                                    width=2,
+                                                    dbc.Label("Rows:", html_for="col_dendogram_ratio", style={"margin-top":"5px"}),
+                                                    width=3,
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
@@ -449,7 +451,7 @@ def make_app_content(pathname):
                                             [
                                                 dbc.Col(
                                                     dbc.Label("Robustness percentil (0 - 100):", style={"margin-top":"10px"}),
-                                                    width=7,
+                                                    width=5,
                                                     style={"textAlign":"left","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
@@ -479,6 +481,7 @@ def make_app_content(pathname):
                                                             {'label' : 'Rows   ' , 'value': 'xticklabels'}
                                                         ],
                                                         value=pa["show_labels"],
+                                                        inputStyle={"margin-right": "3px"},
                                                         labelStyle={'display': 'inline-block',"margin-right":"25px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px"},
                                                         id="show_labels"
@@ -497,22 +500,22 @@ def make_app_content(pathname):
                                                 dbc.Label("Labels font size:", style={"margin-top":"5px"} , width=4),
                                                 dbc.Col(
                                                     dbc.Label("Columns:", html_for="yaxis_font_size", style={"margin-top":"5px"}),
-                                                    width=2,
-                                                    style={"textAlign":"left"},
+                                                    width=3,
+                                                    style={"text-align":"right"},
                                                 ),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["yaxis_font_size"], id='yaxis_font_size', placeholder="", type='text', style=card_input_style ) ,
-                                                    width=2,
+                                                    width=1,
                                                     style={"margin-top":"5px"},
                                                 ),
                                                 dbc.Col(
                                                     dbc.Label("Rows:", html_for="xaxis_font_size", style={"margin-top":"5px"}),
-                                                    width=2,
-                                                    style={"textAlign":"right"},
+                                                    width=3,
+                                                    style={"text-align":"right"},
                                                 ),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["xaxis_font_size"], id='xaxis_font_size', placeholder="", type='text', style=card_input_style ) ,
-                                                    width=2,
+                                                    width=1,
                                                     style={"margin-top":"5px"},
                                                 )
                                             ],
@@ -534,7 +537,7 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("CMAP :", html_for="colorscale", style={"margin-top":"5px"}),
+                                                    dbc.Label("CMAP:", html_for="colorscale", style={"margin-top":"5px"}),
                                                     width=2,
                                                     style={"textAlign":"left"},
                                                 ),
@@ -551,7 +554,7 @@ def make_app_content(pathname):
                                                 dbc.Col(
                                                     dcc.Checklist(
                                                         options=[
-                                                            {'value': 'reverse_color_scale'},], value=[], id="reverse_color_scale", style={"width":"32px","margin-top":"5px"}, 
+                                                            {'value': 'reverse_color_scale'},], value=[], id="reverse_color_scale", style={"width":"32px","margin-top":"7px"}, 
                                                     ),
                                                 ),
                                             ],
@@ -672,6 +675,7 @@ def make_app_content(pathname):
                                                 ),
                                                 dbc.Col(
                                                     dbc.Label("font size:"),
+                                                    style={"text-align":"right"},
                                                     width=2,
                                                 ),
                                                 dbc.Col(
@@ -701,6 +705,7 @@ def make_app_content(pathname):
                                                 ),
                                                 dbc.Col(
                                                     dbc.Label("padding:"),
+                                                    style={"text-align":"right"},
                                                     width=3,
                                                 ),
                                                 dbc.Col(
@@ -814,7 +819,7 @@ def make_app_content(pathname):
                             is_open=False,
                         ),
                     ],
-                    style={"margin-top":"4px","margin-bottom":"2px"} 
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
                 ),
             ],
             body=True,
