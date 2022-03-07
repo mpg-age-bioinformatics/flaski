@@ -20,6 +20,8 @@ import plotly.express as px
 # from plotly.io import write_image
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
+from myapp import db
+from myapp.models import UserLogging
 
 
 
@@ -55,6 +57,9 @@ card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    eventlog = UserLogging(email=current_user.email, action="visit scatterplot")
+    db.session.add(eventlog)
+    db.session.commit()
     protected_content=html.Div(
         [
             make_navbar_logged("Scatter plot",current_user),
@@ -1431,6 +1436,10 @@ def download_pdf(n_clicks,graph, pdf_filename):
         ## 
         fig=go.Figure(graph)
         fig.write_image(figure, format="pdf")
+
+    eventlog = UserLogging(email=current_user.email,action="download figure scatterplot")
+    db.session.add(eventlog)
+    db.session.commit()
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(
