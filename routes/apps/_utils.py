@@ -13,7 +13,7 @@ from datetime import datetime
 from flask import render_template
 
 def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
-    # @cache.memoize(timeout=3600)
+    @cache.memoize(timeout=3600)
     def _parse_import_json(contents,filename,last_modified,session_id,cache,appname):
         content_type, content_string = contents.split(',')
         decoded=base64.b64decode(content_string)
@@ -41,7 +41,7 @@ def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     return _parse_import_json(contents,filename,last_modified,session_id,cache,appname)
 
 def parse_table(contents,filename,last_modified,session_id,cache,appname):
-    # @cache.memoize(timeout=3600)
+    @cache.memoize(timeout=3600)
     def _parse_table(contents,filename,last_modified,session_id,cache):
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
