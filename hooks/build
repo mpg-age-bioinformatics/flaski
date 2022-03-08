@@ -149,16 +149,15 @@ elif [ "${1}" == "aarch64" ] ;
 
 else
     echo ":: Tag: ${DOCKER_TAG}"
-    docker build --build-arg APP_VERSION=${DOCKER_TAG} --no-cache -t ${repoName}:latest -f services/server/Dockerfile .
+    docker build --build-arg APP_VERSION=${DOCKER_TAG} --no-cache -t ${repoName}:latest .
     docker tag ${repoName}:latest ${repoName}:${DOCKER_TAG}
     docker tag ${repoName}:latest ${repoName}:stable
-    docker push ${repoName}:latest
-    echo ":: push tag: latest"
     docker push ${repoName}:stable
     echo ":: push tag: stable"
     docker push ${repoName}:${DOCKER_TAG}
     echo ":: push tag: ${DOCKER_TAG}"
-
+    docker push ${repoName}:latest
+    echo ":: push tag: latest"
 fi
 
 echo ":: Finished"
