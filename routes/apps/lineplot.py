@@ -615,73 +615,73 @@ def make_app_content(pathname):
                     style={"margin-top":"2px","margin-bottom":"2px", "padding":"0px", "margin":"0px"} 
                 ),
                 html.Div(id="marker-cards"),
-                dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            html.H2(
-                                dbc.Button( "Labels", color="black", id={'type':"dynamic-card","index":"labels"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
-                            ),
-                            style={ "height":"40px","padding":"0px"}
-                        ),
-                        dbc.Collapse(
-                            dbc.CardBody(
-                                dbc.Form(
-                                    [
-                                        ############################################
-                                        dbc.Row(
-                                            [
-                                                dbc.Label("Labels col.",html_for='labels_col_value',width=3),
-                                                dbc.Col(
-                                                    dcc.Dropdown( placeholder="select a column..", id='labels_col_value', multi=False, style=card_input_style ),
-                                                    width=9
-                                                    # dcc.Input(id='labels_col_value', placeholder=, type='text', style=card_input_style ) ,
-                                                )
-                                            ],
-                                            className="g-1",
-                                        ),
-                                        ############################################
-                                        dbc.Row(
-                                            [   
-                                                dbc.Label("font size",html_for='labels_font_size',width=3),
-                                                dbc.Col(
-                                                    dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["labels_font_size"],id='labels_font_size', placeholder="size", style=card_input_style ) ,
-                                                    width=3
-                                                ),
-                                                dbc.Label("color",html_for='labels_font_color_value',width=3, style={"textAlign":"right"}),
-                                                dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["labels_font_color"]), value=pa["labels_font_color_value"], placeholder="color", id='labels_font_color_value', multi=False,clearable=False, style=card_input_style ),
-                                                    width=3
-                                                )
-                                            ],
-                                            className="g-1",
-                                        ),
-                                        ############################################
-                                        dbc.Row(
-                                            [
-                                                dbc.Label("arrows",html_for='labels_arrows_value',width=3),
-                                                dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style ),
-                                                    width=3,
-                                                ),
-                                                dbc.Label("color",html_for='labels_colors_value',width=3,style={"textAlign":"right"}),
-                                                dbc.Col(
-                                                    dcc.Dropdown(options=make_options(pa["labels_colors"]), value=pa["labels_colors_value"], placeholder="color", id='labels_colors_value', multi=False, clearable=False,style=card_input_style ),
-                                                    width=3,
-                                                )
-                                            ],
-                                        className="g-1",
-                                        )   
-                                        ############################################                                
-                                    ]
-                                ),
-                                style=card_body_style
-                            ),
-                            id={'type':"collapse-dynamic-card","index":"labels"},
-                            is_open=False,
-                        ),
-                    ],
-                    style={"margin-top":"2px","margin-bottom":"2px"} 
-                )
+                # dbc.Card(
+                #     [
+                #         dbc.CardHeader(
+                #             html.H2(
+                #                 dbc.Button( "Labels", color="black", id={'type':"dynamic-card","index":"labels"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                #             ),
+                #             style={ "height":"40px","padding":"0px"}
+                #         ),
+                #         dbc.Collapse(
+                #             dbc.CardBody(
+                #                 dbc.Form(
+                #                     [
+                #                         ############################################
+                #                         dbc.Row(
+                #                             [
+                #                                 dbc.Label("Labels col.",html_for='labels_col_value',width=3),
+                #                                 dbc.Col(
+                #                                     dcc.Dropdown( placeholder="select a column..", id='labels_col_value', multi=False, style=card_input_style ),
+                #                                     width=9
+                #                                     # dcc.Input(id='labels_col_value', placeholder=, type='text', style=card_input_style ) ,
+                #                                 )
+                #                             ],
+                #                             className="g-1",
+                #                         ),
+                #                         ############################################
+                #                         dbc.Row(
+                #                             [   
+                #                                 dbc.Label("font size",html_for='labels_font_size',width=3),
+                #                                 dbc.Col(
+                #                                     dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["labels_font_size"],id='labels_font_size', placeholder="size", style=card_input_style ) ,
+                #                                     width=3
+                #                                 ),
+                #                                 dbc.Label("color",html_for='labels_font_color_value',width=3, style={"textAlign":"right"}),
+                #                                 dbc.Col(
+                #                                     dcc.Dropdown( options=make_options(pa["labels_font_color"]), value=pa["labels_font_color_value"], placeholder="color", id='labels_font_color_value', multi=False,clearable=False, style=card_input_style ),
+                #                                     width=3
+                #                                 )
+                #                             ],
+                #                             className="g-1",
+                #                         ),
+                #                         ############################################
+                #                         dbc.Row(
+                #                             [
+                #                                 dbc.Label("arrows",html_for='labels_arrows_value',width=3),
+                #                                 dbc.Col(
+                #                                     dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style ),
+                #                                     width=3,
+                #                                 ),
+                #                                 dbc.Label("color",html_for='labels_colors_value',width=3,style={"textAlign":"right"}),
+                #                                 dbc.Col(
+                #                                     dcc.Dropdown(options=make_options(pa["labels_colors"]), value=pa["labels_colors_value"], placeholder="color", id='labels_colors_value', multi=False, clearable=False,style=card_input_style ),
+                #                                     width=3,
+                #                                 )
+                #                             ],
+                #                         className="g-1",
+                #                         )   
+                #                         ############################################                                
+                #                     ]
+                #                 ),
+                #                 style=card_body_style
+                #             ),
+                #             id={'type':"collapse-dynamic-card","index":"labels"},
+                #             is_open=False,
+                #         ),
+                #     ],
+                #     style={"margin-top":"2px","margin-bottom":"2px"} 
+                # )
             ],
             body=True,
             style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
@@ -766,7 +766,7 @@ def make_app_content(pathname):
         [
             dcc.Store( id='session-data' ),
             # dcc.Store( id='json-import' ),
-            dcc.Store( id='update_labels_field-import'),
+            #dcc.Store( id='update_labels_field-import'),
             dcc.Store( id='generate_markers-import'),
             dbc.Row( 
                 [
@@ -808,8 +808,8 @@ def make_app_content(pathname):
                                 [
                                     html.Div( id="toast-read_input_file"  ),
                                     dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
-                                    html.Div( id="toast-update_labels_field"  ),
-                                    dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
+                                    #html.Div( id="toast-update_labels_field"  ),
+                                    #dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
                                     html.Div( id="toast-generate_markers" ),
                                     dcc.Store( id={ "type":"traceback", "index":"generate_markers" }), 
                                     html.Div( id="toast-make_fig_output" ),
@@ -921,12 +921,12 @@ read_input_updates=[
     'vline_linewidth',
     'vline_linestyle_value',
     'vline_color_value',
-    'vline_color_text',
-    'labels_col_value',
-    'labels_font_size',
-    'labels_font_color_value',
-    'labels_arrows_value',
-    'labels_colors_value'
+    'vline_color_text'
+    #'labels_col_value',
+    #'labels_font_size',
+    #'labels_font_color_value',
+    #'labels_arrows_value',
+    #'labels_colors_value'
 ]
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
@@ -935,7 +935,7 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     [ Output('xvals', 'options'),
     Output('yvals', 'options'),
     Output('groups_value', 'options'),
-    Output('labels_col_value', 'options'),
+    #Output('labels_col_value', 'options'),
     Output('upload-data','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
@@ -977,76 +977,77 @@ def read_input_file(contents,filename,last_modified,session_id):
         upload_text=html.Div(
             [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-        )     
-        return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
+        )
+
+        return [ cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"lineplot")
-        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
+        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
 
-@dashapp.callback( 
-    Output('labels-section', 'children'),
-    Output('toast-update_labels_field','children'),
-    Output({ "type":"traceback", "index":"update_labels_field" },'data'),
-    Output('update_labels_field-import', 'data'),
-    Input('session-id','data'),
-    Input('labels_col_value','value'),
-    State('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('update_labels_field-import', 'data'),
-)
-def update_labels_field(session_id,col,contents,filename,last_modified,update_labels_field_import):
-    try:
-        if col:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"lineplot")
-            labels=df[[col]].drop_duplicates()[col].tolist()
-            labels_=make_options(labels)
+# @dashapp.callback( 
+#     Output('labels-section', 'children'),
+#     Output('toast-update_labels_field','children'),
+#     Output({ "type":"traceback", "index":"update_labels_field" },'data'),
+#     Output('update_labels_field-import', 'data'),
+#     Input('session-id','data'),
+#     Input('labels_col_value','value'),
+#     State('upload-data', 'contents'),
+#     State('upload-data', 'filename'),
+#     State('upload-data', 'last_modified'),
+#     State('update_labels_field-import', 'data'),
+# )
+# def update_labels_field(session_id,col,contents,filename,last_modified,update_labels_field_import):
+#     try:
+#         if col:
+#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"lineplot")
+#             labels=df[[col]].drop_duplicates()[col].tolist()
+#             labels_=make_options(labels)
 
-            if ( filename.split(".")[-1] == "json" ) and ( not update_labels_field_import ) :
-                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "lineplot")
-                fixed_labels=app_data['pa']["fixed_labels"]
-                update_labels_field_import=True
-            else:
-                fixed_labels=[]
+#             if ( filename.split(".")[-1] == "json" ) and ( not update_labels_field_import ) :
+#                 app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "lineplot")
+#                 fixed_labels=app_data['pa']["fixed_labels"]
+#                 update_labels_field_import=True
+#             else:
+#                 fixed_labels=[]
 
 
-            labels_section=dbc.Form(
-                dbc.Row(
-                    [
-                        dbc.Label("Labels", width=2),
-                        dbc.Col(
-                            dcc.Dropdown( options=labels_, value=fixed_labels,placeholder="labels", id='fixed_labels', multi=True),
-                            width=10
-                        )
-                    ],
-                    className="g-1",
-                    style={"margin-top":"2px"}
-                )
-            )
-        else:
-            labels_section=dbc.Form(
-                dbc.Row(
-                    [
-                        dbc.Label("Labels", width=2),
-                        dbc.Col(
-                            dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
-                            width=10
-                        )
-                    ],
-                    # row=True,
-                    className="g-1",
-                    style= {'display': 'none',"margin-top":"2px"}
-                )
-            )
+#             labels_section=dbc.Form(
+#                 dbc.Row(
+#                     [
+#                         dbc.Label("Labels", width=2),
+#                         dbc.Col(
+#                             dcc.Dropdown( options=labels_, value=fixed_labels,placeholder="labels", id='fixed_labels', multi=True),
+#                             width=10
+#                         )
+#                     ],
+#                     className="g-1",
+#                     style={"margin-top":"2px"}
+#                 )
+#             )
+#         else:
+#             labels_section=dbc.Form(
+#                 dbc.Row(
+#                     [
+#                         dbc.Label("Labels", width=2),
+#                         dbc.Col(
+#                             dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
+#                             width=10
+#                         )
+#                     ],
+#                     # row=True,
+#                     className="g-1",
+#                     style= {'display': 'none',"margin-top":"2px"}
+#                 )
+#             )
 
-        return labels_section, None, None, update_labels_field_import
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"lineplot")
-        return dash.no_update, toast, tb_str, dash.no_update
+#         return labels_section, None, None, update_labels_field_import
+#     except Exception as e:
+#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+#         toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"lineplot")
+#         return dash.no_update, toast, tb_str, dash.no_update
 
 @dashapp.callback( 
     Output('marker-cards', 'children'),
@@ -1084,15 +1085,32 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                             ############################################
                                 dbc.Row(
                                     [
-                                      
-                                        dbc.Label("shape", width=2),
+                                        dbc.Label("Plot type", width=3),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["markerstyles"]), value=gpa["marker"], placeholder="marker", id={'type':"marker","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=make_options(pa["plot_types"]), value=gpa["plot"], placeholder="plot type", id={'type':"plot","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=6
                                         ),
-                                        dbc.Label("size",style={"textAlign":"right"},width=2),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Central Line:",width=4),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Style", width=2),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["marker_size"]), value=gpa["markers"], placeholder="size", id={'type':"markers","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=make_options(pa["linestyles"]), value=gpa["main_line"], placeholder="style", id={'type':"main_line","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            width=6
+                                        ),
+                                        dbc.Label("Width",style={"textAlign":"right"},width=2),
+                                        dbc.Col(
+                                            dcc.Dropdown( options=make_options(pa["line_size"]), value=gpa["main_lines"], placeholder="width", id={'type':"main_lines","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=2
                                         )
                                     ],
@@ -1102,14 +1120,14 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                 dbc.Row(
                                     [
                                       
-                                        dbc.Label("color",width=2),
+                                        dbc.Label("Color",width=2),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["marker_color"]), value=gpa["markerc"], placeholder="size", id={'type':"markerc","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=make_options(pa["line_color"]), value=gpa["main_linec"], placeholder="color", id={'type':"main_linec","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
                                         ),
                                         dbc.Col(
                                                 [
-                                                    dcc.Input(id={'type':"markerc_write","index":str(card_id)},value=gpa["markerc_write"], placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
+                                                    dcc.Input(id={'type':"main_linec_write","index":str(card_id)},value=gpa["main_linec_write"], placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
                                                 ],
                                             width=6,
                                         )
@@ -1119,10 +1137,23 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                 ############################################
                                 dbc.Row(
                                     [
-                                        dbc.Label("alpha",width=2),
+                                        dbc.Label("Outer Lines:",width=4),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                      
+                                        dbc.Label("Style", width=2),
                                         dbc.Col(
-                                            dcc.Input(id={'type':"marker_alpha","index":str(card_id)}, value=gpa["marker_alpha"],placeholder="value", type='text', style={"height":"35px","width":"100%"} ),
-                                            width=4
+                                            dcc.Dropdown( options=make_options(pa["linestyles"]), value=gpa["side_line"], placeholder="style", id={'type':"side_line","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            width=6
+                                        ),
+                                        dbc.Label("Width",style={"textAlign":"right"},width=2),
+                                        dbc.Col(
+                                            dcc.Dropdown( options=make_options(pa["line_size"]), value=gpa["side_lines"], placeholder="width", id={'type':"side_lines","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            width=2
                                         )
                                     ],
                                     className="g-1",
@@ -1130,35 +1161,17 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                 ############################################
                                 dbc.Row(
                                     [
-
-                                        dbc.Label("Line:",width=2),
-                                    ],
-                                    className="g-1",
-                                ),
-                                ############################################
-                                dbc.Row(
-                                    [
-                                        dbc.Label("",width=1),
-                                        dbc.Label("width",width=2),
+                                      
+                                        dbc.Label("Color",width=2),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=gpa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-                                            width=4
-                                        )
-                                    ],
-                                    className="g-1",
-                                ),
-                                ############################################
-                                dbc.Row(
-                                    [
-                                        dbc.Label("",width=1),
-                                        dbc.Label("color",width=2),
-                                        dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["edge_colors"]), value=gpa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=make_options(pa["line_color"]), value=gpa["side_linec"], placeholder="color", id={'type':"side_linec","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
                                         ),
                                         dbc.Col(
-                                            dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, value=gpa["edgecolor_write"], placeholder=".. or, write color name", type='text', style=card_input_style ),
-                                            width=5
+                                                [
+                                                    dcc.Input(id={'type':"side_linec_write","index":str(card_id)},value=gpa["side_linec_write"], placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
+                                                ],
+                                            width=6,
                                         )
                                     ],
                                     className="g-1",
@@ -1179,7 +1192,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
     try:
 
         if not groups:
-            cards=[ make_card("Marker",0, pa, pa ) ]
+            cards=[ make_card("Line",0, pa, pa ) ]
         else:
             cards=[]
             df=parse_table(contents,filename,last_modified,current_user.id,cache,"lineplot")
@@ -1239,20 +1252,25 @@ states=[State('xvals', 'value'),
     State('vline_linestyle_value', 'value'),
     State('vline_color_value', 'value'),
     State('vline_color_text', 'value'),
-    State('labels_col_value', 'value'),
-    State('labels_font_size', 'value'),
-    State('labels_font_color_value', 'value'),
-    State('labels_arrows_value', 'value'),
-    State('labels_colors_value', 'value'),
-    State('fixed_labels', 'value'),
-    State( { 'type': 'marker', 'index': ALL }, "value"),
-    State( { 'type': 'markers', 'index': ALL }, "value"),
-    State( { 'type': 'markerc', 'index': ALL }, "value"),
-    State( { 'type': 'markerc_write', 'index': ALL }, "value"),
-    State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
-    State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
-    State( { 'type': 'edgecolor', 'index': ALL }, "value"),
-    State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]    
+    #State('labels_col_value', 'value'),
+    #State('labels_font_size', 'value'),
+    #State('labels_font_color_value', 'value'),
+    #State('labels_arrows_value', 'value'),
+    #State('labels_colors_value', 'value'),
+    #State('fixed_labels', 'value'),
+    State( { 'type': 'plot', 'index': ALL }, "value"),
+    State( { 'type': 'main_line', 'index': ALL }, "value"),
+    State( { 'type': 'main_lines', 'index': ALL }, "value"),
+    State( { 'type': 'main_linec', 'index': ALL }, "value"),
+    State( { 'type': 'main_linec_write', 'index': ALL }, "value"),
+    State( { 'type': 'side_line', 'index': ALL }, "value"),
+    State( { 'type': 'side_lines', 'index': ALL }, "value"),
+    State( { 'type': 'side_linec', 'index': ALL }, "value"),
+    State( { 'type': 'side_linec_write', 'index': ALL }, "value") ]
+    #State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
+    #State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
+    #State( { 'type': 'edgecolor', 'index': ALL }, "value"),
+    #State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]    
 
 @dashapp.callback( 
     Output('fig-output', 'children'),
@@ -1294,6 +1312,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         for k, a in zip(input_names,args) :
             if type(k) != dict :
                 pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
         if pa["groups_value"]:
             groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
@@ -1429,8 +1451,8 @@ def download_pdf(n_clicks,graph, pdf_filename):
         fig.write_image(figure, format="pdf")
         time.sleep(2)
         ## 
-        fig=go.Figure(graph)
-        fig.write_image(figure, format="pdf")
+        #fig=go.Figure(graph)
+        #fig.write_image(figure, format="pdf")
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(

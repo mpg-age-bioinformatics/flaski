@@ -1294,6 +1294,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         for k, a in zip(input_names,args) :
             if type(k) != dict :
                 pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
         if pa["groups_value"]:
             groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
