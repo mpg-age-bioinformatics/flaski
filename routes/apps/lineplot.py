@@ -1451,8 +1451,8 @@ def download_pdf(n_clicks,graph, pdf_filename):
         fig.write_image(figure, format="pdf")
         time.sleep(2)
         ## 
-        #fig=go.Figure(graph)
-        #fig.write_image(figure, format="pdf")
+        fig=go.Figure(graph)
+        fig.write_image(figure, format="pdf")
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(

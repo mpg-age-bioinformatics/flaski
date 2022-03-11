@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=[]
 _PUBLIC_VIEWS=[]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=[ "cellplot", "circularbarplots","david","gseaplot","venndiagram","violinplot","lineplot"]
+    _DEV_ROUTES=[ "heatmap", "cellplot", "circularbarplots","david","gseaplot","venndiagram","violinplot"]
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
