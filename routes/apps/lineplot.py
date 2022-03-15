@@ -615,73 +615,7 @@ def make_app_content(pathname):
                     style={"margin-top":"2px","margin-bottom":"2px", "padding":"0px", "margin":"0px"} 
                 ),
                 html.Div(id="marker-cards"),
-                # dbc.Card(
-                #     [
-                #         dbc.CardHeader(
-                #             html.H2(
-                #                 dbc.Button( "Labels", color="black", id={'type':"dynamic-card","index":"labels"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
-                #             ),
-                #             style={ "height":"40px","padding":"0px"}
-                #         ),
-                #         dbc.Collapse(
-                #             dbc.CardBody(
-                #                 dbc.Form(
-                #                     [
-                #                         ############################################
-                #                         dbc.Row(
-                #                             [
-                #                                 dbc.Label("Labels col.",html_for='labels_col_value',width=3),
-                #                                 dbc.Col(
-                #                                     dcc.Dropdown( placeholder="select a column..", id='labels_col_value', multi=False, style=card_input_style ),
-                #                                     width=9
-                #                                     # dcc.Input(id='labels_col_value', placeholder=, type='text', style=card_input_style ) ,
-                #                                 )
-                #                             ],
-                #                             className="g-1",
-                #                         ),
-                #                         ############################################
-                #                         dbc.Row(
-                #                             [   
-                #                                 dbc.Label("font size",html_for='labels_font_size',width=3),
-                #                                 dbc.Col(
-                #                                     dcc.Dropdown(options=make_options(pa["title_size"]), value=pa["labels_font_size"],id='labels_font_size', placeholder="size", style=card_input_style ) ,
-                #                                     width=3
-                #                                 ),
-                #                                 dbc.Label("color",html_for='labels_font_color_value',width=3, style={"textAlign":"right"}),
-                #                                 dbc.Col(
-                #                                     dcc.Dropdown( options=make_options(pa["labels_font_color"]), value=pa["labels_font_color_value"], placeholder="color", id='labels_font_color_value', multi=False,clearable=False, style=card_input_style ),
-                #                                     width=3
-                #                                 )
-                #                             ],
-                #                             className="g-1",
-                #                         ),
-                #                         ############################################
-                #                         dbc.Row(
-                #                             [
-                #                                 dbc.Label("arrows",html_for='labels_arrows_value',width=3),
-                #                                 dbc.Col(
-                #                                     dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='labels_arrows_value', multi=False, style=card_input_style ),
-                #                                     width=3,
-                #                                 ),
-                #                                 dbc.Label("color",html_for='labels_colors_value',width=3,style={"textAlign":"right"}),
-                #                                 dbc.Col(
-                #                                     dcc.Dropdown(options=make_options(pa["labels_colors"]), value=pa["labels_colors_value"], placeholder="color", id='labels_colors_value', multi=False, clearable=False,style=card_input_style ),
-                #                                     width=3,
-                #                                 )
-                #                             ],
-                #                         className="g-1",
-                #                         )   
-                #                         ############################################                                
-                #                     ]
-                #                 ),
-                #                 style=card_body_style
-                #             ),
-                #             id={'type':"collapse-dynamic-card","index":"labels"},
-                #             is_open=False,
-                #         ),
-                #     ],
-                #     style={"margin-top":"2px","margin-bottom":"2px"} 
-                # )
+        
             ],
             body=True,
             style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
@@ -922,11 +856,6 @@ read_input_updates=[
     'vline_linestyle_value',
     'vline_color_value',
     'vline_color_text'
-    #'labels_col_value',
-    #'labels_font_size',
-    #'labels_font_color_value',
-    #'labels_arrows_value',
-    #'labels_colors_value'
 ]
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
@@ -986,68 +915,6 @@ def read_input_file(contents,filename,last_modified,session_id):
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"lineplot")
         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
-
-# @dashapp.callback( 
-#     Output('labels-section', 'children'),
-#     Output('toast-update_labels_field','children'),
-#     Output({ "type":"traceback", "index":"update_labels_field" },'data'),
-#     Output('update_labels_field-import', 'data'),
-#     Input('session-id','data'),
-#     Input('labels_col_value','value'),
-#     State('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('update_labels_field-import', 'data'),
-# )
-# def update_labels_field(session_id,col,contents,filename,last_modified,update_labels_field_import):
-#     try:
-#         if col:
-#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"lineplot")
-#             labels=df[[col]].drop_duplicates()[col].tolist()
-#             labels_=make_options(labels)
-
-#             if ( filename.split(".")[-1] == "json" ) and ( not update_labels_field_import ) :
-#                 app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "lineplot")
-#                 fixed_labels=app_data['pa']["fixed_labels"]
-#                 update_labels_field_import=True
-#             else:
-#                 fixed_labels=[]
-
-
-#             labels_section=dbc.Form(
-#                 dbc.Row(
-#                     [
-#                         dbc.Label("Labels", width=2),
-#                         dbc.Col(
-#                             dcc.Dropdown( options=labels_, value=fixed_labels,placeholder="labels", id='fixed_labels', multi=True),
-#                             width=10
-#                         )
-#                     ],
-#                     className="g-1",
-#                     style={"margin-top":"2px"}
-#                 )
-#             )
-#         else:
-#             labels_section=dbc.Form(
-#                 dbc.Row(
-#                     [
-#                         dbc.Label("Labels", width=2),
-#                         dbc.Col(
-#                             dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
-#                             width=10
-#                         )
-#                     ],
-#                     # row=True,
-#                     className="g-1",
-#                     style= {'display': 'none',"margin-top":"2px"}
-#                 )
-#             )
-
-#         return labels_section, None, None, update_labels_field_import
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"lineplot")
-#         return dash.no_update, toast, tb_str, dash.no_update
 
 @dashapp.callback( 
     Output('marker-cards', 'children'),
@@ -1133,6 +1000,20 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                         )
                                     ],
                                     className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Fill color:",width=2),
+                                        dbc.Col(
+                                                [
+                                                    dcc.Input(id={'type':"fill_color","index":str(card_id)},value=gpa["fill_color"], placeholder="E.g. rgba(0,100,80,0.2)", type='text', style={"height":"35px","width":"100%"} ),
+                                                ],
+                                            width=6,
+                                        )
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top": "5px"},
                                 ),
                                 ############################################
                                 dbc.Row(
@@ -1266,11 +1147,8 @@ states=[State('xvals', 'value'),
     State( { 'type': 'side_line', 'index': ALL }, "value"),
     State( { 'type': 'side_lines', 'index': ALL }, "value"),
     State( { 'type': 'side_linec', 'index': ALL }, "value"),
-    State( { 'type': 'side_linec_write', 'index': ALL }, "value") ]
-    #State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
-    #State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
-    #State( { 'type': 'edgecolor', 'index': ALL }, "value"),
-    #State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]    
+    State( { 'type': 'side_linec_write', 'index': ALL }, "value"),
+    State( { 'type': 'fill_color', 'index': ALL }, "value") ]
 
 @dashapp.callback( 
     Output('fig-output', 'children'),
