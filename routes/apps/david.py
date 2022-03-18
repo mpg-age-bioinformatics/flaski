@@ -3,12 +3,12 @@ from flask_login import current_user
 from flask_caching import Cache
 from flask import session
 import dash
-from dash import dcc, html, dash_table
+from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table
 from pyflaski.david import run_david, figure_defaults
 import os
 import uuid
@@ -91,43 +91,6 @@ def make_app_content(pathname):
                         multiple=False,
                     ),
                 ),
-                # dbc.Row(
-                #     [
-                #         dbc.Col(
-                #             # dbc.FormGroup(
-                #                 [
-                #                     dbc.Label("x values"),
-                #                     dcc.Dropdown( placeholder="x values", id='xvals', multi=False)
-                #                 ],
-                #             # ),
-                #             width=4,
-                #             style={"padding-right":"4px"}
-                #         ),
-                #         dbc.Col(
-                #             # dbc.FormGroup(
-                #                 [
-                #                     dbc.Label("y values" ),
-                #                     dcc.Dropdown( placeholder="y values", id='yvals', multi=False)
-                #                 ],
-                #             # ),
-                #             width=4,
-                #             style={"padding-left":"2px","padding-right":"2px"}
-                #         ),
-                #         dbc.Col(
-                #             # dbc.FormGroup(
-                #                 [
-                #                     dbc.Label("Groups"),
-                #                     dcc.Dropdown( placeholder="groups", id='groups_value', multi=False)
-                #                 ],
-                #             # ),
-                #             width=4,
-                #             style={"padding-left":"4px"}
-                #         ),
-                #     ],
-                #     align="start",
-                #     justify="betweem",
-                #     className="g-0",
-                # ),
                 ############################
                 dbc.Row(
                         dbc.Label("Target Genes"), #"height":"35px",
@@ -553,6 +516,25 @@ def make_app_content(pathname):
                     style={"padding-left":"2px"}
 
                 ),
+                # dbc.Col(
+                #     [
+                #         dbc.Button(
+                #             html.Span(
+                #                 [ 
+                #                     html.I(className="far fa-chart-bar"), #, style={"size":"12px"}
+                #                     " Cellplot" 
+                #                 ]
+                #             ),
+                #             id='cellplot-session-btn', 
+                #             color="secondary",
+                #             style={"width":"100%"}
+                #         ),
+                #         dcc.Download(id="cellplot-session")
+                #     ],
+                #     id="cellplot-session-div",
+                #     width=4,
+                #     style={"padding-left":"2px", "padding-right":"2px"}
+                # ),
             ],
             style={ "min-width":"372px","width":"100%"},
             className="g-0",    
@@ -594,7 +576,7 @@ def make_app_content(pathname):
                                                 html.Span(
                                                     [ 
                                                         html.I(className="fas fas fa-file-pdf"),
-                                                        " PDF" 
+                                                        " Results" 
                                                     ]
                                                 ),
                                                 id='download-pdf-btn', 
@@ -631,7 +613,7 @@ def make_app_content(pathname):
                             dbc.ModalHeader("File name"), # dbc.ModalTitle(
                             dbc.ModalBody(
                                 [
-                                    dcc.Input(id='pdf-filename', value="david.pdf", type='text', style={"width":"100%"})
+                                    dcc.Input(id='pdf-filename', value="david.xlsx", type='text', style={"width":"100%"})
                                 ]
                             ),
                             dbc.ModalFooter(
@@ -684,64 +666,6 @@ def read_session_redis(session_id):
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update
-
-# read_input_updates=[ ]
-
-# read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
-
-# @dashapp.callback( 
-#     [ Output('xvals', 'options'),
-#     Output('yvals', 'options'),
-#     Output('groups_value', 'options'),
-#     Output('labels_col_value', 'options'),
-#     Output('upload-data','children'),
-#     Output('toast-read_input_file','children'),
-#     Output({ "type":"traceback", "index":"read_input_file" },'data'),
-#     # Output("json-import",'data'),
-#     Output('xvals', 'value'),
-#     Output('yvals', 'value')] + read_input_updates_outputs ,
-#     Input('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('session-id', 'data'),
-#     prevent_initial_call=True)
-# def read_input_file(contents,filename,last_modified,session_id):
-#     if not filename :
-#         raise dash.exceptions.PreventUpdate
-
-#     pa_outputs=[ dash.no_update for k in  read_input_updates ]
-#     try:
-#         if filename.split(".")[-1] == "json":
-#             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "david")
-#             df=pd.read_json(app_data["df"])
-#             cols=df.columns.tolist()
-#             cols_=make_options(cols)
-#             filename=app_data["filename"]
-#             xvals=app_data['pa']["xvals"]
-#             yvals=app_data['pa']["yvals"]
-
-#             pa=app_data["pa"]
-
-#             pa_outputs=[pa[k] for k in  read_input_updates ]
-
-#         else:
-#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"david")
-#             app_data=dash.no_update
-#             cols=df.columns.tolist()
-#             cols_=make_options(cols)
-#             xvals=cols[0]
-#             yvals=cols[1]
-
-#         upload_text=html.Div(
-#             [ html.A(filename, id='upload-data-text') ],
-#             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-#         )     
-#         return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
-
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"david")
-#         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
 
 states=[
@@ -853,9 +777,9 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         fig=None
         david_results=run_david(pa)
         df = david_results[0]
+        print(df.head)
         report_stats = david_results[1]
-
-        #app.layout = dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
+        fig=make_table(df, "david_results")
         print("HERE3")
         # fig=make_figure(df,pa)
         # import plotly.graph_objects as go
@@ -881,6 +805,14 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"david")
         return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
+
+
+    # for export to cellplot I first need to generate the david data and then send the session_data to cellplot
+    # if button_id == "cellplot-session-btn" :
+    #     session["session_data"]=session_data
+    #     return dcc.Location(pathname=f"{PAGE_PREFIX}/cellplot/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+    #       # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
 
 @dashapp.callback(
     Output('export-filename-modal', 'is_open'),

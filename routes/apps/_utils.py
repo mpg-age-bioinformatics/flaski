@@ -11,6 +11,7 @@ from myapp.email import send_email
 from myapp import app
 from datetime import datetime
 from flask import render_template
+import dash_table
 
 def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     # @cache.memoize(timeout=3600)
@@ -227,3 +228,47 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
         html_body=render_template('email/app_help.html',
                                     user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file),\
         reply_to=user.email )      
+
+def make_min_width(x, factor=7):
+    name_length = len(x)
+    pixel = 50 + round(name_length*7)
+    pixel = str(pixel) + "px"
+
+
+def make_table(df,id,page_size=50,fixed_columns=False):
+
+    def create_conditional_style(df):
+        style=[]
+        for col in df.columns:
+            pixel=make_min_width(col, factor=7)
+            # name_length = len(col)
+            # pixel = 50 + round(name_length*7)
+            # pixel = str(pixel) + "px"
+            style.append({'if': {'column_id': col}, 'minWidth': pixel})
+
+        return style
+    # width_style=create_conditional_style(df)
+    width_style=[]
+    # print(width_style)
+    
+    report_table=dash_table.DataTable(
+        id=id,
+        columns=[{"name": i, "id": i} for i in df.columns],
+        data=df.to_dict('records'),
+        fixed_rows={ 'headers': True, 'data': 0 },
+        fixed_columns=fixed_columns, 
+        style_cell={
+            'whiteSpace': 'normal'
+        },
+        virtualization=True,
+        style_table={"height": "100%", 'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
+        style_header={'backgroundColor': '#5474d8','color': 'white','fontWeight': 'bold'},
+        style_data_conditional=[
+        { 'if': {'row_index': 'odd'}, 'backgroundColor': 'rgb(242,242,242)'}
+        ]+width_style,
+        page_size=page_size
+        # page_action='none'
+        )
+
+    return report_table
+
