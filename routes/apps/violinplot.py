@@ -419,61 +419,27 @@ def make_app_content(pathname):
                                         className="g-1",
                                         justify="start"
                                     ),
-                                    ############################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Label("Axis:"),
-                                                style={"textAlign":"left"},#,"padding-right":"2px"},
-                                                width=2
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("left",html_for="left_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'left_axis'} ], value=pa["left_axis"], id='left_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("right",html_for="right_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'right_axis'} ], value=pa["right_axis"], id='right_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("upper",html_for="upper_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'upper_axis'} ], value=pa["upper_axis"], id='upper_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("lower",html_for="lower_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'lower_axis'} ], value=pa["lower_axis"], id='lower_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                        ],
-                                        className="g-1",
-                                    ),
+                                        ############################################
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Axis:",html_for="show_axis", width=2),
+                                                dbc.Col(
+                                                    dcc.Checklist(
+                                                        options=[
+                                                            {'label': ' left   ', 'value': 'left_axis'},
+                                                            {'label': ' right   ', 'value': 'right_axis'},
+                                                            {'label': ' upper   ', 'value': 'upper_axis'},
+                                                            {'label': ' lower   ', 'value': 'lower_axis'}
+                                                        ],
+                                                        value=pa["show_axis"],
+                                                        labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
+                                                        style={"height":"35px","margin-top":"16px"},
+                                                        id="show_axis"
+                                                    ),
+                                                )
+                                            ],
+                                            className="g-1",
+                                        ),
                                     ############################
                                     dbc.Row(
                                         [
@@ -549,61 +515,25 @@ def make_app_content(pathname):
                                     dbc.Row(
                                             dbc.Label("Ticks"), #"height":"35px",
                                     ),
-                                    ############################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Label("Location:"),
-                                                style={"textAlign":"left","padding-right":"2px"},
-                                                width=3
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("left",html_for="tick_left_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'tick_left_axis'} ], value=pa["tick_left_axis"], id='tick_left_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("right",html_for="tick_right_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'tick_right_axis'} ], value=pa["tick_right_axis"], id='tick_right_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("upper",html_for="tick_upper_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'tick_upper_axis'} ], value=pa["tick_upper_axis"], id='tick_upper_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("lower",html_for="tick_lower_axis"),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
-                                            ),
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'value':'tick_lower_axis'} ], value=pa["tick_lower_axis"], id='tick_lower_axis', style={"height":"35px"} ),
-                                                width=1
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                        ],
-                                        className="g-1",
-                                    ),
+                                    ############################################
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Location:",html_for="tick_axis",width=3),
+                                                dbc.Col(
+                                                    dcc.Checklist(
+                                                        options=[
+                                                            {'label': ' X   ', 'value': 'tick_lower_axis'},
+                                                            {'label': ' Y   ', 'value': 'tick_left_axis'},
+                                                        ],
+                                                        value=pa["tick_axis"],
+                                                        labelStyle={'display': 'inline-block',"margin-right":"10px"},
+                                                        style={"height":"35px","margin-top":"16px"},
+                                                        id="tick_axis"
+                                                    ),
+                                                )
+                                            ],
+                                            className="g-1",
+                                        ),
                                     ############################
                                     dbc.Row(
                                         [
@@ -1548,19 +1478,13 @@ read_input_updates=[
     'marker_line_outlierwidth',
     'xlabel',
     'ylabel',
-    'left_axis',
-    'right_axis',
-    'upper_axis',
-    'lower_axis',
     'axis_line_color',
     'axis_line_width',
     'label_fontfamily',
     'label_fontcolor',
     'label_fontsize',
-    'tick_left_axis',
-    'tick_right_axis',
-    'tick_upper_axis',
-    'tick_lower_axis',
+    'show_axis',
+    'tick_axis',
     'ticks_line_width',
     'ticks_length',
     'ticks_direction_value',
@@ -2718,19 +2642,13 @@ states=[State('x_val', 'value'),
     State('marker_line_outlierwidth', 'value'),
     State('xlabel', 'value'),
     State('ylabel', 'value'),
-    State('left_axis', 'value'),
-    State('right_axis', 'value'),
-    State('upper_axis', 'value'),
-    State('lower_axis', 'value'),
     State('axis_line_color', 'value'),
     State('axis_line_width', 'value'),
     State('label_fontfamily', 'value'),
     State('label_fontcolor', 'value'),
     State('label_fontsize', 'value'),
-    State('tick_left_axis', 'value'),
-    State('tick_right_axis', 'value'),
-    State('tick_upper_axis', 'value'),
-    State('tick_lower_axis', 'value'),
+    State('show_axis', 'value'),
+    State('tick_axis', 'value'),
     State('ticks_line_width', 'value'),
     State('ticks_length', 'value'),
     State('ticks_direction_value', 'value'),
