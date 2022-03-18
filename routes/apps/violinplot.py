@@ -2620,9 +2620,7 @@ def generate_styles(session_id,styles,contents,filename,last_modified,generate_s
         cards=[]
         selected_styles=styles.split(" and ")
         styles_=["Violinplot", "Boxplot", "Swarmplot"]
-        # print(selected_styles)
         for g in styles_:
-            if g in selected_styles:
                 card=make_card(g, pa, selected_styles)
                 cards.append(card)
         return cards, None, None, generate_styles_import
