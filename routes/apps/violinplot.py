@@ -373,7 +373,7 @@ def make_app_content(pathname):
                                             )
                                         ],
                                         className="g-1"
-                                    ),                                
+                                    ),
                                     ############################
                                 ######### END OF CARD #########
                                 ]
@@ -1199,6 +1199,73 @@ def make_app_content(pathname):
                     ],
                     style={"margin-top":"2px","margin-bottom":"2px"} 
                 ),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Labels", color="black", id={'type':"dynamic-card","index":"labels"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody(
+                                [
+                                        ############################################
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Labels col.",html_for='vp_label',width=3),
+                                                dbc.Col(
+                                                    dcc.Dropdown( placeholder="select a column..", id='vp_label', multi=False, style=card_input_style ),
+                                                    width=9
+                                                    # dcc.Input(id='labels_col_value', placeholder=, type='text', style=card_input_style ) ,
+                                                )
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        html.Div(id="labels-section"),
+                                        ############################################
+                                        dbc.Row(
+                                            [   
+                                                dbc.Label("font size",html_for='fixed_labels_font_size',width=3),
+                                                dbc.Col(
+                                                    dcc.Dropdown(options=make_options(pa["fontsizes"]), value=pa["fixed_labels_font_size"],id='fixed_labels_font_size', placeholder="size", style=card_input_style ) ,
+                                                    width=3
+                                                ),
+                                                dbc.Label("color",html_for='fixed_labels_font_color_value',width=3, style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["colors"]), value=pa["fixed_labels_font_color_value"], placeholder="color", id='fixed_labels_font_color_value', multi=False,clearable=False, style=card_input_style ),
+                                                    width=3
+                                                )
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        ############################################
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("arrows",html_for='fixed_labels_arrows_value',width=3),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["labels_arrows"]),value=None, placeholder="type", id='fixed_labels_arrows_value', multi=False, style=card_input_style ),
+                                                    width=3,
+                                                ),
+                                                dbc.Label("color",html_for='fixed_labels_colors_value',width=3,style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown(options=make_options(pa["colors"]), value=pa["fixed_labels_colors_value"], placeholder="color", id='fixed_labels_colors_value', multi=False, clearable=False,style=card_input_style ),
+                                                    width=3,
+                                                )
+                                            ],
+                                        className="g-1",
+                                        )   
+                                        ############################################                                
+                                ######### END OF CARD #########
+                                ]
+                                ,style=card_body_style
+                            ),
+                            id={'type':"collapse-dynamic-card","index":"labels"},
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                ),
             ],
             body=True,
             style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
@@ -1325,6 +1392,8 @@ def make_app_content(pathname):
                                 [
                                     html.Div( id="toast-read_input_file"  ),
                                     dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
+                                    html.Div( id="toast-update_labels_field"  ),
+                                    dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
                                     html.Div( id="toast-generate_styles" ),
                                     dcc.Store( id={ "type":"traceback", "index":"generate_styles" }), 
                                     html.Div( id="toast-make_fig_output" ),
@@ -1401,6 +1470,7 @@ def read_session_redis(session_id):
 
 read_input_updates=[
     'hue',
+    'vp_label',
     'fig_width',
     'fig_height',
     'style',
@@ -1483,6 +1553,10 @@ read_input_updates=[
     'label_fontfamily',
     'label_fontcolor',
     'label_fontsize',
+    'fixed_labels_font_size',
+    'fixed_labels_font_color_value',
+    'fixed_labels_arrows_value',
+    'fixed_labels_colors_value',
     'show_axis',
     'tick_axis',
     'ticks_line_width',
@@ -1534,6 +1608,7 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     [Output('x_val', 'options'),
     Output('y_val', 'options'),
     Output('hue', 'options'),
+    Output('vp_label', 'options'),
     Output('upload-data','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
@@ -1576,12 +1651,76 @@ def read_input_file(contents,filename,last_modified,session_id):
             [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         )     
-        return [ cols_, cols_, cols_, upload_text, None, None,  x_val, y_val] + pa_outputs
+        return [ cols_, cols_, cols_, cols_, upload_text, None, None,  x_val, y_val] + pa_outputs
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"violinplot")
         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
+
+
+@dashapp.callback( 
+    Output('labels-section', 'children'),
+    Output('toast-update_labels_field','children'),
+    Output({ "type":"traceback", "index":"update_labels_field" },'data'),
+    Output('update_labels_field-import', 'data'),
+    Input('session-id','data'),
+    Input('vp_label','value'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('update_labels_field-import', 'data'),
+)
+def update_labels_field(session_id,col,contents,filename,last_modified,update_labels_field_import):
+    try:
+        if col:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"violinplot")
+            labels=df[[col]].drop_duplicates()[col].tolist()
+            labels_=make_options(labels)
+
+            if ( filename.split(".")[-1] == "json" ) and ( not update_labels_field_import ) :
+                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "violinplot")
+                fixed_labels=app_data['pa']["fixed_labels"]
+                update_labels_field_import=True
+            else:
+                fixed_labels=[]
+
+
+            labels_section=dbc.Form(
+                dbc.Row(
+                    [
+                        dbc.Label("Labels", width=3),
+                        dbc.Col(
+                            dcc.Dropdown( options=labels_, value=fixed_labels,placeholder="labels", id='fixed_labels', multi=True),
+                            width=9
+                        )
+                    ],
+                    className="g-1",
+                    style={"margin-top":"2px"}
+                )
+            )
+        else:
+            labels_section=dbc.Form(
+                dbc.Row(
+                    [
+                        dbc.Label("Labels", width=3),
+                        dbc.Col(
+                            dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
+                            width=9
+                        )
+                    ],
+                    # row=True,
+                    className="g-1",
+                    style= {'display': 'none',"margin-top":"2px"}
+                )
+            )
+
+        return labels_section, None, None, update_labels_field_import
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"violinplot")
+        return dash.no_update, toast, tb_str, dash.no_update
+
 
 @dashapp.callback( 
     Output('style-cards', 'children'),
@@ -2558,6 +2697,7 @@ def generate_styles(session_id,styles,contents,filename,last_modified,generate_s
 states=[State('x_val', 'value'),
     State('y_val', 'value'),
     State('hue', 'value'),
+    State('vp_label', 'value'),
     State('fig_width', 'value'),
     State('fig_height', 'value'),
     State('style', 'value'),
@@ -2690,6 +2830,11 @@ states=[State('x_val', 'value'),
     State('legend_borderwidth', 'value'),
     State('legend_traceorder', 'value'),
     State('legend_bordercolor', 'value'),
+    State('fixed_labels', 'value'),
+    State('fixed_labels_font_size', 'value'),
+    State('fixed_labels_font_color_value', 'value'),
+    State('fixed_labels_arrows_value', 'value'),
+    State('fixed_labels_colors_value', 'value'),
     ]    
 
 @dashapp.callback( 
