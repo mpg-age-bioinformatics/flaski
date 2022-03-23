@@ -11,7 +11,7 @@ from myapp.email import send_email
 from myapp import app
 from datetime import datetime
 from flask import render_template
-import dash_table
+from dash import dash_table
 
 def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     # @cache.memoize(timeout=3600)
