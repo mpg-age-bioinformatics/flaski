@@ -34,6 +34,21 @@ cache = Cache(dashapp.server, config={
     'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),
 })
 
+
+
+def run_david_and_cache(pa,cache):
+    @cache.memoize(timeout=3600)
+    def _run_david_and_cache(pa,cache):
+        print("Running  fresh")
+        import sys ; sys.stdout.flush()
+        df, report_stats, empty =run_david(pa)
+        df=df.astype(str)
+        report_stats=report_stats.astype(str)
+        david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
+        return david_results
+    return _run_david_and_cache(pa,cache)
+
+
 dashapp.layout=html.Div( 
     [ 
         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
@@ -698,6 +713,7 @@ states=[
     Input("export-filename-download","n_clicks"),
     Input("save-session-btn","n_clicks"),
     Input("saveas-session-btn","n_clicks"),
+    Input("send-to-excel","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -706,7 +722,7 @@ states=[
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,send_to_excel,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -773,12 +789,26 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
+    if button_id == "send-to-excel":
+        david_results=run_david_and_cache(pa, cache)
+        david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
+        df = pd.read_json(david_results["df"]) 
+        report_stats = pd.read_json(david_results["stats"])
+
+        ## keep on here
+
+
     try:
         fig=None
-        david_results=run_david(pa)
-        df = david_results[0]
+
+        # david_results=run_david(pa)
+        david_results=run_david_and_cache(pa, cache)
+
+        david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
+
+        df = pd.read_json(david_results["df"]) 
         print(df.head)
-        report_stats = david_results[1]
+        # report_stats = pd.read_json(david_results["stats"])
         fig=make_table(df, "david_results")
         print("HERE3")
         # fig=make_figure(df,pa)
