@@ -42,6 +42,7 @@ def run_david_and_cache(pa,cache):
         print("Running  fresh")
         import sys ; sys.stdout.flush()
         df, report_stats, empty =run_david(pa)
+
         df=df.astype(str)
         report_stats=report_stats.astype(str)
         david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
@@ -531,25 +532,6 @@ def make_app_content(pathname):
                     style={"padding-left":"2px"}
 
                 ),
-                # dbc.Col(
-                #     [
-                #         dbc.Button(
-                #             html.Span(
-                #                 [ 
-                #                     html.I(className="far fa-chart-bar"), #, style={"size":"12px"}
-                #                     " Cellplot" 
-                #                 ]
-                #             ),
-                #             id='cellplot-session-btn', 
-                #             color="secondary",
-                #             style={"width":"100%"}
-                #         ),
-                #         dcc.Download(id="cellplot-session")
-                #     ],
-                #     id="cellplot-session-div",
-                #     width=4,
-                #     style={"padding-left":"2px", "padding-right":"2px"}
-                # ),
             ],
             style={ "min-width":"372px","width":"100%"},
             className="g-0",    
@@ -590,19 +572,37 @@ def make_app_content(pathname):
                                             dbc.Button(
                                                 html.Span(
                                                     [ 
-                                                        html.I(className="fas fas fa-file-pdf"),
+                                                        html.I(className="far fa-lg fa-save"),
                                                         " Results" 
                                                     ]
                                                 ),
-                                                id='download-pdf-btn', 
+                                                id='save-excel-btn', 
                                                 style={"max-width":"150px","width":"100%"},
                                                 color="secondary"
                                             ),
-                                            dcc.Download(id="download-pdf")
+                                            dcc.Download(id='save-excel')
                                         ],
-                                        id="download-pdf-div",
-                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'none'} # 'none' / 'inline-block'
-                                    )
+                                        id="save-excel-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),                                    
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="far fa-chart-bar"),
+                                                        " Cellplot" 
+                                                    ]
+                                                ),
+                                                id='cellplot-session-btn', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='cellplot-session')
+                                        ],
+                                        id="cellplot-session-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),                                    
                                 ],
                                 style={"height":"100%"}
                             ),
@@ -628,16 +628,16 @@ def make_app_content(pathname):
                             dbc.ModalHeader("File name"), # dbc.ModalTitle(
                             dbc.ModalBody(
                                 [
-                                    dcc.Input(id='pdf-filename', value="david.xlsx", type='text', style={"width":"100%"})
+                                    dcc.Input(id='excel-filename', value="david.xlsx", type='text', style={"width":"100%"})
                                 ]
                             ),
                             dbc.ModalFooter(
                                 dbc.Button(
-                                    "Download", id="pdf-filename-download", className="ms-auto", n_clicks=0
+                                    "Download", id="excel-filename-download", className="ms-auto", n_clicks=0
                                 )
                             ),
                         ],
-                        id="pdf-filename-modal",
+                        id="excel-filename-modal",
                         is_open=False,
                     ),
 
@@ -671,16 +671,16 @@ def make_app_content(pathname):
 # example reading session from server storage
 @dashapp.callback( 
     Output('upload-data', 'contents'),
-    Output('upload-data', 'filename'),
+    #Output('upload-data', 'filename'),
     Output('upload-data', 'last_modified'),
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
-        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+        return imp["session_import"], imp["last_modified"]
     else:
-        return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update
    
 
 states=[
@@ -707,25 +707,31 @@ states=[
     Output('toast-make_fig_output','children'),
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
-    Output('download-pdf-div', 'style'),
+    Output('save-excel-div', 'style'),
+    Output('cellplot-session-div', 'style'),
     Output('export-session','data'),
+    Output('save-excel', 'data'),
+    Output("cellplot-session", 'data'), 
     Input("submit-button-state", "n_clicks"),
     Input("export-filename-download","n_clicks"),
     Input("save-session-btn","n_clicks"),
     Input("saveas-session-btn","n_clicks"),
-    Input("send-to-excel","n_clicks"),
+    Input("excel-filename-download","n_clicks"),
+    Input("cellplot-session-btn","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('export-filename','value'),
+    State('excel-filename', 'value'),
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,send_to_excel,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, cellplot_session_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
+    print(filename)
     ctx = dash.callback_context
     print("HERE1")
     if not ctx.triggered:
@@ -743,13 +749,13 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
             if type(k) != dict :
                 pa[k]=a
 
-        session_data={ "session_data": {"app": { "david": {"filename":upload_data_text ,'last_modified':last_modified,"pa":pa} } } }
+        session_data={ "session_data": {"app": { "david": {'last_modified':last_modified,"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None, None
 
     # button_id,  submit-button-state, export-filename-download
 
@@ -764,85 +770,87 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update,dcc.send_bytes(write_json, export_filename), None, None
 
     if button_id == "save-session-btn" :
         try:
-            if filename.split(".")[-1] == "json" :
+            if filename and filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update, None
+                return dash.no_update, toast, None, None, dash.no_update,dash.no_update, None, None, None
             else:
                 session["session_data"]=session_data
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"david")
-            return dash.no_update, toast, None, tb_str, dash.no_update, None
+            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, None, None, None
 
         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
-    if button_id == "send-to-excel":
+    if button_id == "excel-filename-download":
+        if not excel_filename:
+            excel_filename=secure_filename("david_results.%s.xlsx" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
+        excel_filename=secure_filename(excel_filename)
+        if excel_filename.split(".")[-1] != "xlsx":
+            excel_filename=f'{excel_filename}.xlsx'  
+
         david_results=run_david_and_cache(pa, cache)
-        david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
         df = pd.read_json(david_results["df"]) 
         report_stats = pd.read_json(david_results["stats"])
 
-        ## keep on here
+        #excel_file_name = secure_filename("david_results.%s.xlsx" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
+        import io
+        output = io.BytesIO()
+        writer= pd.ExcelWriter(output)
+        df.to_excel(writer, sheet_name = 'david results', index = False)
+        report_stats.to_excel(writer, sheet_name = 'report stats', index = False)
+        writer.save()
+        data=output.getvalue()
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update,None, dcc.send_bytes(data, excel_filename), None
+
+
+    if button_id == "cellplot-session-btn":
+        david_results=run_david_and_cache(pa, cache)
+        df = pd.read_json(david_results["df"])
+        print(df.head())
+
+        session_data = {'session_data': {"app": {"cellplot": {"filename": "<from david app>"}, 'last_modified': last_modified, "df":david_results["df"], "filename2": None, "df_ge": None}}}
+        session["session_data"] = session_data
+        return  dash.no_update, None, None, None, dash.no_update, dash.no_update,None, None, dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index")
 
 
     try:
         fig=None
-
-        # david_results=run_david(pa)
         david_results=run_david_and_cache(pa, cache)
-
-        david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
-
         df = pd.read_json(david_results["df"]) 
-        print(df.head)
-        # report_stats = pd.read_json(david_results["stats"])
         fig=make_table(df, "david_results")
-        print("HERE3")
-        # fig=make_figure(df,pa)
-        # import plotly.graph_objects as go
-        # fig = go.Figure( )
-        # fig.update_layout( )
-        # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
-        # fig.update_layout(
-        #         title={
-        #             'text': "Demo plotly title",
-        #             'xanchor': 'left',
-        #             'yanchor': 'top' ,
-        #             "font": {"size": 25, "color":"black"  } } )
-        # fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-        # fig=dcc.Graph(figure=fig,config=fig_config,  id="graph")
 
-        # changed
-        # return fig, None, session_data, None, download_buttons_style_show
-        # as session data is no longer required for downloading the figure
-
-        return fig, None, None, None, download_buttons_style_show, None
+        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show, None, None, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide,  None, None, None
 
 
-    # for export to cellplot I first need to generate the david data and then send the session_data to cellplot
-    # if button_id == "cellplot-session-btn" :
-    #     session["session_data"]=session_data
-    #     return dcc.Location(pathname=f"{PAGE_PREFIX}/cellplot/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    #       # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
-
+@dashapp.callback(
+    Output('excel-filename-modal', 'is_open'),
+    [ Input('save-excel-btn',"n_clicks"),Input("excel-filename-download", "n_clicks")],
+    [ State("excel-filename-modal", "is_open")], 
+    prevent_initial_call=True
+)
+def download_excel_filename(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 @dashapp.callback(
     Output('export-filename-modal', 'is_open'),
@@ -854,42 +862,6 @@ def download_export_filename(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
-
-@dashapp.callback(
-    Output('pdf-filename-modal', 'is_open'),
-    [ Input('download-pdf-btn',"n_clicks"),Input("pdf-filename-download", "n_clicks")],
-    [ State("pdf-filename-modal", "is_open")], 
-    prevent_initial_call=True
-)
-def download_pdf_filename(n1, n2, is_open):
-    if n1 or n2:
-        return not is_open
-    return is_open
-
-@dashapp.callback(
-    Output('download-pdf', 'data'),
-    Input('pdf-filename-download',"n_clicks"),
-    State('graph', 'figure'),
-    State("pdf-filename", "value"),
-    prevent_initial_call=True
-)
-def download_pdf(n_clicks,graph, pdf_filename):
-    if not pdf_filename:
-        pdf_filename="david.pdf"
-    pdf_filename=secure_filename(pdf_filename)
-    if pdf_filename.split(".")[-1] != "pdf":
-        pdf_filename=f'{pdf_filename}.pdf'
-
-    ### needs logging
-    def write_image(figure, graph=graph):
-        ## This section is for bypassing the mathjax bug on inscription on the final plot
-        fig=px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])        
-        fig.write_image(figure, format="pdf")
-        time.sleep(2)
-        ## 
-        fig=go.Figure(graph)
-        fig.write_image(figure, format="pdf")
-    return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(
     Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
