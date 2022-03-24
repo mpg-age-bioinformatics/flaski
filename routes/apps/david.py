@@ -1,6 +1,7 @@
 from myapp import app, PAGE_PREFIX
 from flask_login import current_user
 from flask_caching import Cache
+#from flaski.routines import check_session_app
 from flask import session
 import dash
 from dash import dcc, html
@@ -671,16 +672,19 @@ def make_app_content(pathname):
 # example reading session from server storage
 @dashapp.callback( 
     Output('upload-data', 'contents'),
-    #Output('upload-data', 'filename'),
+    Output('upload-data', 'filename'),
     Output('upload-data', 'last_modified'),
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
+        print(session["session_data"])
         imp=session["session_data"]
         del(session["session_data"])
-        return imp["session_import"], imp["last_modified"]
+        from time import sleep
+        sleep(2)
+        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
-        return dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update
    
 
 states=[
@@ -744,10 +748,15 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     try:
         input_names = [item.component_id for item in states]
 
-        pa=figure_defaults()
-        for k, a in zip(input_names,args) :
-            if type(k) != dict :
-                pa[k]=a
+        if filename and filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "david")
+            print(app_data.keys())
+            pa = app_data["pa"]
+        else:
+            pa=figure_defaults()
+            for k, a in zip(input_names,args) :
+                if type(k) != dict :
+                    pa[k]=a
 
         session_data={ "session_data": {"app": { "david": {'last_modified':last_modified,"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
@@ -821,9 +830,22 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"])
         print(df.head())
+        #reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
-        session_data = {'session_data': {"app": {"cellplot": {"filename": "<from david app>"}, 'last_modified': last_modified, "df":david_results["df"], "filename2": None, "df_ge": None}}}
-        session["session_data"] = session_data
+        cp_pa=dict()
+        cp_pa["terms_column"] = "Term"
+        cp_pa["david_gene_ids"] = "Genes"
+        cp_pa["plotvalue"] = "PValue"
+        cp_pa["categories_column"] = "Category"
+        cp_pa["annotation_column_value"] = "annotation_2"
+        cp_pa["annotation2_column_value"] = "annotation_1"
+
+        session['filename']="<from DAVID app>"
+        session['pa'] = cp_pa
+        session['COMMIT'] = app.config['COMMIT']
+        session["app"] = 'cellplot'
+        session["df"] = df.to_json()
+        session["df_ge"] = "none"
         return  dash.no_update, None, None, None, dash.no_update, dash.no_update,None, None, dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index")
 
 
