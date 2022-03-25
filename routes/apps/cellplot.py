@@ -1029,6 +1029,7 @@ def read_session_redis(session_id):
         del(session["session_data"])
         from time import sleep
         sleep(2)
+        print(imp)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update
@@ -1125,9 +1126,11 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
     if not filename :
         raise dash.exceptions.PreventUpdate
     read_json=False
+    print("Cellplot read input")
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
     try:
         if filename.split(".")[-1] == "json":
+            print("parse json")
             read_json=True
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
             #first dataframe
@@ -1159,6 +1162,7 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
             pa_outputs=[pa[k] for k in  read_input_updates ]
 
         else:
+            print("parsing dataframe")
             df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
             app_data=dash.no_update
             cols=df.columns.tolist()

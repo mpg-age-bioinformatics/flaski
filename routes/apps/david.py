@@ -9,7 +9,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table, encode_session_app
 from pyflaski.david import run_david, figure_defaults
 import os
 import uuid
@@ -534,7 +534,7 @@ def make_app_content(pathname):
 
                 ),
             ],
-            style={ "min-width":"372px","width":"100%"},
+            style={ "min-width":"372px","width":"100%", "display": "none"},
             className="g-0",    
             # style={ "margin-left":"0px" , "margin-right":"0px"}
         ),
@@ -715,7 +715,6 @@ states=[
     Output('cellplot-session-div', 'style'),
     Output('export-session','data'),
     Output('save-excel', 'data'),
-    Output("cellplot-session", 'data'), 
     Input("submit-button-state", "n_clicks"),
     Input("export-filename-download","n_clicks"),
     Input("save-session-btn","n_clicks"),
@@ -764,7 +763,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None
 
     # button_id,  submit-button-state, export-filename-download
 
@@ -779,7 +778,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update,dcc.send_bytes(write_json, export_filename), None, None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update,dcc.send_bytes(write_json, export_filename), None
 
     if button_id == "save-session-btn" :
         try:
@@ -788,20 +787,20 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
                 return dash.no_update, toast, None, None, dash.no_update,dash.no_update, None, None, None
             else:
                 session["session_data"]=session_data
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"david")
-            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, None, None, None
+            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, None, None
 
         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     if button_id == "excel-filename-download":
@@ -823,7 +822,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         report_stats.to_excel(writer, sheet_name = 'report stats', index = False)
         writer.save()
         data=output.getvalue()
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update,None, dcc.send_bytes(data, excel_filename), None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update,None, dcc.send_bytes(data, excel_filename)
 
 
     if button_id == "cellplot-session-btn":
@@ -839,28 +838,30 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         cp_pa["categories_column"] = "Category"
         cp_pa["annotation_column_value"] = "annotation_2"
         cp_pa["annotation2_column_value"] = "annotation_1"
+        cp_pa["gene_identifier"]=None
+        cp_pa["expression_values"]=None
+        cp_pa["gene_name"]=None
 
-        session['filename']="<from DAVID app>"
-        session['pa'] = cp_pa
-        session['COMMIT'] = app.config['COMMIT']
-        session["app"] = 'cellplot'
-        session["df"] = df.to_json()
-        session["df_ge"] = "none"
-        return  dash.no_update, None, None, None, dash.no_update, dash.no_update,None, None, dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index")
+        session_data={ "session_data": {"app": { "cellplot": {"filename":"<from DAVID app>" ,'last_modified':last_modified,"df":david_results["df"],"pa":cp_pa, 'filename2':None, "df_ge": "none"} } } }
+        session_data["APP_VERSION"]=app.config['APP_VERSION']
+        session_data=encode_session_app(session_data["session_data"])
+        session["session_data"]=session_data
+        return  dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index"), None, None, None, dash.no_update, dash.no_update,None, None
 
 
     try:
         fig=None
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"]) 
+        # truncate to two decimal points were appropriate
         fig=make_table(df, "david_results")
 
-        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show, None, None, None
+        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show, None, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide,  None, None, None
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide,  None, None
 
 
 @dashapp.callback(

@@ -139,6 +139,18 @@ def encode_session_file(filename, current_user ):
     session_import=f'data:application/json;base64,{session_import}'
     return { "session_import":session_import, "last_modified":last_modified, "app_name":app_name, "sessionfilename": filename }
 
+def encode_session_app(session_data):
+    app_data=session_data["app"]
+    app_name=list(app_data.keys())[0]
+    last_modified=app_data[app_name]["last_modified"]
+    filename=app_data[app_name]["filename"]
+    session_import=json.dumps(session_data)
+    session_import=base64.b64encode(session_import.encode('utf-8'))
+    session_import=session_import.decode('utf-8')
+    session_import=f'data:application/json;base64,{session_import}'
+    return { "session_import":session_import, "last_modified":last_modified, "app_name":app_name, "sessionfilename": filename }
+
+
 def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
     if e:
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
