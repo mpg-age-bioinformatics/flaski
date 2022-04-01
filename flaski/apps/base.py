@@ -84,17 +84,18 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         "link":'riboseq' ,
         "java":"javascript:ReverseDisplay('riboseq_more')", 
         "description":"Ribo-Seq submission form.", "submission":"yes"} ,\
-        {"name":"Methylation clock", 
-        "id":'methylclock_more',
-        "link":'methylclock' ,
-        "java":"javascript:ReverseDisplay('methylclock_more')", 
-        "description":"Methylation clock submission form.", "submission":"yes"} ,\
         {"name":"AlphaFold", 
         "id":'alphafold_more',
         "link":'alphafold' ,
         "java":"javascript:ReverseDisplay('alphafold_more')", 
         "description":"AlphaFold.", "submission":"yes"} 
 ]
+
+        # {"name":"Methylation clock", 
+        # "id":'methylclock_more',
+        # "link":'methylclock' ,
+        # "java":"javascript:ReverseDisplay('methylclock_more')", 
+        # "description":"Methylation clock submission form.", "submission":"yes"} ,\
 
 FREEAPPS=FREEAPPS+EXTERNAL_APPS
 
