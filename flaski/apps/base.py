@@ -1,7 +1,7 @@
 from flaski.apps.routes import scatterplot, iscatterplot, heatmap, iheatmap, venndiagram, icellplot, david, aarnaseqlake, pca, histogram, violinplot, iviolinplot
 from flaski.apps.routes import mds, tsne, kegg, ihistogram, lifespan, submissions, circularbarplots, threeDscatterplot, igseaplot, idendrogram
 from flaski.apps.dash import aadatalake
-from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, gsea, riboseq, alphafold
+from flaski.apps.dash import dashapp, rnaseq, asplicing, intronret, circrna, mirna,sixteens ,irfinder, chip, atac, varcal, gsea, riboseq, methylclock, alphafold
 from flaski.apps.external import *
 
 FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' , "java":"javascript:ReverseDisplay('scatterplot_more')", "description":"A static scatterplot app." },\
@@ -84,6 +84,11 @@ FREEAPPS=[{ "name":"Scatter plot","id":'scatterplot_more', "link":'scatterplot' 
         "link":'riboseq' ,
         "java":"javascript:ReverseDisplay('riboseq_more')", 
         "description":"Ribo-Seq submission form.", "submission":"yes"} ,\
+        {"name":"Methylation clock", 
+        "id":'methylclock_more',
+        "link":'methylclock' ,
+        "java":"javascript:ReverseDisplay('methylclock_more')", 
+        "description":"Methylation clock submission form.", "submission":"yes"} ,\
         {"name":"AlphaFold", 
         "id":'alphafold_more',
         "link":'alphafold' ,
@@ -139,7 +144,7 @@ defaults_dic={"rnaseqlake":dict,\
     "venndiagram":venndiagram_def,\
     "violinplot":violinplot_def,\
     "threeDscatterplot":threeDscatterplot_def,\
-    "igseaplot":igseaplot_def
+    "igseaplot":igseaplot_def,
 }
 
 defaults_dic.update(EXT_DEFAULTS_DIC)
