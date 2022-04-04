@@ -116,7 +116,7 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            dcc.Textarea(value=pa["ids"], id='ids', placeholder="", style={"height":"100px","width":"100%"}),
+                            dcc.Textarea(id='ids', placeholder=pa["ids"], style={"height":"100px","width":"100%"}),
                         ),
                     ],
                     align="start",
@@ -131,7 +131,7 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            dcc.Textarea(value=pa["ids_bg"], id='ids_bg', placeholder="", style={"height":"100px","width":"100%"}),
+                            dcc.Textarea( id='ids_bg', placeholder=pa["ids_bg"], style={"height":"100px","width":"100%"}),
                         ),
                     ],
                     align="start",
@@ -139,15 +139,15 @@ def make_app_content(pathname):
                     className="g-0",
                 ),
                 ############################
-                dbc.Row([
-                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
-                ],
-                className="g-0",
-                ),
-                ############################
-                dbc.Row(
-                        dbc.Label("Arguments"), #"height":"35px",
-                ),
+                # dbc.Row([
+                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
+                # ],
+                # className="g-0",
+                # ),
+                # ############################
+                # dbc.Row(
+                #         dbc.Label("Arguments"), #"height":"35px",
+                # ),
                 ############################
                 dbc.Card(
                     [
@@ -174,11 +174,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -193,11 +193,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -212,11 +212,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -231,11 +231,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -250,11 +250,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -269,11 +269,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -288,11 +288,11 @@ def make_app_content(pathname):
                                     style= {"margin-top":"2px"}
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
-                                ],
-                                className="g-1",
-                                ),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"20px" })
+                                # ],
+                                # className="g-1",
+                                # ),
                                 ############################
                                 dbc.Row(
                                     [
@@ -370,7 +370,7 @@ def make_app_content(pathname):
                                         width=6
                                     ),
                                     dbc.Col(
-                                        dcc.Input(value=pa["user"], id='user',style=card_input_style),
+                                        dcc.Input(placeholder=pa["user"], id='user',style=card_input_style),
                                         width=6
                                     ),
                                     ],
