@@ -734,9 +734,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
-    print(filename)
     ctx = dash.callback_context
-    print("HERE1")
     if not ctx.triggered:
         button_id = 'No clicks yet'
     else:
@@ -854,6 +852,17 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"]) 
         # truncate to two decimal points were appropriate
+
+        # print(df.columns.tolist())
+        # df["%"]=df["%"].apply( lambda x: round(x, 2) )
+        table_headers=df.columns.tolist()
+        for col in ["%","Fold Enrichment"]:
+            df[col]=df[col].apply(lambda x: "{0:.2f}".format(float(x)))
+        for col in ["PValue","Bonferroni","Benjamini","FDR"]:
+            df[col]=df[col].apply(lambda x: '{:.2e}'.format(float(x)))
+        for col in ["Genes"]+table_headers[13:]:
+            df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
+
         fig=make_table(df, "david_results")
 
         return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show, None, None
