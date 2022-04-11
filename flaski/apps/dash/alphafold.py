@@ -54,6 +54,7 @@ def make_submission_json(email,group, name, sequence):
         email=",".join(email)
         sequence=sequence.replace(" ", "")
         sequence=secure_filename(sequence)
+        sequence=sequence.upper()
         return {"filename":filename,"email": email, "group_name":group, "group_initials":GROUPS_INITALS[group],"name_fasta_header":name, "sequence_fasta":sequence}
     return _make_submission_json(email,group, name, sequence)
 
