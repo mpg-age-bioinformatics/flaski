@@ -155,8 +155,8 @@ def update_output(session_id, n_clicks, email,group,name,sequence):
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None
 
-    # if CURRENTAPP not in apps:
-    #     return dbc.Alert('''You do not have access to this App.''',color="danger")
+    if CURRENTAPP not in apps:
+        return dbc.Alert('''You do not have access to this App.''',color="danger")
 
     subdic=make_submission_json( email,group, name, sequence)
 
