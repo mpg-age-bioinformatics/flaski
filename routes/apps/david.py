@@ -840,7 +840,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         cp_pa["expression_values"]=None
         cp_pa["gene_name"]=None
 
-        session_data={ "session_data": {"app": { "cellplot": {"filename":"<from DAVID app>" ,'last_modified':last_modified,"df":david_results["df"],"pa":cp_pa, 'filename2':None, "df_ge": "none"} } } }
+        session_data={ "session_data": {"app": { "cellplot": {"filename":"<from DAVID app>.json" ,'last_modified':last_modified,"df":david_results["df"],"pa":cp_pa, 'filename2':None, "df_ge": "none"} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         session_data=encode_session_app(session_data["session_data"])
         session["session_data"]=session_data

@@ -1029,7 +1029,6 @@ def read_session_redis(session_id):
         del(session["session_data"])
         from time import sleep
         sleep(2)
-        print(imp)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update
@@ -1126,13 +1125,24 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
     if not filename :
         raise dash.exceptions.PreventUpdate
     read_json=False
-    print("Cellplot read input")
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
     try:
         if filename.split(".")[-1] == "json":
-            print("parse json")
             read_json=True
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
+            if filename == "<from DAVID app>.json":
+                content_type, content_string = contents.split(',')
+                import base64
+                decoded=base64.b64decode(content_string)
+                decoded=decoded.decode('utf-8')
+                session_import=json.loads(decoded)
+                app_data=session_import['app']['cellplot']
+                cellplot_pa=figure_defaults()
+                # add default plot arguments which were not overwritten by DAVID
+                for key in cellplot_pa:
+                    if not key in app_data["pa"].keys():
+                        app_data["pa"][key] = cellplot_pa[key]
+            else:
+                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
             #first dataframe
             df=pd.read_json(app_data["df"])
             cols=df.columns.tolist()
@@ -1162,7 +1172,6 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
             pa_outputs=[pa[k] for k in  read_input_updates ]
 
         else:
-            print("parsing dataframe")
             df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
             app_data=dash.no_update
             cols=df.columns.tolist()
@@ -1202,8 +1211,6 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
                  style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
             )
         
-        print(filename2)
-        print("HERE6")
         return [ cols_, cols_,cols_, cols_, cols_,cols_, cols2_,cols2_,cols2_, upload_text, upload_text2, None, None, \
             terms_column, david_gene_ids, plotvalue, categories_column, annotation_column_value, annotation2_column_value, gene_identifier, expression_values, gene_name ] + pa_outputs
 
@@ -1227,7 +1234,17 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
 def update_category_field(session_id,col,contents,filename,last_modified,update_category_field_import):
     try:
         if col:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
+            if filename ==  "<from DAVID app>.json":
+                content_type, content_string = contents.split(',')
+                import base64
+                decoded=base64.b64decode(content_string)
+                decoded=decoded.decode('utf-8')
+                session_import=json.loads(decoded)
+                app_data=session_import['app']['cellplot']
+                df=pd.read_json(app_data["df"])
+                update_category_field_import=True
+            else:
+                df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
             category=df[[col]].drop_duplicates()[col].tolist()
             category_=make_options(category)
 
@@ -1365,9 +1382,18 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
     try:
         input_names = [item.component_id for item in states]
 
-        df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
+        if filename == "<from DAVID app>.json":
+            content_type, content_string = contents.split(',')
+            import base64
+            decoded=base64.b64decode(content_string)
+            decoded=decoded.decode('utf-8')
+            session_import=json.loads(decoded)
+            app_data=session_import['app']['cellplot']
+            df=pd.read_json(app_data["df"])
+        else:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
 
-        if filename.split(".")[-1] == "json":
+        if filename.split(".")[-1] == "json" and not filename == "<from DAVID app>.json":
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
             if app_data["df_ge"] != "none":
                 df_ge=pd.read_json(app_data["df_ge"])
@@ -1382,7 +1408,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         for k, a in zip(input_names,args) :
             if type(k) != dict :
                 pa[k]=a
-
 
 
         df = df.astype(str)
