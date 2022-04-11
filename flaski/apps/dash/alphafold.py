@@ -45,16 +45,32 @@ GSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD"
 def make_submission_json(email,group, name, sequence):
     @cache.memoize(60*60*2) # 2 hours
     def _make_submission_json(email,group, name, sequence):
+        def clean_seqs(sequence):
+            sequence=sequence.replace(" ", "")
+            sequence=secure_filename(sequence)
+            sequence=sequence.upper()
+            return sequence
+
+        def clean_header(name):
+            name=secure_filename(name)
+            name=name.replace(" ","_")
+            return name
+
         filename=make_submission_file(".alphafold.json", folder="mpcdf")
-        name=secure_filename(name)
-        name=name.replace(" ","_")
+        name=clean_header(name)
         email=email.replace(" ", ",")
         email=email.split(",")
         email=[ e for e in email if e ]
         email=",".join(email)
-        sequence=sequence.replace(" ", "")
-        sequence=secure_filename(sequence)
-        sequence=sequence.upper()
+
+        if ">" in sequence :
+            sequence=sequence.split(">")
+            sequence=[ s.split("\n") for s in sequence ]
+            sequence=[ [ ">"+clean_header(s[0]), clean_seqs(s[1]) ]  for s in sequence if len(s) > 1 ]
+            sequence=[ ";".join( s ) for s in sequence ]
+            sequence=";".join(sequence)
+        else:
+            sequence=clean_seqs(sequence)
         return {"filename":filename,"email": email, "group_name":group, "group_initials":GROUPS_INITALS[group],"name_fasta_header":name, "sequence_fasta":sequence}
     return _make_submission_json(email,group, name, sequence)
 
@@ -139,8 +155,8 @@ def update_output(session_id, n_clicks, email,group,name,sequence):
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None
 
-    if CURRENTAPP not in apps:
-        return dbc.Alert('''You do not have access to this App.''',color="danger")
+    # if CURRENTAPP not in apps:
+    #     return dbc.Alert('''You do not have access to this App.''',color="danger")
 
     subdic=make_submission_json( email,group, name, sequence)
 
