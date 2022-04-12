@@ -826,8 +826,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     if button_id == "cellplot-session-btn":
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"])
-        print(df.head())
-        #reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         cp_pa=dict()
         cp_pa["terms_column"] = "Term"
@@ -842,7 +840,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         session_data={ "session_data": {"app": { "cellplot": {"filename":"<from DAVID app>.json" ,'last_modified':last_modified,"df":david_results["df"],"pa":cp_pa, 'filename2':None, "df_ge": "none"} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
-        session_data=encode_session_app(session_data["session_data"])
+        session_data=encode_session_app(session_data)
         session["session_data"]=session_data
         return  dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index"), None, None, None, dash.no_update, dash.no_update,None, None
 

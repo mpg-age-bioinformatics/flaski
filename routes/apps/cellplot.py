@@ -1129,22 +1129,15 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
     try:
         if filename.split(".")[-1] == "json":
             read_json=True
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
             if filename == "<from DAVID app>.json":
-                content_type, content_string = contents.split(',')
-                import base64
-                decoded=base64.b64decode(content_string)
-                decoded=decoded.decode('utf-8')
-                session_import=json.loads(decoded)
-                app_data=session_import['app']['cellplot']
                 cellplot_pa=figure_defaults()
-                # add default plot arguments which were not overwritten by DAVID
                 for key in cellplot_pa:
                     if not key in app_data["pa"].keys():
                         app_data["pa"][key] = cellplot_pa[key]
-            else:
-                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
             #first dataframe
             df=pd.read_json(app_data["df"])
+            print(df.head())
             cols=df.columns.tolist()
             cols_=make_options(cols)
             # second dataframe
@@ -1203,12 +1196,12 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
         if filename2:
             upload_text2=html.Div(
                 [ html.A(filename2, id='upload-data2-text') ],
-                 style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                    style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
             )
         else:
             upload_text2=html.Div(
                 ['Drag and Drop or ', html.A('Select File', id='upload-data2-text') ],
-                 style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                    style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
             )
         
         return [ cols_, cols_,cols_, cols_, cols_,cols_, cols2_,cols2_,cols2_, upload_text, upload_text2, None, None, \
@@ -1234,22 +1227,19 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
 def update_category_field(session_id,col,contents,filename,last_modified,update_category_field_import):
     try:
         if col:
-            if filename ==  "<from DAVID app>.json":
-                content_type, content_string = contents.split(',')
-                import base64
-                decoded=base64.b64decode(content_string)
-                decoded=decoded.decode('utf-8')
-                session_import=json.loads(decoded)
-                app_data=session_import['app']['cellplot']
-                df=pd.read_json(app_data["df"])
-                update_category_field_import=True
-            else:
-                df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
+
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
             category=df[[col]].drop_duplicates()[col].tolist()
             category_=make_options(category)
 
             if ( filename.split(".")[-1] == "json" ) and ( not update_category_field_import ) :
                 app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
+                if filename == "<from DAVID app>.json":
+                    cellplot_pa=figure_defaults()
+                    for key in cellplot_pa:
+                        if not key in app_data["pa"].keys():
+                            app_data["pa"][key] = cellplot_pa[key]
+
                 categories_to_plot_value=app_data['pa']["categories_to_plot_value"]
                 update_category_field_import=True
             else:
@@ -1382,16 +1372,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
     try:
         input_names = [item.component_id for item in states]
 
-        if filename == "<from DAVID app>.json":
-            content_type, content_string = contents.split(',')
-            import base64
-            decoded=base64.b64decode(content_string)
-            decoded=decoded.decode('utf-8')
-            session_import=json.loads(decoded)
-            app_data=session_import['app']['cellplot']
-            df=pd.read_json(app_data["df"])
-        else:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
+        df=parse_table(contents,filename,last_modified,current_user.id,cache,"cellplot")
 
         if filename.split(".")[-1] == "json" and not filename == "<from DAVID app>.json":
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")

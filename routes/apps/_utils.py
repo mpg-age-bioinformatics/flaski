@@ -35,7 +35,6 @@ def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
         # with open("/myapp_data/users/test.str", "r") as f:
         #     contents=f.readlines()[0]
         # print("A", contents[:200])
-
         session_import=session_import["session_data"]["app"][appname]
 
         return session_import
@@ -140,7 +139,7 @@ def encode_session_file(filename, current_user ):
     return { "session_import":session_import, "last_modified":last_modified, "app_name":app_name, "sessionfilename": filename }
 
 def encode_session_app(session_data):
-    app_data=session_data["app"]
+    app_data=session_data["session_data"]["app"]
     app_name=list(app_data.keys())[0]
     last_modified=app_data[app_name]["last_modified"]
     filename=app_data[app_name]["filename"]
