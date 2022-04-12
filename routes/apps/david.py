@@ -574,7 +574,7 @@ def make_app_content(pathname):
                                                 html.Span(
                                                     [ 
                                                         html.I(className="far fa-lg fa-save"),
-                                                        " Results" 
+                                                        " Results (xlsx)" 
                                                     ]
                                                 ),
                                                 id='save-excel-btn', 
@@ -584,6 +584,24 @@ def make_app_content(pathname):
                                             dcc.Download(id='save-excel')
                                         ],
                                         id="save-excel-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),                                    
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="far fa-lg fa-save"),
+                                                        " Results (tsv)" 
+                                                    ]
+                                                ),
+                                                id='save-tsv-btn', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='save-tsv')
+                                        ],
+                                        id="save-tsv-div",
                                         style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
                                     ),                                    
                                     html.Div( 
@@ -602,6 +620,24 @@ def make_app_content(pathname):
                                             dcc.Download(id='cellplot-session')
                                         ],
                                         id="cellplot-session-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),                                    
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="fas fa-scroll fa-sm text-white-50"),
+                                                        html.A(" Citation", href='https://github.com/mpg-age-bioinformatics/flaski/wiki/DAVID?#citing', target="_blank", style={"color":"white", "text-decoration":"none"}) 
+                                                    ]
+                                                ),
+                                                id='citation-session-btn', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='citation-session')
+                                        ],
+                                        id="citation-session-div",
                                         style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
                                     ),                                    
                                 ],
@@ -639,6 +675,24 @@ def make_app_content(pathname):
                             ),
                         ],
                         id="excel-filename-modal",
+                        is_open=False,
+                    ),
+
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
+                            dbc.ModalBody(
+                                [
+                                    dcc.Input(id='tsv-filename', value="david.tsv", type='text', style={"width":"100%"})
+                                ]
+                            ),
+                            dbc.ModalFooter(
+                                dbc.Button(
+                                    "Download", id="tsv-filename-download", className="ms-auto", n_clicks=0
+                                )
+                            ),
+                        ],
+                        id="tsv-filename-modal",
                         is_open=False,
                     ),
 
@@ -712,25 +766,31 @@ states=[
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
     Output('save-excel-div', 'style'),
+    Output('save-tsv-div', 'style'),
     Output('cellplot-session-div', 'style'),
+    Output('citation-session-div', 'style'),
     Output('export-session','data'),
     Output('save-excel', 'data'),
+    Output('save-tsv', 'data'),
     Input("submit-button-state", "n_clicks"),
     Input("export-filename-download","n_clicks"),
     Input("save-session-btn","n_clicks"),
     Input("saveas-session-btn","n_clicks"),
     Input("excel-filename-download","n_clicks"),
+    Input("tsv-filename-download","n_clicks"),
     Input("cellplot-session-btn","n_clicks"),
+    Input("citation-session-btn","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('export-filename','value'),
     State('excel-filename', 'value'),
+    State('tsv-filename', 'value'),
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, cellplot_session_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, save_tsv_btn, cellplot_session_btn, citation_session_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,tsv_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -761,7 +821,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, None, None, None
 
     # button_id,  submit-button-state, export-filename-download
 
@@ -776,29 +836,29 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update,dcc.send_bytes(write_json, export_filename), None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
 
     if button_id == "save-session-btn" :
         try:
             if filename and filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update,dash.no_update, None, None, None
+                return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
             else:
                 session["session_data"]=session_data
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"david")
-            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, None, None
+            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, dash.no_update,dash.no_update, None, None, None
 
         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     if button_id == "excel-filename-download":
@@ -812,7 +872,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         df = pd.read_json(david_results["df"]) 
         report_stats = pd.read_json(david_results["stats"])
 
-        #excel_file_name = secure_filename("david_results.%s.xlsx" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
         import io
         output = io.BytesIO()
         writer= pd.ExcelWriter(output)
@@ -820,7 +879,19 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         report_stats.to_excel(writer, sheet_name = 'report stats', index = False)
         writer.save()
         data=output.getvalue()
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update,None, dcc.send_bytes(data, excel_filename)
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update, None, dcc.send_bytes(data, excel_filename), None
+
+    if button_id == "tsv-filename-download":
+        if not tsv_filename:
+            tsv_filename=secure_filename("david_results.%s.tsv" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
+        tsv_filename=secure_filename(tsv_filename)
+        if tsv_filename.split(".")[-1] != "tsv":
+            tsv_filename=f'{tsv_filename}.tsv'  
+
+        david_results=run_david_and_cache(pa, cache)
+        df = pd.read_json(david_results["df"]) 
+
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update, None, None, dcc.send_data_frame(df.to_csv, tsv_filename, sep = "\t")
 
 
     if button_id == "cellplot-session-btn":
@@ -842,7 +913,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         session_data=encode_session_app(session_data)
         session["session_data"]=session_data
-        return  dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index"), None, None, None, dash.no_update, dash.no_update,None, None
+        return  dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index"), None, None, None, dash.no_update, dash.no_update,dash.no_update,dash.no_update, None, None, None
 
 
     try:
@@ -863,12 +934,12 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         fig=make_table(df, "david_results")
 
-        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show, None, None
+        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show,download_buttons_style_show,download_buttons_style_show, None, None, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide,  None, None
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide,download_buttons_style_hide, None, None, None
 
 
 @dashapp.callback(
@@ -878,6 +949,17 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     prevent_initial_call=True
 )
 def download_excel_filename(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+@dashapp.callback(
+    Output('tsv-filename-modal', 'is_open'),
+    [ Input('save-tsv-btn',"n_clicks"),Input("tsv-filename-download", "n_clicks")],
+    [ State("tsv-filename-modal", "is_open")], 
+    prevent_initial_call=True
+)
+def download_tsv_filename(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
