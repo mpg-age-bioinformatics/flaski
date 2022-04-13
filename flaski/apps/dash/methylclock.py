@@ -26,17 +26,17 @@ cache = Cache(dashapp.server, config={
 })
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,rrbs):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,rrbs):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism]}, index=list(range(6)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "rrbs"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, rrbs]}, index=list(range(7)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".methylclock.xlsx")
@@ -88,7 +88,7 @@ external_=make_options(["External"])
 # organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
 organisms=["mmusculus"]
 organisms_=make_options(organisms)
-# ercc_=make_options(["YES","NO"])
+rrbs_=make_options(["","--rrbs"])
 
 # arguments 
 arguments=[ dbc.Row( [
@@ -121,11 +121,11 @@ arguments=[ dbc.Row( [
                 dbc.Col( dcc.Dropdown( id='opt-organism', options=organisms_, value='mmusculus',style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
                 ], style={"margin-top":10}),
-            # dbc.Row( [
-            #     dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
-            #     dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_, style={ "width":"100%"}),md=3 ),
-            #     dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
-            #     ], style={"margin-top":10,"margin-bottom":10}),        
+            dbc.Row( [
+                dbc.Col( html.Label('Seq-type') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-rrbs', options=rrbs_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Select "--rrbs" for RRBS-seq and blank for WGBS-seq'),md=4  ), 
+                ], style={"margin-top":10,"margin-bottom":10}),        
 ]
 
 # input 
@@ -180,7 +180,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('md5sums', 'value'),
     State('project_title', 'value'),
     State('opt-organism', 'value'),
-    # State('opt-ercc', 'value'),
+    State('opt-rrbs', 'value'),
     prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism):
     apps=read_private_apps(current_user.email,app)
