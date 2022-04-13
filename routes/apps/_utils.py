@@ -271,8 +271,8 @@ def make_table(df,id,page_size=50,fixed_columns=False):
         style_cell={
             'whiteSpace': 'normal'
         },
-        virtualization=True,
-        style_table={"height": "100%", 'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
+        virtualization=False,
+        style_table={"height": "75vh", "maxHeight": "75vh",'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
         style_header={'backgroundColor': '#5474d8','color': 'white','fontWeight': 'bold'},
         style_data_conditional=[
         { 'if': {'row_index': 'odd'}, 'backgroundColor': 'rgb(242,242,242)'}

@@ -139,16 +139,6 @@ def make_app_content(pathname):
                     className="g-0",
                 ),
                 ############################
-                # dbc.Row([
-                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
-                # ],
-                # className="g-0",
-                # ),
-                # ############################
-                # dbc.Row(
-                #         dbc.Label("Arguments"), #"height":"35px",
-                # ),
-                ############################
                 dbc.Card(
                     [
                         dbc.CardHeader(
@@ -467,6 +457,55 @@ def make_app_content(pathname):
                     ],
                     style={"margin-top":"2px","margin-bottom":"2px"} 
                 ),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Z-scores", color="black", id={'type':"dynamic-card","index":"zscores"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody(
+                                [
+                                ############################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Calculate Z-score",html_for="zcore", style={"margin-top":"10px", "width":"auto"}),
+                                        dbc.Col(
+                                            dcc.Checklist(options=[ { 'value':'zscore'} ], value=pa["zscore"], id='zscore', style={"margin-top":"6px","height":"35px"} ),
+                                            # className="me-3",
+                                            # width=5
+                                        ),
+                                    ],
+                                    # justify="start",
+                                    className="g-1",
+                                ),
+                                ############################
+                                dbc.Row(
+                                    [
+                                    dbc.Col(
+                                        dbc.Label("Log2fc column", html_for="log2fc_column", style={"margin-top":"5px"}),
+                                        style={"textAlign":"left","padding-right":"2px"},
+                                        width=4
+                                    ),
+                                    dbc.Col(
+                                        dcc.Input(id='log2fc_column', placeholder= "index (0-based)",style=card_input_style),
+                                        width=8
+                                    ),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ######### END OF CARD #########
+                                ]
+                                ,style=card_body_style
+                            ),
+                            id={'type':"collapse-dynamic-card","index":"zscores"},
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px"} 
+                ),
             ],
             body=True,
             style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
@@ -758,6 +797,8 @@ states=[
     State('name_bg', 'value'),
     State('n', 'value'),
     State('p', 'value'),
+    State('zscore','value'),
+    State('log2fc_column', 'value'),
 ]    
 
 @dashapp.callback( 
@@ -929,8 +970,14 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             df[col]=df[col].apply(lambda x: "{0:.2f}".format(float(x)))
         for col in ["PValue","Bonferroni","Benjamini","FDR"]:
             df[col]=df[col].apply(lambda x: '{:.2e}'.format(float(x)))
-        for col in ["Genes"]+table_headers[13:]:
-            df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
+        if "Z-score" in table_headers:
+            for col in ["Genes"]+table_headers[14:]:
+                df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
+            for col in ["Z-score"]:
+                df[col]=df[col].apply(lambda x: "{0:.3f}".format(float(x)))
+        else:
+            for col in ["Genes"]+table_headers[13:]:
+                df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
 
         fig=make_table(df, "david_results")
 
