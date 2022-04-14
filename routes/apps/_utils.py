@@ -244,7 +244,7 @@ def make_min_width(x, factor=7):
     name_length = len(x)
     pixel = 50 + round(name_length*7)
     pixel = str(pixel) + "px"
-
+    return(pixel)
 
 def make_table(df,id,page_size=50,fixed_columns=False):
 
@@ -252,15 +252,11 @@ def make_table(df,id,page_size=50,fixed_columns=False):
         style=[]
         for col in df.columns:
             pixel=make_min_width(col, factor=7)
-            # name_length = len(col)
-            # pixel = 50 + round(name_length*7)
-            # pixel = str(pixel) + "px"
             style.append({'if': {'column_id': col}, 'minWidth': pixel})
 
         return style
-    # width_style=create_conditional_style(df)
-    width_style=[]
-    # print(width_style)
+    width_style=create_conditional_style(df)
+    print(width_style)
     
     report_table=dash_table.DataTable(
         id=id,

@@ -475,12 +475,19 @@ def make_app_content(pathname):
                                 ############################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Calculate Z-score",html_for="zcore", style={"margin-top":"10px", "width":"auto"}),
-                                        dbc.Col(
-                                            dcc.Checklist(options=[ { 'value':'zscore'} ], value=pa["zscore"], id='zscore', style={"margin-top":"6px","height":"35px"} ),
-                                            # className="me-3",
-                                            # width=5
-                                        ),
+                                        html.P([
+                                            "Calculate Z-scores to visualize terms in ", 
+                                            html.A("plotGODESeq", href='https://nlenov.wordpress.com/2018/10/19/plotgodeseq-differential-expression-and-gene-ontology-enrichment-on-one-plot/', target="_blank"), 
+                                            html.Br(), "The Z-score for each term is calculated as:", html.Br(),
+                                            "\"z-score = (# up genes - # down genes)/ sqrt(# up genes + # down genes)\"", html.Br(),
+                                            html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" }),
+                                            "To activate Z-score calculation please provide log2 fold changes along with the target genes in a tab separated manner. i.e", html.Br(), html.Br(),
+                                            "WBGene00004825 skr-19  -3.549520", html.Br(), 
+                                            "WBGene00005663 sars-1  -1.354167", html.Br(), 
+                                            "WBGene00019947 htz-1   1.5593289", html.Br(), 
+                                            html.Br(), "Please indicate the log2fc column index below.", html.Br(), 
+                                            "In the example above, the correct column index is 3. "
+                                            ]),
                                     ],
                                     # justify="start",
                                     className="g-1",
@@ -494,7 +501,7 @@ def make_app_content(pathname):
                                         width=4
                                     ),
                                     dbc.Col(
-                                        dcc.Input(id='log2fc_column', placeholder= "index (0-based)",style=card_input_style),
+                                        dcc.Input(id='log2fc_column', placeholder= "",style=card_input_style),
                                         width=8
                                     ),
                                     ],
@@ -801,7 +808,6 @@ states=[
     State('name_bg', 'value'),
     State('n', 'value'),
     State('p', 'value'),
-    State('zscore','value'),
     State('log2fc_column', 'value'),
 ]    
 
@@ -985,7 +991,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             for col in ["Genes"]+table_headers[13:]:
                 df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
 
-        fig=make_table(df, "david_results")
+        fig=make_table(df, "david_results", fixed_columns = False)
 
         return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show,download_buttons_style_show,download_buttons_style_show, None, None, None
 
