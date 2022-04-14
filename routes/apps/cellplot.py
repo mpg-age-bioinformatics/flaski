@@ -1137,7 +1137,6 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
                         app_data["pa"][key] = cellplot_pa[key]
             #first dataframe
             df=pd.read_json(app_data["df"])
-            print(df.head())
             cols=df.columns.tolist()
             cols_=make_options(cols)
             # second dataframe

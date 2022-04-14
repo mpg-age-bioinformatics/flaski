@@ -42,11 +42,15 @@ def run_david_and_cache(pa,cache):
     def _run_david_and_cache(pa,cache):
         print("Running  fresh")
         import sys ; sys.stdout.flush()
-        df, report_stats, empty =run_david(pa)
+        df, report_stats, msg =run_david(pa)
 
-        df=df.astype(str)
-        report_stats=report_stats.astype(str)
-        david_results={ "df": df.to_json() , "stats": report_stats.to_json() }
+        if msg == None:
+            # only handle df if there is no error message returned
+            df=df.astype(str)
+            report_stats=report_stats.astype(str)
+            david_results={ "df": df.to_json() , "stats": report_stats.to_json(), "msg": None }
+        else:
+            david_results={ "df": None , "stats": None, "msg": msg }
         return david_results
     return _run_david_and_cache(pa,cache)
 
@@ -864,8 +868,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
         return dash.no_update, toast, None, tb_str, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, None, None, None
 
-    # button_id,  submit-button-state, export-filename-download
-
     if button_id == "export-filename-download" :
         if not export_filename:
             export_filename="david.json"
@@ -960,6 +962,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     try:
         fig=None
         david_results=run_david_and_cache(pa, cache)
+        # add check message
+        if not david_results["msg"] == None:
+            # raise exception with message
+            raise Exception(david_results["msg"])
         df = pd.read_json(david_results["df"]) 
         # truncate to two decimal points were appropriate
 
