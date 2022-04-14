@@ -177,6 +177,11 @@ git push
 git push origin --tags      
 ```
 
+To list the latest existing tag:
+```
+git describe --abbrev=0 --tags
+```
+
 To tag the latest commit:
 ```
 git tag -e -a <version> HEAD
