@@ -29,6 +29,10 @@ cache = Cache(dashapp.server, config={
 def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,rrbs):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,rrbs):
+        if rrbs == "reduced representation" : 
+            rrbs="--rrbs"
+        else:
+            rrbs=""
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
@@ -42,7 +46,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         filename=make_submission_file(".methylclock.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism, rrbs)
 
 
 # base samples input dataframe and example dataframe
@@ -88,7 +92,7 @@ external_=make_options(["External"])
 # organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
 organisms=["mmusculus"]
 organisms_=make_options(organisms)
-rrbs_=make_options(["","--rrbs"])
+rrbs_=make_options(["whole genome","reduced representation"])
 
 # arguments 
 arguments=[ dbc.Row( [
@@ -123,8 +127,8 @@ arguments=[ dbc.Row( [
                 ], style={"margin-top":10}),
             dbc.Row( [
                 dbc.Col( html.Label('Seq-type') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-rrbs', options=rrbs_, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Select "--rrbs" for RRBS-seq and blank for WGBS-seq'),md=4  ), 
+                dbc.Col( dcc.Dropdown( id='opt-rrbs', options=rrbs_, value="whole genome", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Reduced Representation or Whole  Bisulfide Sequencing'),md=4  ), 
                 ], style={"margin-top":10,"margin-bottom":10}),        
 ]
 
@@ -182,7 +186,7 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-organism', 'value'),
     State('opt-rrbs', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism):
+def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism, rrbs):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
@@ -190,7 +194,7 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
     if CURRENTAPP not in apps:
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism, rrbs)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     # print(subdic["filename"])
