@@ -40,10 +40,7 @@ cache = Cache(dashapp.server, config={
 def run_david_and_cache(pa,cache):
     @cache.memoize(timeout=3600)
     def _run_david_and_cache(pa,cache):
-        print("Running  fresh")
-        import sys ; sys.stdout.flush()
         df, report_stats, msg =run_david(pa)
-
         if msg == None:
             # only handle df if there is no error message returned
             df=df.astype(str)
@@ -781,7 +778,6 @@ def make_app_content(pathname):
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
-        print(session["session_data"])
         imp=session["session_data"]
         del(session["session_data"])
         from time import sleep
@@ -858,7 +854,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         if filename and filename.split(".")[-1] == "json":
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "david")
-            print(app_data.keys())
             pa = app_data["pa"]
         else:
             pa=figure_defaults()
@@ -982,14 +977,18 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             df[col]=df[col].apply(lambda x: "{0:.2f}".format(float(x)))
         for col in ["PValue","Bonferroni","Benjamini","FDR"]:
             df[col]=df[col].apply(lambda x: '{:.2e}'.format(float(x)))
+        # for col in ["Genes"]+table_headers[14:]:
+        #     df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
+
         if "Z-score" in table_headers:
-            for col in ["Genes"]+table_headers[14:]:
-                df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
             for col in ["Z-score"]:
                 df[col]=df[col].apply(lambda x: "{0:.3f}".format(float(x)))
+            addon=14
         else:
-            for col in ["Genes"]+table_headers[13:]:
-                df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
+            addon=13
+
+        for col in ["Genes"]+table_headers[addon:]:
+            df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
 
         fig=make_table(df, "david_results", fixed_columns = False)
 

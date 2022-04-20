@@ -14,7 +14,7 @@ from flask import render_template
 from dash import dash_table
 
 def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
-    # @cache.memoize(timeout=3600)
+    @cache.memoize(timeout=3600)
     def _parse_import_json(contents,filename,last_modified,session_id,cache,appname):
         content_type, content_string = contents.split(',')
         decoded=base64.b64decode(content_string)
@@ -41,7 +41,7 @@ def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     return _parse_import_json(contents,filename,last_modified,session_id,cache,appname)
 
 def parse_table(contents,filename,last_modified,session_id,cache,appname):
-    # @cache.memoize(timeout=3600)
+    @cache.memoize(timeout=3600)
     def _parse_table(contents,filename,last_modified,session_id,cache):
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
@@ -256,7 +256,6 @@ def make_table(df,id,page_size=50,fixed_columns=False):
 
         return style
     width_style=create_conditional_style(df)
-    print(width_style)
     
     report_table=dash_table.DataTable(
         id=id,
