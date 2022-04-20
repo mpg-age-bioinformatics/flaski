@@ -277,36 +277,58 @@ def make_app_content(pathname):
                                     # ),
                                     ## end of example card body row
                                     dbc.Row(
-                                        [
+                                            [
+                                                dbc.Col(
+                                                    dbc.Label("Width",html_for="width", style={"margin-top":"8px"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=2
+                                                ),
+                                                dbc.Col(
+                                                    dcc.Input(id='width', value=pa["width"], placeholder="eg. 600", type='text', style={"margin-top":"5px", "width":"100%"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=4
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Label("Height", html_for="height", style={"margin-top":"8px"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=2
+                                                ),
+                                                dbc.Col(
+                                                    dcc.Input(id='height', value = pa["height"], placeholder="eg. 600", type='text', style={"margin-top":"5px", "width":"100%"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=4
+                                                ),
+                                            ],
 
-                                            dbc.Label("Width",html_for="width", style={"margin-top":"10px","width":"64px"}), #"height":"35px",
-                                            dbc.Col(
-                                                dcc.Input(id='width', value=pa["width"], placeholder="eg. 600", type='text', style={"height":"35px","width":"100%"}),
-                                                style={"margin-right":"5px"}
-                                            ),
-                                            dbc.Label("Height", html_for="height",style={"margin-left":"5px","margin-top":"10px","width":"64px","text-align":"right"}),
-                                            dbc.Col(
-                                                dcc.Input(id='height', value = pa["height"], placeholder="eg. 600", type='text',style={"height":"35px","width":"100%"}  ) ,
-                                            ),
-        
-                                        ],
                                         className="g-1",
                                     ),
                                     ############################
                                     dbc.Row(
-                                        [
-                                            dbc.Label("Title",width="auto",html_for="title",style={"margin-top":"0px","width":"64px"}), #"margin-top":"8px",
-                                            dbc.Col(
-                                                dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style={"height":"35px","min-width":"169px","width":"100%"} ) ,
-                                                style={"margin-right":"5px"},
-                                            ),
-                                            dbc.Label("size",html_for="title_font_size",width="auto", style={"text-align":"right","margin-left":"5px"}),
-                                            dbc.Col(
-                                                dcc.Input(value=pa["title_font_size"],placeholder="size", id='title_font_size', style={"width":"55px"}),
-                                            )
-                                        ],
+                                            [
+                                                dbc.Col(
+                                                    dbc.Label("Title",html_for="title", style={"margin-top":"8px"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=2
+                                                ),
+                                                dbc.Col(
+                                                    dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style={"margin-top":"5px", "width":"100%"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=7
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Label("size", width="auto", html_for="title_font_size"),#, style={"margin-top":"8px"}),
+                                                    style={"textAlign":"right","padding-right":"2px"},
+                                                    width=1
+                                                ),
+                                                dbc.Col(
+                                                    dcc.Input(value=pa["title_font_size"],placeholder="size", id='title_font_size', style={"margin-top":"5px", "width":"100%"}),
+                                                    style={"textAlign":"left","padding-right":"2px"},
+                                                    width=2
+                                                ),
+                                            ],
+
                                         className="g-1",
-                                        justify="between"
+                                        # justify="between"
                                     ), 
                                     ######### END OF CARD #########
                                 ]
@@ -339,14 +361,14 @@ def make_app_content(pathname):
                                             #     width=7
                                             # ),
                                             dbc.Col(
-                                                dcc.Checklist(options=[ {'label': " Annotation bars with n. Terms", 'value':'write_n_terms'} ], value=pa["write_n_terms"], id='write_n_terms', style={"height":"35px", } ),
+                                                dcc.Checklist(options=[ {'label': " Annotate bars with n. Terms", 'value':'write_n_terms'} ], value=pa["write_n_terms"], id='write_n_terms', style={"height":"35px", } ),
                                                 style={"textAlign":"left","padding-right":"2px", 'margin-top':"10px"},
                                                 width=8
                                                 # className="me-3",
                                                 # width=5
                                             ),
                                                 dbc.Col(
-                                                    dbc.Label("size", html_for="annotation_size",style={"margin-top":"5px"}),
+                                                    dbc.Label("size", html_for="annotation_size"),#,style={"margin-top":"5px"}),
                                                     width=2,
                                                     style={"textAlign":"right","padding-right":"2px", 'margin-top':"10px"}
                                                 ),
@@ -397,13 +419,13 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("Set the continuous color midpoint", html_for="color_continuous_midpoint",style={"margin-top":"5px"}),
-                                                    # width=8,
+                                                    dbc.Label("Color midpoint", html_for="color_continuous_midpoint"),#,style={"margin-top":"5px"}),
+                                                    width=4,
                                                     style={"textAlign":"left","padding-right":"2px", 'margin-top':"10px"}
                                                 ),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["color_continuous_midpoint"],placeholder="", id='color_continuous_midpoint', style=card_input_style),
-                                                    # width=4
+                                                    width=3
                                                 ),
             
                                             ],
