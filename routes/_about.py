@@ -1,4 +1,8 @@
-_about='''
+from myapp import app
+v=app.config["APP_VERSION"]
+v=str(v)
+
+_about=f'''
 Flaski is a flask and dash based collection of web apps for life sciences. 
 
 Flaski provides:
@@ -27,11 +31,15 @@ Issues: [https://github.com/mpg-age-bioinformatics/flaski/issues](https://github
 
 Source: [https://github.com/mpg-age-bioinformatics/flaski](https://github.com/mpg-age-bioinformatics/flaski).
 
-#### Citing
+##### Citing
 
 Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515
 
-#### Credits
+##### Credits
 
 The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing, Cologne, Germany.
+
+##### Version
+
+{v}
 '''
