@@ -32,7 +32,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         if rrbs == "reduced representation" : 
             rrbs="--rrbs"
         else:
-            rrbs=""
+            rrbs="wgbs"
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
