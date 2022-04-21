@@ -85,7 +85,7 @@ example_input.style_cell=style_cell
 # generate dropdown options
 groups_=make_options(GROUPS)
 external_=make_options(["External"])
-organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
+organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
 organisms_=make_options(organisms)
 ercc_=make_options(["YES","NO"])
 
