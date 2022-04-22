@@ -550,6 +550,52 @@ def make_app_content(pathname):
                                         className="g-1",
                                         justify="start"
                                     ),
+                                    ############################
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                dbc.Label("Color",html_for="label_fontcolor", style={"margin-top":"5px"}),
+                                                style={"textAlign":"right","padding-right":"2px"},
+                                                width=3
+                                            ),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["colors"]), value=pa["label_fontcolor"], placeholder="label_fontcolor", id='label_fontcolor', multi=False, clearable=False, style=card_input_style),
+                                                width = 5
+                                            ),
+                                            dbc.Col(
+                                                dbc.Label("Size",html_for="label_fontsize", style={"margin-top":"5px"}),
+                                                style={"textAlign":"right","padding-right":"2px"},
+                                                width=2
+                                            ),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["fontsizes"]), value=pa["label_fontsize"], placeholder="label_fontsize", id='label_fontsize', multi=False, clearable=False, style=card_input_style),
+                                                width = 2
+                                            )
+                                       ],
+                                        className="g-1",
+                                        justify="start"
+                                    ),                                
+                                    ############################
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                dbc.Label("Family",html_for="label_fontfamily", style={"margin-top":"5px"}),
+                                                style={"textAlign":"right","padding-right":"2px"},
+                                                width=3
+                                            ),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["fonts"]), value=pa["label_fontfamily"], placeholder="label_fontfamily", id='label_fontfamily', multi=False, clearable=False, style=card_input_style),
+                                                width = 9
+                                            ),
+                                        ],
+                                        className="g-1",
+                                    ),
+                                    ############################
+                                    dbc.Row([
+                                        html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
+                                    ],
+                                    className="g-1",
+                                    justify="start"),
                                         ############################################
                                         dbc.Row(
                                             [
@@ -596,46 +642,6 @@ def make_app_content(pathname):
                                         ],
                                         className="g-1",
                                     ),
-                                    ############################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Label("Family",html_for="label_fontfamily", style={"margin-top":"5px"}),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=3
-                                            ),
-                                            dbc.Col(
-                                                dcc.Dropdown( options=make_options(pa["fonts"]), value=pa["label_fontfamily"], placeholder="label_fontfamily", id='label_fontfamily', multi=False, clearable=False, style=card_input_style),
-                                                width = 9
-                                            ),
-                                        ],
-                                        className="g-1",
-                                    ),
-                                    ############################
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Label("Color",html_for="label_fontcolor", style={"margin-top":"5px"}),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=3
-                                            ),
-                                            dbc.Col(
-                                                dcc.Dropdown( options=make_options(pa["colors"]), value=pa["label_fontcolor"], placeholder="label_fontcolor", id='label_fontcolor', multi=False, clearable=False, style=card_input_style),
-                                                width = 5
-                                            ),
-                                            dbc.Col(
-                                                dbc.Label("Size",html_for="label_fontsize", style={"margin-top":"5px"}),
-                                                style={"textAlign":"right","padding-right":"2px"},
-                                                width=2
-                                            ),
-                                            dbc.Col(
-                                                dcc.Dropdown( options=make_options(pa["fontsizes"]), value=pa["label_fontsize"], placeholder="label_fontsize", id='label_fontsize', multi=False, clearable=False, style=card_input_style),
-                                                width = 2
-                                            )
-                                       ],
-                                        className="g-1",
-                                        justify="start"
-                                    ),                                
                                     ############################
                                     dbc.Row([
                                         html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
