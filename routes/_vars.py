@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=[]
 _PUBLIC_VIEWS=[]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=[ "heatmap", "circularbarplots","gseaplot","venndiagram", "dendrogram"]
+    _DEV_ROUTES=[ "heatmap", "circularbarplots","gseaplot","venndiagram", "dendrogram", "threeDscatterplot"]
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -36,6 +36,7 @@ other_nav_dropdowns =[
                 "DAVID":"/david/",\
                 "Circular bar plot":"/circularbarplots/",\
                 "Dendrogram":"/dendrogram/",\
+                "3D Scatter plot":"/threeDscatterplot/",\
 
             } \
     } \
