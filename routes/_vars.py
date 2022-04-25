@@ -30,12 +30,12 @@ other_nav_dropdowns =[
                 "Line plot":"/lineplot/",\
                 "Heatmap":"/heatmap/",\
                 "Violin plot":"/violinplot/",\
-                #"Venndiagram":"/venndiagram/",\
-                "Cell plot":"/cellplot/",\
-                "GSEA plot":"/gseaplot/",\
-                "DAVID":"/david/",\
                 "Circular bar plot":"/circularbarplots/",\
                 "Dendrogram":"/dendrogram/",\
+                #"Venndiagram":"/venndiagram/",\
+                "GSEA plot":"/gseaplot/",\
+                "DAVID":"/david/",\
+                "Cell plot":"/cellplot/",\
 
             } \
     } \
