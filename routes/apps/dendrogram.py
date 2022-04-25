@@ -1434,7 +1434,7 @@ def make_app_content(pathname):
                                 id="loading-fig-output",
                                 type="default",
                                 children=[
-                                    html.Div(id="fig-output"),
+                                    html.Div(id="fig-output", style={"overflow":"scroll"}),
                                     html.Div( 
                                         [
                                             dbc.Button(
@@ -1628,7 +1628,6 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     State('session-id', 'data'),
     prevent_initial_call=True)
 def read_input_file(contents,filename,last_modified,session_id):
-    print("HERE")
     if not filename :
         raise dash.exceptions.PreventUpdate
 

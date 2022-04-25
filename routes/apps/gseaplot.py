@@ -270,49 +270,49 @@ def make_app_content(pathname):
                                             dbc.Col(
                                                 dbc.Label("Axis:"),
                                                 style={"textAlign":"left","padding-right":"2px"},
-                                                width=3
+                                                # width=1
                                             ),
                                             dbc.Col(
                                                 dbc.Label("left",html_for="left_axis"),
                                                 style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
+                                                # width=1
                                             ),
                                             dbc.Col(
                                                 dcc.Checklist(options=[ {'value':'left_axis'} ], value=pa["left_axis"], id='left_axis', style={"height":"35px"} ),
-                                                width=1
+                                                # width=1
                                                 # className="me-3",
                                                 # width=5
                                             ),
                                             dbc.Col(
                                                 dbc.Label("right",html_for="right_axis"),
                                                 style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
+                                                # width=1
                                             ),
                                             dbc.Col(
                                                 dcc.Checklist(options=[ {'value':'right_axis'} ], value=pa["right_axis"], id='right_axis', style={"height":"35px"} ),
-                                                width=1
+                                                # width=1
                                                 # className="me-3",
                                                 # width=5
                                             ),
                                             dbc.Col(
                                                 dbc.Label("upper",html_for="upper_axis"),
                                                 style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
+                                                # width=1
                                             ),
                                             dbc.Col(
                                                 dcc.Checklist(options=[ {'value':'upper_axis'} ], value=pa["upper_axis"], id='upper_axis', style={"height":"35px"} ),
-                                                width=1
+                                                # width=1
                                                 # className="me-3",
                                                 # width=5
                                             ),
                                             dbc.Col(
                                                 dbc.Label("lower",html_for="lower_axis"),
                                                 style={"textAlign":"right","padding-right":"2px"},
-                                                width=1
+                                                # width=1
                                             ),
                                             dbc.Col(
                                                 dcc.Checklist(options=[ {'value':'lower_axis'} ], value=pa["lower_axis"], id='lower_axis', style={"height":"35px"} ),
-                                                width=1
+                                                # width=1
                                                 # className="me-3",
                                                 # width=5
                                             ),
