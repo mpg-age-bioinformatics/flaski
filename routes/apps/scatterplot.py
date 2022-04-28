@@ -1053,6 +1053,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
         toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"scatterplot")
         return dash.no_update, toast, tb_str, dash.no_update
 
+
 @dashapp.callback( 
     Output('marker-cards', 'children'),
     Output('toast-generate_markers','children'),
@@ -1060,20 +1061,34 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
     Output('generate_markers-import', 'data'),
     Input('session-id', 'data'),
     Input('groups_value', 'value'),
-    State('upload-data', 'contents'),
+    Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('generate_markers-import', 'data'),
     )
-def generate_markers(session_id,groups,contents,filename,last_modified,generate_markers_import):
+def generate_markers(session_id,groups, contents,filename,last_modified,generate_markers_import):
     pa=figure_defaults()
     if filename :
         if ( filename.split(".")[-1] == "json") and ( not generate_markers_import ):
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
             pa=app_data['pa']
             generate_markers_import=True
+            df=pd.read_json(app_data["df"])
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+        else:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+    else:
+        cols=[]
+        cols_=make_options(cols)
+
         
-    def make_card(card_header,card_id,pa,gpa):
+    def make_card(card_header,card_id,pa,gpa, cols_, field_style_on_off):
+        print(field_style_on_off)
+        card_input_style={"height":"35px","width":"100%"}
+        card_input_style_dynamic={"height":"35px","width":"100%", 'display':field_style_on_off}
         card=dbc.Card(
             [
                 dbc.CardHeader(
@@ -1086,6 +1101,22 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                     dbc.CardBody(
                         dbc.Form(
                             [
+                                ############################################
+                                dbc.Row(
+                                    [
+
+                                        dbc.Label("Fixed Styles", style={'font-weight': 'bold','display':field_style_on_off}),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [
+
+                                        dbc.Label("Marker:",width=2),
+                                    ],
+                                    className="g-1",
+                                ),
                             ############################################
                                 dbc.Row(
                                     [
@@ -1099,7 +1130,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["marker_size"]), value=gpa["markers"], placeholder="size", id={'type':"markers","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=2
-                                        )
+                                        ),
                                     ],
                                     className="g-1",
                                 ),
@@ -1132,6 +1163,12 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     ],
                                     className="g-1",
                                 ),
+                                ############################
+                                dbc.Row([
+                                    html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px","margin-bottom":"15px","margin":"auto","horizontal-align":"middle"})
+                                ],
+                                className="g-1",
+                                justify="start"),
                                 ############################################
                                 dbc.Row(
                                     [
@@ -1168,6 +1205,253 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                     ],
                                     className="g-1",
                                 ),
+                                ############################
+                                dbc.Row([
+                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px", 'display':field_style_on_off })
+                                ],
+                                className="g-1",
+                                justify="start"),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Dynamic marker styles", style={'font-weight': 'bold', 'display':field_style_on_off}),
+                               
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Select a column and range for dynamic sizes", style={'display':field_style_on_off}),
+                               
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [   dbc.Label("", width = 4, style={'display':field_style_on_off}),
+                                        dbc.Col(
+                                            dcc.Dropdown( options=cols_, value=gpa["markersizes_col"], id={'type':"markersizes_col","index":str(card_id)}, multi=False, style=card_input_style_dynamic ),
+                                            width=8
+                                        ),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################ 
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("and explicitly define your size map if necessary:",style={"margin-top":"5px",'display':field_style_on_off }),
+                                            #width=3,
+                                            #style={"textAlign":"right","padding-right":"2px"}
+                                        ),
+                                    ],
+                                    className="g-0",
+                                ),
+
+                                ############################################ 
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("", style={'display':field_style_on_off}),
+                                            width=4, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Lower", style={'display':field_style_on_off}),
+                                            width=4, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        # dbc.Col(
+                                        #     dbc.Label("Center", style={'display':field_style_on_off}),
+                                        #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        # ),
+                                        dbc.Col(
+                                            dbc.Label("Upper", style={'display':field_style_on_off}),
+                                            width=4, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    justify="center",
+                                ),
+
+                                ############################################
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("Value: ", style={'display':field_style_on_off}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["lower_size_value"], id={'type':"lower_size_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
+                                        ),
+                                        # dbc.Col(
+                                        #     dbc.Input(value=pa["center_size_value"], id={'type':"center_size_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
+                                        #     #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
+                                        # ),
+                                        dbc.Col(
+                                            dbc.Input(value=pa["upper_size_value"], id={'type':"upper_size_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top":"5px"},
+                                    align="center",
+                                ),
+
+                                ############################################
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("Size: ", style={'display':field_style_on_off}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["lower_size"], id={'type':"lower_size","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                        # dbc.Col(
+                                        #     dbc.Input(value=gpa["center_size"], id={'type':"center_size","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                        #     #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        # ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["upper_size"], id={'type':"upper_size","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top":"5px"},
+                                    align="center",
+                                ),
+                                ############################
+                                dbc.Row([
+                                    html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px","margin-bottom":"15px","margin":"auto","horizontal-align":"middle",'display':field_style_on_off})
+                                ],
+                                className="g-1",
+                                justify="start"),
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Select a column and color scale for gradient coloring", style={'display':field_style_on_off}),
+                               
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+                                dbc.Row(
+                                    [   dbc.Label("", width = 1,style={'display':field_style_on_off}),
+                                        dbc.Col(
+                                            dcc.Dropdown( options=cols_, value=gpa["markerc_col"], id={'type':"markerc_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style_dynamic ),
+                                            width=4
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("CMAP:", html_for="colorscale", style={"margin-top":"5px",'display':field_style_on_off}),
+                                            width=2,
+                                            style={"textAlign":"right"},
+                                        ),
+                                        dbc.Col(
+                                            dcc.Dropdown(options=make_options(pa["colorscale"]), value=gpa["colorscale_value"], id={'type':"colorscale_value","index":str(card_id)}, multi=False, clearable=False, style=card_input_style_dynamic ),
+                                            width=3,
+                                            style={"margin-top":"5px"}
+                                        ),
+                                        dbc.Col(
+                                            dcc.Checklist(
+                                                options=[
+                                                    {'label': 'reverse', 'value': 'reverse_color_scale'},], value=gpa['reverse_color_scale'], id={'type':"reverse_color_scale","index":str(card_id)}, style={"margin-top":"7px",'display':field_style_on_off}, 
+                                            ),
+                                            width=2,
+                                        ),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################ 
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("..or, explicitly define your color map:",style={"margin-top":"5px",'display':field_style_on_off}),
+                                            #width=3,
+                                            #style={"textAlign":"right","padding-right":"2px"}
+                                        ),
+                                    ],
+                                    className="g-0",
+                                ),
+
+                                ############################################ 
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Lower", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Center", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Upper", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    justify="center",
+                                ),
+
+                                ############################################
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("Value: ", style={'display':field_style_on_off}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["lower_value"], id={'type':"lower_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=pa["center_value"], id={'type':"center_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=pa["upper_value"], id={'type':"upper_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top":"5px"},
+                                    align="center",
+                                ),
+
+                                ############################################
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("Color: ", style={'display':field_style_on_off}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["lower_color"], id={'type':"lower_color","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["center_color"], id={'type':"center_color","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["upper_color"], id={'type':"upper_color","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top":"5px"},
+                                    align="center",
+                                ),
                                 ############################################
                             ],
                         ),
@@ -1184,17 +1468,18 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
     try:
 
         if not groups:
-            cards=[ make_card("Marker",0, pa, pa ) ]
+            field_style_on_off='inline-block'
+            cards=[ make_card("Marker",0, pa, pa, cols_, field_style_on_off) ]
         else:
+            field_style_on_off= 'none'
             cards=[]
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
             groups_=df[[groups]].drop_duplicates()[groups].tolist()
             for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
                 if filename.split(".")[-1] == "json":
                     pa_=pa["groups_settings"][i]
-                    card=make_card(g, i, pa, pa_)
+                    card=make_card(g, i, pa, pa_, cols_,field_style_on_off)
                 else:
-                    card=make_card(g, i, pa, pa)
+                    card=make_card(g, i, pa, pa, cols_,field_style_on_off)
                 cards.append(card)
         return cards, None, None, generate_markers_import
 
@@ -1202,6 +1487,18 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"scatterplot")
         return dash.no_update, toast, tb_str, dash.no_update
+
+# # new call back
+# # input fileupload
+# # output (marker_size_columns, options)
+# # output (marker_color_columns, options)
+
+# @dashapp.callback( 
+#     Output(),
+#     Input(),
+# )
+# def 
+
 
 
 states=[State('xvals', 'value'),
@@ -1252,9 +1549,23 @@ states=[State('xvals', 'value'),
     State('fixed_labels', 'value'),
     State( { 'type': 'marker', 'index': ALL }, "value"),
     State( { 'type': 'markers', 'index': ALL }, "value"),
+    State( { 'type': 'markersizes_col', 'index': ALL }, "value"),
     State( { 'type': 'markerc', 'index': ALL }, "value"),
+    State( { 'type': 'lower_size_value', 'index': ALL }, "value"),
+    State( { 'type': 'upper_size_value', 'index': ALL }, "value"),
+    State( { 'type': 'lower_size', 'index': ALL }, "value"),
+    State( { 'type': 'upper_size', 'index': ALL }, "value"),    
+    State( { 'type': 'markerc_col', 'index': ALL }, "value"),
+    State( { 'type': 'reverse_color_scale', 'index': ALL }, "value"),
+    State( { 'type': 'lower_value', 'index': ALL }, "value"),
+    State( { 'type': 'center_value', 'index': ALL }, "value"),
+    State( { 'type': 'upper_value', 'index': ALL }, "value"),
+    State( { 'type': 'lower_color', 'index': ALL }, "value"),
+    State( { 'type': 'center_color', 'index': ALL }, "value"),
+    State( { 'type': 'upper_color', 'index': ALL }, "value"),    
     State( { 'type': 'markerc_write', 'index': ALL }, "value"),
     State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
+    State( { 'type': 'colorscale_value', 'index': ALL }, "value"),
     State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
     State( { 'type': 'edgecolor', 'index': ALL }, "value"),
     State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]    
@@ -1370,6 +1681,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
+        print(pa['markerc_col'])
         fig=make_figure(df,pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )
