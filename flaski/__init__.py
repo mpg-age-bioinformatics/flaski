@@ -12,6 +12,15 @@ from waitress import serve
 
 app = Flask(__name__)
 app.config.from_object(Config)
+if app.config["CACHE_TYPE"] == "RedisCache" :
+    import redis
+    redis_password = os.environ.get('REDIS_PASSWORD') or 'REDIS_PASSWORD'
+    redis_address = os.environ.get('REDIS_ADDRESS') or None
+    session_redis= redis.from_url('redis://:%s@%s' %(redis_password,redis_address))
+    app.config["SESSION_TYPE"] = 'redis'
+    app.config["REDIS_ADDRESS"]=redis_address
+    app.config["SESSION_REDIS"]=session_redis
+    
 db = SQLAlchemy(app ,engine_options={"pool_pre_ping":True, "pool_size":0,"pool_recycle":-1} )
 migrate = Migrate(app, db)
 login = LoginManager(app)
