@@ -9,18 +9,21 @@ import os
 from flask_mail import Mail
 from flask_session import Session
 from waitress import serve
+import redis
 
 app = Flask(__name__)
 app.config.from_object(Config)
 if app.config["CACHE_TYPE"] == "RedisCache" :
-    import redis
     redis_password = os.environ.get('REDIS_PASSWORD') or 'REDIS_PASSWORD'
     redis_address = os.environ.get('REDIS_ADDRESS') or None
     session_redis= redis.from_url('redis://:%s@%s' %(redis_password,redis_address))
-    app.config["SESSION_TYPE"] = 'redis'
     app.config["REDIS_ADDRESS"]=redis_address
     app.config["SESSION_REDIS"]=session_redis
-    
+elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
+    sentinel = redis.sentinel.Sentinel([ (os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port')) ], password=os.environ.get('REDIS_PASSWORD'), sentinel_kwargs={"password": os.environ.get('REDIS_PASSWORD')})
+    connection=sentinel.master_for(os.environ.get('CACHE_REDIS_SENTINEL_MASTER'), socket_timeout=0.1)
+    app.config["SESSION_REDIS"]=connection
+
 db = SQLAlchemy(app ,engine_options={"pool_pre_ping":True, "pool_size":0,"pool_recycle":-1} )
 migrate = Migrate(app, db)
 login = LoginManager(app)

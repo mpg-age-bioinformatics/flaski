@@ -16,6 +16,7 @@ class Config(object):
     REMEMBER_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
+    SESSION_TYPE = 'redis'
     CACHE_TYPE = os.environ.get('CACHE_TYPE') or 'RedisCache' # or RedisSentinelCache
     CACHE_REDIS_SENTINELS = [ [ os.environ.get('CACHE_REDIS_SENTINELS_address') or None ,  os.environ.get('CACHE_REDIS_SENTINELS_port') or None ] ]
     CACHE_REDIS_SENTINEL_MASTER = os.environ.get('CACHE_REDIS_SENTINEL_MASTER') or None
