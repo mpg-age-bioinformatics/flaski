@@ -981,9 +981,9 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         #     df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
 
         if "Z-score" in table_headers:
-            for col in ["Z-score"]:
+            for col in ["Z-score", "mean log2 FC"]:
                 df[col]=df[col].apply(lambda x: "{0:.3f}".format(float(x)))
-            addon=14
+            addon=15
         else:
             addon=13
 

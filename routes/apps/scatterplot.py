@@ -1086,7 +1086,6 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
 
         
     def make_card(card_header,card_id,pa,gpa, cols_, field_style_on_off):
-        print(field_style_on_off)
         card_input_style={"height":"35px","width":"100%"}
         card_input_style_dynamic={"height":"35px","width":"100%", 'display':field_style_on_off}
         card=dbc.Card(
@@ -1453,6 +1452,28 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                     align="center",
                                 ),
                                 ############################################
+                                dbc.Row(
+                                    [   
+                                        dbc.Col(
+                                            dcc.Checklist(
+                                                options=[
+                                                    {'label': ' show legend', 'value': 'color_legend'},], value=gpa['color_legend'], id={'type':"color_legend","index":str(card_id)}, style={"margin-top":"17px",'display':field_style_on_off}, 
+                                            ),
+                                            width=3,
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Title:", html_for="colorscaleTitle", style={"margin-top":"15px",'display':field_style_on_off}),
+                                            width=2,
+                                            style={"textAlign":"right"},
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["colorscaleTitle"], id={'type':"colorscaleTitle","index":str(card_id)}, placeholder="", type="text", style={"margin-top":"10px",'display':field_style_on_off} ),
+                                            width=7
+                                        ),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
                             ],
                         ),
                         style=card_body_style),
@@ -1562,7 +1583,9 @@ states=[State('xvals', 'value'),
     State( { 'type': 'upper_value', 'index': ALL }, "value"),
     State( { 'type': 'lower_color', 'index': ALL }, "value"),
     State( { 'type': 'center_color', 'index': ALL }, "value"),
-    State( { 'type': 'upper_color', 'index': ALL }, "value"),    
+    State( { 'type': 'upper_color', 'index': ALL }, "value"),
+    State( { 'type': 'color_legend', 'index': ALL }, "value"),
+    State( { 'type': 'colorscaleTitle', 'index': ALL }, "value"),
     State( { 'type': 'markerc_write', 'index': ALL }, "value"),
     State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
     State( { 'type': 'colorscale_value', 'index': ALL }, "value"),
@@ -1681,7 +1704,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
-        print(pa['markerc_col'])
         fig=make_figure(df,pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )
