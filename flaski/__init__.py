@@ -21,7 +21,7 @@ if app.config["CACHE_TYPE"] == "RedisCache" :
     app.config["SESSION_REDIS"]=session_redis
 elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
     sentinel = redis.sentinel.Sentinel([ (os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port')) ], password=os.environ.get('REDIS_PASSWORD'), sentinel_kwargs={"password": os.environ.get('REDIS_PASSWORD')})
-    connection=sentinel.master_for(os.environ.get('CACHE_REDIS_SENTINEL_MASTER'), socket_timeout=1)
+    connection=sentinel.master_for(os.environ.get('CACHE_REDIS_SENTINEL_MASTER'))
     app.config["SESSION_REDIS"]=connection
 
 db = SQLAlchemy(app ,engine_options={"pool_pre_ping":True, "pool_size":0,"pool_recycle":-1} )
