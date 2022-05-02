@@ -11,6 +11,8 @@ from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_nav
 import dash_bootstrap_components as dbc
 from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table, encode_session_app
 from pyflaski.david import run_david, figure_defaults
+from pyflaski.scatterplot import figure_defaults as scatter_pa
+from pyflaski.cellplot import figure_defaults as cell_pa
 import os
 import uuid
 import traceback
@@ -650,7 +652,7 @@ def make_app_content(pathname):
                                         ],
                                         id="save-tsv-div",
                                         style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
-                                    ),                                    
+                                    ),
                                     html.Div( 
                                         [
                                             dbc.Button(
@@ -667,6 +669,24 @@ def make_app_content(pathname):
                                             dcc.Download(id='cellplot-session')
                                         ],
                                         id="cellplot-session-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),                                    
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="far fa-chart-bar"),
+                                                        " Scatterplot" 
+                                                    ]
+                                                ),
+                                                id='scatterplot-session-btn', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='scatterplot-session')
+                                        ],
+                                        id="scatterplot-session-div",
                                         style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
                                     ),                                    
                                     html.Div( 
@@ -815,6 +835,7 @@ states=[
     Output('save-excel-div', 'style'),
     Output('save-tsv-div', 'style'),
     Output('cellplot-session-div', 'style'),
+    Output('scatterplot-session-div', 'style'),
     Output('citation-session-div', 'style'),
     Output('export-session','data'),
     Output('save-excel', 'data'),
@@ -826,6 +847,7 @@ states=[
     Input("excel-filename-download","n_clicks"),
     Input("tsv-filename-download","n_clicks"),
     Input("cellplot-session-btn","n_clicks"),
+    Input("scatterplot-session-btn","n_clicks"),
     Input("citation-session-btn","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -837,7 +859,7 @@ states=[
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, save_tsv_btn, cellplot_session_btn, citation_session_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,tsv_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, save_tsv_btn, cellplot_session_btn, scatterplot_session_btn, citation_session_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,tsv_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -848,7 +870,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
-    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
+    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'}
     try:
         input_names = [item.component_id for item in states]
 
@@ -867,7 +889,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, None, None, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide, None, None, None
 
     if button_id == "export-filename-download" :
         if not export_filename:
@@ -880,29 +902,29 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
 
     if button_id == "save-session-btn" :
         try:
             if filename and filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
+                return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
             else:
                 session["session_data"]=session_data
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update,dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"david")
-            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, dash.no_update,dash.no_update, None, None, None
+            return dash.no_update, toast, None, tb_str, dash.no_update,  dash.no_update, dash.no_update,dash.no_update,dash.no_update, None, None, None
 
         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     if button_id == "excel-filename-download":
@@ -923,7 +945,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         report_stats.to_excel(writer, sheet_name = 'report stats', index = False)
         writer.save()
         data=output.getvalue()
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update, None, dcc.send_bytes(data, excel_filename), None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, None, dcc.send_bytes(data, excel_filename), None
 
     if button_id == "tsv-filename-download":
         if not tsv_filename:
@@ -935,14 +957,14 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"]) 
 
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update, None, None, dcc.send_data_frame(df.to_csv, tsv_filename, sep = "\t")
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, None, None, dcc.send_data_frame(df.to_csv, tsv_filename, sep = "\t")
 
 
     if button_id == "cellplot-session-btn":
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"])
 
-        cp_pa=dict()
+        cp_pa=cell_pa()
         cp_pa["terms_column"] = "Term"
         cp_pa["david_gene_ids"] = "Genes"
         cp_pa["plotvalue"] = "PValue"
@@ -957,8 +979,41 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         session_data=encode_session_app(session_data)
         session["session_data"]=session_data
-        return  dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index"), None, None, None, dash.no_update, dash.no_update,dash.no_update,dash.no_update, None, None, None
+        return  dcc.Location(pathname=f'{PAGE_PREFIX}/cellplot/', id="index"), None, None, None, dash.no_update, dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
 
+    if button_id == "scatterplot-session-btn":
+        david_results=run_david_and_cache(pa, cache)
+        df = pd.read_json(david_results["df"])
+        
+        sp_pa=scatter_pa()
+
+        sp_pa["fig_width"] = "1000"
+        sp_pa["fig_height"] = "600"
+        sp_pa["xvals"] = "Z-score"
+        sp_pa["yvals"] = "-log10 (pvalue)"
+        sp_pa["markersizes_col"] = "Fold Enrichment"
+        sp_pa["markerc_col"] = "mean log2 FC"
+        sp_pa["marker_alpha"] = "0.7"
+        sp_pa["lower_value"] = "-3"
+        sp_pa["center_value"] = "0"
+        sp_pa["upper_value"] = "3"
+        sp_pa["lower_color"] = "blue"
+        sp_pa["center_color"] = "lightgray"
+        sp_pa["upper_color"] = "red"
+        sp_pa["lower_size_value"] = "1"
+        sp_pa["upper_size_value"] = "30"
+        sp_pa["lower_size"] = "10"
+        sp_pa["upper_size"] = "30"
+        sp_pa["color_legend"] = ["color_legend"]
+        sp_pa["colorscaleTitle"] = "mean log2 FC"
+        sp_pa["labels_col_value"] = "Term"
+        
+        session_data={ "session_data": {"app": { "scatterplot": {"filename":"<from DAVID app>.json" ,'last_modified':last_modified,"df":david_results["df"],"pa":sp_pa} } } }
+        session_data["APP_VERSION"]=app.config['APP_VERSION']
+        session_data=encode_session_app(session_data)
+        session["session_data"]=session_data
+        #return  dash.no_update, None, None, None, dash.no_update, dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
+        return  dcc.Location(pathname=f'{PAGE_PREFIX}/scatterplot/', id="index"), None, None, None, dash.no_update, dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
 
     try:
         fig=None
@@ -981,10 +1036,12 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         #     df[col]=df[col].apply(lambda x: str(x)[:40]+"..")
 
         if "Z-score" in table_headers:
-            for col in ["Z-score", "mean log2 FC"]:
+            download_buttons_style_scatterforward={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
+            for col in ["Z-score", "mean log2 FC", "-log10 (pvalue)"]:
                 df[col]=df[col].apply(lambda x: "{0:.3f}".format(float(x)))
-            addon=15
+            addon=16
         else:
+            download_buttons_style_scatterforward={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
             addon=13
 
         for col in ["Genes"]+table_headers[addon:]:
@@ -992,12 +1049,12 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         fig=make_table(df, "david_results", fixed_columns = False)
 
-        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show,download_buttons_style_show,download_buttons_style_show, None, None, None
+        return fig, None, None, None,  download_buttons_style_show, download_buttons_style_show,download_buttons_style_show,download_buttons_style_scatterforward,download_buttons_style_show, None, None, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide,download_buttons_style_hide, None, None, None
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide,download_buttons_style_hide, None, None, None
 
 
 @dashapp.callback(

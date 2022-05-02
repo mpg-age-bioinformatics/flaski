@@ -1152,11 +1152,6 @@ def read_input_file(contents,filename, contents2, filename2, last_modified, last
         if filename.split(".")[-1] == "json":
             read_json=True
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
-            if filename == "<from DAVID app>.json":
-                cellplot_pa=figure_defaults()
-                for key in cellplot_pa:
-                    if not key in app_data["pa"].keys():
-                        app_data["pa"][key] = cellplot_pa[key]
             #first dataframe
             df=pd.read_json(app_data["df"])
             cols=df.columns.tolist()
@@ -1260,11 +1255,6 @@ def update_category_field(session_id,col,contents,filename,last_modified,update_
 
             if ( filename.split(".")[-1] == "json" ) and ( not update_category_field_import ) :
                 app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "cellplot")
-                if filename == "<from DAVID app>.json":
-                    cellplot_pa=figure_defaults()
-                    for key in cellplot_pa:
-                        if not key in app_data["pa"].keys():
-                            app_data["pa"][key] = cellplot_pa[key]
 
                 categories_to_plot_value=app_data['pa']["categories_to_plot_value"]
                 update_category_field_import=True
