@@ -30,10 +30,19 @@ dashapp = dash.Dash("storage",url_base_pathname=f'{PAGE_PREFIX}/storage/', meta_
 
 protect_dashviews(dashapp)
 
-cache = Cache(dashapp.server, config={
-    'CACHE_TYPE': 'redis',
-    'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),
-})
+if app.config["CACHE_TYPE"] == "RedisCache" :
+    cache = Cache(dashapp.server, config={
+        'CACHE_TYPE': 'RedisCache',
+        'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),
+    })
+elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
+    cache = Cache(dashapp.server, config={
+        'CACHE_TYPE': 'RedisSentinelCache',
+        'CACHE_REDIS_SENTINELS': [ 
+            [ (os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port')) ]
+        ],
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
+    })
 
 dashapp.layout=html.Div( 
     [ 
