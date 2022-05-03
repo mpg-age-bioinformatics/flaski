@@ -1007,6 +1007,9 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         sp_pa["color_legend"] = ["color_legend"]
         sp_pa["colorscaleTitle"] = "mean log2 FC"
         sp_pa["labels_col_value"] = "Term"
+        sp_pa["title"] = "plotGODESeq"
+        sp_pa["xlabel"] = "zscore"
+        sp_pa["ylabel"] = "-log10(p-value GO enrichment)"
         
         session_data={ "session_data": {"app": { "scatterplot": {"filename":"<from DAVID app>.json" ,'last_modified':last_modified,"df":david_results["df"],"pa":sp_pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
