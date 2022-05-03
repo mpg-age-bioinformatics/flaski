@@ -109,7 +109,7 @@ def make_app_content(pathname):
                             # dbc.FormGroup(
                                 [
                                     dbc.Label("x values"),
-                                    dcc.Dropdown( placeholder="x values", id='xvals', multi=False)
+                                    dcc.Dropdown( placeholder="x values", id='xvals', multi=False, clearable=False)
                                 ],
                             # ),
                             width=4,
@@ -119,7 +119,7 @@ def make_app_content(pathname):
                             # dbc.FormGroup(
                                 [
                                     dbc.Label("y values" ),
-                                    dcc.Dropdown( placeholder="y values", id='yvals', multi=False)
+                                    dcc.Dropdown( placeholder="y values", id='yvals', multi=False, clearable=False)
                                 ],
                             # ),
                             width=4,
@@ -129,7 +129,7 @@ def make_app_content(pathname):
                             # dbc.FormGroup(
                                 [
                                     dbc.Label("z values" ),
-                                    dcc.Dropdown( placeholder="z values", id='zvals', multi=False)
+                                    dcc.Dropdown( placeholder="z values", id='zvals', multi=False, clearable=False)
                                 ],
                             # ),
                             width=4,
@@ -764,38 +764,47 @@ def make_app_content(pathname):
                                             ],
                                             className="g-1",
                                         ),
-                                        ############################
-                                        dbc.Row([
-                                            html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
-                                        ],
-                                        className="g-1",
-                                        justify="start"),
-                                        ############################################ 
+                                   ############################################ 
+
+                                    ]
+                                ),
+                                style=card_body_style
+                            ),
+                            id={'type':"collapse-dynamic-card","index":"axes"},
+                            is_open=False,
+                        ),
+                    ],
+                    style={"margin-top":"2px","margin-bottom":"2px", "padding":"0px", "margin":"0px"} 
+                ),
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H2(
+                                dbc.Button( "Reference Planes", color="black", id={'type':"dynamic-card","index":"planes"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                            ),
+                            style={ "height":"40px","padding":"0px"}
+                        ),
+                        dbc.Collapse(
+                            dbc.CardBody(
+                                dbc.Form(
+                                    [ 
+                                        # ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("X-Axis plane at:",width=4),
-                                                dbc.Col(
-                                                    dcc.Input(id='x_axis_plane', placeholder="", type='text', style=card_input_style),
-                                                    width=2
-                                                ),
-                                                dbc.Label("X-CMAP",width=2, style = {"textAlign":"right"}),
-                                                dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["plane_colors"]), value=pa["x_axis_plane_color_value"] , id='x_axis_plane_color_value', multi=False, clearable=False, style=card_input_style ) ,
-                                                    width=4
-                                                ),
+                                                dbc.Label("X-Axis plane",style={'font-weight': 'bold'}, width = 4),
                                             ],
                                             className="g-1",
                                         ),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'label':' reverse colorscale', 'value':'x_axis_reverse_color_scale'} ], value=pa["x_axis_reverse_color_scale"], id='x_axis_reverse_color_scale', style={"margin-top":"6px","height":"35px"} ),
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                                dbc.Label("",width=1),
-                                                dbc.Label("Opacity",width=3, style = {"textAlign":"right"}),
+                                                dbc.Label("",width=4),
+                                                dbc.Label("at:",width=2, style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Input(id='x_axis_plane', placeholder="", type='text', style=card_input_style),
+                                                    width=2
+                                                ),
+                                                dbc.Label("Opacity",width=2, style = {"textAlign":"right"}),
                                                 dbc.Col(
                                                     dcc.Input(id='x_axis_plane_color_opacity', value=pa["x_axis_plane_color_opacity"], type='text', style=card_input_style),
                                                     width=2
@@ -806,7 +815,23 @@ def make_app_content(pathname):
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Custom X CMAP",width=4),
+                                            dbc.Label("X-CMAP",width=3, style = {"textAlign":"left"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["plane_colors"]), value=pa["x_axis_plane_color_value"] , id='x_axis_plane_color_value', multi=False, clearable=False, style=card_input_style ) ,
+                                                width=5
+                                            ),
+                                            dbc.Col(
+                                                dcc.Checklist(options=[ {'label':' reverse', 'value':'x_axis_reverse_color_scale'} ], value=pa["x_axis_reverse_color_scale"], id='x_axis_reverse_color_scale', style={"margin-top":"6px","height":"35px", "textAlign": "right"} ),
+                                                # className="me-3",
+                                                width=4
+                                            ),
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        ############################################ 
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Custom CMAP",width=4),
                                                 dbc.Label("min:",width=2, style = {"textAlign":"right"}),                                                
                                                 dbc.Col(
                                                     dcc.Input(id='x_plane_lower_color', placeholder="", type='text', style=card_input_style),
@@ -820,32 +845,29 @@ def make_app_content(pathname):
                                             ],
                                             className="g-1",
                                         ),
+                                        ############################################
+                                        dbc.Row([
+                                            html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
+                                        ],
+                                        className="g-1",
+                                        justify="start"),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Y-Axis plane at:",width=4),
-                                                dbc.Col(
-                                                    dcc.Input(id='y_axis_plane', placeholder="", type='text', style=card_input_style),
-                                                    width=2
-                                                ),
-                                                dbc.Label("Y-CMAP",width=2, style = {"textAlign":"right"}),
-                                                dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["plane_colors"]), value=pa["y_axis_plane_color_value"] , id='y_axis_plane_color_value', multi=False, clearable=False, style=card_input_style ) ,
-                                                    width=4
-                                                ),
+                                                dbc.Label("Y-Axis plane",style={'font-weight': 'bold'}, width = 4),
                                             ],
                                             className="g-1",
                                         ),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'label':' reverse colorscale', 'value':'y_axis_reverse_color_scale'} ], value=pa["y_axis_reverse_color_scale"], id='y_axis_reverse_color_scale', style={"margin-top":"6px","height":"35px"} ),
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                                dbc.Label("",width=1),
-                                                dbc.Label("Opacity",width=3, style = {"textAlign":"right"}),
+                                                dbc.Label("",width=4),
+                                                dbc.Label("at:",width=2, style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Input(id='y_axis_plane', placeholder="", type='text', style=card_input_style),
+                                                    width=2
+                                                ),
+                                                dbc.Label("Opacity",width=2, style = {"textAlign":"right"}),
                                                 dbc.Col(
                                                     dcc.Input(id='y_axis_plane_color_opacity', value=pa["y_axis_plane_color_opacity"], type='text', style=card_input_style),
                                                     width=2
@@ -856,7 +878,23 @@ def make_app_content(pathname):
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Custom Y CMAP",width=4),
+                                            dbc.Label("Y-CMAP",width=3, style = {"textAlign":"left"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["plane_colors"]), value=pa["y_axis_plane_color_value"] , id='y_axis_plane_color_value', multi=False, clearable=False, style=card_input_style ) ,
+                                                width=5
+                                            ),
+                                            dbc.Col(
+                                                dcc.Checklist(options=[ {'label':' reverse', 'value':'y_axis_reverse_color_scale'} ], value=pa["y_axis_reverse_color_scale"], id='y_axis_reverse_color_scale', style={"margin-top":"6px","height":"35px", "textAlign": "right"} ),
+                                                # className="me-3",
+                                                width=4
+                                            ),
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        ############################################ 
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Custom CMAP",width=4),
                                                 dbc.Label("min:",width=2, style = {"textAlign":"right"}),                                                
                                                 dbc.Col(
                                                     dcc.Input(id='y_plane_lower_color', placeholder="", type='text', style=card_input_style),
@@ -870,32 +908,29 @@ def make_app_content(pathname):
                                             ],
                                             className="g-1",
                                         ),
+                                        ############################################
+                                        dbc.Row([
+                                            html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
+                                        ],
+                                        className="g-1",
+                                        justify="start"),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Z-Axis plane at:",width=4),
-                                                dbc.Col(
-                                                    dcc.Input(id='z_axis_plane', placeholder="", type='text', style=card_input_style),
-                                                    width=2
-                                                ),
-                                                dbc.Label("Z-CMAP",width=2, style = {"textAlign":"right"}),
-                                                dbc.Col(
-                                                    dcc.Dropdown( options=make_options(pa["plane_colors"]), value=pa["z_axis_plane_color_value"] , id='z_axis_plane_color_value', multi=False, clearable=False, style=card_input_style ) ,
-                                                    width=4
-                                                ),
+                                                dbc.Label("Z-Axis plane",style={'font-weight': 'bold'}, width = 4),
                                             ],
                                             className="g-1",
                                         ),
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                            dbc.Col(
-                                                dcc.Checklist(options=[ {'label':' reverse colorscale', 'value':'z_axis_reverse_color_scale'} ], value=pa["z_axis_reverse_color_scale"], id='z_axis_reverse_color_scale', style={"margin-top":"6px","height":"35px"} ),
-                                                # className="me-3",
-                                                # width=5
-                                            ),
-                                                dbc.Label("",width=1),
-                                                dbc.Label("Opacity",width=3, style = {"textAlign":"right"}),
+                                                dbc.Label("",width=4),
+                                                dbc.Label("at:",width=2, style={"textAlign":"right"}),
+                                                dbc.Col(
+                                                    dcc.Input(id='z_axis_plane', placeholder="", type='text', style=card_input_style),
+                                                    width=2
+                                                ),
+                                                dbc.Label("Opacity",width=2, style = {"textAlign":"right"}),
                                                 dbc.Col(
                                                     dcc.Input(id='z_axis_plane_color_opacity', value=pa["z_axis_plane_color_opacity"], type='text', style=card_input_style),
                                                     width=2
@@ -906,7 +941,23 @@ def make_app_content(pathname):
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Custom Z CMAP",width=4),
+                                            dbc.Label("Z-CMAP",width=3, style = {"textAlign":"left"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["plane_colors"]), value=pa["z_axis_plane_color_value"] , id='z_axis_plane_color_value', multi=False, clearable=False, style=card_input_style ) ,
+                                                width=5
+                                            ),
+                                            dbc.Col(
+                                                dcc.Checklist(options=[ {'label':' reverse', 'value':'z_axis_reverse_color_scale'} ], value=pa["z_axis_reverse_color_scale"], id='z_axis_reverse_color_scale', style={"margin-top":"6px","height":"35px", "textAlign": "right"} ),
+                                                # className="me-3",
+                                                width=4
+                                            ),
+                                            ],
+                                            className="g-1",
+                                        ),
+                                        ############################################ 
+                                        dbc.Row(
+                                            [
+                                                dbc.Label("Custom CMAP",width=4),
                                                 dbc.Label("min:",width=2, style = {"textAlign":"right"}),                                                
                                                 dbc.Col(
                                                     dcc.Input(id='z_plane_lower_color', placeholder="", type='text', style=card_input_style),
@@ -926,7 +977,7 @@ def make_app_content(pathname):
                                 ),
                                 style=card_body_style
                             ),
-                            id={'type':"collapse-dynamic-card","index":"axes"},
+                            id={'type':"collapse-dynamic-card","index":"planes"},
                             is_open=False,
                         ),
                     ],
@@ -1216,6 +1267,8 @@ def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
+        from time import sleep
+        sleep(2)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update
@@ -1346,7 +1399,8 @@ def read_input_file(contents,filename,last_modified,session_id):
         upload_text=html.Div(
             [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-        )     
+        )
+        print(cols_)
         return [ cols_, cols_, cols_, cols_,cols_, upload_text, None, None,  xvals, yvals, zvals] + pa_outputs
 
     except Exception as e:
@@ -1424,7 +1478,7 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
     Output('generate_markers-import', 'data'),
     Input('session-id', 'data'),
     Input('groups_value', 'value'),
-    State('upload-data', 'contents'),
+    Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('generate_markers-import', 'data'),
@@ -1436,8 +1490,19 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "threeDscatterplot")
             pa=app_data['pa']
             generate_markers_import=True
+            df=pd.read_json(app_data["df"])
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+        else:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+    else:
+        cols=[]
+        cols_=make_options(cols)
+
         
-    def make_card(card_header,card_id,pa,gpa):
+    def make_card(card_header,card_id,pa,gpa, cols_):
         card=dbc.Card(
             [
                 dbc.CardHeader(
@@ -1468,7 +1533,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                             width=4
                                         ),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["markersizes_cols"]), value=gpa["markersizes_col"], id={'type':"markersizes_col","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=cols_, value=gpa["markersizes_col"], id={'type':"markersizes_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style ),
                                             width=6
                                         )
                                     ],
@@ -1484,7 +1549,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                             width=4
                                         ),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["markerstyles_cols"]), value=gpa["markerstyles_col"], id={'type':"markerstyles_col","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=cols_, value=gpa["markerstyles_col"], id={'type':"markerstyles_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style ),
                                             width=6
                                         )
                                     ],
@@ -1501,7 +1566,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                         ),
                                         dbc.Col(
                                                 [
-                                            dcc.Dropdown( options=make_options(pa["markerc_cols"]), value=gpa["markerc_col"], id={'type':"markerc_col","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=cols_, value=gpa["markerc_col"], id={'type':"markerc_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style ),
                                                 ],
                                             width=6,
                                         )
@@ -1531,67 +1596,67 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                                             width=4
                                         ),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["markeralpha_col"]), value=gpa["markeralpha_col_value"], id={'type':"markeralpha_col_value","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=cols_, value=gpa["markeralpha_col_value"], id={'type':"markeralpha_col_value","index":str(card_id)}, multi=False, clearable=True, style=card_input_style ),
                                             width=6
                                         )
                                     ],
                                     className="g-1",
                                 ),
-                                ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
-                                ],
-                                className="g-1",
-                                justify="start"),
-                                ############################################
-                                dbc.Row(
-                                    [
+                                # ############################
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" })
+                                # ],
+                                # className="g-1",
+                                # justify="start"),
+                                # ############################################
+                                # dbc.Row(
+                                #     [
 
-                                        dbc.Label("Line",width=2),
-                                    ],
-                                    className="g-1",
-                                ),
-                                ############################################
-                                dbc.Row(
-                                    [
-                                        dbc.Label("width",width=2,style={"textAlign":"right"}),
-                                        dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=gpa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-                                            width=4
-                                        ),
-                                        dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["edge_linewidth_cols"]), value=gpa["edge_linewidth_col"], id={'type':"edge_linewidth_col","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-                                            width=6
-                                        )
-                                    ],
-                                    className="g-1",
-                                ),
-                                ############################################
-                                dbc.Row(
-                                    [
-                                        dbc.Label("color",width=2,style={"textAlign":"right"}),
-                                        dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["edge_colors"]), value=gpa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-                                            width=4
-                                        ),
-                                        dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["edgecolor_cols"]), value=gpa["edgecolor_col"], id={'type':"edgecolor_col","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-                                            width=6
-                                        )
-                                    ],
-                                    className="g-1",
-                                ),
-                                ############################################
-                                dbc.Row(
-                                    [
-                                        dbc.Label("",width=2),
-                                        dbc.Col(
-                                            dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, value=gpa["edgecolor_write"], placeholder=".. or, write color name", type='text', style=card_input_style ),
-                                            width=10
-                                        )
-                                    ],
-                                    className="g-1",
-                                ),
+                                #         dbc.Label("Line",width=2),
+                                #     ],
+                                #     className="g-1",
+                                # ),
+                                # ############################################
+                                # dbc.Row(
+                                #     [
+                                #         dbc.Label("width",width=2,style={"textAlign":"right"}),
+                                #         dbc.Col(
+                                #             dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=gpa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                #             width=4
+                                #         ),
+                                #         dbc.Col(
+                                #             dcc.Dropdown( options=cols_, value=gpa["edge_linewidth_col"], id={'type':"edge_linewidth_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style ),
+                                #             width=6
+                                #         )
+                                #     ],
+                                #     className="g-1",
+                                # ),
+                                # ############################################
+                                # dbc.Row(
+                                #     [
+                                #         dbc.Label("color",width=2,style={"textAlign":"right"}),
+                                #         dbc.Col(
+                                #             dcc.Dropdown( options=make_options(pa["edge_colors"]), value=gpa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                #             width=4
+                                #         ),
+                                #         dbc.Col(
+                                #             dcc.Dropdown( options=cols_, value=gpa["edgecolor_col"], id={'type':"edgecolor_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style ),
+                                #             width=6
+                                #         )
+                                #     ],
+                                #     className="g-1",
+                                # ),
+                                # ############################################
+                                # dbc.Row(
+                                #     [
+                                #         dbc.Label("",width=2),
+                                #         dbc.Col(
+                                #             dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, value=gpa["edgecolor_write"], placeholder=".. or, write color name", type='text', style=card_input_style ),
+                                #             width=10
+                                #         )
+                                #     ],
+                                #     className="g-1",
+                                # ),
                                 ############################################
                             ],
                         ),
@@ -1608,7 +1673,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
     try:
 
         if not groups:
-            cards=[ make_card("Marker",0, pa, pa ) ]
+            cards=[ make_card("Marker",0, pa, pa, cols_ ) ]
         else:
             cards=[]
             df=parse_table(contents,filename,last_modified,current_user.id,cache,"threeDscatterplot")
@@ -1616,9 +1681,9 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
             for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
                 if filename.split(".")[-1] == "json":
                     pa_=pa["groups_settings"][i]
-                    card=make_card(g, i, pa, pa_)
+                    card=make_card(g, i, pa, pa_, cols_)
                 else:
-                    card=make_card(g, i, pa, pa)
+                    card=make_card(g, i, pa, pa, cols_)
                 cards.append(card)
         return cards, None, None, generate_markers_import
 
@@ -1711,7 +1776,7 @@ states=[
     State( { 'type': 'markerc_col', 'index': ALL }, "value"),
     State( { 'type': 'markerc_write', 'index': ALL }, "value"),
     State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
-    State( { 'type': 'markeralpha_col', 'index': ALL }, "value"),
+    State( { 'type': 'markeralpha_col_value', 'index': ALL }, "value"),
     State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
     State( { 'type': 'edge_linewidth_col', 'index': ALL }, "value"),
     State( { 'type': 'edgecolor', 'index': ALL }, "value"),
