@@ -1268,7 +1268,7 @@ def read_session_redis(session_id):
         imp=session["session_data"]
         del(session["session_data"])
         from time import sleep
-        sleep(2)
+        sleep(1)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update
@@ -1381,7 +1381,7 @@ def read_input_file(contents,filename,last_modified,session_id):
             filename=app_data["filename"]
             xvals=app_data['pa']["xvals"]
             yvals=app_data['pa']["yvals"]
-            yvals=app_data['pa']["zvals"]
+            zvals=app_data['pa']["zvals"]
 
             pa=app_data["pa"]
 
@@ -1400,7 +1400,6 @@ def read_input_file(contents,filename,last_modified,session_id):
             [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         )
-        print(cols_)
         return [ cols_, cols_, cols_, cols_,cols_, upload_text, None, None,  xvals, yvals, zvals] + pa_outputs
 
     except Exception as e:
@@ -1464,7 +1463,6 @@ def update_labels_field(session_id,col,contents,filename,last_modified,update_la
                     style= {'display': 'none',"margin-top":"2px"}
                 )
             )
-
         return labels_section, None, None, update_labels_field_import
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
