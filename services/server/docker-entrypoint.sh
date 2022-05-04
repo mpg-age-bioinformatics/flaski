@@ -7,14 +7,19 @@ if [[ "$FLASK_ENV" == "init" ]] ; then
   touch /mysql_backup.log
   touch /rsync.log
 
-  while ! mysqladmin --user=root --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} status ; 
-    do echo "Waiting for mysql.. " && sleep 4
-  done
-
   if mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} -e "use flaski";
     then
       echo "Flaski database already exists."
     else
+
+      while ! mysqladmin --user=root --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} status ; 
+        do echo "Waiting for mysql.. " && sleep 4
+      done
+
+      if mysql --user=${MYSQL_USER} --password="${MYSQL_PASSWORD}" --host=${MYSQL_HOST} -e "use flaski";
+        then
+          echo "Flaski database already exists."
+        else
 
 mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=${MYSQL_HOST} << _EOF_
 CREATE USER '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';
@@ -25,7 +30,8 @@ GRANT ALL PRIVILEGES ON flaski.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 _EOF_
 
-      echo "mysql database created.."
+          echo "mysql database created.."
+      fi
   fi
 
   if [[ "$RESTORE_DB" == "1" ]] ; then
