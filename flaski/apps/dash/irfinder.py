@@ -20,10 +20,19 @@ navbar_title="IRfinder submission form"
 dashapp = dash.Dash(CURRENTAPP,url_base_pathname=f'/{CURRENTAPP}/' , meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title="FLASKI", assets_folder="/flaski/flaski/static/dash/")
 protect_dashviews(dashapp)
 
-cache = Cache(dashapp.server, config={
-    'CACHE_TYPE': 'redis',
-    'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_ADDRESS') )  #'redis://localhost:6379'),
-})
+if app.config["CACHE_TYPE"] == "RedisCache" :
+    cache = Cache(dashapp.server, config={
+        'CACHE_TYPE': 'RedisCache',
+        'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),
+    })
+elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
+    cache = Cache(dashapp.server, config={
+        'CACHE_TYPE': 'RedisSentinelCache',
+        'CACHE_REDIS_SENTINELS': [ 
+            [ os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port') ]
+        ],
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
+    })
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
