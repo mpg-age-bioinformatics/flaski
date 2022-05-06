@@ -823,11 +823,15 @@ def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
-        if type(imp) == dict:
-            ks=list( imp.keys() )
-            if ( "session_import" in ks ) and ( "sessionfilename" in ks ) and ( "last_modified" in ks ) :
-                return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
-    return dash.no_update, dash.no_update, dash.no_update
+        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+    else:
+        return dash.no_update, dash.no_update, dash.no_update
+
+    #     if type(imp) == dict:
+    #         ks=list( imp.keys() )
+    #         if ( "session_import" in ks ) and ( "sessionfilename" in ks ) and ( "last_modified" in ks ) :
+    #             return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+    # return dash.no_update, dash.no_update, dash.no_update
 
 read_input_updates=[
     'groups_value',
