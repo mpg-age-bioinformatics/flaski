@@ -23,7 +23,7 @@ import plotly.express as px
 # from plotly.io import write_image
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
-
+from time import sleep
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -32,7 +32,11 @@ dashapp = dash.Dash("david",url_base_pathname=f'{PAGE_PREFIX}/david/', meta_tags
 
 protect_dashviews(dashapp)
 
-if app.config["CACHE_TYPE"] == "RedisCache" :
+if app.config["SESSION_TYPE"] == "sqlalchemy":
+    import sqlalchemy
+    engine = sqlalchemy.create_engine(app.config["SQLALCHEMY_DATABASE_URI"] , echo=True)
+    app.config["SESSION_SQLALCHEMY"] = engine
+elif app.config["CACHE_TYPE"] == "RedisCache" :
     cache = Cache(dashapp.server, config={
         'CACHE_TYPE': 'RedisCache',
         'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),
@@ -808,7 +812,7 @@ def read_session_redis(session_id):
         imp=session["session_data"]
         del(session["session_data"])
         from time import sleep
-        sleep(2)
+        sleep(3)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
         return dash.no_update, dash.no_update, dash.no_update

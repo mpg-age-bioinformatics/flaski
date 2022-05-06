@@ -22,7 +22,7 @@ import stat
 from datetime import datetime
 # import dash_table
 import shutil
-
+from time import sleep
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
@@ -30,7 +30,11 @@ dashapp = dash.Dash("storage",url_base_pathname=f'{PAGE_PREFIX}/storage/', meta_
 
 protect_dashviews(dashapp)
 
-if app.config["CACHE_TYPE"] == "RedisCache" :
+if app.config["SESSION_TYPE"] == "sqlalchemy":
+    import sqlalchemy
+    engine = sqlalchemy.create_engine(app.config["SQLALCHEMY_DATABASE_URI"] , echo=True)
+    app.config["SESSION_SQLALCHEMY"] = engine
+elif app.config["CACHE_TYPE"] == "RedisCache" :
     cache = Cache(dashapp.server, config={
         'CACHE_TYPE': 'RedisCache',
         'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),

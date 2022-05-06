@@ -73,6 +73,7 @@ services:
    - APP_URL=https://0.0.0.0 # eg. https://0.0.0.0/v3 for a /v3 PAGE_PREFIX
   #  - PAGE_PREFIX=/v3 # eg . /v3   - LOGS=/var/log/myapp/
    - SECRET_KEY=${SECRET_KEY}
+   - SESSION_TYPE=sqlalchemy
    - REDIS_ADDRESS=redis:6379/0
    - REDIS_PASSWORD=${REDIS_PASSWORD}
    - DB_NAME=myapp
