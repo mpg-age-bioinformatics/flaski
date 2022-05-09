@@ -1479,15 +1479,16 @@ def make_app_content(pathname):
     Output('upload-data', 'contents'),
     Output('upload-data', 'filename'),
     Output('upload-data', 'last_modified'),
+    Output('stored-file', 'children'),
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
         sleep(3)
-        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+        return imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
     else:
-        return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, None
 
 read_input_updates=[
     'hue',

@@ -117,48 +117,26 @@ def make_app_content(pathname):
                 ############################
                 dbc.Row(
                     [
-                        dbc.Col(
-                            dbc.Label("Row Names"),
-                            style={"textAlign":"left","padding-right":"2px"},
-                            width=4
-                        ),
+                        dbc.Label("Row Names",width = 4),
                         dbc.Col(                        
                             dcc.Dropdown( placeholder="index", id='xvals', multi=False),
                             width=8
                         ),
                     ],
-                    align="start",
-                    justify="betweem",
-                    className="g-0",
-                ),
-                ############################
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Checklist(options=[ {'label':' Groups in first row', 'value':'groups'} ], value=pa["groups"], id='groups', style={"margin-top":"6px","height":"35px"} ),
-                            # className="me-3",
-                            # width=5
-                        ),
-                    ],
-                    # justify="start",
                     className="g-1",
                 ),
                 ############################
+                html.Div(id="group-section"),
+                ############################
                 dbc.Row(
                     [
-                        dbc.Col(
-                            dbc.Label("Data Columns"),
-                            style={"textAlign":"left","padding-right":"2px"},
-                            width=4
-                        ),
+                        dbc.Label("Data Columns",width = 4),
                         dbc.Col(                        
                             dcc.Dropdown( placeholder="data columns", id='yvals', multi=True),
                             width=8
                         ),
                     ],
-                    align="start",
-                    justify="betweem",
-                    className="g-0",
+                    className="g-1",
                 ),
                 ############################
                 dbc.Card(
@@ -311,6 +289,7 @@ def make_app_content(pathname):
         [
             dcc.Store( id='session-data' ),
             # dcc.Store( id='json-import' ),
+            dcc.Store( id='update_group_field-import'),
             dcc.Store( id='update_labels_field-import'),
             dcc.Store( id='generate_markers-import'),
             dbc.Row( 
@@ -389,6 +368,8 @@ def make_app_content(pathname):
                                 [
                                     html.Div( id="toast-read_input_file"  ),
                                     dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
+                                    html.Div( id="toast-update_group_field"  ),
+                                    dcc.Store( id={ "type":"traceback", "index":"update_group_field" }), 
                                     html.Div( id="toast-make_fig_output" ),
                                     dcc.Store( id={ "type":"traceback", "index":"make_fig_output" }), 
                                     html.Div(id="toast-email"),  
@@ -511,7 +492,7 @@ def read_input_file(contents,filename,last_modified,session_id):
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
     try:
         if filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "mds")
             df=pd.read_json(app_data["df"])
             cols=df.columns.tolist()
             cols_=make_options(cols)
@@ -524,7 +505,7 @@ def read_input_file(contents,filename,last_modified,session_id):
             pa_outputs=[pa[k] for k in  read_input_updates ]
 
         else:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"mds")
             app_data=dash.no_update
             cols=df.columns.tolist()
             cols_=make_options(cols)
@@ -539,8 +520,77 @@ def read_input_file(contents,filename,last_modified,session_id):
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"scatterplot")
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"mds")
         return [dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
+
+
+@dashapp.callback( 
+    Output('group-section', 'children'),
+    Output('toast-update_group_field','children'),
+    Output({ "type":"traceback", "index":"update_group_field" },'data'),
+    Output('update_group_field-import', 'data'),
+    Input('session-id','data'),
+    Input('xvals','value'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('update_group_field-import', 'data'),
+)
+def update_group_field(session_id,col,contents,filename,last_modified,update_group_field_import):
+    try:
+        if filename:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"mds")
+            if col:
+                group=df[[col]].drop_duplicates()[col].tolist()
+                group_=make_options(group)
+            else:
+                group=df.index.tolist()
+                group_=make_options(group)
+
+            if ( filename.split(".")[-1] == "json" ) and ( not update_group_field_import ) :
+                app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "mds")
+
+                groups=app_data['pa']["groups"]
+                update_group_field_import=True
+            else:
+                groups=[]
+
+
+            group_section=dbc.Form(
+                dbc.Row(
+                    [
+                        dbc.Label("Groups (in Row)", width=4),
+                        dbc.Col(
+                            dcc.Dropdown( options=group_, value=None, id='groups', multi=False),
+                            width=8
+                        )
+                    ],
+                    className="g-1",
+                    style={"margin-top":"2px"}
+                )
+            )
+        else:
+            group_section=dbc.Form(
+                dbc.Row(
+                    [
+                        dbc.Label("Groups (in Row)", width=4),
+                        dbc.Col(
+                            dcc.Dropdown( placeholder="group", id='groups', multi=False),
+                            width=8
+                        )
+                    ],
+                    # row=True,
+                    className="g-1",
+                    style= {'display': 'none',"margin-top":"2px"}
+                )
+            )
+
+        return group_section, None, None, update_group_field_import
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem updating the group field.","update_group_field", e, current_user,"cellplot")
+        return dash.no_update, toast, tb_str, dash.no_update
+
 
 states=[
     State('xvals', 'value'),
@@ -583,7 +633,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
-    print("HERE")
     ctx = dash.callback_context
     if not ctx.triggered:
         button_id = 'No clicks yet'
@@ -691,7 +740,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         sp_pa["fig_height"] = "600"
         sp_pa["xvals"] = "Component1"
         sp_pa["yvals"] = "Component2"
-        sp_pa["labels_col_value"] = "row"
+        sp_pa["labels_col_value"] = "Sample"
         sp_pa["title"] = "MDS"
         sp_pa["xlabel"] = "Component1"
         sp_pa["ylabel"] = "Component2"
