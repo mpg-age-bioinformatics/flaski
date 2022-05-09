@@ -206,7 +206,7 @@ def make_app_content(pathname):
                                 dbc.Row(
                                     [
                                     dbc.Col(
-                                        dbc.Label("Perform MDS on:",html_for="scale_value", style={"margin-top":"5px"}),
+                                        dbc.Label("Scale input data on:",html_for="scale_value", style={"margin-top":"5px"}),
                                         style={"textAlign":"left","padding-right":"2px"},
                                         width=8
                                     ),
@@ -678,7 +678,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         mds_results=run_mds_and_cache(df, pa, cache)
         projected = pd.read_json(mds_results["projected"]) 
 
-        return dash.no_update, None, None, None,dash.no_update, dash.no_update, dash.no_update, None, None, dcc.send_data_frame(df.to_csv, tsv_filename, sep = "\t")
+        return dash.no_update, None, None, None,dash.no_update, dash.no_update, dash.no_update, None, None, dcc.send_data_frame(projected.to_csv, tsv_filename, sep = "\t")
 
 
     if button_id == "scatterplot-session-btn":

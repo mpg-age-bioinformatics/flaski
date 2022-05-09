@@ -1450,7 +1450,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
 
     if button_id == "save-session-btn" :
         try:
-            if filename.split(".")[-1] == "json" :
+            if filename.split(".")[-1] == "json" and not filename == "<from DAVID app>.json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
                 return dash.no_update, toast, None, None, dash.no_update, None
             else:
