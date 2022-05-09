@@ -60,7 +60,7 @@ GSRAHSSHLKSKKGQSTSRH\n\
 >sequence_n_nam...."
 
 def make_submission_json(email,group, name, sequence):
-    @cache.memoize(60*60*2) # 2 hours
+    @cache.memoize(7200) # 2 hours
     def _make_submission_json(email,group, name, sequence):
         def clean_seqs(sequence):
             sequence=sequence.replace(" ", "")
