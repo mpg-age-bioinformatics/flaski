@@ -1512,7 +1512,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
             cards=[]
             groups_=df[[groups]].drop_duplicates()[groups].tolist()
             for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
-                if filename.split(".")[-1] == "json" and not filename == "<from MDS app>.json":
+                if filename.split(".")[-1] == "json" and not filename in ["<from MDS app>.json", "<from PCA app>.json"]:
                     pa_=pa["groups_settings"][i]
                     card=make_card(g, i, pa, pa_, cols_,field_style_on_off)
                 else:
@@ -1686,7 +1686,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
 
     if button_id == "save-session-btn" :
         try:
-            if filename.split(".")[-1] == "json" and not filename in ["<from MDS app>.json", "<from DAVID app>.json"]:
+            if filename.split(".")[-1] == "json" and not filename in ["<from MDS app>.json", "<from DAVID app>.json", "<from PCA app>.json"]:
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
                 return dash.no_update, toast, None, None, dash.no_update, None
             else:
