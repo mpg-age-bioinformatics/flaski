@@ -196,8 +196,11 @@ def reset_password(token):
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
-        db.session.commit()
+        now=str(datetime.utcnow()).split(" ")[0]
+        last_seen=str(current_user.last_seen).split(" ")[0]
+        if now != last_seen :
+            current_user.last_seen = datetime.utcnow()
+            db.session.commit()
         if not current_user.active:
             flash('This account is not active. Please contact support.',"error")
             logout_user()
