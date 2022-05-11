@@ -1,1 +1,1 @@
-from myapp.routes.apps import storage, scatterplot, heatmap, violinplot, cellplot, gseaplot, david, lineplot, dendrogram, threeDscatterplot, mds, pca
+from myapp.routes.apps import storage, scatterplot, heatmap, violinplot, cellplot, gseaplot, david, lineplot, dendrogram, threeDscatterplot, mds, pca, tsne
