@@ -199,7 +199,7 @@ services:
   command: redis-server --requirepass ${REDIS_PASSWORD}
 
  reverse-proxy:
-  image: traefik:v2.4
+  image: traefik:v2.6
   command: 
     - --api.insecure=true
     - --providers.docker=true
