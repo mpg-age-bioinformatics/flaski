@@ -200,8 +200,8 @@ services:
   #  - ~/flaski_data/certificates/key.pem:/certs/key.pem:ro
   #  - ~/flaski_data/certificates/dhparam.pem:/certs/dhparam.pem:ro
    - ./services/nginx/flaski23.conf:/etc/nginx/conf.d/default.conf:rw
-   - ~/flaski23/certificates/cert.pem:/certs/cert.pem:ro 
-   - ~/flaski23/certificates/key.pem:/certs/key.pem:ro
+   - ~/flaski23/certificates/tls.cert:/certs/cert.pem:ro 
+   - ~/flaski23/certificates/tls.key:/certs/key.pem:ro
    - ~/flaski23/certificates/dhparam.pem:/certs/dhparam.pem:ro
   links:
    - server
