@@ -22,6 +22,7 @@ COPY ./static/dog-solid.png /myapp/myapp/static/favicon.ico
 COPY ./static/dog-solid.png /myapp/myapp/static/logo.png
 COPY ./pyflaski/pyflaski /myapp/pyflaski
 COPY ./pyflaski/data/david /myapp/data/david
+COPY ./pyflaski/data/kegg /myapp/data/kegg
 COPY ./routes/home.py /myapp/myapp/routes/home.py
 COPY ./routes/apps /myapp/myapp/routes/apps
 COPY ./routes/_routes.py /myapp/myapp/routes/_routes.py

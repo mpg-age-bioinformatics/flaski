@@ -52,7 +52,7 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
 def run_kegg_and_cache(pa, cache):
     @cache.memoize(timeout=3600)
     def _run_kegg_and_cache(pa, cache):
-        projected = make_figure(pa)
+        projected, msg = make_figure(pa)
         kegg_results={ "projected": projected.to_json() }
         return kegg_results
     return _run_kegg_and_cache(pa, cache)
@@ -276,24 +276,6 @@ def make_app_content(pathname):
                                         id="save-tsv-div",
                                         style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
                                     ),
-                                    html.Div( 
-                                        [
-                                            dbc.Button(
-                                                html.Span(
-                                                    [ 
-                                                        html.I(className="far fa-chart-bar"),
-                                                        " Scatterplot" 
-                                                    ]
-                                                ),
-                                                id='scatterplot-session-btn', 
-                                                style={"max-width":"150px","width":"100%"},
-                                                color="secondary"
-                                            ),
-                                            dcc.Download(id='scatterplot-session')
-                                        ],
-                                        id="scatterplot-session-div",
-                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
-                                    ),
                                 ],
                                 style={"height":"100%"}
                             ),
@@ -405,7 +387,6 @@ states=[
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
     Output('save-excel-div', 'style'),
     Output('save-tsv-div', 'style'),
-    Output('scatterplot-session-div', 'style'),
     Output('export-session','data'),
     Output('save-excel', 'data'),
     Output('save-tsv', 'data'),
@@ -415,7 +396,6 @@ states=[
     Input("saveas-session-btn","n_clicks"),
     Input("excel-filename-download","n_clicks"),
     Input("tsv-filename-download","n_clicks"),
-    Input("scatterplot-session-btn","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -426,7 +406,7 @@ states=[
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, save_tsv_btn, scatterplot_session_btn, session_id,contents,filename,last_modified,export_filename,excel_filename,tsv_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, save_tsv_btn,  session_id,contents,filename,last_modified,export_filename,excel_filename,tsv_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -441,7 +421,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         input_names = [item.component_id for item in states]
 
         if filename and filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "david")
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "kegg")
             pa = app_data["pa"]
         else:
             pa=figure_defaults()
@@ -455,7 +435,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"kegg")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide,download_buttons_style_hide, None, None, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None, None
 
     if button_id == "export-filename-download" :
         if not export_filename:
@@ -468,7 +448,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update,dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
 
     if button_id == "save-session-btn" :
         try:
@@ -477,20 +457,20 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
                 return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update, None, None, None
             else:
                 session["session_data"]=session_data
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update,dash.no_update,dash.no_update, dash.no_update, dash.no_update
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update,dash.no_update, dash.no_update, dash.no_update
                 # save session_data to redis session
                 # redirect to as a save as to file server
 
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"kegg")
-            return dash.no_update, toast, None, tb_str, dash.no_update, dash.no_update,dash.no_update, None, None, None
+            return dash.no_update, toast, None, tb_str, dash.no_update, dash.no_update, None, None, None
 
         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'),  dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'),  dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     if button_id == "excel-filename-download":
@@ -509,7 +489,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         projected.to_excel(writer, sheet_name = 'kegg results', index = False)
         writer.save()
         data=output.getvalue()
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update,dash.no_update, None, dcc.send_bytes(data, excel_filename), None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, None, dcc.send_bytes(data, excel_filename), None
 
     if button_id == "tsv-filename-download":
         if not tsv_filename:
@@ -521,7 +501,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         kegg_results=run_kegg_and_cache(pa, cache)
         projected = pd.read_json(kegg_results["projected"]) 
 
-        return dash.no_update, None, None, None,dash.no_update, dash.no_update, dash.no_update, None, None, dcc.send_data_frame(projected.to_csv, tsv_filename, sep = "\t")
+        return dash.no_update, None, None, None,dash.no_update, dash.no_update, None, None, dcc.send_data_frame(projected.to_csv, tsv_filename, sep = "\t")
 
 
     try:
@@ -530,14 +510,14 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         projected = pd.read_json(kegg_results["projected"]) 
         # truncate to two decimal points were appropriate
 
-        fig=make_table(projected, "kegg_results", fixed_columns = False)
+        fig=make_table(projected, "kegg_results", fixed_columns = True)
 
-        return fig, None, None, None,  download_buttons_style_show,download_buttons_style_show,download_buttons_style_show,None, None, None
+        return fig, None, None, None,  download_buttons_style_show,download_buttons_style_show,None, None, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"kegg")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide,  download_buttons_style_hide, download_buttons_style_hide, None, None, None
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide,  download_buttons_style_hide, None, None, None
 
 
 @dashapp.callback(
