@@ -137,7 +137,7 @@ def make_app_content(pathname):
                                 ],
                             # ),
                             width=4,
-                            style={"padding-left":"2px","padding-right":"2px"}
+                            style={"padding-left":"4px"}
                         ),
                     ],
                     align="start",
@@ -154,7 +154,7 @@ def make_app_content(pathname):
                                 ],
                             # ),
                             width=12,
-                            style={"padding-left":"4px"}
+                            style={"padding-top":"10px"}
                         ),
                     ],
                     align="start",

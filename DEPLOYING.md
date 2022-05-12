@@ -41,7 +41,7 @@ docker-compose up -d --build
 
 If running myapp on development mode you will have to start flask from inside the server container:
 ```
-docker compose exec server /bin/bash
+docker-compose exec server /bin/bash
 flask run --host 0.0.0.0 --port 8000
 ```
 Adding administrator user:
@@ -55,7 +55,7 @@ To use the SMTP debugging server from Python comment all email related `env` in 
 You can not using python's fake email server that accepts emails, but instead of sending them, it prints them to the console. 
 To run this server, open a second terminal session and run the following command on it:
 ```bash
-docker compose exec server python3 -m smtpd -n -c DebuggingServer localhost:8025
+docker-compose exec server python3 -m smtpd -n -c DebuggingServer localhost:8025
 ```
 
 ### pyflaski
