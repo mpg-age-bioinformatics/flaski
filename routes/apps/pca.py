@@ -310,7 +310,7 @@ def make_app_content(pathname):
                                 id="loading-fig-output",
                                 type="default",
                                 children=[
-                                    html.Div(id="fig-output"),
+                                    html.Div(id="fig-output", style={"margin-left": "5px"}),
                                     html.Div( 
                                         [
                                             dbc.Button(
