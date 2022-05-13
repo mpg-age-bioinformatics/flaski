@@ -3,6 +3,7 @@ from plotly import optional_imports
 from myapp import app, PAGE_PREFIX
 from flask_login import current_user
 from flask_caching import Cache
+from myapp.models import UserLogging
 from flask import session
 import dash
 from dash import dcc, html
@@ -69,6 +70,9 @@ card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    eventlog = UserLogging(email=current_user.email, action="visit circularbarplots")
+    db.session.add(eventlog)
+    db.session.commit()
     protected_content=html.Div(
         [
             make_navbar_logged("Circular bars plot",current_user),
