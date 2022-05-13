@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=[]
 _PUBLIC_VIEWS=[]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=[ "heatmap", "circularbarplots","venndiagram", "kegg"  ]
+    _DEV_ROUTES=[ "heatmap", "circularbarplots","venndiagram"]
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -27,6 +27,7 @@ other_nav_dropdowns =[
         "Apps": \
             {
                 "Scatter plot":"/scatterplot/",\
+                "3D Scatter plot":"/threeDscatterplot/",\
                 "Line plot":"/lineplot/",\
                 "Heatmap":"/heatmap/",\
                 "Violin plot":"/violinplot/",\
@@ -36,11 +37,10 @@ other_nav_dropdowns =[
                 "GSEA plot":"/gseaplot/",\
                 "DAVID":"/david/",\
                 "Cell plot":"/cellplot/",\
-                "3D Scatter plot":"/threeDscatterplot/",\
-                "MDS":"/mds/",\
-                "PCA":"/pca/",\
-                "tSNE":"/tsne/",\
                 "KEGG":"/kegg/",\
+                "PCA":"/pca/",\
+                "MDS":"/mds/",\
+                "tSNE":"/tsne/",\
 
             } \
     } \

@@ -9,9 +9,8 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table, encode_session_app
+from myapp.routes.apps._utils import parse_import_json, make_options, make_except_toast, ask_for_help, save_session,  make_table_kegg
 from pyflaski.kegg import make_figure, figure_defaults
-from pyflaski.scatterplot import figure_defaults as scatter_pa
 import os
 import uuid
 import traceback
@@ -239,7 +238,7 @@ def make_app_content(pathname):
                                 id="loading-fig-output",
                                 type="default",
                                 children=[
-                                    html.Div(id="fig-output"),
+                                    html.Div(id="fig-output", style={"margin-left": "4px"}),
                                     html.Div( 
                                         [
                                             dbc.Button(
@@ -510,7 +509,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         projected = pd.read_json(kegg_results["projected"]) 
         # truncate to two decimal points were appropriate
 
-        fig=make_table(projected, "kegg_results", fixed_columns = True)
+        fig=make_table_kegg(projected, "kegg_results", fixed_columns = True)
 
         return fig, None, None, None,  download_buttons_style_show,download_buttons_style_show,None, None, None
 
