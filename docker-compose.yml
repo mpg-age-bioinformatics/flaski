@@ -206,31 +206,31 @@ services:
   links:
    - mariadb
 
- uploads:
-  container_name: uploads
-  # image: mpgagebioinformatics/myapp # -flaski2:latest
-  build:
-    context: ~/myapp
-    dockerfile: services/server/Dockerfile
-    args:
-      BUILD_NAME: myapp
-      MYAPP_VERSION: dev
-      UPGRADE_REQS: "no"  
-  entrypoint: /myapp/services/rsync/entrypoint.sh
-  volumes:
-   - ~/myapp:/myapp
-   - ~/flaski23/backup/mpcdf/:/mpcdf
-   - ~/flaski23/backup/submissions/:/submissions
-   - ./.owncloud.flaski:/flaski/.owncloud.flaski
-  #  - /srv/submissions/:/submissions
-  #  - /srv/backup/mariadb:/backup/mariadb
-  #  - /srv/backup/data/users:/backup/users_data
-  environment:
-   FLASK_ENV: rsync
-   OWNCLOUD_ADDRESS: https://datashare.mpcdf.mpg.de
-   OWNCLOUD_USER: g-flaski
-   OWNCLOUD_PASS: ${OWNCLOUD_PASS}   
-  restart: unless-stopped
+#  uploads:
+#   container_name: uploads
+#   # image: mpgagebioinformatics/myapp # -flaski2:latest
+#   build:
+#     context: ~/myapp
+#     dockerfile: services/server/Dockerfile
+#     args:
+#       BUILD_NAME: myapp
+#       MYAPP_VERSION: dev
+#       UPGRADE_REQS: "no"  
+#   entrypoint: /myapp/services/rsync/entrypoint.sh
+#   volumes:
+#    - ~/myapp:/myapp
+#    - ~/flaski23/backup/mpcdf/:/mpcdf
+#    - ~/flaski23/backup/submissions/:/submissions
+#    - ./.owncloud.flaski:/flaski/.owncloud.flaski
+#   #  - /srv/submissions/:/submissions
+#   #  - /srv/backup/mariadb:/backup/mariadb
+#   #  - /srv/backup/data/users:/backup/users_data
+#   environment:
+#    FLASK_ENV: rsync
+#    OWNCLOUD_ADDRESS: https://datashare.mpcdf.mpg.de
+#    OWNCLOUD_USER: g-flaski
+#    OWNCLOUD_PASS: ${OWNCLOUD_PASS}   
+#   restart: unless-stopped
 
  mariadb:
   container_name: mariadb
