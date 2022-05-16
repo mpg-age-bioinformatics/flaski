@@ -1548,6 +1548,11 @@ def download_pdf(n_clicks,graph, pdf_filename):
         ## 
         fig=go.Figure(graph)
         fig.write_image(figure, format="pdf")
+
+    eventlog = UserLogging(email=current_user.email,action="download figure cellplot")
+    db.session.add(eventlog)
+    db.session.commit()
+
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(

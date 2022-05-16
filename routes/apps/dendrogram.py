@@ -1916,6 +1916,7 @@ def download_pdf(n_clicks,graph, pdf_filename):
     eventlog = UserLogging(email=current_user.email,action="download figure dendrogram")
     db.session.add(eventlog)
     db.session.commit()
+    
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(
