@@ -173,6 +173,7 @@ services:
   volumes:
    - ~/flaski23/backup/mpcdf/:/mpcdf
    - ~/flaski23/backup/submissions/:/submissions
+   - ./.owncloud.flaski:/flaski/.owncloud.flaski
   #  - /srv/submissions/:/submissions
   #  - /srv/backup/mariadb:/backup/mariadb
   #  - /srv/backup/data/users:/backup/users_data
