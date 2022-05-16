@@ -16,8 +16,8 @@ services:
   entrypoint: /flaski/services/init/entrypoint.sh 
   user: root
   volumes:
-   - data3:/flaski_data/users
-   - ~/myapp:/flaski
+   - data3:/myapp_data/users
+   - ~/myapp:/myapp
    - ~/flaski23/backup/stats:/backup/stats
    - ~/flaski23/backup/users_data3:/backup/users_data
   #  - ~/flaski23/backup/users_data2:/backup/users_data
