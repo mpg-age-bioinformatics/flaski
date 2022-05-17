@@ -4,6 +4,8 @@ from flaski.apps.main.iscatterplot import make_figure as make_scatter
 from flaski.apps.main.iscatterplot import figure_defaults as defaults_scatter
 from flaski.apps.main.pca import make_figure as make_pca
 from flaski.apps.main.pca import figure_defaults as defaults_pca
+import plotly.express as px
+import plotly.graph_objects as go
 
 import numpy as np
 import re
@@ -321,6 +323,40 @@ def make_annotated_col(x,annotate_genes):
     else:
         return ""
 
+def make_bar_plot(df, cols_to_exclude,sets, label): 
+    bar_df=df.copy()
+    sets_=sets.copy()
+    sets_=[s.replace("_"," ") for s in sets_]
+    
+    bar_df=bar_df.drop(cols_to_exclude, axis=1)
+    bar_df=pd.melt(bar_df)
+
+    if len(sets) <= 14:
+        minheight = 600
+    else:
+        minheight=len(sets)
+        minheight=minheight * 35
+    
+    def format_df(x1,x2):
+        v=x1.split(x2)[1].rsplit(" ",1)[0]
+        return v
+
+    if len(sets_) == 1 :
+        bar_df["Dataset"]=sets_[0]
+        bar_df["Group"]=[s.rsplit(" ",1)[0] for s in bar_df["variable"].tolist()]
+        bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':'mean'})
+    else:
+        bar_df['Dataset'] = bar_df['variable'].apply(lambda x: [s for s in sets_ if s in x][0])        
+        bar_df['Group'] = bar_df.apply(lambda x: format_df(x.variable, x.Dataset), axis=1)
+        bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':'mean'})
+    
+    bar_df["Sample"]=bar_df["Dataset"]+"__"+bar_df["Group"]
+
+    fig = go.Figure()
+    fig = px.bar(bar_df, x='Sample', y='value', color="Dataset", labels={'value':label}, height=minheight)
+    #fig.show()
+
+    return fig
 
     # # print(projected.head(),features.head())
     # import sys

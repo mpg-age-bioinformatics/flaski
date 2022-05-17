@@ -1,26 +1,32 @@
-import re
+import pandas as pd
+import os
+import io
+
 from flaski import app
+from flaski import db
 from flask_login import current_user
 from flask_caching import Cache
 from flaski.routines import check_session_app
+from flaski.models import User, UserLogging
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import plotly.graph_objects as go
 from ._utils import handle_dash_exception, parse_table, protect_dashviews, validate_user_access, \
     make_navbar, make_footer, make_options, make_table, META_TAGS, make_min_width, \
     change_table_minWidth, change_fig_minWidth
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge,\
-        make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col
+        make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col, make_bar_plot
 import uuid
 from werkzeug.utils import secure_filename
-import json
+
 from flask import session
 
-import pandas as pd
-import os
+
+
 
 CURRENTAPP="aadatalake"
 navbar_title="RNAseq data lake"
@@ -133,6 +139,30 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     else:
         gene_expression_bol=False
 
+    ## barPlot
+    selected_sets=list(set(results_files["Set"]))
+    if (genenames and len(genenames) == 1) or (geneids and len(geneids) == 1):
+        gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
+
+        bar_df=gene_expression
+        if genenames:
+            label=genenames[0]
+        elif geneids:
+            label=geneids[0]
+        bar_plot=make_bar_plot(bar_df, ["gene_name", "gene_id"], selected_sets, label)
+        
+        bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
+        bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto"}, id="bar_plot")
+ 
+        download_bar=html.Div( 
+        [   
+            html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+            dcc.Download(id="download-bar")
+        ])      
+        gene_expression_bar_bol=True
+    else:
+        gene_expression_bar_bol=False
+
     ## PCA
     selected_sets=list(set(selected_results_files["Set"]))
     if len(selected_sets) == 1 : 
@@ -215,9 +245,83 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                         "color":"white"})
                 ])
 
+                if len(genenames) == 1 or len(geneids) == 1:
+                    bar_df=dge.copy()
+                    
+                    cols_exclude=["gene id", "gene name","base Mean","log2 FC","lfc SE","p value","padj"]
+
+                    if genenames:
+                        label=genenames[0]
+                    elif geneids:
+                        label=geneids[0]
+
+                    bar_plot=make_bar_plot(bar_df, cols_exclude, selected_sets, label)
+                    
+                    bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
+                    bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto"}, id="bar_plot")
+                    
+                    download_bar=html.Div( 
+                    [   
+                        html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+                        dcc.Download(id="download-bar")
+                    ])      
+                    gene_expression_bar_bol=True
+
                 dge_bol=True
 
-    if  ( dge_bol ) & ( pca_bol ) :
+    if  ( dge_bol ) & ( pca_bol ) & (gene_expression_bar_bol) :
+
+        minwidth=["Samples","Expression", "PCA", "Bar Plot", "DGE","Volcano","MA"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+        dge_=change_table_minWidth(dge_,minwidth)
+
+        pca_plot=change_fig_minWidth(pca_plot,minwidth)
+        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
+
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ pca_plot, iscatter_pca ], 
+                    label="PCA", id="tab-pca", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ bar_plot_, download_bar], 
+                    label="Bar Plot", id="tab-bar", 
+                    style={"margin-top":"0%"}),        
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ dge_, download_dge], 
+                    label="DGE", id="tab-dge", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ dbc.Row( [
+                             dbc.Col(volcano_plot), 
+                             dbc.Col( [ html.Div(id="volcano-plot-table") ]   
+                             ) ], 
+                             style={"minWidth":minwidth}),
+                    dbc.Row([iscatter_volcano,html.Div(id="volcano-bt")]),
+                    ], 
+                    label="Volcano", id="tab-volcano", 
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ dbc.Row( [
+                             dbc.Col(ma_plot), 
+                             dbc.Col( [ html.Div(id="ma-plot-table") ]   
+                             ) ], 
+                             style={"minWidth":minwidth}),
+                    dbc.Row([iscatter_ma,html.Div(id="ma-bt")]),
+                    ] ,
+                    label="MA", id="tab-ma", 
+                    style={"margin-top":"0%"})
+            ],  
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+
+
+    elif  ( dge_bol ) & ( pca_bol ) :
 
         minwidth=["Samples","Expression", "PCA", "DGE","Volcano","MA"]
         minwidth=len(minwidth) * 150
@@ -264,6 +368,61 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
 
+    elif  (pca_bol) & (gene_expression_bar_bol) :
+
+        minwidth=["Samples","Expression", "PCA", "Bar Plot"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+
+        pca_plot=change_fig_minWidth(pca_plot,minwidth)
+        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
+
+        out=dcc.Tabs( [ 
+                    dcc.Tab([ results_files_, download_samples], 
+                            label="Samples", id="tab-samples",
+                            style={"margin-top":"0%"}),
+                    dcc.Tab( [ pca_plot, iscatter_pca ], 
+                            label="PCA", id="tab-pca", 
+                            style={"margin-top":"0%"}),
+                    dcc.Tab( [ bar_plot_, download_bar], 
+                    label="Bar Plot", id="tab-bar", 
+                    style={"margin-top":"0%"}),
+                    dcc.Tab( [ gene_expression_, download_geneexp], 
+                            label="Expression", id="tab-geneexpression", 
+                            style={"margin-top":"0%"}),
+                    ],
+                    mobile_breakpoint=0,
+                    style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+
+
+    elif (gene_expression_bol) & (gene_expression_bar_bol) :
+
+        minwidth=["Samples","Expression", "Bar Plot"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
+
+
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
+             dcc.Tab( [ bar_plot_, download_bar], 
+                    label="Bar Plot", id="tab-bar", 
+                    style={"margin-top":"0%"}),
+            ],  
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+
     elif  pca_bol :
 
         minwidth=["Samples","Expression", "PCA"]
@@ -289,6 +448,31 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     mobile_breakpoint=0,
                     style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
     
+    elif gene_expression_bar_bol :
+
+        minwidth=["Samples","Expression", "Bar Plot"]
+        minwidth=len(minwidth) * 150
+        minwidth = str(minwidth) + "px"
+
+        results_files_=change_table_minWidth(results_files_,minwidth)
+        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
+
+        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
+
+        out=dcc.Tabs( [ 
+            dcc.Tab([ results_files_, download_samples], 
+                    label="Samples", id="tab-samples",
+                    style={"margin-top":"0%"}),
+            dcc.Tab( [ gene_expression_, download_geneexp], 
+                    label="Expression", id="tab-geneexpression", 
+                    style={"margin-top":"0%"}),
+             dcc.Tab( [ bar_plot_, download_bar], 
+                    label="Bar Plot", id="tab-bar", 
+                    style={"margin-top":"0%"}),
+            ],  
+            mobile_breakpoint=0,
+            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
+
     elif gene_expression_bol:
 
         minwidth=["Samples","Expression"]
@@ -615,6 +799,46 @@ def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, filepre
     fileprefix=secure_filename(str(fileprefix))
     filename="%s.dge.xlsx" %fileprefix
     return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge", index=False)
+
+@dashapp.callback(
+    Output('download-bar', 'data'),
+    Input('btn-download-bar',"n_clicks"),
+    State('bar_plot', 'figure'),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-samples", "value"),
+    State("download_name", "value"),
+    prevent_initial_call=True,
+)
+def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    ## samples
+    results_files=selected_results_files[["Set","Group","Reps"]]
+    results_files.columns=["Set","Group","Sample"]
+    results_files=results_files.drop_duplicates()
+    selected_sets=list(set(results_files["Set"]))
+
+    if len(selected_sets) <= 14:
+        minheight = 600
+    else:
+        minheight=len(selected_sets)
+        minheight=minheight * 35
+
+    fileprefix=secure_filename(str(download_name))
+    pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
+    
+    if not pdf_filename:
+        pdf_filename="geneExp.bar.Plot.pdf"
+    pdf_filename=secure_filename(pdf_filename)
+    if pdf_filename.split(".")[-1] != "pdf":
+        pdf_filename=f'{pdf_filename}.pdf'
+
+    def write_image(figure, graph=figure):
+        fig=go.Figure(graph)
+        fig.write_image(figure, format="pdf", height=minheight, width=minheight)
+        
+    return dcc.send_bytes(write_image, pdf_filename)
+    
 
 @dashapp.callback(
     Output(component_id='opt-datasets', component_property='options'),

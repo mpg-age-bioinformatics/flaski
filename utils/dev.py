@@ -11,12 +11,17 @@ EXTERNAL_APPS=[ {"name":"Motif enrichment analysis",
         "id":'dashapp_more',
         "link":'dashapp' ,
         "java":"javascript:ReverseDisplay('dashapp_more')", 
-        "description":"A demo App for Flaski-Dash integration"},
+        "description":"A demo App for Flaski-Dash integration"},\
         { "name":"Methylation Clock", 
         "id":'methylclock_more',
         "link":'methylclock' ,
         "java":"javascript:ReverseDisplay('methylclock_more')", 
-        "description":"Methylation clock submission form.", "submission":"yes"}
+        "description":"Methylation clock submission form.", "submission":"yes"},\
+         { "name":"Data Lake", 
+        "id":'aadatalake_more',
+        "link":'aadatalake' ,
+        "java":"javascript:ReverseDisplay('aadatalake_more')", 
+        "description":"An RNAseq data lake."}
         ]
                 
 EXT_DEFAULTS_DIC={}
