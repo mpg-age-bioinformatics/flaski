@@ -717,6 +717,12 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         session["session_data"]=session_data
         return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'),  dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
+    if button_id in ["excel-filename-download","tsv-filename-download" ] :
+
+        eventlog = UserLogging(email=current_user.email,action="download table tsne values")
+        db.session.add(eventlog)
+        db.session.commit()
     
     if button_id == "excel-filename-download":
         if not excel_filename:
