@@ -692,7 +692,7 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("Spikes:", html_for="grid_value",style={"margin-top":"5px"}),
+                                                    dbc.Label("Spikes:", style={"margin-top":"5px"}),
                                                     width=2
                                                 ),
                                                 dbc.Col(
@@ -710,7 +710,7 @@ def make_app_content(pathname):
                                                     style={"textAlign":"right","padding-right":"2px"}
                                                 ),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["grid_width"],id='grid_width', placeholder="value", type='text', style=card_input_style ),
+                                                    dcc.Input(value=pa["spikes_thickness"],id='spikes_thickness', placeholder="value", type='text', style=card_input_style ),
                                                     width=3,
                                                 ),
                                             ],
@@ -863,9 +863,9 @@ def make_app_content(pathname):
                                         ############################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Text",html_for='ylabel',width=2),
+                                                dbc.Label("Text",html_for='legend_title',width=2),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["ylabel"] ,id='ylabel', placeholder="", type='text', style=card_input_style) ,
+                                                    dcc.Input(value=pa["legend_title"] ,id='legend_title', placeholder="", type='text', style=card_input_style) ,
                                                     width=10,
                                                 ),
                                             ],
@@ -1170,7 +1170,7 @@ def make_app_content(pathname):
             dcc.Store( id='session-data' ),
             # dcc.Store( id='json-import' ),
             # dcc.Store( id='update_labels_field-import'),
-            dcc.Store( id='generate_extras-import'),
+            #dcc.Store( id='generate_extras-import'),
             dcc.Store( id='generate_markers-import'),
             dbc.Row( 
                 [
@@ -1294,48 +1294,71 @@ def read_session_redis(session_id):
         return dash.no_update, dash.no_update, dash.no_update, None
 
 read_input_updates=[
-    # 'groups_value',
-    # 'fig_width',
-    # 'fig_height',
-    # 'title',
-    # 'title_fontsize',
-    # 'show_legend',
-    # 'legend_fontsize',
-    # 'xlabel',
-    # 'xlabels',
-    # 'ylabel',
-    # 'ylabels',
-    # 'show_axis',
-    # 'axis_line_width',
-    # 'tick_axis',
-    # 'ticks_length',
-    # 'ticks_direction_value',
-    # 'xticks_fontsize',
-    # 'xticks_rotation',
-    # 'yticks_fontsize',
-    # 'yticks_rotation',
-    # 'x_lower_limit',
-    # 'x_upper_limit',
-    # 'y_lower_limit',
-    # 'y_upper_limit',
-    # 'grid_value',
-    # 'grid_width',
-    # 'grid_color',
-    # 'grid_color_text',
-    # 'hline',
-    # 'hline_linewidth',
-    # 'hline_linestyle_value',
-    # 'hline_color_value',
-    # 'hline_color_text',
-    # 'vline_linewidth',
-    # 'vline_linestyle_value',
-    # 'vline_color_value',
-    # 'vline_color_text',
-    # 'labels_col_value',
-    # 'label_fontsize',
-    # 'labels_font_color_value',
-    # 'labels_arrows_value',
-    # 'labels_colors_value'
+    'layout',
+    'barmode',
+    'fig_width',
+    'fig_height',
+    'paper_bgcolor',
+    'plot_bgcolor',
+    'title',
+    'title_fontfamily',
+    'title_fontsize',
+    'title_fontcolor',
+    'xref',
+    'x',
+    'title_xanchor',
+    'yref',
+    'y',
+    'title_yanchor',
+    'xlabel',
+    'ylabel',
+    'label_fontfamily',
+    'label_fontsize',
+    'label_fontcolor',
+    'show_axis',
+    'axis_line_color',
+    'axis_line_width',
+    'tick_axis',
+    'ticks_direction_value',
+    'ticks_color',
+    'ticks_length',
+    'ticks_line_width',
+    'xticks_fontsize',
+    'xticks_rotation',
+    'yticks_fontsize',
+    'yticks_rotation',
+    'x_lower_limit',
+    'x_upper_limit',
+    'y_lower_limit',
+    'y_upper_limit',
+    'maxxticks',
+    'maxyticks',
+    'spikes_value',
+    'spikes_mode',
+    'spikes_dash',
+    'spikes_color',
+    'grid_value',
+    'grid_width',
+    'grid_color',
+    'legend_title',
+    'legend_side',
+    'legend_title_fontfamily',
+    'legend_title_fontsize',
+    'legend_title_fontcolor',
+    'legend_x',
+    'legend_xanchor',
+    'legend_y',
+    'legend_yanchor',
+    'legend_fontfamily',
+    'legend_fontsize',
+    'legend_fontcolor',
+    'legend_bgcolor',
+    'legend_orientation',
+    'legend_valign',
+    'legend_bordercolor',
+    'legend_borderwidth',
+    'legend_traceorder',
+    'legend_tracegroupgap',
 ]
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
@@ -1387,11 +1410,12 @@ def read_input_file(contents,filename,last_modified,session_id):
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"histogram")
         return [ dash.no_update, dash.no_update,  toast, tb_str, dash.no_update] + pa_outputs
-   
+
+
 @dashapp.callback( 
     Output('extra-cards', 'children'),
     Output('toast-generate_extras','children'),
-    Output({ "type":"traceback", "index":"generate_extra" },'data'),
+    Output({ "type":"traceback", "index":"generate_extras" },'data'),
     Output('generate_extras-import', 'data'),
     Input('session-id', 'data'),
     Input('vals', 'value'),
@@ -1402,6 +1426,7 @@ def read_input_file(contents,filename,last_modified,session_id):
     )
 def generate_extras(session_id,groups, contents,filename,last_modified,generate_extras_import):
     pa=figure_defaults()
+    print("extra cards")
     if filename :
         if ( filename.split(".")[-1] == "json") and ( not generate_extras_import ):
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "histogram")
@@ -1433,7 +1458,7 @@ def generate_extras(session_id,groups, contents,filename,last_modified,generate_
                                 ],
                             ),
                             style=card_body_style),
-                        id={'type':"collapse-dynamic-card","index":str(card_id)},
+                        id={'type':"collapse-dynamic-card","index":'errorbar'},
                         is_open=False,
                     ),
                 ],
@@ -1457,11 +1482,11 @@ def generate_extras(session_id,groups, contents,filename,last_modified,generate_
                     card_header = "Histogram %s" %(g)
                     card=make_card(card_header, i, pa, pa)
                 cards.append(card)
-        return cards, None, None, generate_markers_import
+        return cards, None, None, generate_extras_import
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"histogram")
+        toast=make_except_toast("There was a problem generating the marker's card.","generate_extras", e, current_user,"histogram")
         return dash.no_update, toast, tb_str, dash.no_update
 
 
@@ -1524,14 +1549,14 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                     [
                                         dbc.Label("Direction",width=3),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["cumulative_directions"]), value=gpa["hist_direction"],  id={'type':"hist_direction","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=make_options(pa["cumulative_directions"]), value=gpa["cumulative_direction"],  id={'type':"cumulative_direction","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
                                         ),
                                         dbc.Label("",width=1),
                                         dbc.Col(
                                             dcc.Checklist(
                                                 options=[
-                                                    {'label': ' Cumulative', 'value': 'hist_cumulative'},], value=gpa['hist_cumulative'], id={'type':"hist_cumulative","index":str(card_id)}, style={"margin-top":"6px"}, 
+                                                    {'label': ' Cumulative', 'value': 'cumulative'},], value=gpa['cumulative'], id={'type':"cumulative","index":str(card_id)}, style={"margin-top":"6px"}, 
                                             ),
                                             width=4,
                                         ),
@@ -1544,7 +1569,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                     [
                                         dbc.Label("Function",width=3),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["histfuncs"]), value=gpa["hist_func"],  id={'type':"hist_func","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
+                                            dcc.Dropdown( options=make_options(pa["histfuncs"]), value=gpa["histfunc"],  id={'type':"histfunc","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
                                         ),
                                         dbc.Label("alpha",width=2, style = {"textAlign": "right"}),
@@ -1709,7 +1734,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                         ),
                                         dbc.Label("size",width=2, style={"textAlign":"right"}),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["fontsizes"]), value=pa["hover_fontsize"],placeholder="size", id='hover_fontsize', multi=False, clearable=False, style=card_input_style),
+                                            dcc.Dropdown( options=make_options(pa["fontsizes"]), value=gpa["hover_fontsize"],  id={'type':"hover_fontsize","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width = 2,
                                         ),
                                     ],
@@ -1763,76 +1788,94 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
 
 
 states=[
-    # State('xvals', 'value'),
-    # State('yvals', 'value'),
-    # State('groups_value', 'value'),
-    # State('fig_width', 'value'),
-    # State('fig_height', 'value'),
-    # State('title', 'value'),
-    # State('title_fontsize', 'value'),
-    # State('show_legend', 'value'),
-    # State('legend_fontsize', 'value'),
-    # State('xlabel', 'value'),
-    # State('xlabels', 'value'),
-    # State('ylabel', 'value'),
-    # State('ylabels', 'value'),
-    # State('show_axis', 'value'),
-    # State('axis_line_width', 'value'),
-    # State('tick_axis', 'value'),
-    # State('ticks_length', 'value'),
-    # State('ticks_direction_value', 'value'),
-    # State('xticks_fontsize', 'value'),
-    # State('xticks_rotation', 'value'),
-    # State('yticks_fontsize', 'value'),
-    # State('yticks_rotation', 'value'),
-    # State('x_lower_limit', 'value'),
-    # State('x_upper_limit', 'value'),
-    # State('y_lower_limit', 'value'),
-    # State('y_upper_limit', 'value'),
-    # State('grid_value', 'value'),
-    # State('grid_width', 'value'),
-    # State('grid_color', 'value'),
-    # State('grid_color_text', 'value'),
-    # State('hline', 'value'),
-    # State('hline_linewidth', 'value'),
-    # State('hline_linestyle_value', 'value'),
-    # State('hline_color_value', 'value'),
-    # State('hline_color_text', 'value'),
-    # State('vline', 'value'),
-    # State('vline_linewidth', 'value'),
-    # State('vline_linestyle_value', 'value'),
-    # State('vline_color_value', 'value'),
-    # State('vline_color_text', 'value'),
-    # State('labels_col_value', 'value'),
-    # State('label_fontsize', 'value'),
-    # State('labels_font_color_value', 'value'),
-    # State('labels_arrows_value', 'value'),
-    # State('labels_colors_value', 'value'),
-    # State('fixed_labels', 'value'),
-    # State( { 'type': 'marker', 'index': ALL }, "value"),
-    # State( { 'type': 'markers', 'index': ALL }, "value"),
-    # State( { 'type': 'markersizes_col', 'index': ALL }, "value"),
-    # State( { 'type': 'markerc', 'index': ALL }, "value"),
-    # State( { 'type': 'lower_size_value', 'index': ALL }, "value"),
-    # State( { 'type': 'upper_size_value', 'index': ALL }, "value"),
-    # State( { 'type': 'lower_size', 'index': ALL }, "value"),
-    # State( { 'type': 'upper_size', 'index': ALL }, "value"),    
-    # State( { 'type': 'markerc_col', 'index': ALL }, "value"),
-    # State( { 'type': 'reverse_color_scale', 'index': ALL }, "value"),
-    # State( { 'type': 'lower_value', 'index': ALL }, "value"),
-    # State( { 'type': 'center_value', 'index': ALL }, "value"),
-    # State( { 'type': 'upper_value', 'index': ALL }, "value"),
-    # State( { 'type': 'lower_color', 'index': ALL }, "value"),
-    # State( { 'type': 'center_color', 'index': ALL }, "value"),
-    # State( { 'type': 'upper_color', 'index': ALL }, "value"),
-    # State( { 'type': 'color_legend', 'index': ALL }, "value"),
-    # State( { 'type': 'colorscaleTitle', 'index': ALL }, "value"),
-    # State( { 'type': 'markerc_write', 'index': ALL }, "value"),
-    # State( { 'type': 'marker_alpha', 'index': ALL }, "value"),
-    # State( { 'type': 'colorscale_value', 'index': ALL }, "value"),
-    # State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
-    # State( { 'type': 'edgecolor', 'index': ALL }, "value"),
-    # State( { 'type': 'edgecolor_write', 'index': ALL }, "value") 
+    State('vals', 'value'),
+    State('layout', 'value'),
+    State('barmode', 'value'),
+    State('fig_width', 'value'),
+    State('fig_height', 'value'),
+    State('paper_bgcolor', 'value'),
+    State('plot_bgcolor', 'value'),
+    State('title', 'value'),
+    State('title_fontfamily', 'value'),
+    State('title_fontsize', 'value'),
+    State('title_fontcolor', 'value'),
+    State('xref', 'value'),
+    State('x', 'value'),
+    State('title_xanchor', 'value'),
+    State('yref', 'value'),
+    State('y', 'value'),
+    State('title_yanchor', 'value'),
+    State('xlabel', 'value'),
+    State('ylabel', 'value'),
+    State('label_fontfamily', 'value'),
+    State('label_fontsize', 'value'),
+    State('label_fontcolor', 'value'),
+    State('show_axis', 'value'),
+    State('axis_line_color', 'value'),
+    State('axis_line_width', 'value'),
+    State('tick_axis', 'value'),
+    State('ticks_direction_value', 'value'),
+    State('ticks_color', 'value'),
+    State('ticks_length', 'value'),
+    State('ticks_line_width', 'value'),
+    State('xticks_fontsize', 'value'),
+    State('xticks_rotation', 'value'),
+    State('yticks_fontsize', 'value'),
+    State('yticks_rotation', 'value'),
+    State('x_lower_limit', 'value'),
+    State('x_upper_limit', 'value'),
+    State('y_lower_limit', 'value'),
+    State('y_upper_limit', 'value'),
+    State('maxxticks', 'value'),
+    State('maxyticks', 'value'),
+    State('spikes_value', 'value'),
+    State('spikes_mode', 'value'),
+    State('spikes_dash', 'value'),
+    State('spikes_color', 'value'),
+    State('grid_value', 'value'),
+    State('grid_width', 'value'),
+    State('grid_color', 'value'),
+    State('legend_title', 'value'),
+    State('legend_side', 'value'),
+    State('legend_title_fontfamily', 'value'),
+    State('legend_title_fontsize', 'value'),
+    State('legend_title_fontcolor', 'value'),
+    State('legend_x', 'value'),
+    State('legend_xanchor', 'value'),
+    State('legend_y', 'value'),
+    State('legend_yanchor', 'value'),
+    State('legend_fontfamily', 'value'),
+    State('legend_fontsize', 'value'),
+    State('legend_fontcolor', 'value'),
+    State('legend_bgcolor', 'value'),
+    State('legend_orientation', 'value'),
+    State('legend_valign', 'value'),
+    State('legend_bordercolor', 'value'),
+    State('legend_borderwidth', 'value'),
+    State('legend_traceorder', 'value'),
+    State('legend_tracegroupgap', 'value'),
+    State( { 'type': 'hist_label', 'index': ALL }, "value"),
+    State( { 'type': 'cumulative_direction', 'index': ALL }, "value"),
+    State( { 'type': 'cumulative', 'index': ALL }, "value"),
+    State( { 'type': 'histfunc', 'index': ALL }, "value"),
+    State( { 'type': 'opacity', 'index': ALL }, "value"),
+    State( { 'type': 'color_value', 'index': ALL }, "value"),
+    State( { 'type': 'color_rgb', 'index': ALL }, "value"),
+    State( { 'type': 'line_color', 'index': ALL }, "value"),
+    State( { 'type': 'line_rgb', 'index': ALL }, "value"),
+    State( { 'type': 'linestyle_value', 'index': ALL }, "value"),
+    State( { 'type': 'linewidth', 'index': ALL }, "value"),
+    State( { 'type': 'histnorm', 'index': ALL }, "value"),
+    State( { 'type': 'bins_number', 'index': ALL }, "value"),
+    State( { 'type': 'orientation_value', 'index': ALL }, "value"),
+    State( { 'type': 'text', 'index': ALL }, "value"),
+    State( { 'type': 'hoverinfo', 'index': ALL }, "value"),
+    State( { 'type': 'hover_align', 'index': ALL }, "value"),
+    State( { 'type': 'hover_bordercolor', 'index': ALL }, "value"),
+    State( { 'type': 'hover_bgcolor', 'index': ALL }, "value"),
+    State( { 'type': 'hover_fontfamily', 'index': ALL }, "value"),
+    State( { 'type': 'hover_fontsize', 'index': ALL }, "value"),
+    State( { 'type': 'hover_fontcolor', 'index': ALL }, "value"),
     ]    
 
 @dashapp.callback( 
@@ -1880,24 +1923,25 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
                 for i, a_ in enumerate(a) :
                     pa[k_]=a_
 
-        if pa["groups_value"]:
-            groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
+        if pa["vals"]:
+            groups=pa["vals"]
             pa["list_of_groups"]=groups
             groups_settings_={}
             for i, g in enumerate(groups):
-                groups_settings_[i]={"name":g}
+                groups_settings_[g]={'name': g}
 
             for k, a in zip(input_names,args):
                 if type(k) == dict :
                     k_=k['type']
                     for i, a_ in enumerate(a) :
-                        groups_settings_[i][k_]=a_
+                        groups_settings_[groups[i]][k_]=a_
 
-            groups_settings = []
-            for i in list(groups_settings_.keys()):
-                groups_settings.append(groups_settings_[i])
+            # print(groups_settings_)
+            # groups_settings = []
+            # for i in list(groups_settings_.keys()):
+            #     groups_settings.append(groups_settings_[i])
 
-            pa["groups_settings"]=groups_settings
+            pa["groups_settings"]=groups_settings_
 
         session_data={ "session_data": {"app": { "histogram": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
