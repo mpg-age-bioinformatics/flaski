@@ -1170,7 +1170,7 @@ def make_app_content(pathname):
             dcc.Store( id='session-data' ),
             # dcc.Store( id='json-import' ),
             # dcc.Store( id='update_labels_field-import'),
-            #dcc.Store( id='generate_extras-import'),
+            dcc.Store( id='generate_extras-import'),
             dcc.Store( id='generate_markers-import'),
             dbc.Row( 
                 [
@@ -1419,12 +1419,13 @@ def read_input_file(contents,filename,last_modified,session_id):
     Output('generate_extras-import', 'data'),
     Input('session-id', 'data'),
     Input('vals', 'value'),
+    Input('layout', 'value'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
     State('generate_extras-import', 'data'),
     )
-def generate_extras(session_id,groups, contents,filename,last_modified,generate_extras_import):
+def generate_extras(session_id,groups, layout,contents,filename,last_modified,generate_extras_import):
     pa=figure_defaults()
     print("extra cards")
     if filename :
@@ -1434,8 +1435,16 @@ def generate_extras(session_id,groups, contents,filename,last_modified,generate_
             generate_extras_import=True
 
         
-    def make_card(card_header,pa, selected_box):
-        if card_header == "errorbar":
+    def make_card(card_header,pa, selected_style):
+        if card_header == "Errorbar":
+            if "errorbar" in selected_style:
+                # card_style_on_off={ "height":"40px","padding":"0px", 'display':"inline-block"}
+                card_style_on_off={"margin-top":"2px","margin-bottom":"2px"}#, 'display':"inline-block" } 
+            else:
+                # card_style_on_off={ "height":"40px","padding":"0px", 'display':"none"}
+                card_style_on_off={"margin-top":"0px","margin-bottom":"0px", 'display':"none" } 
+                # card_style_on_off="none"
+
             card=dbc.Card(
                 [
                     dbc.CardHeader(
@@ -1448,13 +1457,63 @@ def generate_extras(session_id,groups, contents,filename,last_modified,generate_
                         dbc.CardBody(
                             dbc.Form(
                                 [
+                                   ############################################
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("Type",html_for="errorbar_type",width=3),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["errorbar_types"]), value=pa["errorbar_type"], id='errorbar_type', multi=False, clearable=False, style=card_input_style),
+                                                width = 4,
+                                            ),
+                                            dbc.Label("Width",html_for="errorbar_width",width=3, style={"textAlign":"right"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["fontsizes"]), value=pa["errorbar_width"], id='errorbar_width', multi=False, clearable=False, style=card_input_style),
+                                                width = 2,
+                                            ),
+                                        ],
+                                        # justify="start",
+                                        className="g-1",
+                                    ),
                                     ############################################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Main Body"),
+                                            dbc.Label("Color",html_for="errorbar_color",width=3),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["colors"]), value=pa["errorbar_color"], id='errorbar_color', multi=False, clearable=False, style=card_input_style),
+                                                width = 4,
+                                            ),
+                                            dbc.Label("Thickness",html_for="errorbar_thickness",width=3, style={"textAlign":"right"}),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["fontsizes"]), value=pa["errorbar_thickness"], id='errorbar_thickness', multi=False, clearable=False, style=card_input_style),
+                                                width = 2,
+                                            ),
                                         ],
+                                        # justify="start",
                                         className="g-1",
                                     ),
+                                    ############################################
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("", width = 3),
+                                            dbc.Col(
+                                                dcc.Checklist(options=[ {'label':' Symmetric', 'value':'errorbar_symmetric'}], 
+                                                                          value=pa["errorbar_symmetric"], id='errorbar_symmetric',
+                                                                          labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
+                                                                          style={"height":"35px"},
+                                                                        ),
+                                                # className="me-3",
+                                                width=4
+                                            ),
+                                            dbc.Label("Value",html_for="errorbar_value",width=3, style={"textAlign":"right"}),
+                                            dbc.Col(
+                                                dcc.Input(value=pa["errorbar_value"],id='errorbar_value', type='text', style=card_input_style) ,
+                                                width = 2,
+                                            ),
+                                        ],
+                                        # justify="start",
+                                        className="g-1",
+                                    ),
+                                    ############################################
                                 ],
                             ),
                             style=card_body_style),
@@ -1462,25 +1521,103 @@ def generate_extras(session_id,groups, contents,filename,last_modified,generate_
                         is_open=False,
                     ),
                 ],
-                style={"margin-top":"2px","margin-bottom":"2px"} 
+                style=card_style_on_off
             )
+        if card_header == "KDE":
+            if "kde" in selected_style:
+                # card_style_on_off={ "height":"40px","padding":"0px", 'display':"inline-block"}
+                card_style_on_off={"margin-top":"2px","margin-bottom":"2px"}#, 'display':"inline-block" } 
+            else:
+                # card_style_on_off={ "height":"40px","padding":"0px", 'display':"none"}
+                card_style_on_off={"margin-top":"0px","margin-bottom":"0px", 'display':"none" } 
+                # card_style_on_off="none"
 
+            card=dbc.Card(
+                [
+                    dbc.CardHeader(
+                        html.H2(
+                            dbc.Button( "Kernal Density Estimator (KDE)", color="black", id={'type':"dynamic-card","index":"kde"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                        ),
+                        style={ "height":"40px","padding":"0px"}
+                    ),
+                    dbc.Collapse(
+                        dbc.CardBody(
+                            dbc.Form(
+                                [
+                                    ############################################
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                dcc.Checklist(options=[ {'label':' Histogram', 'value':'show_hist'}, 
+                                                                         {'label': ' Rug', 'value':'show_rug'},
+                                                                         {'label': ' Curve', 'value':'show_curve'}], 
+                                                                          value=pa["kde_type"], id='kde_type',
+                                                                          labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
+                                                                          style={"height":"35px", "textAlign": "center"},
+                                                                        ),
+                                                # className="me-3",
+                                                # width=5
+                                            ),
+                                        ],
+                                        # justify="start",
+                                        className="g-1",
+                                    ),
+                                    ############################################
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("Curve type",html_for="curve_type",width=3),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["curve_types"]), value=pa["curve_type"], id='curve_type', multi=False, clearable=False, style=card_input_style),
+                                                width = 4,
+                                            ),
+                                            dbc.Label("Bin size",html_for="bin_size",width=3, style={"textAlign":"right"}),
+                                            dbc.Col(
+                                                dcc.Input(value=pa["bin_size"],id='bin_size', type='text', style=card_input_style) ,
+                                                width = 2,
+                                            ),
+                                        ],
+                                        # justify="start",
+                                        className="g-1",
+                                    ),
+                                    ############################################
+                                    dbc.Row(
+                                        [
+                                            dbc.Label("Normalization",html_for="kde_histnorm",width=3),
+                                            dbc.Col(
+                                                dcc.Dropdown( options=make_options(pa["kde_histnorms"]), value=pa["kde_histnorm"], id='kde_histnorm', multi=False, clearable=False, style=card_input_style),
+                                                width = 4,
+                                            ),
+                                            dbc.Label("Rug text",html_for="rug_text",width=3, style={"textAlign":"right"}),
+                                            dbc.Col(
+                                                dcc.Input(value=pa["rug_text"],id='rug_text', type='text', style=card_input_style) ,
+                                                width = 2,
+                                            ),
+                                        ],
+                                        # justify="start",
+                                        className="g-1",
+                                    ),
+                                    ############################################
+                                ],
+                            ),
+                            style=card_body_style),
+                        id={'type':"collapse-dynamic-card","index":'kde'},
+                        is_open=False,
+                    ),
+                ],
+                style=card_style_on_off
+            )
         return card
-
+    
     try:
-        if not groups:
-            # cards=[ make_card("Marker",0, pa, pa) ]
-            cards = None
-        if groups:
-            cards=[]
-            for g, i in zip(  groups, list( range( len(groups) ) )  ):
-                if filename.split(".")[-1] == "json" and not filename in ["<from MDS app>.json", "<from PCA app>.json", "<from tSNE app>.json"]:
-                    pa_=pa["groups_settings"][i]
-                    card_header = "Histogram %s" %(g)
-                    card=make_card(card_header, i, pa, pa_)
-                else:
-                    card_header = "Histogram %s" %(g)
-                    card=make_card(card_header, i, pa, pa)
+        cards=[]
+        for extra in ["Errorbar", "KDE"]:
+            if extra == "Errorbar":
+                # cards=[ make_card("Marker",0, pa, pa) ]
+                card=make_card("Errorbar", pa, layout)
+                cards.append(card)
+            if extra == 'KDE':
+                # include color options for different groups
+                card=make_card("KDE", pa, layout)
                 cards.append(card)
         return cards, None, None, generate_extras_import
 
@@ -1584,7 +1721,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Fill color",width=3),
+                                        dbc.Label("Color",width=3),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["colors"]), value=gpa["color_value"],  id={'type':"color_value","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
@@ -1600,7 +1737,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Line color",width=3),
+                                        dbc.Label("Border color",width=3),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["colors"]), value=gpa["line_color"],  id={'type':"line_color","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
@@ -1616,7 +1753,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Line style",width=3),
+                                        dbc.Label("Border style",width=3),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["linestyles"]), value=gpa["linestyle_value"],  id={'type':"linestyle_value","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
                                             width=4
@@ -1773,10 +1910,10 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
             for g, i in zip(  groups, list( range( len(groups) ) )  ):
                 if filename.split(".")[-1] == "json" and not filename in ["<from MDS app>.json", "<from PCA app>.json", "<from tSNE app>.json"]:
                     pa_=pa["groups_settings"][i]
-                    card_header = "Histogram %s" %(g)
+                    card_header = "%s" %(g)
                     card=make_card(card_header, i, pa, pa_)
                 else:
-                    card_header = "Histogram %s" %(g)
+                    card_header = "%s" %(g)
                     card=make_card(card_header, i, pa, pa)
                 cards.append(card)
         return cards, None, None, generate_markers_import
@@ -1854,6 +1991,17 @@ states=[
     State('legend_borderwidth', 'value'),
     State('legend_traceorder', 'value'),
     State('legend_tracegroupgap', 'value'),
+    State('kde_type', 'value'),
+    State('curve_type', 'value'),
+    State('bin_size', 'value'),
+    State('kde_histnorm', 'value'),
+    State('rug_text', 'value'),
+    State('errorbar_type', 'value'),
+    State('errorbar_width', 'value'),
+    State('errorbar_color', 'value'),
+    State('errorbar_thickness', 'value'),
+    State('errorbar_symmetric', 'value'),
+    State('errorbar_value', 'value'),    
     State( { 'type': 'hist_label', 'index': ALL }, "value"),
     State( { 'type': 'cumulative_direction', 'index': ALL }, "value"),
     State( { 'type': 'cumulative', 'index': ALL }, "value"),
