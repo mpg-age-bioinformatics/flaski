@@ -24,6 +24,8 @@ import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
 from time import sleep
 from dash import dash_table
+from myapp import db
+from myapp.models import UserLogging
 
 
 

@@ -24,6 +24,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
 from time import sleep
+from myapp import db
+from myapp.models import UserLogging
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
