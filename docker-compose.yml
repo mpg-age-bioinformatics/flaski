@@ -13,7 +13,7 @@ services:
       BUILD_NAME: myapp
       MYAPP_VERSION: dev
       UPGRADE_REQS: "no"
-  entrypoint: /myapp/services/init/entrypoint.sh 
+  entrypoint: /myapp/services/init/entrypoint.sh
   user: root
   volumes:
    - data3:/myapp_data/users
@@ -331,6 +331,26 @@ services:
 #    - init
 #    - mariadb
 #    - redis
+
+#  pureftpd:
+#   container_name: pureftpd
+#   # image: mpgagebioinformatics/myapp:latest
+#   build:
+#     context: ./pureftpd
+#     dockerfile: Dockerfile
+#   user: root
+#   restart: always
+#   environment:
+#     - PUREFTPD_MYSQL_SERVER=mariadb
+#     - PUREFTPD_MYSQL_PORT=3306
+#     - PUREFTPD_MYSQL_USER=pureftpd
+#     - PUREFTPD_MYSQL_PASS=${MYSQL_PASSWORD}
+#     - PUREFTPD_MYSQL_DB=pureftpd
+#   links:
+#    - mariadb
+#   depends_on:
+#    - init
+#    - mariadb
 
  reverse-proxy:
   image: traefik:v2.6

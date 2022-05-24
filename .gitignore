@@ -1,6 +1,7 @@
 # Compiled python modules.
 *.pyc
-
+notes.md
+pureftpd
 pyflaski/build/
 
 # Setuptools distribution folder.
