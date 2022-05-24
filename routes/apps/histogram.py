@@ -1565,10 +1565,10 @@ def generate_extras(session_id,groups, layout,contents,filename,last_modified,ge
                                     ############################################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Curve type",html_for="curve_type",width=3),
+                                            dbc.Label("Curve type",html_for="curve_type",width=4),
                                             dbc.Col(
                                                 dcc.Dropdown( options=make_options(pa["curve_types"]), value=pa["curve_type"], id='curve_type', multi=False, clearable=False, style=card_input_style),
-                                                width = 4,
+                                                width = 3,
                                             ),
                                             dbc.Label("Bin size",html_for="bin_size",width=3, style={"textAlign":"right"}),
                                             dbc.Col(
@@ -1582,10 +1582,10 @@ def generate_extras(session_id,groups, layout,contents,filename,last_modified,ge
                                     ############################################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Normalization",html_for="kde_histnorm",width=3),
+                                            dbc.Label("Normalization",html_for="kde_histnorm",width=4),
                                             dbc.Col(
                                                 dcc.Dropdown( options=make_options(pa["kde_histnorms"]), value=pa["kde_histnorm"], id='kde_histnorm', multi=False, clearable=False, style=card_input_style),
-                                                width = 4,
+                                                width = 3,
                                             ),
                                             dbc.Label("Rug text",html_for="rug_text",width=3, style={"textAlign":"right"}),
                                             dbc.Col(
