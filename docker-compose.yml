@@ -69,7 +69,7 @@ services:
    SECRET_KEY: ${SECRET_KEY}
    PRIVATE_APPS: /flaski_private/private.apps.tsv
    APP_URL: https://flaski.localhost
-   FLASK_ENV: production #development #production
+   FLASK_ENV: development #development #production
    LOGS: /var/log/flaski/
   #  MAIL_PASSWORD: ${MAIL_PASSWORD}
   #  MAIL_PORT: 587
@@ -139,7 +139,7 @@ services:
    SECRET_KEY: ${SECRET_KEY}
    APP_URL: https://flaski.localhost/v3
    PAGE_PREFIX: /v3
-   FLASK_ENV: production #development #production
+   FLASK_ENV: development #development #production
   #  MAIL_PASSWORD: ${MAIL_PASSWORD}
   #  MAIL_PORT: 587
   #  MAIL_SERVER: mail.age.mpg.de
