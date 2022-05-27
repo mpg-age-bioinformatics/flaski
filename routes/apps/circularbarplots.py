@@ -23,6 +23,8 @@ import plotly.express as px
 # from plotly.io import write_image
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
+from myapp import db
+from myapp.models import UserLogging
 from time import sleep
 
 
@@ -139,7 +141,7 @@ def make_app_content(pathname):
                         dbc.Col(
                                 [
                                     dbc.Label("Bar Groups" ),
-                                    dcc.Dropdown(placeholder="Groups column", id='groupval', multi=False  , value=pa["groupval"] )
+                                    dcc.Dropdown(placeholder="Groups column", id='groupval', multi=False)
                                 ],
                         ),
                     ],
@@ -181,48 +183,49 @@ def make_app_content(pathname):
                                     dbc.Row(
                                         [
 
-                                            dbc.Label("Width",html_for="fig_width", style={"margin-top":"14px","width":"64px",}), #"height":"35px",
+                                            dbc.Label("Width:",html_for="fig_width", style={"margin-top":"10px","width":"64px",}), #"height":"35px",
                                             dbc.Col(
-                                                dcc.Input( id='fig_width', placeholder="eg. 600", type='text' , style={"height":"35px","width":"100%"} ),
-                                                style={"margin-right":"5px","margin-top":"10px"}
+                                                dcc.Input( id='fig_width', placeholder="eg. 600", type='text' , style={"height":"35px","width":"100%", "margin-top":"5px"}),
+                                                style={"margin-right":"5px"}
                                             ),
-                                            dbc.Label("Height", html_for="fig_height",style={"margin-left":"5px","margin-top":"14px","width":"64px","text-align":"right"}),
+                                            dbc.Label("Height:", html_for="fig_height",style={"margin-left":"5px","margin-top":"10px","width":"64px","text-align":"left"}),
                                             dbc.Col(
-                                                dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style={"height":"35px","width":"100%"}) ,
-                                                style={"margin-right":"5px","margin-top":"10px"}
+                                                dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style={"height":"35px","width":"100%", "margin-top":"5px"}) ,
                                             ),
         
                                         ],
                                         className="g-1",
+                                        align="center",
                                     ),
                                     ############################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Title",width="auto",html_for="title",style={"margin-top":"10px","width":"64px"}), #"margin-top":"8px",
+                                            dbc.Label("Title:",html_for="title",style={"margin-top":"10px","width":"64px"}), #"margin-top":"8px",
                                             dbc.Col(
-                                                dcc.Input(value=pa["title"],id='title', placeholder="title", type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
+                                                dcc.Input(value=pa["title"],id='title', placeholder=pa["title"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                 style={"margin-right":"5px"},
                                             ),
-                                            dbc.Label("size",html_for="titles",width="auto", style={"text-align":"right","margin-left":"5px"}),
+                                            dbc.Label("Size:",html_for="titles", style={"text-align":"left","margin-left":"5px","margin-top":"10px","width":"64px"}),
                                             dbc.Col(
                                                 dcc.Dropdown( options=make_options(pa["title_size"]), value=pa["titles"], placeholder="size", 
-                                                id='titles', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                id='titles', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px"}),
                                             )
                                         ],
                                         className="g-1",
-                                        justify="between"
+                                        align="center",
                                     ),                                
                                     ############################
                                     dbc.Row(
                                         [
-                                            dbc.Label("Title color",width="auto",html_for="title_color",style={"margin-top":"10px","width":"64px"}), #"margin-top":"8px",
+                                            dbc.Label("Title color:",html_for="title_color", style={"margin-top":"10px", "width":"90px"}), #"margin-top":"8px",
                                             dbc.Col(
                                                 dcc.Dropdown( options=make_options(pa["title_colors"]), value=pa["title_color"], placeholder=pa["title_color"], 
-                                                id='title_color', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                id='title_color', multi=False, clearable=False, style={"margin-top":"5px", "width":"167px"}),
+                                                
                                             ) 
                                         ],
                                         className="g-1",
-                                        justify="between"
+                                        align="center",
                                     ),                       
                                     ############################
 
@@ -250,83 +253,97 @@ def make_app_content(pathname):
                                     [ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Barmode:",html_for='barmode_val',width=3),
+                                                dbc.Label("Barmode:",html_for='barmode_val',style={"width":"120px","margin-top":"10px","text-align":"left"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["barmode"]), value=pa["barmode_val"], placeholder=pa["barmode_val"], 
-                                                    id='barmode_val', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='barmode_val', multi=False, clearable=False, style={"width":"100%","margin-top":"5px","text-align":"left"}),
+                                                    style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Normalisation:",html_for='barnorm_val',width=3),
+                                                dbc.Label("Normalisation:",html_for='barnorm_val',style={"width":"120px","margin-top":"10px","text-align":"left"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["barnorm"]), value=pa["barnorm_val"], placeholder=pa["barnorm_val"], 
-                                                    id='barnorm_val', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='barnorm_val', multi=False, clearable=False, style={"width":"100%","margin-top":"5px","text-align":"left"}),
+                                                    #style={"margin-right":"5px"} 
                                                 ),
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Start direction:",html_for='direction_val',width=3),
+                                                dbc.Label("Start direction:",html_for='direction_val',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["direction"]), value=pa["direction_val"], placeholder=pa["direction_val"], 
-                                                    id='direction_val', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='direction_val', multi=False, clearable=False, style={"margin-top":"5px","width":"100%"}),
+                                                    style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Start angle:",html_for='start_angle',width=3),
+                                                dbc.Label("Start angle:",html_for='start_angle',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["start_angle"],id='title', placeholder=pa["start_angle"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                    dcc.Input(value=pa["start_angle"],id='start_angle', placeholder=pa["start_angle"], type='text', style={"height":"35px", "margin-top":"5px", "width":"100%"}) , 
                                                 ),
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Plot font size:",html_for='plot_font',width=3),
+                                                dbc.Label("Plot font size:",html_for='plot_font',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["plot_font_sizes"]), value=pa["plot_font"], placeholder=pa["plot_font"], 
-                                                    id='plot_font', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='plot_font', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px"}),
+                                                    style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Polar bargap:",html_for='polar_bargap',width=3),
+                                                dbc.Label("Polar bargap:",html_for='polar_bargap',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["polar_bargaps"]), value=pa["polar_bargap"], placeholder=pa["polar_bargap"], 
-                                                    id='polar_bargap', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='polar_bargap', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px"}),
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="between",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Central circle:",html_for='polar_hole',width=3),
+                                                dbc.Label("Central circle:",html_for='polar_hole',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["polar_holes"]), value=pa["polar_hole"], placeholder=pa["polar_hole"], 
-                                                    id='polar_hole', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='polar_hole', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px"}),
+                                                    style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Paper color:",html_for='paper_bgcolor',width=3),
+                                                dbc.Label("Paper color:",html_for='paper_bgcolor',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["paper_bgcolors"]), value=pa["paper_bgcolor"], placeholder=pa["paper_bgcolor"], 
-                                                    id='paper_bgcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='paper_bgcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px"}),
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
-                                            [
-                                                dbc.Label("Polar background color:",html_for='polar_bgcolor',width=3),
+                                            [   
+                                                dbc.Label("Bars layout:",html_for='polar_barmode',style={"width":"120px","margin-top":"10px"}),
+                                                dbc.Col(
+                                                    dcc.Dropdown( options=make_options(pa["polar_barmodes"]), value=pa["polar_barmode"], placeholder=pa["polar_barmode"], 
+                                                    id='polar_barmode', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"},
+                                                ),
+
+                                                dbc.Label("Background:",html_for='polar_bgcolor',style={"width":"120px","margin-top":"10px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["polar_bgcolors"]), value=pa["polar_bgcolor"], placeholder=pa["polar_bgcolor"], 
-                                                    id='polar_bgcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='polar_bgcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px"}),
                                                 ),
                                             ],
                                             className="g-1",
+                                            align="center", 
                                         ),
                                         #####################################
                                      
@@ -341,6 +358,7 @@ def make_app_content(pathname):
                     ],
                     style={"margin-top":"2px","margin-bottom":"2px"} 
                 ),
+                html.Div(id="marker-cards"),
                 dbc.Card(
                     [
                         dbc.CardHeader(
@@ -355,54 +373,58 @@ def make_app_content(pathname):
                                     [ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Background:",html_for='legend_bgcolor',width=3),
+                                                dbc.Label("Background:",html_for='legend_bgcolor', style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_colors"]), value=pa["legend_bgcolor"], placeholder=pa["legend_bgcolor"], 
-                                                    id='legend_bgcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='legend_bgcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Border:",html_for='legend_bordercolor',width=3),
+                                                dbc.Label("Border:",html_for='legend_bordercolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_colors"]), value=pa["legend_bordercolor"], placeholder=pa["legend_bordercolor"], 
-                                                    id='legend_bordercolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='legend_bordercolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                 ),
 
                                             ],
+                                            align="center",
                                             className="g-1",
                                         ),
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Borderwidth:",html_for='legend_borderwidth',width=3),
+                                                dbc.Label("Borderwidth:",html_for='legend_borderwidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["legend_borderwidth"],id='legend_borderwidth', placeholder=pa["legend_borderwidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
+                                                dcc.Input(value=pa["legend_borderwidth"],id='legend_borderwidth', placeholder=pa["legend_borderwidth"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                 style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Orientation:",html_for='legend_orientation',width=3),
+                                                dbc.Label("Orientation:",html_for='legend_orientation', style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_orientations"]), value=pa["legend_orientation"], placeholder=pa["legend_orientation"], 
-                                                    id='legend_orientation', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='legend_orientation', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                 ),
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Title font:",html_for='legend_title_font',width=3),
+                                                dbc.Label("Label font:",html_for='legend_title_font',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_title_sizes"]), value=pa["legend_title_font"], placeholder=pa["legend_title_font"], 
-                                                    id='legend_title_font', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='legend_title_font', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Text font:",html_for='legend_text_font',width=3),
+                                                dbc.Label("Title font:",html_for='legend_text_font',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_text_sizes"]), value=pa["legend_text_font"], placeholder=pa["legend_text_font"], 
-                                                    id='legend_text_font', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='legend_text_font', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         
@@ -441,99 +463,106 @@ def make_app_content(pathname):
                                                             {'label': ' Ticklabels   ', 'value': 'angular_ticklabels'},
                                                             
                                                         ],
-                                                        value=pa["angular_features"],
-                                                        labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
-                                                        style={"height":"35px","margin-top":"10px"},
+                                                        value=["angular_ticklabels"],
+                                                        labelStyle={'display': 'inline-block', "margin-right":"110px"},#,"height":"35px"}, "margin-right":"110px",
+                                                        style={"height":"35px","margin-top":"10px", "width":"100%" },
+                                                        #inputStyle={"margin-right": "20px"},
                                                         id="angular_features"
                                                     ),
                                                 )
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Grid color:",html_for='angular_gridcolor',width=3),
+                                                dbc.Label("Grid color:",html_for='angular_gridcolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_gridcolors"]), value=pa["angular_gridcolor"], placeholder=pa["angular_gridcolor"], 
-                                                    id='angular_gridcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='angular_gridcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Grid width:",html_for='angular_gridwidth',width=3),
+                                                dbc.Label("Grid width:",html_for='angular_gridwidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["angular_gridwidth"],id='angular_gridwidth', placeholder=pa["angular_gridwidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["angular_gridwidth"],id='angular_gridwidth', placeholder=pa["angular_gridwidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 ),
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Line color:",html_for='angular_linecolor',width=3),
+                                                dbc.Label("Line color:",html_for='angular_linecolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_linecolors"]), value=pa["angular_linecolor"], placeholder=pa["angular_linecolor"], 
-                                                    id='angular_linecolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='angular_linecolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Line width:",html_for='angular_linewidth',width=3),
+                                                dbc.Label("Line width:",html_for='angular_linewidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["angular_linewidth"],id='angular_linewidth', placeholder=pa["angular_linewidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["angular_linewidth"],id='angular_linewidth', placeholder=pa["angular_linewidth"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
+                                                
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick color:",html_for='angular_tickcolor',width=3),
+                                                dbc.Label("Tick color:",html_for='angular_tickcolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_tickcolors"]), value=pa["angular_tickcolor"], placeholder=pa["angular_tickcolor"], 
-                                                    id='angular_tickcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='angular_tickcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Tick length:",html_for='angular_ticklen',width=3),
+                                                dbc.Label("Tick length:",html_for='angular_ticklen',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["angular_ticklen"],id='angular_ticklen', placeholder=pa["angular_ticklen"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["angular_ticklen"],id='angular_ticklen', placeholder=pa["angular_ticklen"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
+                                                
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick angle:",html_for='angular_tickangle',width=3),
+                                                dbc.Label("Tick angle:",html_for='angular_tickangle',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["angular_tickangle"],id='angular_tickangle', placeholder=pa["angular_tickangle"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["angular_tickangle"],id='angular_tickangle', placeholder=pa["angular_tickangle"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
+                                                style={"margin-right":"5px"}
+                                                
                                                 ),
-                                                dbc.Label("Tick width:",html_for='angular_tickwidth',width=3),
+                                                dbc.Label("Tick width:",html_for='angular_tickwidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["angular_tickwidth"],id='angular_tickwidth', placeholder=pa["angular_tickwidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["angular_tickwidth"],id='angular_tickwidth', placeholder=pa["angular_tickwidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
+                                                
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick direction:",html_for='angular_ticks',width=3),
+                                                dbc.Label("Tick direction:",html_for='angular_ticks',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_tickDirections"]), value=pa["angular_ticks"], placeholder=pa["angular_ticks"], 
-                                                    id='angular_ticks', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='angular_ticks', multi=False, clearable=False, style={"width":"140px", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
 
@@ -572,104 +601,110 @@ def make_app_content(pathname):
                                                             {'label': ' Ticklabels   ', 'value': 'radial_ticklabels'}
                                                             
                                                         ],
-                                                        value=pa["radial_features"],
-                                                        labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
-                                                        style={"height":"35px","margin-top":"10px"},
+                                                        value=["radial_visibility"],
+                                                        labelStyle={'display': 'inline-block',"margin-right":"60px"},#,"height":"35px"},
+                                                        style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="radial_features"
                                                     ),
                                                 )
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Grid color:",html_for='radial_gridcolor',width=3),
+                                                dbc.Label("Grid color:",html_for='radial_gridcolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_gridcolors"]), value=pa["radial_gridcolor"], placeholder=pa["radial_gridcolor"], 
-                                                    id='radial_gridcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='radial_gridcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Grid width:",html_for='radial_gridwidth',width=3),
+                                                dbc.Label("Grid width:",html_for='radial_gridwidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["radial_gridwidth"],id='radial_gridwidth', placeholder=pa["radial_gridwidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["radial_gridwidth"],id='radial_gridwidth', placeholder=pa["radial_gridwidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 ),
 
                                             ],
                                             className="g-1",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Line color:",html_for='radial_linecolor',width=3),
+                                                dbc.Label("Line color:",html_for='radial_linecolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_linecolors"]), value=pa["radial_linecolor"], placeholder=pa["radial_linecolor"], 
-                                                    id='radial_linecolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='radial_linecolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Line width:",html_for='radial_linewidth',width=3),
+                                                dbc.Label("Line width:",html_for='radial_linewidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["radial_linewidth"],id='radial_linewidth', placeholder=pa["radial_linewidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["radial_linewidth"],id='radial_linewidth', placeholder=pa["radial_linewidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
+                                                
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Radial angle:",html_for='radial_angle',width=3),
+                                                dbc.Label("Radial angle:",html_for='radial_angle',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["radial_angle"],id='radial_angle', placeholder=pa["radial_angle"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["radial_angle"],id='radial_angle', placeholder=pa["radial_angle"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) ,
+                                                style={"margin-right":"5px"} 
+                                                
                                                 ),
-                                                dbc.Label("Tick angle:",html_for='radial_tickangle',width=3),
+                                                dbc.Label("Tick angle:",html_for='radial_tickangle',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["radial_tickangle"],id='radial_tickangle', placeholder=pa["radial_tickangle"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["radial_tickangle"],id='radial_tickangle', placeholder=pa["radial_tickangle"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
+                                                
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick length:",html_for='radial_ticklen',width=3),
+                                                dbc.Label("Tick length:",html_for='radial_ticklen',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["radial_ticklen"],id='radial_ticklen', placeholder=pa["radial_ticklen"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["radial_ticklen"],id='radial_ticklen', placeholder=pa["radial_ticklen"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
+                                                style={"margin-right":"5px"}
+                                                
                                                 ),
-                                                dbc.Label("Tick width:",html_for='radial_tickwidth',width=3),
+                                                dbc.Label("Tick width:",html_for='radial_tickwidth',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
-                                                dcc.Input(value=pa["radial_tickwidth"],id='radial_tickwidth', placeholder=pa["radial_tickwidth"], type='text', style={"height":"35px", "min-width":"169px","width":"100%", "margin-top":"5px"} ) , 
-                                                style={"margin-right":"5px"},
+                                                dcc.Input(value=pa["radial_tickwidth"],id='radial_tickwidth', placeholder=pa["radial_tickwidth"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
+                                                
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick color:",html_for='radial_tickcolor',width=3),
+                                                dbc.Label("Tick color:",html_for='radial_tickcolor',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_tickcolors"]), value=pa["radial_tickcolor"], placeholder=pa["radial_tickcolor"], 
-                                                    id='radial_tickcolor', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='radial_tickcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Tick direction:",html_for='radial_tickside',width=3),
+                                                dbc.Label("Tick direction:",html_for='radial_tickside',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_ticksides"]), value=pa["radial_tickside"], placeholder=pa["radial_tickside"], 
-                                                    id='radial_tickside', multi=False, clearable=False, style={"width":"55px", "margin-top":"5px"}),
+                                                    id='radial_tickside', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                 ),
 
                                             ],
                                             className="g-1",
-                                            justify="start",
+                                            align="center",
                                         ),
                                         ####################################
 
@@ -768,7 +803,7 @@ def make_app_content(pathname):
     app_content=html.Div(
         [
             dcc.Store( id='session-data' ),
-            # dcc.Store( id='json-import' ),
+            dcc.Store( id='generate_markers-import' ),
             
             dbc.Row( 
                 [
@@ -811,10 +846,8 @@ def make_app_content(pathname):
                                 [
                                     html.Div( id="toast-read_input_file"  ),
                                     dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
-                                    # html.Div( id="toast-update_labels_field"  ),
-                                    # dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
-                                    # html.Div( id="toast-generate_markers" ),
-                                    # dcc.Store( id={ "type":"traceback", "index":"generate_markers" }), 
+                                    html.Div( id="toast-generate_markers" ),
+                                    dcc.Store( id={ "type":"traceback", "index":"generate_markers" }), 
                                     html.Div( id="toast-make_fig_output" ),
                                     dcc.Store( id={ "type":"traceback", "index":"make_fig_output" }), 
                                     html.Div(id="toast-email"),  
@@ -890,13 +923,12 @@ def read_session_redis(session_id):
         return dash.no_update, dash.no_update, dash.no_update, None
 
 read_input_updates=[
+    "groupval",
     "fig_width",
     "fig_height",
     "title",
     "titles",
-    "groupval",
     "title_color",
-    "bar_colour_val",
     "barmode_val",
     "barnorm_val",
     "direction_val",
@@ -938,218 +970,328 @@ read_input_updates=[
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 
-# @dashapp.callback( 
-#     [ Output('xvals', 'options'),
-#     Output('yvals', 'options'),
-#     Output('findrow', 'options'),
-#     Output('upload-data','children'),
-#     Output('toast-read_input_file','children'),
-#     Output({ "type":"traceback", "index":"read_input_file" },'data'),
-#     Output('xvals', 'value'),
-#     Output('yvals', 'value'),
-#     Output('findrow', 'children'),]+ read_input_updates_outputs ,
-#     Input('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('session-id', 'data'),
-#     prevent_initial_call=True)
-# def read_input_file(contents,filename,last_modified,session_id):
-#     if not filename :
-#         raise dash.exceptions.PreventUpdate
+@dashapp.callback( 
+    [ Output('angvals', 'options'),
+    Output('radvals', 'options'),
+    Output('groupval', 'options'),
+    Output('upload-data','children'),
+    Output('toast-read_input_file','children'),
+    Output({ "type":"traceback", "index":"read_input_file" },'data'),
+    Output('angvals', 'value'),
+    Output('radvals', 'value')] + read_input_updates_outputs ,
+    Input('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('session-id', 'data'),
+    prevent_initial_call=True)
+def read_input_file(contents,filename,last_modified,session_id):
+    if not filename :
+        raise dash.exceptions.PreventUpdate
 
-#     pa_outputs=[ dash.no_update for k in  read_input_updates ]
-#     try:
-#         if filename.split(".")[-1] == "json":
-#             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "circularbarplots")
-#             df=pd.read_json(app_data["df"])
-#             cols=df.columns.tolist()
-#             cols_=make_options(cols)
-#             filename=app_data["filename"]
-#             xvals=app_data['pa']["xvals"]
-#             yvals=app_data['pa']["yvals"]
-#             available_rows=df[xvals].tolist()
-#             available_rows_=make_options(available_rows)
-
-#             pa=app_data["pa"]
-
-#             pa_outputs=[pa[k] for k in  read_input_updates ]
-
-#         else:
-#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"circularbarplots")
-#             app_data=dash.no_update
-#             cols=df.columns.tolist()
-#             cols_=make_options(cols)
-#             xvals=cols[0]
-#             yvals=cols[1:]
-#             available_rows=df[xvals].tolist()
-#             available_rows_=make_options(available_rows)
+    pa_outputs=[ dash.no_update for k in  read_input_updates ]
+     
+    try:
+        if filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "circularbarplots")
+            df=pd.read_json(app_data["df"])
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+            filename=app_data["filename"]
+            angvals=app_data['pa']["angvals"]
+            radvals=app_data['pa']["radvals"]
             
-#         upload_text=html.Div(
-#             [ html.A(filename, id='upload-data-text') ],
-#             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-#         )
-#         return [ cols_, cols_, available_rows_, upload_text, None, None,  xvals, yvals, available_rows] + pa_outputs
+            pa=app_data["pa"]
 
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         print(tb_str)
-#         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"circularbarplots")
-#         print(toast)
-#         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update, dash.no_update ] + pa_outputs
+            pa_outputs=[pa[k] for k in  read_input_updates ]
+
+        else:
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"circularbarplots")
+            app_data=dash.no_update
+            cols=df.columns.tolist()
+            cols_=make_options(cols)
+            angvals=cols[2]
+            radvals=cols[0]
+            
+            
+        upload_text=html.Div(
+            [ html.A(filename, id='upload-data-text') ],
+            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+        )
+
+        return [ cols_, cols_, cols_, upload_text, None, None,  angvals, radvals] + pa_outputs
+
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        print(tb_str)
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"circularbarplots")
+        print(toast)
+        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
 
-
-# states=[State('xvals', 'value'),
-#     State('yvals', 'value'),
-#     State('findrow', 'value'),
-#     State('fig_width', 'value'),
-#     State('fig_height', 'value'),
-#     State('title', 'value'),
-#     State('title_size_value', 'value'),
-#     State('show_clusters', 'value'),
-#     State('method_value', 'value'),
-#     State('distance_value', 'value'),
-#     State('dendogram_dist', 'value'),
-#     State('col_color_threshold', 'value'),
-#     State('row_color_threshold', 'value'),
-#     State('col_dendogram_ratio', 'value'),
-#     State('row_dendogram_ratio', 'value'),
-#     State('add_constant', 'value'),
-#     State('log_transform_value', 'value'),
-#     State('zscore_value', 'value'),
-#     State('robust', 'value'),
-#     State("show_labels", 'value'),
-#     State('xaxis_font_size', 'value'),
-#     State('yaxis_font_size', 'value'),  
-#     State('colorscale_value', 'value'),
-#     State('reverse_color_scale', 'value'),
-#     State('lower_value', 'value'),
-#     State('center_value', 'value'),
-#     State('upper_value', 'value'),
-#     State('lower_color', 'value'),
-#     State('center_color', 'value'),
-#     State('upper_color', 'value'),
-#     State('color_bar_label', 'value'),
-#     State('color_bar_font_size', 'value'),
-#     State('color_bar_ticks_font_size', 'value'),
-#     State('color_bar_horizontal_padding', 'value'),
-#     State('findrowtype_value', 'value'),
-#     State('findrowdown', 'value'),
-#     State('findrowup', 'value'),
-#     ]
-
-# @dashapp.callback( 
-#     Output('fig-output', 'children'),
-#     Output( 'toast-make_fig_output','children'),
-#     Output('session-data','data'),
-#     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
-#     Output('download-pdf-div', 'style'),
-#     Output('export-session','data'),
-#     Input("submit-button-state", "n_clicks"),
-#     Input("export-filename-download","n_clicks"),
-#     Input("save-session-btn","n_clicks"),
-#     Input("saveas-session-btn","n_clicks"),
-#     [ State('session-id', 'data'),
-#     State('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('export-filename','value'),
-#     State('upload-data-text', 'children')] + states,
-#     prevent_initial_call=True
-#     )
-# def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
-#     ## This function can be used for the export, save, and save as by making use of 
-#     ## Determining which Input has fired with dash.callback_context
-#     ## in https://dash.plotly.com/advanced-callbacks
-#     ctx = dash.callback_context
-#     if not ctx.triggered:
-#         button_id = 'No clicks yet'
-#     else:
-#         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
-#     download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
-#     download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
-#     try:
-#         input_names = [item.component_id for item in states]
-#         df=parse_table(contents,filename,last_modified,current_user.id,cache,"circularbarplots")
+@dashapp.callback( 
+    Output('marker-cards', 'children'),
+    Output('toast-generate_markers','children'),
+    Output({ "type":"traceback", "index":"generate_markers" },'data'),
+    Output('generate_markers-import', 'data'),
+    Input('session-id', 'data'),
+    Input('groupval', 'value'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('generate_markers-import', 'data'),
+    )
+def generate_markers(session_id,groups,contents,filename,last_modified,generate_markers_import):
+    pa=figure_defaults()
+    if filename :
+        if ( filename.split(".")[-1] == "json") and ( not generate_markers_import ):
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "circularbarplots")
+            pa=app_data['pa']
+            generate_markers_import=True
+            
+    def make_card(card_header,card_id,pa,gpa,):
         
-#         pa=figure_defaults()
-#         for k, a in zip(input_names,args) :
-#             if type(k) != dict :
-#                 pa[k]=a
+        card=dbc.Card(
+            [
+                dbc.CardHeader(
+                    html.H2(
+                        dbc.Button( card_header, color="black", id={'type':"dynamic-card","index":str(card_id)}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
+                    ),
+                    style={ "height":"40px","padding":"0px"}
+                ),
+                dbc.Collapse(
+                    dbc.CardBody(
+                        dbc.Form(
+                            [
+                            ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Bar Color:", style={"margin-top":"10px", "width":"100px"}),
+                                        dbc.Col(
+                                            dcc.Dropdown( options=make_options(pa["bar_colours"]), value=gpa["bar_colour_val"], placeholder="Color", id={'type':"bar_colour_val","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"220px","margin-top":"5px"} ),
+                                            
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    align="center",
+                                ), 
+                            ],
+                        ),
+                        style=card_body_style),
+                    id={'type':"collapse-dynamic-card","index":str(card_id)},
+                    is_open=False,
+                ),
+            ],
+            style={"margin-top":"2px","margin-bottom":"2px"} 
+        )
 
-#         session_data={ "session_data": {"app": { "circularbarplots": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
-#         session_data["APP_VERSION"]=app.config['APP_VERSION']
+        return card
+
+    try:
+
+        if not groups:
+            cards=[ make_card("Bar Color",0, pa, pa) ]
+        else:
+            cards=[]
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"circularbarplots")
+            groups_=df[[groups]].drop_duplicates()[groups].tolist()
+            for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
+                if filename.split(".")[-1] == "json":
+                    pa_=pa["groups_settings"][i]
+                    header="Bar Color: "+str(g)
+                    card=make_card(header, i, pa, pa_)
+                else:
+                    header="Bar Color: "+str(g)
+                    card=make_card(header, i, pa, pa)
+                cards.append(card)
+        return cards, None, None, generate_markers_import
+
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"circularbarplots")
+        return dash.no_update, toast, tb_str, dash.no_update
+
+
+states=[State('angvals', 'value'),
+    State('radvals', 'value'),
+    State('groupval', 'value'),
+    State('fig_width', 'value'),
+    State('fig_height', 'value'),
+    State('title', 'value'),
+    State('titles', 'value'),
+    State('title_color', 'value'),
+    State('barmode_val', 'value'),
+    State('barnorm_val', 'value'),
+    State('start_angle', 'value'),
+    State('plot_font', 'value'),
+    State('legend_bgcolor', 'value'),
+    State('legend_bordercolor', 'value'),
+    State('legend_borderwidth', 'value'),
+    State('legend_title_font', 'value'),
+    State('legend_text_font', 'value'),
+    State('legend_orientation', 'value'),
+    State('polar_bargap', 'value'),
+    State('polar_barmode', 'value'),
+    State("polar_bgcolor", 'value'),
+    State('polar_hole', 'value'),
+    State('paper_bgcolor', 'value'),  
+    State('angular_features', 'value'),
+    State('angular_ticks', 'value'),
+    State('angular_gridcolor', 'value'),
+    State('angular_gridwidth', 'value'),
+    State('angular_linecolor', 'value'),
+    State('angular_linewidth', 'value'),
+    State('angular_tickcolor', 'value'),
+    State('angular_ticklen', 'value'),
+    State('angular_tickwidth', 'value'),
+    State('angular_tickangle', 'value'),
+    State('radial_features', 'value'),
+    State('radial_gridcolor', 'value'),
+    State('radial_gridwidth', 'value'),
+    State('radial_linecolor', 'value'),
+    State('radial_linewidth', 'value'),
+    State('radial_angle', 'value'),
+    State('radial_tickangle', 'value'),
+    State('radial_ticklen', 'value'),
+    State('radial_tickwidth', 'value'),
+    State('radial_tickcolor', 'value'),
+    State('radial_tickside', 'value'),
+    State( {'type': 'bar_colour_val', 'index':ALL}, 'value' )
+    ]
+
+@dashapp.callback( 
+    Output('fig-output', 'children'),
+    Output( 'toast-make_fig_output','children'),
+    Output('session-data','data'),
+    Output({ "type":"traceback", "index":"make_fig_output" },'data'),
+    Output('download-pdf-div', 'style'),
+    Output('export-session','data'),
+    Input("submit-button-state", "n_clicks"),
+    Input("export-filename-download","n_clicks"),
+    Input("save-session-btn","n_clicks"),
+    Input("saveas-session-btn","n_clicks"),
+    [ State('session-id', 'data'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('export-filename','value'),
+    State('upload-data-text', 'children')] + states,
+    prevent_initial_call=True
+    )
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,export_filename,upload_data_text, *args):
+    ## This function can be used for the export, save, and save as by making use of 
+    ## Determining which Input has fired with dash.callback_context
+    ## in https://dash.plotly.com/advanced-callbacks
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        button_id = 'No clicks yet'
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
+    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
+    try:
+        input_names = [item.component_id for item in states]
+        df=parse_table(contents,filename,last_modified,current_user.id,cache,"circularbarplots")
         
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"circularbarplots")
-#         return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
+        pa=figure_defaults()
+        for k, a in zip(input_names,args) :
+            if type(k) != dict :
+                pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
-#     # button_id,  submit-button-state, export-filename-download
+        if pa["groupval"]:
+            groups=df[[ pa["groupval"] ]].drop_duplicates()[ pa["groupval"] ].tolist()
+            pa["list_of_groups"]=groups
+            groups_settings_={}
+            for i, g in enumerate(groups):
+                groups_settings_[i]={"name":g}
 
-#     if button_id == "export-filename-download" :
-#         if not export_filename:
-#             export_filename="circularbarplots.json"
-#         export_filename=secure_filename(export_filename)
-#         if export_filename.split(".")[-1] != "json":
-#             export_filename=f'{export_filename}.json'  
+            for k, a in zip(input_names,args):
+                if type(k) == dict :
+                    k_=k['type']
+                    for i, a_ in enumerate(a) :
+                        groups_settings_[i][k_]=a_
 
-#         def write_json(export_filename,session_data=session_data):
-#             export_filename.write(json.dumps(session_data).encode())
-#             # export_filename.seek(0)
+            groups_settings = []
+            for i in list(groups_settings_.keys()):
+                groups_settings.append(groups_settings_[i])
 
-#         return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+            pa["groups_settings"]=groups_settings
 
-#     if button_id == "save-session-btn" :
-#         try:
-#             if filename.split(".")[-1] == "json" :
-#                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-#                 return dash.no_update, toast, None, None, dash.no_update, None
-#             else:
-#                 session["session_data"]=session_data
-#                 return dcc.Location(pathname="/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-#                 # save session_data to redis session
-#                 # redirect to as a save as to file server
+        session_data={ "session_data": {"app": { "circularbarplots": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
+        session_data["APP_VERSION"]=app.config['APP_VERSION']
+        
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"circularbarplots")
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
 
-#         except Exception as e:
-#             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"circularbarplots")
-#             return dash.no_update, toast, None, tb_str, dash.no_update, None
+    # button_id,  submit-button-state, export-filename-download
 
-#         # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+    if button_id == "export-filename-download" :
+        if not export_filename:
+            export_filename="circularbarplots.json"
+        export_filename=secure_filename(export_filename)
+        if export_filename.split(".")[-1] != "json":
+            export_filename=f'{export_filename}.json'  
 
-#     if button_id == "saveas-session-btn" :
-#         session["session_data"]=session_data
-#         return dcc.Location(pathname="/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-#           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+        def write_json(export_filename,session_data=session_data):
+            export_filename.write(json.dumps(session_data).encode())
+            # export_filename.seek(0)
+
+        return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
+    if button_id == "save-session-btn" :
+        try:
+            if filename.split(".")[-1] == "json" :
+                toast=save_session(session_data, filename,current_user, "make_fig_output" )
+                return dash.no_update, toast, None, None, dash.no_update, None
+            else:
+                session["session_data"]=session_data
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                # save session_data to redis session
+                # redirect to as a save as to file server
+
+        except Exception as e:
+            tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+            toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"circularbarplots")
+            return dash.no_update, toast, None, tb_str, dash.no_update, None
+
+        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
+    if button_id == "saveas-session-btn" :
+        session["session_data"]=session_data
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+          # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
-#     try:
-#         #fig, clusters_cols, clusters_rows, df_=make_figure(df,pa)
-#         fig=make_figure(df,pa)
-#         # import plotly.graph_objects as go
-#         # fig = go.Figure( )
-#         # fig.update_layout( )
-#         # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
-#         # fig.update_layout(
-#         #         title={
-#         #             'text': "Demo plotly title",
-#         #             'xanchor': 'left',
-#         #             'yanchor': 'top' ,
-#         #             "font": {"size": 25, "color":"black"  } } )
-#         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-#         fig=dcc.Graph(figure=fig,config=fig_config,  id="graph", responsive=True)
+    try:
+        fig=make_figure(df,pa)
+        # import plotly.graph_objects as go
+        # fig = go.Figure( )
+        # fig.update_layout( )
+        # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
+        # fig.update_layout(
+        #         title={
+        #             'text': "Demo plotly title",
+        #             'xanchor': 'left',
+        #             'yanchor': 'top' ,
+        #             "font": {"size": 25, "color":"black"  } } )
+        fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
+        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph", responsive=True)
 
-#         # changed
-#         # return fig, None, session_data, None, download_buttons_style_show
-#         # as session data is no longer required for downloading the figure
+        # changed
+        # return fig, None, session_data, None, download_buttons_style_show
+        # as session data is no longer required for downloading the figure
 
-#         return fig, None, None, None, download_buttons_style_show, None
+        return fig, None, None, None, download_buttons_style_show, None
         
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"circularbarplots")
-#         return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"circularbarplots")
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
 
 @dashapp.callback(
     Output('export-filename-modal', 'is_open'),
