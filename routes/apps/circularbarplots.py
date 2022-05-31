@@ -1280,7 +1280,8 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         #             'yanchor': 'top' ,
         #             "font": {"size": 25, "color":"black"  } } )
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph", responsive=True)
+        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph") 
+        
 
         # changed
         # return fig, None, session_data, None, download_buttons_style_show
@@ -1338,6 +1339,11 @@ def download_pdf(n_clicks,graph, pdf_filename):
         ## 
         fig=go.Figure(graph)
         fig.write_image(figure, format="pdf")
+
+    eventlog = UserLogging(email=current_user.email,action="download figure circularbarplots")
+    db.session.add(eventlog)
+    db.session.commit()
+
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(
