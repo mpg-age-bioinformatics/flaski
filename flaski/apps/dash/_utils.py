@@ -51,7 +51,7 @@ GROUPS_INITALS={"Adam_Antebi":"AA",\
 "Dario_Valenzano":"DV",\
 "Ivan_Matic":"IM",\
 "James_Stewart":"JS",\
-"Lena_Pernas":"LP",\
+"Lena_Pernas":"LPe",\
 "Linda_Partridge":"LP",\
 "Martin_Denzel":"MD",\
 "Martin_Graef":"MG",\
