@@ -1,3 +1,4 @@
+from matplotlib.pyplot import plot
 import pandas as pd
 # from flaski.routines import fuzzy_search
 from flaski.apps.main.iscatterplot import make_figure as make_scatter
@@ -323,19 +324,28 @@ def make_annotated_col(x,annotate_genes):
     else:
         return ""
 
+def plot_height(sets):
+    if len(sets) <= 14:
+        minheight = 700
+    else:
+        minheight=len(sets)
+        minheight=minheight * 45
+
+    if minheight > 945:
+        minheight=945
+    
+    return minheight
+
 def make_bar_plot(df, cols_to_exclude,sets, label): 
     bar_df=df.copy()
     sets_=sets.copy()
     sets_=[s.replace("_"," ") for s in sets_]
     
     bar_df=bar_df.drop(cols_to_exclude, axis=1)
+    bar_df=np.log10(bar_df+1)
     bar_df=pd.melt(bar_df)
 
-    if len(sets) <= 14:
-        minheight = 600
-    else:
-        minheight=len(sets)
-        minheight=minheight * 35
+    height_=plot_height(sets)
     
     def format_df(x1,x2):
         v=x1.split(x2)[1].rsplit(" ",1)[0]
@@ -344,19 +354,40 @@ def make_bar_plot(df, cols_to_exclude,sets, label):
     if len(sets_) == 1 :
         bar_df["Dataset"]=sets_[0]
         bar_df["Group"]=[s.rsplit(" ",1)[0] for s in bar_df["variable"].tolist()]
-        bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':'mean'})
+        bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':['mean','std']})
+
+        bar_df["Sample"]=bar_df["Dataset"]+"__"+bar_df["Group"]
+        bar_df.columns=["Dataset", "Group", "mean", "std", "Sample"]
+
+        if len(list(set( bar_df["Group"].tolist() ))) ==1:
+            width_bar=0.15
+        elif len(list(set( bar_df["Group"].tolist() ))) == 2:
+            width_bar=0.25
+        else:
+            width_bar=0.5
+
+        fig = go.Figure()
+        fig = px.bar(bar_df, x='Sample', y='mean', color="Group", labels={'mean':label}, height=height_)
+        fig.update_traces(error_y={"type":"data", "array":np.array(bar_df["std"]), "symmetric":True, "color":'rgba(0,0,0,0.5)',"thickness":2, "width":5})
+        fig.update_traces(width=width_bar)
+
+        # for data in fig.data:
+        #     data["width"] = 0.5
     else:
         bar_df['Dataset'] = bar_df['variable'].apply(lambda x: [s for s in sets_ if s in x][0])        
         bar_df['Group'] = bar_df.apply(lambda x: format_df(x.variable, x.Dataset), axis=1)
-        bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':'mean'})
+        bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':['mean','std']})
     
-    bar_df["Sample"]=bar_df["Dataset"]+"__"+bar_df["Group"]
+        bar_df["Sample"]=bar_df["Dataset"]+"__"+bar_df["Group"]
+        bar_df.columns=["Dataset", "Group", "mean", "std", "Sample"]
 
-    fig = go.Figure()
-    fig = px.bar(bar_df, x='Sample', y='value', color="Dataset", labels={'value':label}, height=minheight)
+        fig = go.Figure()
+        fig = px.bar(bar_df, x='Sample', y='mean', color="Dataset", labels={'mean':label}, height=height_)
+        fig.update_traces(error_y={"type":"data", "array":np.array(bar_df["std"]), "symmetric":True, "color":'rgba(0,0,0,0.5)',"thickness":1.5, "width":2}) # width=2000
+    
     #fig.show()
-
     return fig
+
 
     # # print(projected.head(),features.head())
     # import sys

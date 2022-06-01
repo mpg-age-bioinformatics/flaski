@@ -19,7 +19,7 @@ from ._utils import handle_dash_exception, parse_table, protect_dashviews, valid
     change_table_minWidth, change_fig_minWidth
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge,\
-        make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col, make_bar_plot
+        make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col, make_bar_plot, plot_height
 import uuid
 from werkzeug.utils import secure_filename
 
@@ -143,16 +143,18 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     selected_sets=list(set(results_files["Set"]))
     if (genenames and len(genenames) == 1) or (geneids and len(geneids) == 1):
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
-
+        
         bar_df=gene_expression
         if genenames:
             label=genenames[0]
         elif geneids:
             label=geneids[0]
-        bar_plot=make_bar_plot(bar_df, ["gene_name", "gene_id"], selected_sets, label)
+
+        plot_height_=plot_height(selected_sets)
         
+        bar_plot=make_bar_plot(bar_df, ["gene_name", "gene_id"], selected_sets, label)
         bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
-        bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto"}, id="bar_plot")
+        bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
  
         download_bar=html.Div( 
         [   
@@ -255,10 +257,12 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     elif geneids:
                         label=geneids[0]
 
-                    bar_plot=make_bar_plot(bar_df, cols_exclude, selected_sets, label)
                     
+                    plot_height_=plot_height(selected_sets)
+
+                    bar_plot=make_bar_plot(bar_df, cols_exclude, selected_sets, label)
                     bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
-                    bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto"}, id="bar_plot")
+                    bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
                     
                     download_bar=html.Div( 
                     [   
@@ -818,11 +822,7 @@ def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
     results_files=results_files.drop_duplicates()
     selected_sets=list(set(results_files["Set"]))
 
-    if len(selected_sets) <= 14:
-        minheight = 600
-    else:
-        minheight=len(selected_sets)
-        minheight=minheight * 35
+    minheight=plot_height(selected_sets)
 
     fileprefix=secure_filename(str(download_name))
     pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
