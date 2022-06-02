@@ -22,6 +22,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
 from time import sleep
+from myapp import db
+from myapp.models import UserLogging
+from time import sleep
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -107,43 +110,43 @@ def make_app_content(pathname):
                         multiple=False,
                     ),
                 ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            # dbc.FormGroup(
-                                [
-                                    dbc.Label("x values"),
-                                    dcc.Dropdown( placeholder="x values", id='xvals', multi=False)
-                                ],
-                            # ),
-                            width=4,
-                            style={"padding-right":"4px"}
-                        ),
-                        dbc.Col(
-                            # dbc.FormGroup(
-                                [
-                                    dbc.Label("y values" ),
-                                    dcc.Dropdown( placeholder="y values", id='yvals', multi=False)
-                                ],
-                            # ),
-                            width=4,
-                            style={"padding-left":"2px","padding-right":"2px"}
-                        ),
-                        dbc.Col(
-                            # dbc.FormGroup(
-                                [
-                                    dbc.Label("Groups"),
-                                    dcc.Dropdown( placeholder="groups", id='groups_value', multi=False)
-                                ],
-                            # ),
-                            width=4,
-                            style={"padding-left":"4px"}
-                        ),
-                    ],
-                    align="start",
-                    justify="betweem",
-                    className="g-0",
-                ),
+                # dbc.Row(
+                #     [
+                #         dbc.Col(
+                #             # dbc.FormGroup(
+                #                 [
+                #                     dbc.Label("x values"),
+                #                     dcc.Dropdown( placeholder="x values", id='xvals', multi=False)
+                #                 ],
+                #             # ),
+                #             width=4,
+                #             style={"padding-right":"4px"}
+                #         ),
+                #         dbc.Col(
+                #             # dbc.FormGroup(
+                #                 [
+                #                     dbc.Label("y values" ),
+                #                     dcc.Dropdown( placeholder="y values", id='yvals', multi=False)
+                #                 ],
+                #             # ),
+                #             width=4,
+                #             style={"padding-left":"2px","padding-right":"2px"}
+                #         ),
+                #         dbc.Col(
+                #             # dbc.FormGroup(
+                #                 [
+                #                     dbc.Label("Groups"),
+                #                     dcc.Dropdown( placeholder="groups", id='groups_value', multi=False)
+                #                 ],
+                #             # ),
+                #             width=4,
+                #             style={"padding-left":"4px"}
+                #         ),
+                #     ],
+                #     align="start",
+                #     justify="betweem",
+                #     className="g-0",
+                # ),
                 # dbc.FormGroup(
                 #     [
                 #         dbc.Col( 
@@ -252,25 +255,6 @@ def make_app_content(pathname):
                         dbc.Collapse(
                             dbc.CardBody(
                                 [
-                                    ## example card body row
-                                    # dbc.Row(
-                                    #     [
-
-                                    #         dbc.Label("Width", width="auto",style={"margin-right":"2px"}),
-                                    #         dbc.Col(
-                                    #             dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style=card_input_style),
-                                    #             style={"margin-right":"5px"}
-                                    #         ),
-                                    #         dbc.Label("Height", width="auto",style={"margin-right":"2px", "margin-left":"5px"}),
-                                    #         dbc.Col(
-                                    #             dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style=card_input_style  ) ,
-                                    #         ),
-        
-                                    #     ],
-                                    #     className="g-0",
-                                    # ),
-                                    ## end of example card body row
-                                   ############################
                                     dbc.Row(
                                             dbc.Label("Name"), #"height":"35px",
                                     ),
@@ -422,25 +406,6 @@ def make_app_content(pathname):
                         dbc.Collapse(
                             dbc.CardBody(
                                 [
-                                    ## example card body row
-                                    # dbc.Row(
-                                    #     [
-
-                                    #         dbc.Label("Width", width="auto",style={"margin-right":"2px"}),
-                                    #         dbc.Col(
-                                    #             dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style=card_input_style),
-                                    #             style={"margin-right":"5px"}
-                                    #         ),
-                                    #         dbc.Label("Height", width="auto",style={"margin-right":"2px", "margin-left":"5px"}),
-                                    #         dbc.Col(
-                                    #             dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style=card_input_style  ) ,
-                                    #         ),
-        
-                                    #     ],
-                                    #     className="g-0",
-                                    # ),
-                                    ## end of example card body row
-                                   ############################
                                     dbc.Row(
                                             dbc.Label("Name"), #"height":"35px",
                                     ),
@@ -591,25 +556,6 @@ def make_app_content(pathname):
                         dbc.Collapse(
                             dbc.CardBody(
                                 [
-                                    ## example card body row
-                                    # dbc.Row(
-                                    #     [
-
-                                    #         dbc.Label("Width", width="auto",style={"margin-right":"2px"}),
-                                    #         dbc.Col(
-                                    #             dcc.Input(id='fig_width', placeholder="eg. 600", type='text', style=card_input_style),
-                                    #             style={"margin-right":"5px"}
-                                    #         ),
-                                    #         dbc.Label("Height", width="auto",style={"margin-right":"2px", "margin-left":"5px"}),
-                                    #         dbc.Col(
-                                    #             dcc.Input(id='fig_height', placeholder="eg. 600", type='text',style=card_input_style  ) ,
-                                    #         ),
-        
-                                    #     ],
-                                    #     className="g-0",
-                                    # ),
-                                    ## end of example card body row
-                                   ############################
                                     dbc.Row(
                                             dbc.Label("Name"), #"height":"35px",
                                     ),
@@ -1025,280 +971,69 @@ read_input_updates=[
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 
-@dashapp.callback( 
-    [ Output('xvals', 'options'),
-    Output('yvals', 'options'),
-    Output('groups_value', 'options'),
-    Output('labels_col_value', 'options'),
-    Output('upload-data','children'),
-    Output('toast-read_input_file','children'),
-    Output({ "type":"traceback", "index":"read_input_file" },'data'),
-    # Output("json-import",'data'),
-    Output('xvals', 'value'),
-    Output('yvals', 'value')] + read_input_updates_outputs ,
-    Input('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('session-id', 'data'),
-    prevent_initial_call=True)
-def read_input_file(contents,filename,last_modified,session_id):
-    print("HERE5")
-    if not filename :
-        raise dash.exceptions.PreventUpdate
+# @dashapp.callback( 
+#     [ Output('xvals', 'options'),
+#     Output('yvals', 'options'),
+#     Output('groups_value', 'options'),
+#     Output('labels_col_value', 'options'),
+#     Output('upload-data','children'),
+#     Output('toast-read_input_file','children'),
+#     Output({ "type":"traceback", "index":"read_input_file" },'data'),
+#     # Output("json-import",'data'),
+#     Output('xvals', 'value'),
+#     Output('yvals', 'value')] + read_input_updates_outputs ,
+#     Input('upload-data', 'contents'),
+#     State('upload-data', 'filename'),
+#     State('upload-data', 'last_modified'),
+#     State('session-id', 'data'),
+#     prevent_initial_call=True)
+# def read_input_file(contents,filename,last_modified,session_id):
+#     print("HERE5")
+#     if not filename :
+#         raise dash.exceptions.PreventUpdate
 
-    pa_outputs=[ dash.no_update for k in  read_input_updates ]
-    try:
-        if filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-            df=pd.read_json(app_data["df"])
-            cols=df.columns.tolist()
-            cols_=make_options(cols)
-            filename=app_data["filename"]
-            xvals=app_data['pa']["xvals"]
-            yvals=app_data['pa']["yvals"]
+#     pa_outputs=[ dash.no_update for k in  read_input_updates ]
+#     try:
+#         if filename.split(".")[-1] == "json":
+#             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+#             df=pd.read_json(app_data["df"])
+#             cols=df.columns.tolist()
+#             cols_=make_options(cols)
+#             filename=app_data["filename"]
+#             xvals=app_data['pa']["xvals"]
+#             yvals=app_data['pa']["yvals"]
 
-            pa=app_data["pa"]
+#             pa=app_data["pa"]
 
-            pa_outputs=[pa[k] for k in  read_input_updates ]
+#             pa_outputs=[pa[k] for k in  read_input_updates ]
 
-        else:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
-            app_data=dash.no_update
-            cols=df.columns.tolist()
-            cols_=make_options(cols)
-            xvals=cols[0]
-            yvals=cols[1]
+#         else:
+#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
+#             app_data=dash.no_update
+#             cols=df.columns.tolist()
+#             cols_=make_options(cols)
+#             xvals=cols[0]
+#             yvals=cols[1]
 
-        print(cols)
-        upload_text=html.Div(
-            [ html.A(filename, id='upload-data-text') ],
-            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-        )     
-        return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
+#         print(cols)
+#         upload_text=html.Div(
+#             [ html.A(filename, id='upload-data-text') ],
+#             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+#         )     
+#         return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
 
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
-        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
+#     except Exception as e:
+#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+#         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
+#         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
 
-# @dashapp.callback( 
-#     Output('labels-section', 'children'),
-#     Output('toast-update_labels_field','children'),
-#     Output({ "type":"traceback", "index":"update_labels_field" },'data'),
-#     Output('update_labels_field-import', 'data'),
-#     Input('session-id','data'),
-#     Input('labels_col_value','value'),
-#     State('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('update_labels_field-import', 'data'),
-# )
-# def update_labels_field(session_id,col,contents,filename,last_modified,update_labels_field_import):
-#     try:
-#         if col:
-#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
-#             labels=df[[col]].drop_duplicates()[col].tolist()
-#             labels_=make_options(labels)
-
-#             if ( filename.split(".")[-1] == "json" ) and ( not update_labels_field_import ) :
-#                 app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-#                 fixed_labels=app_data['pa']["fixed_labels"]
-#                 update_labels_field_import=True
-#             else:
-#                 fixed_labels=[]
-
-
-#             labels_section=dbc.Form(
-#                 dbc.Row(
-#                     [
-#                         dbc.Label("Labels", width=2),
-#                         dbc.Col(
-#                             dcc.Dropdown( options=labels_, value=fixed_labels,placeholder="labels", id='fixed_labels', multi=True),
-#                             width=10
-#                         )
-#                     ],
-#                     className="g-1",
-#                     style={"margin-top":"2px"}
-#                 )
-#             )
-#         else:
-#             labels_section=dbc.Form(
-#                 dbc.Row(
-#                     [
-#                         dbc.Label("Labels", width=2),
-#                         dbc.Col(
-#                             dcc.Dropdown( placeholder="labels", id='fixed_labels', multi=True),
-#                             width=10
-#                         )
-#                     ],
-#                     # row=True,
-#                     className="g-1",
-#                     style= {'display': 'none',"margin-top":"2px"}
-#                 )
-#             )
-
-#         return labels_section, None, None, update_labels_field_import
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem updating the labels field.","update_labels_field", e, current_user,"venndiagram")
-#         return dash.no_update, toast, tb_str, dash.no_update
-
-# @dashapp.callback( 
-#     Output('marker-cards', 'children'),
-#     Output('toast-generate_markers','children'),
-#     Output({ "type":"traceback", "index":"generate_markers" },'data'),
-#     Output('generate_markers-import', 'data'),
-#     Input('session-id', 'data'),
-#     Input('groups_value', 'value'),
-#     State('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('generate_markers-import', 'data'),
-#     )
-# def generate_markers(session_id,groups,contents,filename,last_modified,generate_markers_import):
-#     pa=figure_defaults()
-#     if filename :
-#         if ( filename.split(".")[-1] == "json") and ( not generate_markers_import ):
-#             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-#             pa=app_data['pa']
-#             generate_markers_import=True
-        
-#     def make_card(card_header,card_id,pa,gpa):
-#         card=dbc.Card(
-#             [
-#                 dbc.CardHeader(
-#                     html.H2(
-#                         dbc.Button( card_header, color="black", id={'type':"dynamic-card","index":str(card_id)}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
-#                     ),
-#                     style={ "height":"40px","padding":"0px"}
-#                 ),
-#                 dbc.Collapse(
-#                     dbc.CardBody(
-#                         dbc.Form(
-#                             [
-#                             ############################################
-#                                 dbc.Row(
-#                                     [
-                                      
-#                                         dbc.Label("shape", width=2),
-#                                         dbc.Col(
-#                                             dcc.Dropdown( options=make_options(pa["markerstyles"]), value=gpa["marker"], placeholder="marker", id={'type':"marker","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-#                                             width=6
-#                                         ),
-#                                         dbc.Label("size",style={"textAlign":"right"},width=2),
-#                                         dbc.Col(
-#                                             dcc.Dropdown( options=make_options(pa["marker_size"]), value=gpa["markers"], placeholder="size", id={'type':"markers","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-#                                             width=2
-#                                         )
-#                                     ],
-#                                     className="g-1",
-#                                 ),
-#                                 ############################################
-#                                 dbc.Row(
-#                                     [
-                                      
-#                                         dbc.Label("color",width=2),
-#                                         dbc.Col(
-#                                             dcc.Dropdown( options=make_options(pa["marker_color"]), value=gpa["markerc"], placeholder="size", id={'type':"markerc","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-#                                             width=4
-#                                         ),
-#                                         dbc.Col(
-#                                                 [
-#                                                     dcc.Input(id={'type':"markerc_write","index":str(card_id)},value=gpa["markerc_write"], placeholder=".. or, write color name", type='text', style={"height":"35px","width":"100%"} ),
-#                                                 ],
-#                                             width=6,
-#                                         )
-#                                     ],
-#                                     className="g-1",
-#                                 ),
-#                                 ############################################
-#                                 dbc.Row(
-#                                     [
-#                                         dbc.Label("alpha",width=2),
-#                                         dbc.Col(
-#                                             dcc.Input(id={'type':"marker_alpha","index":str(card_id)}, value=gpa["marker_alpha"],placeholder="value", type='text', style={"height":"35px","width":"100%"} ),
-#                                             width=4
-#                                         )
-#                                     ],
-#                                     className="g-1",
-#                                 ),
-#                                 ############################################
-#                                 dbc.Row(
-#                                     [
-
-#                                         dbc.Label("Line:",width=2),
-#                                     ],
-#                                     className="g-1",
-#                                 ),
-#                                 ############################################
-#                                 dbc.Row(
-#                                     [
-#                                         dbc.Label("",width=1),
-#                                         dbc.Label("width",width=2),
-#                                         dbc.Col(
-#                                             dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=gpa["edge_linewidth"], placeholder="width", id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-#                                             width=4
-#                                         )
-#                                     ],
-#                                     className="g-1",
-#                                 ),
-#                                 ############################################
-#                                 dbc.Row(
-#                                     [
-#                                         dbc.Label("",width=1),
-#                                         dbc.Label("color",width=2),
-#                                         dbc.Col(
-#                                             dcc.Dropdown( options=make_options(pa["edge_colors"]), value=gpa["edgecolor"], placeholder="color", id={'type':"edgecolor","index":str(card_id)}, multi=False, clearable=False, style=card_input_style ),
-#                                             width=4
-#                                         ),
-#                                         dbc.Col(
-#                                             dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, value=gpa["edgecolor_write"], placeholder=".. or, write color name", type='text', style=card_input_style ),
-#                                             width=5
-#                                         )
-#                                     ],
-#                                     className="g-1",
-#                                 ),
-#                                 ############################################
-#                             ],
-#                         ),
-#                         style=card_body_style),
-#                     id={'type':"collapse-dynamic-card","index":str(card_id)},
-#                     is_open=False,
-#                 ),
-#             ],
-#             style={"margin-top":"2px","margin-bottom":"2px"} 
-#         )
-
-#         return card
-
-#     try:
-
-#         if not groups:
-#             cards=[ make_card("Marker",0, pa, pa ) ]
-#         else:
-#             cards=[]
-#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
-#             groups_=df[[groups]].drop_duplicates()[groups].tolist()
-#             for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
-#                 if filename.split(".")[-1] == "json":
-#                     pa_=pa["groups_settings"][i]
-#                     card=make_card(g, i, pa, pa_)
-#                 else:
-#                     card=make_card(g, i, pa, pa)
-#                 cards.append(card)
-#         return cards, None, None, generate_markers_import
-
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem generating the marker's card.","generate_markers", e, current_user,"venndiagram")
-#         return dash.no_update, toast, tb_str, dash.no_update
 
 
 states=[
-    State('xvals', 'value'),
-    State('yvals', 'value'),
-    State('groups_value', 'value'),
+    # State('xvals', 'value'),
+    # State('yvals', 'value'),
+    # State('groups_value', 'value'),
     State('fig_width', 'value'),
     State('fig_height', 'value'),
     State('title', 'value'),
@@ -1368,34 +1103,39 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
     download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
     try:
         input_names = [item.component_id for item in states]
-
-        df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
+        print("HERE2")
+        #df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
 
         pa=figure_defaults()
         for k, a in zip(input_names,args) :
             if type(k) != dict :
                 pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
-        if pa["groups_value"]:
-            groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
-            pa["list_of_groups"]=groups
-            groups_settings_={}
-            for i, g in enumerate(groups):
-                groups_settings_[i]={"name":g}
+        print(pa)
+        # if pa["groups_value"]:
+        #     groups=df[[ pa["groups_value"] ]].drop_duplicates()[ pa["groups_value"] ].tolist()
+        #     pa["list_of_groups"]=groups
+        #     groups_settings_={}
+        #     for i, g in enumerate(groups):
+        #         groups_settings_[i]={"name":g}
 
-            for k, a in zip(input_names,args):
-                if type(k) == dict :
-                    k_=k['type']
-                    for i, a_ in enumerate(a) :
-                        groups_settings_[i][k_]=a_
+        #     for k, a in zip(input_names,args):
+        #         if type(k) == dict :
+        #             k_=k['type']
+        #             for i, a_ in enumerate(a) :
+        #                 groups_settings_[i][k_]=a_
 
-            groups_settings = []
-            for i in list(groups_settings_.keys()):
-                groups_settings.append(groups_settings_[i])
+        #     groups_settings = []
+        #     for i in list(groups_settings_.keys()):
+        #         groups_settings.append(groups_settings_[i])
 
-            pa["groups_settings"]=groups_settings
+        #     pa["groups_settings"]=groups_settings
 
-        session_data={ "session_data": {"app": { "venndiagram": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
+        session_data={ "session_data": {"app": { "venndiagram": {"filename":upload_data_text ,'last_modified':last_modified,"pa":pa} } } } #"df":df.to_json()
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
     except Exception as e:
