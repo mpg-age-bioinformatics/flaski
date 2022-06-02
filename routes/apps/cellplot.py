@@ -1480,7 +1480,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
     try:
-        fig=make_figure(df, df_ge, pa)
+        fig, warnmsg=make_figure(df, df_ge, pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )
         # fig.update_layout( )
@@ -1497,8 +1497,18 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         # changed
         # return fig, None, session_data, None, download_buttons_style_show
         # as session data is no longer required for downloading the figure
+        if warnmsg: 
+            toast=dbc.Toast( warnmsg,
+                id={'type':'toast-error','index':"make_fig_output",},
+                header="Exception",
+                is_open=True,
+                dismissable=True,
+                icon="danger",
+                # top: 66 positions the toast below the navbar
+                # style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
+            )
 
-        return fig, None, None, None, download_buttons_style_show, None
+        return fig, warnmsg, None, None, download_buttons_style_show, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))

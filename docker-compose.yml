@@ -74,9 +74,9 @@ services:
   #  MAIL_PASSWORD: ${MAIL_PASSWORD}
   #  MAIL_PORT: 587
   #  MAIL_SERVER: mail.age.mpg.de
+  #  MAIL_USE_TLS: '1'
    MAIL_USERNAME: flaski@age.mpg.de
    ADMINS: flaski@age.mpg.de
-  #  MAIL_USE_TLS: '1'
    MYSQL_HOST: mariadb
    MYSQL_PORT: 3306
    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -208,7 +208,7 @@ services:
 
 #  uploads:
 #   container_name: uploads
-#   # image: mpgagebioinformatics/myapp # -flaski2:latest
+#   # image: mpgagebioinformatics/myapp:latest # -flaski2:latest
 #   build:
 #     context: ~/myapp
 #     dockerfile: services/server/Dockerfile
@@ -331,26 +331,6 @@ services:
 #    - init
 #    - mariadb
 #    - redis
-
-#  pureftpd:
-#   container_name: pureftpd
-#   # image: mpgagebioinformatics/myapp:latest
-#   build:
-#     context: ./pureftpd
-#     dockerfile: Dockerfile
-#   user: root
-#   restart: always
-#   environment:
-#     - PUREFTPD_MYSQL_SERVER=mariadb
-#     - PUREFTPD_MYSQL_PORT=3306
-#     - PUREFTPD_MYSQL_USER=pureftpd
-#     - PUREFTPD_MYSQL_PASS=${MYSQL_PASSWORD}
-#     - PUREFTPD_MYSQL_DB=pureftpd
-#   links:
-#    - mariadb
-#   depends_on:
-#    - init
-#    - mariadb
 
  reverse-proxy:
   image: traefik:v2.6
