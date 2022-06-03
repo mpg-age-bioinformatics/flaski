@@ -370,6 +370,16 @@ def make_bar_plot(df, cols_to_exclude,sets, label):
         fig = px.bar(bar_df, x='Sample', y='mean', color="Group", labels={'mean':label}, height=height_)
         fig.update_traces(error_y={"type":"data", "array":np.array(bar_df["std"]), "symmetric":True, "color":'rgba(0,0,0,0.5)',"thickness":2, "width":5})
         fig.update_traces(width=width_bar)
+        fig.update_layout(
+            yaxis = dict(
+                title_text = "log10( normalized counts + 1 )",
+            ),
+            title={
+                'text': label,
+                'xanchor': 'left',
+                'yanchor': 'top' }
+                # "font": {"size": float(pa["titles"]), "color":"black"  } } 
+        )
 
         # for data in fig.data:
         #     data["width"] = 0.5
