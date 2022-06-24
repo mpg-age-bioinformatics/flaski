@@ -13,6 +13,53 @@ from datetime import datetime
 from flask import render_template
 from dash import dash_table
 
+
+GROUPS=["Adam_Antebi",\
+"Aleksandra_Filipovska",\
+"Anne_Schaefer",\
+"Bioinformatics",\
+"Constantinos_Demetriades",\
+"CRISPR_Screening",\
+"Dario_Valenzano",\
+"Ivan_Matic",\
+"James_Stewart",\
+"Lena_Pernas",\
+"Linda_Partridge",\
+"Martin_Denzel",\
+"Martin_Graef",\
+"Metabolomics",\
+"Nils_Larson",\
+"Peter_Tessarz",\
+"Phenotyping",\
+"Proteomics",\
+"Ron_Jachimowicz",\
+"Sara_Wickstroem",\
+"Thomas_Langer",\
+"External"]
+
+GROUPS_INITALS={"Adam_Antebi":"AA",\
+"Aleksandra_Filipovska":"AF",\
+"Anne_Schaefer":"AS",\
+"Bioinformatics":"bit",\
+"Constantinos_Demetriades":"CD",\
+"CRISPR_Screening":"CS",\
+"Dario_Valenzano":"DV",\
+"Ivan_Matic":"IM",\
+"James_Stewart":"JS",\
+"Lena_Pernas":"LPe",\
+"Linda_Partridge":"LP",\
+"Martin_Denzel":"MD",\
+"Martin_Graef":"MG",\
+"Metabolomics":"Met",\
+"Nils_Larson":"NL",\
+"Peter_Tessarz":"PT",\
+"Phenotyping":"Phe",\
+"Proteomics":"Prt",\
+"Ron_Jachimowicz":"RJ",\
+"Sara_Wickstroem":"SW",\
+"Thomas_Langer":"TL",\
+"External":"ext"}
+
 def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     @cache.memoize(timeout=3600)
     def _parse_import_json(contents,filename,last_modified,session_id,cache,appname):
