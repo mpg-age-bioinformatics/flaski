@@ -12,6 +12,7 @@ from myapp import app
 from datetime import datetime
 from flask import render_template
 from dash import dash_table
+import re
 
 
 GROUPS=["Adam_Antebi",\
@@ -287,6 +288,36 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
                                     user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file),\
         reply_to=user.email )      
 
+def send_submission_email(user,submission_type,submission_file, attachment_path,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
+    with app.app_context():
+        send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[user.email, 'automation@age.mpg.de' ], 
+                text_body=render_template('email/submissions.age.txt',
+                                            user=user, submission_type=submission_type, attachment_path=attachment_path),
+                html_body=render_template('email/submissions.age.html',
+                                            user=user, submission_type=submission_type, attachment_path=attachment_path),\
+                reply_to='bioinformatics@age.mpg.de',\
+                attachment=submission_file ,
+                attachment_path=attachment_path ,\
+                open_type=open_type,\
+                attachment_type=attachment_type)
+
+def submission_mpcdf_email():
+    with app.app_context():
+        send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[user.email, 'automation@age.mpcdf.de' ], 
+                text_body=render_template('email/submissions.age.txt',
+                                            user=user, submission_type=submission_type, attachment_path=attachment_path),
+                html_body=render_template('email/submissions.mpcdf.html',
+                                            user=user, submission_type=submission_type, attachment_path=attachment_path),\
+                reply_to='bioinformatics@age.mpg.de',\
+                attachment=submission_file ,
+                attachment_path=attachment_path ,\
+                open_type=open_type,\
+                attachment_type=attachment_type)
+
 def make_min_width(x, factor=7):
     name_length = len(x)
     pixel = 50 + round(name_length*7)
@@ -324,3 +355,32 @@ def make_table(df,id,page_size=50,fixed_columns=False):
         )
 
     return report_table
+
+def validate_metadata(metadata):
+    email=metadata[  metadata["Field"] == "email"][ "Value" ].values[0]
+    email=str(email).rstrip().lstrip()
+    email=email.split(",")
+    email=[ re.search("([^@|\s]+@[^@]+\.[^@|\s]+)",e,re.I) for e in email ]
+    email=[ e.group(1) for e in email if e ]
+    if not email :
+        msg="Contact email is not a valid email. Please provide a valid email in the 'email' field of your submission file."
+        return msg
+    nas=metadata[metadata["Value"].isna()]["Field"].tolist()
+    if nas:
+        msg="The following fields require a valid value: {fields} ".format(fields=", ".join(nas) )
+        return msg
+    return None
+
+def timestamp():
+  now = datetime.now()
+  dt_string = now.strftime("%Y%m%d.%H%M%S.")
+  return dt_string
+
+def make_submission_file(suffix,folder="submissions"):
+  dt_string=timestamp()
+  new_file, filename = tempfile.mkstemp(suffix=suffix, prefix=dt_string )
+  os.close(new_file)
+  if not os.path.isdir(f"/{folder}/"):
+      os.makedirs(f"/{folder}/")
+  filename=f"/{folder}/"+os.path.basename(filename)
+  return filename

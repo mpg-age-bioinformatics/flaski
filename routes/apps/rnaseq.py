@@ -8,8 +8,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, GROUPS, make_table
-from pyflaski.scatterplot import make_figure, figure_defaults
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, GROUPS, make_table, make_submission_file, validate_metadata
 import os
 import uuid
 import traceback
@@ -313,56 +312,62 @@ Once you have been given access more information will be displayed on how to tra
     return content
 
 # # main submission call
-# @dashapp.callback(
-#     Output('message', component_property='children'),
-#     Input('session-id', 'data'),
-#     Input('submit-button-state', 'n_clicks'),
-#     State('adding-rows-table', 'data'),
-#     State('email', 'value'),
-#     State('opt-group', 'value'),
-#     State('folder', 'value'),
-#     State('md5sums', 'value'),
-#     State('project_title', 'value'),
-#     State('opt-organism', 'value'),
-#     State('opt-ercc', 'value'),
-#     prevent_initial_call=True )
-# def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
-#     # apps=read_private_apps(current_user.email,app)
-#     # apps=[ s["link"] for s in apps ]
-#     # if not validate_user_access(current_user,CURRENTAPP):
-#     #         return dcc.Location(pathname="/index", id="index"), None, None
-#     # if CURRENTAPP not in apps:
-#         # return dbc.Alert('''You do not have access to this App.''',color="danger")
+@dashapp.callback(
+    Output('message', component_property='children'),
+    Input('session-id', 'data'),
+    Input('submit-button-state', 'n_clicks'),
+    State('adding-rows-table', 'data'),
+    State('email', 'value'),
+    State('opt-group', 'value'),
+    State('folder', 'value'),
+    State('md5sums', 'value'),
+    State('project_title', 'value'),
+    State('opt-organism', 'value'),
+    State('opt-ercc', 'value'),
+    prevent_initial_call=True )
+def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
+    # apps=read_private_apps(current_user.email,app)
+    # apps=[ s["link"] for s in apps ]
+    # if not validate_user_access(current_user,CURRENTAPP):
+    #         return dcc.Location(pathname="/index", id="index"), None, None
+    # if CURRENTAPP not in apps:
+        # return dbc.Alert('''You do not have access to this App.''',color="danger")
 
-#     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
-#     samples=pd.read_json(subdic["samples"])
-#     metadata=pd.read_json(subdic["metadata"])
-#     # print(subdic["filename"])
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
+    samples=pd.read_json(subdic["samples"])
+    metadata=pd.read_json(subdic["metadata"])
 
-#     #{"filename": filename, "samples":df, "metadata":df_}
-#     validation=validate_metadata(metadata)
-#     if validation:
-#         return dbc.Alert(dcc.Markdown(validation, style={"margin-top":"15px"} ),color="warning")
+    #{"filename": filename, "samples":df, "metadata":df_}
+    validation=validate_metadata(metadata)
+    if validation:
+        return dbc.Alert(dcc.Markdown(validation, style={"margin-top":"15px"} ),color="warning")
 
-#     if os.path.isfile(subdic["filename"]):
-#         msg='''You have already submitted this data. Re-submission will not take place.'''
-#     else:
-#         msg='''**Submission successful**. Please check your email for confirmation.'''
+    if os.path.isfile(subdic["filename"]):
+        msg='''You have already submitted this data. Re-submission will not take place.'''
+    else:
+        msg='''**Submission successful**. Please check your email for confirmation.'''
     
-#     if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
-#         subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
 
-#     EXCout=pd.ExcelWriter(subdic["filename"])
-#     samples.to_excel(EXCout,"samples",index=None)
-#     metadata.to_excel(EXCout,"RNAseq",index=None)
-#     EXCout.save()
+    user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+    # mps_domain="mpg.de"
+    # if user_domain[-len(mps_domain):] == mps_domain :
+    ## comment for debug
+    # if user_domain !="age.mpg.de" :
+    #     subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
-#     send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+    EXCout=pd.ExcelWriter(subdic["filename"])
+    samples.to_excel(EXCout,"samples",index=None)
+    metadata.to_excel(EXCout,"RNAseq",index=None)
+    EXCout.save()
 
-#     if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
-#         os.remove(subdic["filename"])
+    send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
 
-#     return dcc.Markdown(msg, style={"margin-top":"10px"} )
+    # temporary!!!!
+    if user_domain !="age.mpg.de" :
+        os.remove(subdic["filename"])
+
+    return dcc.Markdown(msg, style={"margin-top":"10px"} )
 
 # add rows buttom 
 @dashapp.callback(
