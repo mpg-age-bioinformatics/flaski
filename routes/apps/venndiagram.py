@@ -812,7 +812,9 @@ def make_app_content(pathname):
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
+        print("HELLLO")
         imp=session["session_data"]
+        print(imp)
         del(session["session_data"])
         sleep(3)
         return imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
@@ -820,7 +822,7 @@ def read_session_redis(session_id):
         return dash.no_update, dash.no_update, dash.no_update, None
 
 read_input_updates=[
-    'groups_value',
+    #'groups_value',
     'fig_width',
     'fig_height',
     'title',
@@ -858,61 +860,67 @@ read_input_updates=[
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 
-# @dashapp.callback( 
-#     [ Output('xvals', 'options'),
-#     Output('yvals', 'options'),
-#     Output('groups_value', 'options'),
-#     Output('labels_col_value', 'options'),
-#     Output('upload-data','children'),
-#     Output('toast-read_input_file','children'),
-#     Output({ "type":"traceback", "index":"read_input_file" },'data'),
-#     # Output("json-import",'data'),
-#     Output('xvals', 'value'),
-#     Output('yvals', 'value')] + read_input_updates_outputs ,
-#     Input('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     State('session-id', 'data'),
-#     prevent_initial_call=True)
-# def read_input_file(contents,filename,last_modified,session_id):
-#     print("HERE5")
-#     if not filename :
-#         raise dash.exceptions.PreventUpdate
+@dashapp.callback( 
+    [
+    # Output('xvals', 'options'),
+    # Output('yvals', 'options'),
+    # Output('groups_value', 'options'),
+    # Output('labels_col_value', 'options'),
+    Output('upload-data','children'),
+    Output('toast-read_input_file','children'),
+    Output({ "type":"traceback", "index":"read_input_file" },'data'), ] + read_input_updates_outputs ,
+    # Output("json-import",'data'),
+    # Output('xvals', 'value'),
+    # Output('yvals', 'value')] + read_input_updates_outputs ,
+    Input('upload-data', 'contents') ,
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('session-id', 'data'),
+    prevent_initial_call=True)
+def read_input_file(contents,filename,last_modified,session_id):
+    print("HERE5")
+    if not filename :
+        raise dash.exceptions.PreventUpdate
 
-#     pa_outputs=[ dash.no_update for k in  read_input_updates ]
-#     try:
-#         if filename.split(".")[-1] == "json":
-#             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-#             df=pd.read_json(app_data["df"])
-#             cols=df.columns.tolist()
-#             cols_=make_options(cols)
-#             filename=app_data["filename"]
-#             xvals=app_data['pa']["xvals"]
-#             yvals=app_data['pa']["yvals"]
+    pa_outputs=[ dash.no_update for k in  read_input_updates ]
+    try:
+        if filename.split(".")[-1] == "json":
+            print(filename)
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+            #df=pd.read_json(app_data["df"])
+            # cols=df.columns.tolist()
+            # cols_=make_options(cols)
+            filename=app_data["filename"]
 
-#             pa=app_data["pa"]
+            # xvals=app_data['pa']["xvals"]
+            # yvals=app_data['pa']["yvals"]
 
-#             pa_outputs=[pa[k] for k in  read_input_updates ]
+            pa=app_data["pa"]
 
-#         else:
-#             df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
-#             app_data=dash.no_update
-#             cols=df.columns.tolist()
-#             cols_=make_options(cols)
-#             xvals=cols[0]
-#             yvals=cols[1]
+            pa_outputs=[pa[k] for k in  read_input_updates ]
 
-#         print(cols)
-#         upload_text=html.Div(
-#             [ html.A(filename, id='upload-data-text') ],
-#             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-#         )     
-#         return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
+        else:
+            # df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
+            app_data=dash.no_update
+            # cols=df.columns.tolist()
+            # cols_=make_options(cols)
+            # xvals=cols[0]
+            # yvals=cols[1]
 
-#     except Exception as e:
-#         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-#         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
-#         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
+        # print(cols)
+        upload_text=html.Div(
+            [ html.A(filename, id='upload-data-text') ],
+            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+        )     
+        #return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
+        return [ upload_text, None, None] + pa_outputs
+
+
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
+        # return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
+        return [ dash.no_update, toast, tb_str ] + pa_outputs
    
 
 
@@ -992,19 +1000,24 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         input_names = [item.component_id for item in states]
         #df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
 
-        pa=figure_defaults()
-        for k, a in zip(input_names,args) :
-            if type(k) != dict :
-                pa[k]=a
-            elif type(k) == dict :
-                k_=k['type'] 
-                for i, a_ in enumerate(a) :
-                    pa[k_]=a_
+        if filename and filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+            pa = app_data["pa"]
+        else:
+            pa=figure_defaults()
+            for k, a in zip(input_names,args) :
+                if type(k) != dict :
+                    pa[k]=a
+                elif type(k) == dict :
+                    k_=k['type'] 
+                    for i, a_ in enumerate(a) :
+                        pa[k_]=a_
 
-        print(pa)
+        #print(pa)
         
-        session_data={ "session_data": {"app": { "venndiagram": {"filename":upload_data_text ,'last_modified':last_modified,"pa":pa} } } } #"df":df.to_json()
+        session_data={ "session_data": {"app": { "venndiagram": {"filename":upload_data_text, 'last_modified':last_modified,"pa":pa} } } } #"df":df.to_json()
         session_data["APP_VERSION"]=app.config['APP_VERSION']
+        #print(session_data)
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
@@ -1028,6 +1041,8 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
     if button_id == "save-session-btn" :
         try:
+            print("hi there")
+            print(filename)
             if filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
                 return dash.no_update, toast, None, None, dash.no_update, None
@@ -1046,6 +1061,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
+        #print(session_data)
         return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
     
