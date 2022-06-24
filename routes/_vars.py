@@ -44,8 +44,14 @@ other_nav_dropdowns =[
                 "tSNE":"/tsne/",\
                 "Lifespan":"/lifespan/",\
 
+            }, \
+
+    }, \
+    { "Forms": \
+            {
+                "RNAseq":"/rnaseq/",\
             } \
-    } \
+    }
 ]
 ###################################
 # _PRIVATE_ROUTES=['home'] ## only users added to this route on the admin board / User model will have access
@@ -65,6 +71,21 @@ other_nav_dropdowns =[
 #                 "Settings":"/settings/",\
 #                 "Logout":"/logout/"
 #             } \
-#     } \
+#     }, \
+#     { \
+#         "Eg. DropDown 2": \
+#             {
+#                 "Home":"/home/",\
+#                 "separator_1":"-",\
+#                 "General":"__title__",\
+#                 "About":"/about/",\
+#                 "Impressum":"/impressum/",\
+#                 "Privacy":"/privacy/",\
+#                 "fixed_separator":"-",\
+#                 "Configuration":"__title__", \
+#                 "Settings":"/settings/",\
+#                 "Logout":"/logout/"
+#             } \
+#     }
 # ]
 ###################################
