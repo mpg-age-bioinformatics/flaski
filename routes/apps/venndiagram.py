@@ -663,7 +663,7 @@ def make_app_content(pathname):
     app_content=html.Div(
         [
             dcc.Store( id='session-data' ),
-            # dcc.Store( id='json-import' ),
+            dcc.Store( id='json-import' ),
             dbc.Row( 
                 [
                     dbc.Col(
@@ -805,10 +805,11 @@ def make_app_content(pathname):
 
 # example reading session from server storage
 @dashapp.callback( 
-    Output('upload-data', 'contents'),
-    Output('upload-data', 'filename'),
-    Output('upload-data', 'last_modified'),
-    Output('stored-file', 'children'),
+    Output('json-import', 'data'),
+    # Output('upload-data', 'contents'),
+    # Output('upload-data', 'filename'),
+    # Output('upload-data', 'last_modified'),
+    # Output('stored-file', 'children'),
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
@@ -817,9 +818,9 @@ def read_session_redis(session_id):
         print(imp)
         del(session["session_data"])
         sleep(3)
-        return imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
+        return imp #imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
     else:
-        return dash.no_update, dash.no_update, dash.no_update, None
+        return dash.no_update#, dash.no_update, dash.no_update, None
 
 read_input_updates=[
     #'groups_value',
@@ -866,61 +867,56 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     # Output('yvals', 'options'),
     # Output('groups_value', 'options'),
     # Output('labels_col_value', 'options'),
-    Output('upload-data','children'),
+    # Output('upload-data','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'), ] + read_input_updates_outputs ,
     # Output("json-import",'data'),
     # Output('xvals', 'value'),
     # Output('yvals', 'value')] + read_input_updates_outputs ,
-    Input('upload-data', 'contents') ,
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('session-id', 'data'),
+    Input('json-import', 'data'),
+    # Input('upload-data', 'contents') ,
+    # State('upload-data', 'filename'),
+    # State('upload-data', 'last_modified'),
+    Input('session-id', 'data'),
     prevent_initial_call=True)
-def read_input_file(contents,filename,last_modified,session_id):
+def read_input_file(json_import,session_id):
     print("HERE5")
-    if not filename :
+    if not json_import:
+        raise dash.exceptions.PreventUpdate
+    ## debug by printing type(session_data)
+    if type(json_import) != dict :
         raise dash.exceptions.PreventUpdate
 
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
     try:
-        if filename.split(".")[-1] == "json":
-            print(filename)
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-            #df=pd.read_json(app_data["df"])
-            # cols=df.columns.tolist()
-            # cols_=make_options(cols)
-            filename=app_data["filename"]
+        # if filename.split(".")[-1] == "json":
+        app_data=some_way_to_collect_from(json_import)
+        # app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+        #df=pd.read_json(app_data["df"])
+        # cols=df.columns.tolist()
+        # cols_=make_options(cols)
+        # filename=app_data["filename"]
 
-            # xvals=app_data['pa']["xvals"]
-            # yvals=app_data['pa']["yvals"]
+        # xvals=app_data['pa']["xvals"]
+        # yvals=app_data['pa']["yvals"]
 
-            pa=app_data["pa"]
+        pa=app_data["pa"]
 
-            pa_outputs=[pa[k] for k in  read_input_updates ]
+        pa_outputs=[pa[k] for k in  read_input_updates ]
 
-        else:
-            # df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
-            app_data=dash.no_update
-            # cols=df.columns.tolist()
-            # cols_=make_options(cols)
-            # xvals=cols[0]
-            # yvals=cols[1]
-
-        # print(cols)
-        upload_text=html.Div(
-            [ html.A(filename, id='upload-data-text') ],
-            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-        )     
+        # upload_text=html.Div(
+        #     [ html.A(filename, id='upload-data-text') ],
+        #     style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+        # )     
         #return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
-        return [ upload_text, None, None] + pa_outputs
+        return [ None, None] + pa_outputs
 
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
         # return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
-        return [ dash.no_update, toast, tb_str ] + pa_outputs
+        return [ toast, tb_str ] + pa_outputs
    
 
 
@@ -976,15 +972,16 @@ states=[
     Input("saveas-session-btn","n_clicks"),
     Input("excel-filename-download","n_clicks"),
     [ State('session-id', 'data'),
-    State('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
+    State('json-import', 'data'),
+    # State('upload-data', 'contents'),
+    # State('upload-data', 'filename'),
+    # State('upload-data', 'last_modified'),
     State('export-filename','value'),
     State('excel-filename', 'value'),
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn,session_id,json_import,export_filename,excel_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -1000,18 +997,29 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         input_names = [item.component_id for item in states]
         #df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
 
-        if filename and filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-            pa = app_data["pa"]
-        else:
-            pa=figure_defaults()
-            for k, a in zip(input_names,args) :
-                if type(k) != dict :
-                    pa[k]=a
-                elif type(k) == dict :
-                    k_=k['type'] 
-                    for i, a_ in enumerate(a) :
-                        pa[k_]=a_
+        # pa=None
+        # if json_import:
+        #     ## debug by printing type(session_data)
+        #     if type(json_import) != dict :
+        #         # app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+        #         # get app data from json_import
+        #         app_data=some_way_to_collect_from(json_import)
+        #         pa = app_data["pa"]
+
+        # if filename and filename.split(".")[-1] == "json":
+        #    app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+        #    pa = app_data["pa"]
+
+
+        # if not pa :
+        pa=figure_defaults()
+        for k, a in zip(input_names,args) :
+            if type(k) != dict :
+                pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
         #print(pa)
         
