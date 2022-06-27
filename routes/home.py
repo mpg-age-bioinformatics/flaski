@@ -10,6 +10,8 @@ from ._utils import META_TAGS, check_email, password_check, navbar_A, protect_da
 from flask_login import current_user
 from ._vars import other_nav_dropdowns, _PRIVATE_ROUTES, _PUBLIC_VIEWS
 
+_PR = [ s for s in _PRIVATE_ROUTES if s not in _PUBLIC_VIEWS ]
+
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
 dashapp = dash.Dash("home",url_base_pathname=f'{PAGE_PREFIX}/home/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
@@ -50,7 +52,7 @@ def make_layout(pathname):
         row=[]
         for l in list( links_keys ) :
             app_route=links_dic[l].split("/")[1]
-            if app_route in _PRIVATE_ROUTES :
+            if app_route in _PR :
                 route_obj=PrivateRoutes.query.filter_by(route=app_route).first()
                 if not route_obj :
                     continue

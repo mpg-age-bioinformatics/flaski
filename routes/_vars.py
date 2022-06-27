@@ -1,7 +1,7 @@
 import os
 
 _PRIVATE_ROUTES=[]
-_PUBLIC_VIEWS=[]
+_PUBLIC_VIEWS=['rnaseq']
 
 if os.environ['FLASK_ENV'] != "development" :
     _DEV_ROUTES=["circularbarplots","venndiagram", "lifespan", "rnaseq" ] #"circularbarplots"  "heatmap",

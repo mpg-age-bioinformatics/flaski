@@ -34,9 +34,9 @@ COPY ./email/app_exception.html /myapp/myapp/templates/email/app_exception.html
 COPY ./email/app_exception.txt /myapp/myapp/templates/email/app_exception.txt
 COPY ./email/app_help.html /myapp/myapp/templates/email/app_help.html
 COPY ./email/app_help.txt /myapp/myapp/templates/email/app_help.txt
-COPY ./email/submissions.age.html:/myapp/myapp/templates/email/submissions.age.html
-COPY ./email/submissions.age.txt:/myapp/myapp/templates/email/submissions.age.txt
-COPY ./email/submissions.mpcdf.html:/myapp/myapp/templates/email/submissions.mpcdf.html
-COPY ./email/submissions.mpcdf.txt:/myapp/myapp/templates/email/submissions.mpcdf.txt
+COPY ./email/submissions.age.html /myapp/myapp/templates/email/submissions.age.html
+COPY ./email/submissions.age.txt /myapp/myapp/templates/email/submissions.age.txt
+COPY ./email/submissions.mpcdf.html /myapp/myapp/templates/email/submissions.mpcdf.html
+COPY ./email/submissions.mpcdf.txt /myapp/myapp/templates/email/submissions.mpcdf.txt
 
 USER myapp

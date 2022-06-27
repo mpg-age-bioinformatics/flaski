@@ -384,3 +384,19 @@ def make_submission_file(suffix,folder="submissions"):
       os.makedirs(f"/{folder}/")
   filename=f"/{folder}/"+os.path.basename(filename)
   return filename
+
+def check_access(route):
+    route_obj=PrivateRoutes.query.filter_by(route=route).first()
+    if not route_obj :
+        header="ERROR"
+        msg='''This App needs to be configured. Please contact support.'''
+        return header, msg
+        
+    users=route_obj.users
+    uid=current_user.id
+    if uid not in users :
+        header="ERROR"
+        msg='''You are not allowed to use this App.'''
+        return header, msg
+
+    return None, None
