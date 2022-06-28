@@ -73,6 +73,7 @@ services:
    DB_NAME: flaski
    REDIS_ADDRESS: redis:6379/0
    REDIS_PASSWORD: ${REDIS_PASSWORD}
+   USERS_DATA: /flaski_data/
   labels:
    - traefik.http.services.server.loadbalancer.server.port=8000
    - traefik.http.middlewares.server_https.redirectscheme.scheme=https
