@@ -873,26 +873,15 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     prevent_initial_call=True)
 #def read_input_file(json_import):
 def read_input_file(contents, filename, last_modified, session_id):
-    # if not json_import:
-    #     raise dash.exceptions.PreventUpdate
-    # ## debug by printing type(session_data)
-    # if type(json_import) != dict :
-    #     raise dash.exceptions.PreventUpdate
-
     if not filename:
         raise dash.exceptions.PreventUpdate
-    ## debug by printing type(session_data)
-    # if type(json_import) != dict :
-    #     raise dash.exceptions.PreventUpdate
-
+    
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
 
     try:
-
         if filename.split(".")[-1] == "json":
 
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-
             pa=app_data["pa"]
             pa_outputs=[pa[k] for k in  read_input_updates ]
 
@@ -906,10 +895,6 @@ def read_input_file(contents, filename, last_modified, session_id):
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
         return [ toast, tb_str ] + pa_outputs
-
-
-   
-
 
 
 states=[

@@ -600,7 +600,7 @@ def make_app_content(pathname):
 
                 ),
             ],
-            style={ "min-width":"372px","width":"100%", "display": "none"},
+            style={ "min-width":"372px","width":"100%"}, #"display": "none"},
             className="g-0",    
             # style={ "margin-left":"0px" , "margin-right":"0px"}
         ),
@@ -824,6 +824,64 @@ def read_session_redis(session_id):
         return dash.no_update, dash.no_update, dash.no_update
    
 
+read_input_updates=[
+    'ids', 
+    'ids_bg', 
+    'categories_gene_ontology_value', 
+    'categories_gene_domains_value',
+    'categories_pathways_value', 
+    'categories_general_annotations_value', 
+    'categories_functional_categories_value', 
+    'categories_protein_protein_interactions_value', 
+    'categories_literature_value', 
+    'categories_disease_value', 
+    'database_value', 
+    'user', 
+    'name', 
+    'name_bg', 
+    'n', 
+    'p', 
+    'log2fc_column'
+] 
+
+read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
+
+@dashapp.callback( 
+   [
+    Output('toast-read_input_file','children'), 
+    Output({ "type":"traceback", "index":"read_input_file" },'data'), ] + read_input_updates_outputs ,
+    #Input('json-import', 'data'),
+    Input('upload-data', 'contents') ,
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('session-id', 'data'),
+    prevent_initial_call=True)
+#def read_input_file(json_import):
+def read_input_file(contents, filename, last_modified, session_id):
+    if not filename:
+        raise dash.exceptions.PreventUpdate
+    
+    pa_outputs=[ dash.no_update for k in  read_input_updates ]
+
+    try:
+
+        if filename and filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "david")
+            pa = app_data["pa"]
+            pa_outputs=[pa[k] for k in  read_input_updates ]
+
+        # upload_text=html.Div(
+        #     [ html.A(filename, id='upload-data-text') ],
+        #     style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+        # )     
+        return [ None, None] + pa_outputs
+
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"david")
+        return [ toast, tb_str ] + pa_outputs
+
+
 states=[
     State('ids', 'value'),
     State('ids_bg', 'value'),
@@ -888,25 +946,26 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
     download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
     download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'}
+    
     try:
         input_names = [item.component_id for item in states]
 
-        if filename and filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "david")
-            pa = app_data["pa"]
-        else:
-            pa=figure_defaults()
-            for k, a in zip(input_names,args) :
-                if type(k) != dict :
-                    pa[k]=a
+        pa=figure_defaults()
+        for k, a in zip(input_names,args) :
+            if type(k) != dict :
+                pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
-        session_data={ "session_data": {"app": { "david": {'last_modified':last_modified,"pa":pa} } } }
+        session_data={ "session_data": {"app": { "david": {"filename":upload_data_text,'last_modified':last_modified,"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"david")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide,download_buttons_style_hide, download_buttons_style_hide, None, None, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, download_buttons_style_hide, None, None, None
 
     if button_id == "export-filename-download" :
         if not export_filename:
@@ -919,10 +978,11 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             export_filename.write(json.dumps(session_data).encode())
             # export_filename.seek(0)
 
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
+        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
 
     if button_id == "save-session-btn" :
         try:
+            print("here")
             if filename and filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
                 return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
