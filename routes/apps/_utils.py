@@ -4,16 +4,24 @@ import json
 import base64
 import tempfile
 import pandas as pd
+from flask_login import current_user
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 import traceback
 from myapp.email import send_email
-from myapp import app
-from datetime import datetime
+from myapp import app, db
+from datetime import datetime, date
 from flask import render_template
 from dash import dash_table
 import re
+from myapp.models import FTPSubmissions, PrivateRoutes
+import pymysql.cursors
+import hashlib
+import random
+import string
+import openpyxl
 
+APP_URL=app.config['APP_URL']
 
 GROUPS=["Adam_Antebi",\
 "Aleksandra_Filipovska",\
@@ -60,6 +68,28 @@ GROUPS_INITALS={"Adam_Antebi":"AA",\
 "Sara_Wickstroem":"SW",\
 "Thomas_Langer":"TL",\
 "External":"ext"}
+
+def user_generator():
+    name_upper_chars = string.ascii_uppercase
+    upper_name = ''.join(random.choice(name_upper_chars) for y in range(1))
+    name_chars = string.ascii_lowercase
+    name = ''.join(random.choice(name_chars) for x in range(4))
+    digits_chars = string.digits
+    digits = ''.join(random.choice(digits_chars) for z in range(2))
+    user=upper_name + name + digits
+    return user
+
+def password_generator():
+    alphabets = list(string.ascii_letters)
+    digits = list(string.digits)
+    password = []
+    for i in range(7):
+        password.append(random.choice(alphabets))
+    for i in range(3):
+        password.append(random.choice(digits))
+    random.shuffle(password)
+    password="".join(password)
+    return password
 
 def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     @cache.memoize(timeout=3600)
@@ -303,15 +333,83 @@ def send_submission_email(user,submission_type,submission_file, attachment_path,
                 open_type=open_type,\
                 attachment_type=attachment_type)
 
-def submission_mpcdf_email():
+def send_submission_ftp_email(user,submission_type,submission_file, attachment_path,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
+    submission=FTPSubmissions.query.filter_by(file_name=submission_file).first()
+    if submission:
+        return "Error"
+
+    today=str(date.today())
+
+    PUREFTPD_AUTH_SALT=os.getenv('PUREFTPD_AUTH_SALT')
+    PUREFTPD_MYSQL_SERVER=os.getenv('PUREFTPD_MYSQL_SERVER')
+    PUREFTPD_MYSQL_PORT=os.getenv('PUREFTPD_MYSQL_PORT')
+    PUREFTPD_MYSQL_USER=os.getenv('PUREFTPD_MYSQL_USER')
+    PUREFTPD_MYSQL_PASS=os.getenv('PUREFTPD_MYSQL_PASS')
+    PUREFTPD_MYSQL_DB=os.getenv('PUREFTPD_MYSQL_DB')
+
+    ftp_user=user_generator()
+    ftp_pass=password_generator()
+
+    AUTHD_PASSWORD=hashlib.pbkdf2_hmac('sha256',
+        ftp_pass.encode('utf-8'),
+        PUREFTPD_AUTH_SALT.encode('utf-8'), 
+        100000 ).hex()
+
+    # Connect to the database
+    connection = pymysql.connect(host=PUREFTPD_MYSQL_SERVER,
+                                port=int(PUREFTPD_MYSQL_PORT),
+                                user=PUREFTPD_MYSQL_USER,
+                                password=PUREFTPD_MYSQL_PASS,
+                                database=PUREFTPD_MYSQL_DB,
+                                cursorclass=pymysql.cursors.DictCursor)
+
+    with connection:
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO `users` (`user`, `pass`,`uid`,`gid`,`dir`, `user_quota_size`, `user_quota_files`, `created` ) VALUES (%s, %s, %s, %s, %s, %s,%s, %s );"
+            response=cursor.execute(sql, (ftp_user, AUTHD_PASSWORD, '1000', '1003', f'/home/{ftp_user}','200', '80', today ))
+        connection.commit()
+
+    ##### add ftp user name to excel file in a new sheet called ftp 
+    ftp_df=pd.DataFrame({ "user":ftp_user}, index=[0])
+    workbook = openpyxl.load_workbook(attachment_path)
+    writer = pd.ExcelWriter(attachment_path, engine='openpyxl')
+    writer.book = workbook
+    writer.sheets = dict((ws.title, ws) for ws in workbook.worksheets)
+    ftp_df.to_excel(writer, 'ftp')
+    writer.save()
+    writer.close()
+
+    # generate submission and respective token
+    submission = FTPSubmissions(file_name=attachment_path, user_id=current_user.id )
+    db.session.add(submission)
+    db.session.commit()
+
+    token = submission.get_submission_validation_token()
+
+    token_link=f"{APP_URL}/transfer/{token}"
+
+    # filename=os.path.basename(submission_file)
+
     with app.app_context():
         send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
                 sender=app.config['MAIL_USERNAME'],
                 recipients=[user.email, 'automation@age.mpcdf.de' ], 
-                text_body=render_template('email/submissions.age.txt',
-                                            user=user, submission_type=submission_type, attachment_path=attachment_path),
-                html_body=render_template('email/submissions.mpcdf.html',
-                                            user=user, submission_type=submission_type, attachment_path=attachment_path),\
+                text_body=render_template('email/submissions.ftp.txt',
+                                            user=user, 
+                                            filename=submission_file,
+                                            submission_type=submission_type,
+                                            PUREFTPD_MYSQL_SERVER=PUREFTPD_MYSQL_SERVER,
+                                            ftp_user=ftp_user,
+                                            ftp_pass=ftp_pass,
+                                            token_link=token_link ),\
+                html_body=render_template('email/submissions.ftp.html',
+                                            user=user, 
+                                            filename=submission_file,
+                                            submission_type=submission_type, 
+                                            PUREFTPD_MYSQL_SERVER=PUREFTPD_MYSQL_SERVER,
+                                            ftp_user=ftp_user,
+                                            ftp_pass=ftp_pass,
+                                            token_link=token_link ),\
                 reply_to='bioinformatics@age.mpg.de',\
                 attachment=submission_file ,
                 attachment_path=attachment_path ,\

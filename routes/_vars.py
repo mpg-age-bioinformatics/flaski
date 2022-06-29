@@ -1,6 +1,6 @@
 import os
 
-_PRIVATE_ROUTES=[]
+_PRIVATE_ROUTES=['rnaseq']
 _PUBLIC_VIEWS=['rnaseq']
 
 if os.environ['FLASK_ENV'] != "development" :

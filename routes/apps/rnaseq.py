@@ -7,14 +7,14 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email
+from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
 import io
 import base64
 import pandas as pd
 from myapp import db
-from myapp.models import UserLogging
+from myapp.models import UserLogging, PrivateRoutes
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -98,6 +98,9 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
     Input('session-id', 'data')
 )
 def make_app_content(session_id):
+    header_access, msg_access = check_access( 'rnaseq' )
+    #header_access, msg_access = None, None # for local debugging 
+
     input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
     example_input=pd.DataFrame( 
         { 
@@ -193,30 +196,25 @@ Once you have been given access more information will be displayed on how to tra
     user_domain=user_domain.split("@")[-1]
 
     mps_domain="mpg.de"
-    if user_domain[-len(mps_domain):] == mps_domain :
-        if user_domain =="age.mpg.de" :
-            readme=dcc.Markdown(readme_age, style={"width":"90%", "margin":"10px"} )
-            groups_=make_options(GROUPS)
-            groups_val=None
-            folder_row=dbc.Row( 
-                [
-                    dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
-                    dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                    dbc.Col( html.Label('Folder containing your files'),md=3  ), 
-                ], 
-                style={"margin-top":10}
-            )
-        else:
-            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
-            groups_=make_options([user_domain])
-            groups_val=user_domain
-            folder_row=None
-        
+    #if user_domain[-len(mps_domain):] == mps_domain :
+    if user_domain =="age.mpg.de" :
+        readme=dcc.Markdown(readme_age, style={"width":"90%", "margin":"10px"} )
+        groups_=make_options(GROUPS)
+        groups_val=None
+        folder_row_style={"margin-top":10 }
+        folder=""
+    elif not header_access :
+        readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
+        groups_=make_options([user_domain])
+        groups_val=user_domain
+        folder_row_style={"margin-top":10, 'display': 'none' }
+        folder="FTP"
     else:
         readme=dcc.Markdown(readme_noaccess, style={"width":"90%", "margin":"10px"} )
         groups_=make_options(["External"])
         groups_val="External"
-        folder_row=None
+        folder_row_style={"margin-top":10, 'display': 'none' }
+        folder="FTP" 
 
     input_df=make_table(input_df,'adding-rows-table')
     input_df.editable=True
@@ -242,7 +240,14 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
             ], 
             style={"margin-top":10}),
-        folder_row,
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value=folder, type='text', style={ "width":"100%" } ) ,md=3 ),
+                dbc.Col( html.Label('Folder containing your files'),md=3  ), 
+            ], 
+            style=folder_row_style
+        ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right" }), 
@@ -275,7 +280,7 @@ Once you have been given access more information will be displayed on how to tra
             [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label("`wget` command for direct download (empty you don't have one)"),md=3  ), 
+                dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
             ], 
             style={"margin-top":10,"margin-bottom":10}),       
     ]
@@ -325,8 +330,8 @@ Once you have been given access more information will be displayed on how to tra
         html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle("Header",id="modal_header") ),
-                dbc.ModalBody("This is the content of the modal", id="modal_body"),
+                dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),
+                dbc.ModalBody("If this message does not change in a few seconds than something went wrong!", id="modal_body"),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Close", id="close", className="ms-auto", n_clicks=0
@@ -384,11 +389,11 @@ def read_file(contents,filename,last_modified):
 
     return [ input_df ] +  values_to_return + [ filename ]
 
-# # main submission call
+# main submission call
 @dashapp.callback(
     Output("modal_header", "children"),
     Output("modal_body", "children"),
-    Input('session-id', 'data'),
+    # Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
     State('email', 'value'),
@@ -400,8 +405,9 @@ def read_file(contents,filename,last_modified):
     State('opt-ercc', 'value'),
     State('wget', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
+def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
     header, msg = check_access( 'rnaseq' )
+    # header, msg = None, None # for local debugging 
     if msg :
         return header, msg
 
@@ -426,22 +432,20 @@ def update_output(session_id, n_clicks, rows, email, group, folder, md5sums, pro
 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
-    # mps_domain="mpg.de"
+    mps_domain="mpg.de"
     # if user_domain[-len(mps_domain):] == mps_domain :
-    ## comment for debug
-    # if user_domain !="age.mpg.de" :
-    #     subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    if user_domain !="age.mpg.de" :
+        subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
     EXCout=pd.ExcelWriter(subdic["filename"])
     samples.to_excel(EXCout,"samples",index=None)
     metadata.to_excel(EXCout,"RNAseq",index=None)
     EXCout.save()
 
-    send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
-
-    # temporary!!!!
-    if user_domain !="age.mpg.de" :
-        os.remove(subdic["filename"])
+    if user_domain == "age.mpg.de" :
+        send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+    else:
+        send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
 
     return header, msg
 

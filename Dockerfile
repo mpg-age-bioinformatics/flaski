@@ -36,7 +36,10 @@ COPY ./email/app_help.html /myapp/myapp/templates/email/app_help.html
 COPY ./email/app_help.txt /myapp/myapp/templates/email/app_help.txt
 COPY ./email/submissions.age.html /myapp/myapp/templates/email/submissions.age.html
 COPY ./email/submissions.age.txt /myapp/myapp/templates/email/submissions.age.txt
-COPY ./email/submissions.mpcdf.html /myapp/myapp/templates/email/submissions.mpcdf.html
-COPY ./email/submissions.mpcdf.txt /myapp/myapp/templates/email/submissions.mpcdf.txt
+COPY ./email/submissions.ftp.html /myapp/myapp/templates/email/submissions.ftp.html
+COPY ./email/submissions.ftp.txt /myapp/myapp/templates/email/submissions.ftp.txt
+COPY ./email/submissions.ftp.data.html /myapp/myapp/templates/email/submissions.ftp.data.html
+COPY ./email/submissions.ftp.data.txt /myapp/myapp/templates/email/submissions.ftp.data.txt
+COPY ./_models.py /myapp/myapp/_models.py
 
 USER myapp

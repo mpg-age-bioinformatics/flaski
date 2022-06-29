@@ -22,6 +22,7 @@ services:
    - ~/flaski23/backup/users_data3:/backup/users_data
   #  - ~/flaski23/backup/users_data2:/backup/users_data
    - ~/flaski23/backup/mariadb:/backup/mariadb:ro
+   - ./_models.py:/myapp/myapp/_models.py
   environment:
    APP_NAM: myapp
    FLASK_ENV: init
@@ -135,6 +136,9 @@ services:
    - ./email/submissions.age.txt:/myapp/myapp/templates/email/submissions.age.txt
    - ./email/submissions.mpcdf.html:/myapp/myapp/templates/email/submissions.mpcdf.html
    - ./email/submissions.mpcdf.txt:/myapp/myapp/templates/email/submissions.mpcdf.txt
+   - ./_models.py:/myapp/myapp/_models.py
+   - ./email/submissions.mpcdf.data.html:/myapp/myapp/templates/email/submissions.mpcdf.data.html
+   - ./email/submissions.mpcdf.data.txt:/myapp/myapp/templates/email/submissions.mpcdf.data.txt
   environment:
    N_WORKERS: 4
    ADMINS: flaski@age.mpg.de
@@ -158,6 +162,12 @@ services:
    DB_NAME: flaski
    REDIS_ADDRESS: redis:6379/0
    REDIS_PASSWORD: ${REDIS_PASSWORD}
+   PUREFTPD_AUTH_SALT: ${PUREFTPD_AUTH_SALT}
+   PUREFTPD_MYSQL_SERVER: ${PUREFTPD_MYSQL_SERVER}
+   PUREFTPD_MYSQL_PORT: 3306
+   PUREFTPD_MYSQL_USER: pureftpd
+   PUREFTPD_MYSQL_PASS: ${PUREFTPD_MYSQL_PASS}
+   PUREFTPD_MYSQL_DB: pureftpd
   labels:
    - traefik.http.services.server3.loadbalancer.server.port=8000
    - traefik.http.middlewares.server3_https.redirectscheme.scheme=https

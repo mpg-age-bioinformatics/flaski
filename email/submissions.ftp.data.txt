@@ -1,0 +1,9 @@
+Hi {{ user.firstname }}
+
+your request "{{ filename }}" for {{ submission_type }} analysis has been released.
+
+Submission file attached.
+
+Cheers!
+
+Flaski

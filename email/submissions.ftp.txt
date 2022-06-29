@@ -1,0 +1,23 @@
+Hi {{ user.firstname }}
+
+your request "{{ filename }}" for {{ submission_type }} analysis has been received.
+
+Please transfer your data over FTP to 
+
+ftp:  {{ PUREFTPD_MYSQL_SERVER }}
+user: {{ ftp_user }}
+pass: {{ ftp_pass }}
+
+drop all your files on the main folder, do not create subdirectories. 
+
+Please realise that this FTP account will be inactivated in 2 weeks.
+
+Once you've transfered all your files click on the following link to start the analysis:
+
+{{ token_link }}
+
+Submission file attached.
+
+Cheers!
+
+Flaski

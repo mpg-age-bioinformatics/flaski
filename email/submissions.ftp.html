@@ -1,0 +1,23 @@
+<p>Hi {{ user.firstname }}</p>
+<br>
+<p>your request "{{ filename }}" for {{ submission_type }} analysis has been received.</p>
+<br>
+<p>Please transfer your data over FTP to</p>
+<br>
+<p>ftp:  {{ PUREFTPD_MYSQL_SERVER }}</p>
+<p>user: {{ ftp_user }}</p>
+<p>pass: {{ ftp_pass }}</p>
+<br>
+<p>drop all your files on the main folder, do not create subdirectories. </p>
+<br>
+<p>Please realise that this FTP account will be inactivated in 2 weeks.</p>
+<br>
+<p>Once you've transfered all your files click on the following link to start the analysis:</p>
+<br>
+<p>{{ token_link }}</p>
+<br>
+<p>Submission file attached.</p>
+<br>
+<p>Cheers!</p>
+<br>
+<p>Flaski</p>
