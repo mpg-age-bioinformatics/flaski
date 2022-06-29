@@ -264,7 +264,7 @@ def make_app_content(pathname):
 
                 ),
             ],
-            style={ "min-width":"372px","width":"100%", "display": "none"},
+            style={ "min-width":"372px","width":"100%"}, #, "display": "none"},
             className="g-0",    
             # style={ "margin-left":"0px" , "margin-right":"0px"}
         ),
@@ -429,6 +429,46 @@ def read_session_redis(session_id):
     else:
         return dash.no_update, dash.no_update, dash.no_update
    
+read_input_updates=["ids",
+    "species"
+]
+
+read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
+
+@dashapp.callback( 
+   [
+    Output('toast-read_input_file','children'), 
+    Output({ "type":"traceback", "index":"read_input_file" },'data'), ] + read_input_updates_outputs ,
+    #Input('json-import', 'data'),
+    Input('upload-data', 'contents') ,
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('session-id', 'data'),
+    prevent_initial_call=True)
+#def read_input_file(json_import):
+def read_input_file(contents, filename, last_modified, session_id):
+    if not filename:
+        raise dash.exceptions.PreventUpdate
+
+    pa_outputs=[ dash.no_update for k in  read_input_updates ]
+
+    try:
+
+        if filename and filename.split(".")[-1] == "json":
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "kegg")
+            pa = app_data["pa"]
+            pa_outputs=[pa[k] for k in  read_input_updates ]
+
+        # upload_text=html.Div(
+        #     [ html.A(filename, id='upload-data-text') ],
+        #     style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+        # )     
+        return [ None, None] + pa_outputs
+
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"kegg")
+        return [ toast, tb_str ] + pa_outputs
 
 
 states=[
@@ -471,21 +511,23 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         button_id = 'No clicks yet'
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
     download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
     download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'}
+    
     try:
         input_names = [item.component_id for item in states]
 
-        if filename and filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "kegg")
-            pa = app_data["pa"]
-        else:
-            pa=figure_defaults()
-            for k, a in zip(input_names,args) :
-                if type(k) != dict :
-                    pa[k]=a
+        pa=figure_defaults()
+        for k, a in zip(input_names,args) :
+            if type(k) != dict :
+                pa[k]=a
+            elif type(k) == dict :
+                k_=k['type'] 
+                for i, a_ in enumerate(a) :
+                    pa[k_]=a_
 
-        session_data={ "session_data": {"app": { "kegg": {'last_modified':last_modified,"pa":pa} } } }
+        session_data={ "session_data": {"app": { "kegg": {"filename":upload_data_text,"last_modified":last_modified,"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         
     except Exception as e:
@@ -510,7 +552,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         try:
             if filename and filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update, None, None, None
+                return dash.no_update, toast, None, None, dash.no_update,dash.no_update, None, None, None
             else:
                 session["session_data"]=session_data
                 return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update,dash.no_update, dash.no_update, dash.no_update

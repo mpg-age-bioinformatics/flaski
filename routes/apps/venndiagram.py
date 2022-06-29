@@ -107,6 +107,7 @@ def make_app_content(pathname):
                             'borderStyle': 'dashed',
                             'borderRadius': '5px',
                             "margin-bottom": "10px",
+                            "display":"none"
                         },
                         multiple=False,
                     ),
@@ -721,8 +722,8 @@ def make_app_content(pathname):
                             ),
                             html.Div(
                                 [
-                                    # html.Div( id="toast-read_input_file"  ),
-                                    # dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
+                                    html.Div( id="toast-read_input_file"  ),
+                                    dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
                                     # html.Div( id="toast-update_labels_field"  ),
                                     # dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
                                     # html.Div( id="toast-generate_markers" ),
@@ -805,22 +806,21 @@ def make_app_content(pathname):
 
 # example reading session from server storage
 @dashapp.callback( 
-    Output('json-import', 'data'),
-    # Output('upload-data', 'contents'),
-    # Output('upload-data', 'filename'),
-    # Output('upload-data', 'last_modified'),
+    #Output('json-import', 'data'),
+    Output('upload-data', 'contents'),
+    Output('upload-data', 'filename'),
+    Output('upload-data', 'last_modified'),
     # Output('stored-file', 'children'),
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
-        print("HELLLO")
         imp=session["session_data"]
-        print(imp)
         del(session["session_data"])
         sleep(3)
-        return imp #imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
+        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
+        #return imp #imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
     else:
-        return dash.no_update#, dash.no_update, dash.no_update, None
+        return dash.no_update, dash.no_update, dash.no_update#, None
 
 read_input_updates=[
     #'groups_value',
@@ -862,63 +862,39 @@ read_input_updates=[
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 
 @dashapp.callback( 
-    [
-    # Output('xvals', 'options'),
-    # Output('yvals', 'options'),
-    # Output('groups_value', 'options'),
-    # Output('labels_col_value', 'options'),
-    # Output('upload-data','children'),
-    Output('toast-read_input_file','children'),
+   [
+    Output('toast-read_input_file','children'), 
     Output({ "type":"traceback", "index":"read_input_file" },'data'), ] + read_input_updates_outputs ,
-    # Output("json-import",'data'),
-    # Output('xvals', 'value'),
-    # Output('yvals', 'value')] + read_input_updates_outputs ,
-    Input('json-import', 'data'),
-    # Input('upload-data', 'contents') ,
-    # State('upload-data', 'filename'),
-    # State('upload-data', 'last_modified'),
-    Input('session-id', 'data'),
+    #Input('json-import', 'data'),
+    Input('upload-data', 'contents') ,
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    State('session-id', 'data'),
     prevent_initial_call=True)
-def read_input_file(json_import,session_id):
-    print("HERE5")
-    if not json_import:
+#def read_input_file(json_import):
+def read_input_file(contents, filename, last_modified, session_id):
+    if not filename:
         raise dash.exceptions.PreventUpdate
-    ## debug by printing type(session_data)
-    if type(json_import) != dict :
-        raise dash.exceptions.PreventUpdate
-
+    
     pa_outputs=[ dash.no_update for k in  read_input_updates ]
+
     try:
-        # if filename.split(".")[-1] == "json":
-        app_data=some_way_to_collect_from(json_import)
-        # app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-        #df=pd.read_json(app_data["df"])
-        # cols=df.columns.tolist()
-        # cols_=make_options(cols)
-        # filename=app_data["filename"]
+        if filename.split(".")[-1] == "json":
 
-        # xvals=app_data['pa']["xvals"]
-        # yvals=app_data['pa']["yvals"]
-
-        pa=app_data["pa"]
-
-        pa_outputs=[pa[k] for k in  read_input_updates ]
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
+            pa=app_data["pa"]
+            pa_outputs=[pa[k] for k in  read_input_updates ]
 
         # upload_text=html.Div(
         #     [ html.A(filename, id='upload-data-text') ],
         #     style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         # )     
-        #return [ cols_, cols_, cols_, cols_, upload_text, None, None,  xvals, yvals] + pa_outputs
         return [ None, None] + pa_outputs
-
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"venndiagram")
-        # return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
         return [ toast, tb_str ] + pa_outputs
-   
-
 
 
 states=[
@@ -972,16 +948,15 @@ states=[
     Input("saveas-session-btn","n_clicks"),
     Input("excel-filename-download","n_clicks"),
     [ State('session-id', 'data'),
-    State('json-import', 'data'),
-    # State('upload-data', 'contents'),
-    # State('upload-data', 'filename'),
-    # State('upload-data', 'last_modified'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
     State('export-filename','value'),
     State('excel-filename', 'value'),
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn,session_id,json_import,export_filename,excel_filename,upload_data_text, *args):
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn,session_id,contents,filename,last_modified,export_filename,excel_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -995,23 +970,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
     try:
         input_names = [item.component_id for item in states]
-        #df=parse_table(contents,filename,last_modified,current_user.id,cache,"venndiagram")
 
-        # pa=None
-        # if json_import:
-        #     ## debug by printing type(session_data)
-        #     if type(json_import) != dict :
-        #         # app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-        #         # get app data from json_import
-        #         app_data=some_way_to_collect_from(json_import)
-        #         pa = app_data["pa"]
-
-        # if filename and filename.split(".")[-1] == "json":
-        #    app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "venndiagram")
-        #    pa = app_data["pa"]
-
-
-        # if not pa :
         pa=figure_defaults()
         for k, a in zip(input_names,args) :
             if type(k) != dict :
@@ -1020,19 +979,15 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
                 k_=k['type'] 
                 for i, a_ in enumerate(a) :
                     pa[k_]=a_
-
-        #print(pa)
-        
-        session_data={ "session_data": {"app": { "venndiagram": {"filename":upload_data_text, 'last_modified':last_modified,"pa":pa} } } } #"df":df.to_json()
+      
+        session_data={ "session_data": {"app": { "venndiagram": {"filename":upload_data_text,"last_modified":last_modified,"pa":pa} } } } #"df":df.to_json()
         session_data["APP_VERSION"]=app.config['APP_VERSION']
-        #print(session_data)
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"venndiagram")
         return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None
 
-    # button_id,  submit-button-state, export-filename-download
 
     if button_id == "export-filename-download" :
         if not export_filename:
@@ -1043,17 +998,15 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         def write_json(export_filename,session_data=session_data):
             export_filename.write(json.dumps(session_data).encode())
-            # export_filename.seek(0)
+            
 
         return dash.no_update, None, None, None, dash.no_update, dash.no_update, dcc.send_bytes(write_json, export_filename), dash.no_update
 
     if button_id == "save-session-btn" :
         try:
-            print("hi there")
-            print(filename)
             if filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update, None
+                return dash.no_update, toast, None, None, dash.no_update, dash.no_update, None, None
             else:
                 session["session_data"]=session_data
                 return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -1065,14 +1018,12 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"venndiagram")
             return dash.no_update, toast, None, tb_str, dash.no_update, dash.no_update, None, None
 
-        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+        
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        #print(session_data)
         return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-          # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
-    
+          
 
     if button_id == "excel-filename-download":
 
@@ -1122,7 +1073,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         #             "font": {"size": 25, "color":"black"  } } )
         fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
         fig=dcc.Graph(figure=fig,config=fig_config,  id="graph")
-        print("HERE4")
 
         # changed
         # return fig, None, session_data, None, download_buttons_style_show
@@ -1133,7 +1083,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"venndiagram")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
+        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None
 
 @dashapp.callback(
     Output('excel-filename-modal', 'is_open'),
