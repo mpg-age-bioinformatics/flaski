@@ -6,11 +6,11 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 from myapp.email import send_email
 import os
-from datetime import datetime
+from datetime import datetime, date
 from myapp.routes._utils import META_TAGS, navbar_A
 from flask import render_template
 from myapp.models import User, FTPSubmissions
-
+import pymysql.cursors
 
 dashapp = dash.Dash("transfer",url_base_pathname=f'{PAGE_PREFIX}/transfer/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
@@ -110,8 +110,46 @@ def release_request(n_clicks, pathname):
             is_open=True,
         )
         return modal
-    
-    os.rename(submission_file, dest)
+
+    today=str(date.today())
+    PUREFTPD_AUTH_SALT=os.getenv('PUREFTPD_AUTH_SALT')
+    PUREFTPD_MYSQL_SERVER=os.getenv('PUREFTPD_MYSQL_SERVER')
+    PUREFTPD_MYSQL_PORT=os.getenv('PUREFTPD_MYSQL_PORT')
+    PUREFTPD_MYSQL_USER=os.getenv('PUREFTPD_MYSQL_USER')
+    PUREFTPD_MYSQL_PASS=os.getenv('PUREFTPD_MYSQL_PASS')
+    PUREFTPD_MYSQL_DB=os.getenv('PUREFTPD_MYSQL_DB')
+
+    ftp_user=s.ftp_user
+
+    try:
+        connection = pymysql.connect(host=PUREFTPD_MYSQL_SERVER,
+                                    port=int(PUREFTPD_MYSQL_PORT),
+                                    user=PUREFTPD_MYSQL_USER,
+                                    password=PUREFTPD_MYSQL_PASS,
+                                    database=PUREFTPD_MYSQL_DB,
+                                    cursorclass=pymysql.cursors.DictCursor)
+
+        with connection:
+            with connection.cursor() as cursor:
+                sql=( f"UPDATE users SET uploaded = {today} WHERE user = '{ftp_user}';" )  
+                response=cursor.execute(sql)
+            connection.commit()
+
+    except:
+        modal=dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Error",id="modal_header") ),
+                dbc.ModalBody("ftp server could not be reached. Please try again later.", id="modal_body"),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close", id="close", className="ms-auto", n_clicks=0, href=app.config['APP_URL']
+                    )
+                ),
+            ],
+            id="modal",
+            is_open=True,
+        )
+        return modal
 
     modal=dbc.Modal(
         [
@@ -130,6 +168,8 @@ def release_request(n_clicks, pathname):
     submission_type=filename.split(".")[-2]
 
     user=User.query.get(s.user_id)
+
+    os.rename(submission_file, dest)
 
     send_email(f'[Flaski][Automation][{submission_type}] Files have been transfered.',
         sender=app.config['MAIL_USERNAME'],

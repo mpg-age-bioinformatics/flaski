@@ -99,7 +99,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 )
 def make_app_content(session_id):
     header_access, msg_access = check_access( 'rnaseq' )
-    #header_access, msg_access = None, None # for local debugging 
+    # header_access, msg_access = None, None # for local debugging 
 
     input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
     example_input=pd.DataFrame( 

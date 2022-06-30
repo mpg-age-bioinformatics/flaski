@@ -380,7 +380,7 @@ def send_submission_ftp_email(user,submission_type,submission_file, attachment_p
     writer.close()
 
     # generate submission and respective token
-    submission = FTPSubmissions(file_name=attachment_path, user_id=current_user.id )
+    submission = FTPSubmissions(file_name=attachment_path, user_id=current_user.id, ftp_user=ftp_user )
     db.session.add(submission)
     db.session.commit()
 

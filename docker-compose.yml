@@ -198,6 +198,7 @@ services:
       MYAPP_VERSION: dev
       UPGRADE_REQS: "no"  
   entrypoint: /flaski/services/backup/entrypoint.sh
+  user: root
   depends_on:
    - mariadb
    - init

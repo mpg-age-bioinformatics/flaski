@@ -10,6 +10,7 @@ class FTPSubmissions(db.Model):
     file_name=db.Column(db.String(128), index=True, unique=True)
     user_id=db.Column(db.Integer)
     date_time = db.Column(db.DateTime, default=datetime.utcnow )
+    ftp_user = db.Column(db.String(128), index=True, unique=True)
 
     def __init__(self, **kwargs):
         super(FTPSubmissions, self).__init__(**kwargs)
