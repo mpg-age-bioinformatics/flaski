@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table
 from pyflaski.lifespan import make_figure, figure_defaults
 import os
 import uuid
@@ -511,52 +511,7 @@ def make_app_content(pathname):
                     style={"margin-top":"2px","margin-bottom":"2px"} 
                 ),
                 html.Div(id="marker-cards"),
-                # dbc.Card(
-                #     [
-                #         dbc.CardHeader(
-                #             html.H2(
-                #                 dbc.Button( "Censors", color="black", id={'type':"dynamic-card","index":"censors"}, n_clicks=0,style={ "margin-bottom":"5px","width":"100%"}),
-                #             ),
-                #             style={ "height":"40px","padding":"0px"}
-                #         ),
-                #         dbc.Collapse(
-                #             dbc.CardBody(
-                #                 [
-                #                     dbc.Row(
-                #                         [
-                #                             dbc.Col(
-                #                                 dcc.Checklist(
-                #                                     options=[
-                #                                         {'label': ' Plot Confidence Interval lines OR   ', 'value': 'ci_force_lines'},
-                #                                         {'label': ' Plot Confidence Intervals   ',  'value': 'Conf_Interval'},
-                #                                         {'label': ' Plot Censors   ', 'value': 'show_censors'},
-                #                                         {'label': ' Plot Legend   ', 'value': 'ci_legend'},
-                                                        
-                                                        
-                #                                     ],
-                #                                     value=[],
-                #                                     labelStyle={'display': 'block', "margin-right":"20px" },#,"height":"35px"}, "margin-right":"110px",   'display': 'inline-block',
-                #                                     #style={"height":"35px","margin-top":"10px", "width":"100%" },
-                #                                     id="model_settings"
-                                                   
-                #                                 ),
-                #                             )
-                #                         ],
-                #                         className="g-1",
-                #                         align="center",
-                #                     ),
-                #                     ############################
-                                    
-                #                     ######### END OF CARD #########
-                #                 ]
-                #                 ,style=card_body_style
-                #             ),
-                #             id={'type':"collapse-dynamic-card","index":"censors"},
-                #             is_open=False,
-                #         ),
-                #     ],
-                #     style={"margin-top":"4px","margin-bottom":"2px"} 
-                # ),
+                
              ],
             body=True,
             style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
@@ -677,7 +632,65 @@ def make_app_content(pathname):
                                         ],
                                         id="download-pdf-div",
                                         style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'none'} # 'none' / 'inline-block'
-                                    )
+                                    ),
+
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="far fa-lg fa-save"),
+                                                        " Results (xlsx)" 
+                                                    ]
+                                                ),
+                                                id='save-excel-btn', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='save-excel')
+                                        ],
+                                        id="save-excel-div",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ), 
+
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="far fa-lg fa-save"),
+                                                        " Results (xlsx)" 
+                                                    ]
+                                                ),
+                                                id='save-excel-btn3', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='save-excel')
+                                        ],
+                                        id="save-excel-div3",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),
+
+                                    html.Div( 
+                                        [
+                                            dbc.Button(
+                                                html.Span(
+                                                    [ 
+                                                        html.I(className="far fa-lg fa-save"),
+                                                        " Results (xlsx)" 
+                                                    ]
+                                                ),
+                                                id='save-excel-btn4', 
+                                                style={"max-width":"150px","width":"100%"},
+                                                color="secondary"
+                                            ),
+                                            dcc.Download(id='save-excel')
+                                        ],
+                                        id="save-excel-div4",
+                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
+                                    ),             
+
                                 ],
                                 style={"height":"100%"}
                             ),
@@ -698,6 +711,24 @@ def make_app_content(pathname):
                         sm=12,md=6,lg=7,xl=8,
                         align="top",
                         style={"height":"100%"}
+                    ),
+
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
+                            dbc.ModalBody(
+                                [
+                                    dcc.Input(id='excel-filename', value="lifespan.xlsx", type='text', style={"width":"100%"})
+                                ]
+                            ),
+                            dbc.ModalFooter(
+                                dbc.Button(
+                                    "Download", id="excel-filename-download", className="ms-auto", n_clicks=0
+                                )
+                            ),
+                        ],
+                        id="excel-filename-modal",
+                        is_open=False,
                     ),
 
                     dbc.Modal(
@@ -768,45 +799,15 @@ read_input_updates=[
         "titles",
         "groups_value",
         "censors_val",
-        #"model_settings",
-        # "censor_marker":ALLOWED_MARKERS,\
-        # "censor_marker_value":"x",\
-        # "censor_marker_size":STANDARD_SIZES,\
-        # "censor_marker_size_val":"4",\
-        # "censor_marker_size_cols":["select a column.."], \
-        # "censor_marker_size_col":"select a column..", \
-        # "marker_color":STANDARD_COLORS,\
-        # "markerc":"black",\
-        # "markerc_cols":["select a column.."], \
-        # "markerc_col":"select a column..", \
-        # "markerc_write":"",\
-        # "ci_alpha",
-        #"linestyle_value",
-        #"linewidth_write",
-        # "line_colors":STANDARD_COLORS,\
-        # "line_color_value":"blue",\
-        # "linecolor_cols":["select a column.."],\
-        # "linecolor_col":"select a column..",\
-        # "linecolor_write":"",\
-        # "edge_linewidths":STANDARD_SIZES,\
-        # "edge_linewidth":"1",\
-        # "edge_linewidth_cols":["select a column.."],\
-        # "edge_linewidth_col":"select a column..",\
-        # "edge_colors":STANDARD_COLORS,\
-        # "edgecolor":"black",\
-        # "edgecolor_cols":["select a column.."], \
-        # "edgecolor_col":"select a column..", \
-        # "edgecolor_write":"",\
-        # "marker_alpha":"1",\
         "xlabel",
         "xlabels",
         "ylabel",
         "ylabels",
-        "axis_line_width",
         "show_axis",
+        "axis_line_width",
         "show_ticks",
-        "ticks_direction_value",
         "ticks_length",
+        "ticks_direction_value",
         "xticks_fontsize",
         "yticks_fontsize",
         "xticks_rotation",
@@ -815,13 +816,10 @@ read_input_updates=[
         "y_lower_limit",
         "x_upper_limit",
         "y_upper_limit",
-        # #"maxxticks"
-        # #"maxyticks",
         "grid_value",
-        # #"grid_color_value",
-        # #"grid_linestyle_value"
-        "grid_linewidth"
-        #"grid_alpha"
+        "grid_linewidth",
+        "grid_color_value",
+        #"grid_linestyle_value" 
 ]
 
 read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
@@ -836,7 +834,6 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
     Output('xvals', 'value'),
     Output('yvals', 'value'),  ] + read_input_updates_outputs ,
-    #Output('censors_val', 'value')  ] + read_input_updates_outputs ,
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
@@ -860,7 +857,7 @@ def read_input_file(contents,filename,last_modified,session_id):
             #censors_val=app_data['pa']["censors_val"]
             
             pa=app_data["pa"]
-
+            
             pa_outputs=[pa[k] for k in  read_input_updates ]
 
         else:
@@ -911,6 +908,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
         if ( filename.split(".")[-1] == "json") and ( not generate_markers_import ):
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "lifespan")
             pa=app_data['pa']
+            print(pa["groups_settings"])
             generate_markers_import=True
 
     #         df=pd.read_json(app_data["df"])
@@ -1016,7 +1014,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                                     {'label': ' Legend   ', 'value': 'ci_legend'}                       
                                                     
                                                 ],
-                                                value=[],
+                                                value=gpa["model_settings"],
                                                 labelStyle={'display': 'inline-block', "margin-right":"20px"},#,"height":"35px"}, "margin-right":"110px",
                                                 style={"height":"35px","margin-top":"10px", "width":"100%" },
                                                 #inputStyle={"margin-right": "20px"},
@@ -1094,34 +1092,10 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                             style={"margin-right":"5px"},
                                         ),
 
-                                        # dbc.Col(
-                                        #     dcc.Checklist(
-                                        #         options=[
-                                        #             #{'label': ' Plot Confidence Interval lines   ', 'value': 'ci_force_lines'},
-                                        #             #{'label': ' Shade Confidence Intervals   ',  'value': 'Conf_Interval'},
-                                        #             #{'label': ' Plot Censors   ', 'value': 'show_censors'},
-                                        #             {'label': ' Plot Legend   ', 'value': 'ci_legend'}                       
-                                                    
-                                        #         ],
-                                        #         value=[],
-                                        #         labelStyle={'display': 'inline-block', "margin-right":"20px"},#,"height":"35px"}, "margin-right":"110px",
-                                        #         style={"height":"35px","margin-top":"10px", "width":"100%" },
-                                        #         #inputStyle={"margin-right": "20px"},
-                                        #         id={'type':"model_settings","index":str(card_id)}
-                                        #     ),
-                                        # )
-
                                     ],
                                     className="g-1",
                                     align="center",
                                 ),
-
-
-
-
-
-
-
 
                                 ############################################
                                 dbc.Row(
@@ -1243,6 +1217,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
         if not groups:
             field_style_on_off='inline-block'
             #cards=[ make_card("Model Settings",0, pa, pa, cols_, field_style_on_off) ]
+            pa["model_settings"]=[]
             cards=[ make_card("Plot settings",0, pa, pa) ]
         else:
             field_style_on_off= 'none'
@@ -1256,6 +1231,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                     header="Plot Settings: "+str(g)
                     card=make_card(header, i, pa, pa_)
                 else:
+                    pa["model_settings"]=[]
                     header="Plot Settings: "+str(g)
                     card=make_card(header, i, pa, pa)
                 cards.append(card)
@@ -1269,12 +1245,6 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
         
 
 
-
-
-
-
-
-
 states=[State("xvals", "value"),
     State("yvals", "value"),
     State("censors_val", "value"),
@@ -1283,37 +1253,15 @@ states=[State("xvals", "value"),
     State("fig_height","value"),
     State("title","value"),
     State("titles","value"),
-    State("groups_value","value"),
-    State("censors_val","value"),
-    State( { "type":"model_settings",  "index":ALL}, "value"),
-    State( { "type":"linewidth_write", "index":ALL}, "value"),
-    State( { "type":"linestyle_value", "index":ALL}, "value"),
-    State( { "type":"line_color_value", "index":ALL}, "value"),
-    State( { "type":"linecolor_write", "index":ALL}, "value"),
-    State( { "type":"censor_marker_value", "index":ALL}, "value"),
-    State( {"type":"censor_marker_size_val", "index":ALL}, "value"),
-    State(  {"type":"markerc", "index":ALL}, "value"),
-    State(  {"type":"markerc_write", "index":ALL}, "value"),
-
-    State(  {"type":"ci_linewidth_write", "index":ALL}, "value"),
-    State(  {"type":"ci_linestyle_value", "index":ALL}, "value"),
-    State(  {"type":"ci_line_color_value", "index":ALL}, "value"),
-    State(  {"type":"ci_linecolor_write", "index":ALL}, "value"),
-    State(  {"type":"ci_alpha","index":ALL}, "value"),
-   
-    State( { "type":"edge_linewidth", "index":ALL}, "value"),
-    State( { "type":"edgecolor", "index":ALL}, "value"),
-    State( { "type":"edgecolor_write", "index":ALL}, "value"),
-    State( { "type":"marker_alpha",  "index":ALL}, "value"),
     State("xlabel","value"),
     State("xlabels","value"),
     State("ylabel","value"),
     State("ylabels","value"),
-    State("axis_line_width","value"),
     State("show_axis","value"),
+    State("axis_line_width","value"),
     State("show_ticks","value"),
-    State("ticks_direction_value", "value"),
     State("ticks_length","value"),
+    State("ticks_direction_value", "value"),
     State("xticks_fontsize","value"),
     State("yticks_fontsize","value"),
     State("xticks_rotation","value"),
@@ -1322,26 +1270,29 @@ states=[State("xvals", "value"),
     State("y_lower_limit","value"),
     State("x_upper_limit","value"),
     State("y_upper_limit","value"),
-    #State("maxxticks")
-    #State("maxyticks",)
     State("grid_value","value"),
+    State("grid_linewidth","value"),
+    #State("grid_linestyle_value")
     State("grid_color_value", "value"),
     State("grid_color_text", "value"),
-    #State("grid_linestyle_value")
-    State("grid_linewidth","value")
-    #State(   #"grid_alpha")
-     # "censor_marker":ALLOWED_MARKERS,\
-        # "censor_marker_value":"x",\
-        # "censor_marker_size":STANDARD_SIZES,\
-        # "censor_marker_size_val":"4",\
-        # "censor_marker_size_cols":["select a column.."], \
-        # "censor_marker_size_col":"select a column..", \
-        # "marker_color":STANDARD_COLORS,\
-        # "markerc":"black",\
-        # "markerc_cols":["select a column.."], \
-        # "markerc_col":"select a column..", \
-        # "markerc_write":"",\
-        # "ci_alpha",
+    State( { "type":"linewidth_write", "index":ALL}, "value"),
+    State( { "type":"linestyle_value", "index":ALL}, "value"),
+    State( { "type":"line_color_value", "index":ALL}, "value"),
+    State( { "type":"linecolor_write", "index":ALL}, "value"),
+    State( { "type":"model_settings",  "index":ALL}, "value"),
+    State(  {"type":"ci_linewidth_write", "index":ALL}, "value"),
+    State(  {"type":"ci_linestyle_value", "index":ALL}, "value"),
+    State(  {"type":"ci_line_color_value", "index":ALL}, "value"),
+    State(  {"type":"ci_linecolor_write", "index":ALL}, "value"),
+    State(  {"type":"ci_alpha","index":ALL}, "value"),
+    State(  { "type":"censor_marker_value", "index":ALL}, "value"),
+    State(  {"type":"censor_marker_size_val", "index":ALL}, "value"),
+    State(  {"type":"markerc", "index":ALL}, "value"),
+    State(  {"type":"markerc_write", "index":ALL}, "value"),
+    State( { "type":"edge_linewidth", "index":ALL}, "value"),
+    State( { "type":"edgecolor", "index":ALL}, "value"),
+    State( { "type":"edgecolor_write", "index":ALL}, "value"),
+    State( { "type":"marker_alpha",  "index":ALL}, "value")
 ]
 
 
@@ -1350,21 +1301,25 @@ states=[State("xvals", "value"),
     Output( 'toast-make_fig_output','children'),
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
-    Output('download-pdf-div', 'style'),
+    #Output('download-pdf-div', 'style'),
+    #Output('save-excel-div', 'style'),
     Output('export-session','data'),
+    Output('save-excel', 'data'),
     Input("submit-button-state", "n_clicks"),
     Input("export-filename-download","n_clicks"),
     Input("save-session-btn","n_clicks"),
     Input("saveas-session-btn","n_clicks"),
+    Input("excel-filename-download","n_clicks"),
     [ State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
-    #State('export-filename','value'),
+    State('export-filename','value'),
+    State('excel-filename','value'),
     State('upload-data-text', 'children')] + states,
     prevent_initial_call=True
     )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,session_id,contents,filename,last_modified,upload_data_text, *args): #export_filename
+def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn,session_id,contents,filename,last_modified,export_filename, excel_filename,upload_data_text, *args):
     ## This function can be used for the export, save, and save as by making use of 
     ## Determining which Input has fired with dash.callback_context
     ## in https://dash.plotly.com/advanced-callbacks
@@ -1414,52 +1369,190 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"lifespan")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, None
+        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None
 
     # button_id,  submit-button-state, export-filename-download
 
-    # if button_id == "export-filename-download" :
-    #     if not export_filename:
-    #         export_filename="lifespan.json"
-    #     export_filename=secure_filename(export_filename)
-    #     if export_filename.split(".")[-1] != "json":
-    #         export_filename=f'{export_filename}.json'  
+    if button_id == "export-filename-download" :
+        if not export_filename:
+            export_filename="lifespan.json"
+        export_filename=secure_filename(export_filename)
+        if export_filename.split(".")[-1] != "json":
+            export_filename=f'{export_filename}.json'  
 
-    #     def write_json(export_filename,session_data=session_data):
-    #         export_filename.write(json.dumps(session_data).encode())
-    #         # export_filename.seek(0)
+        def write_json(export_filename,session_data=session_data):
+            export_filename.write(json.dumps(session_data).encode())
+            # export_filename.seek(0)
 
-    #     return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+        return dash.no_update, None, None, None, dcc.send_bytes(write_json, export_filename), dash.no_update
 
-    # if button_id == "save-session-btn" :
-    #     try:
-    #         if filename.split(".")[-1] == "json" :
-    #             toast=save_session(session_data, filename,current_user, "make_fig_output" )
-    #             return dash.no_update, toast, None, None, dash.no_update, None
-    #         else:
-    #             session["session_data"]=session_data
-    #             return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    #             # save session_data to redis session
-    #             # redirect to as a save as to file server
+    if button_id == "save-session-btn" :
+        try:
+            if filename.split(".")[-1] == "json" :
+                toast=save_session(session_data, filename,current_user, "make_fig_output" )
+                return dash.no_update, toast, None, None,  None, None
+            else:
+                session["session_data"]=session_data
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                # save session_data to redis session
+                # redirect to as a save as to file server
 
-    #     except Exception as e:
-    #         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-    #         toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"lifespan")
-    #         return dash.no_update, toast, None, tb_str, dash.no_update, None
+        except Exception as e:
+            tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+            toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"lifespan")
+            return dash.no_update, toast, None, tb_str, None, None
 
-    #     # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
-    # if button_id == "saveas-session-btn" :
-    #     session["session_data"]=session_data
-    #     return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    #       # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
-    
-    try:
+    if button_id == "saveas-session-btn" :
+        session["session_data"]=session_data
+        print(session_data)
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+          # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
+
+    if button_id == "excel-filename-download":
+        eventlog = UserLogging(email=current_user.email,action="download lifespan")
+        db.session.add(eventlog)
+        db.session.commit()
+
+        if not excel_filename:
+            excel_filename=secure_filename("lifespan_results.%s.xlsx" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
+        excel_filename=secure_filename(excel_filename)
+        if excel_filename.split(".")[-1] != "xlsx":
+            excel_filename=f'{excel_filename}.xlsx'  
+
+        import io
+        output = io.BytesIO()
+        writer= pd.ExcelWriter(output)
+
         if pa["groups_value"]:
             df,fig,cph_coeff_,cph_stats=make_figure(df,pa)
+
+            df.to_excel(writer, sheet_name = 'SurvivalAnalysis', index = False)
+            cph_stats.to_excel(writer, sheet_name="CoxPH.Stats", index=False)
+            cph_coeff_.to_excel(writer, sheet_name="CoxPH.Coeff", index=False)
+
         else:
             df,fig=make_figure(df,pa)
-        # import plotly.graph_objects as go
+
+            df.to_excel(writer, sheet_name = 'SurvivalAnalysis', index = False)
+        
+        writer.save()
+        data=output.getvalue()
+        return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(data, excel_filename)
+    
+    try:
+
+        tab1_btn=html.Div( 
+                            [
+                                dbc.Button(
+                                    html.Span(
+                                        [ 
+                                            html.I(className="fas fas fa-file-pdf"),
+                                            " PDF" 
+                                        ]
+                                    ),
+                                    id='download-pdf-btn', 
+                                    style={"max-width":"150px","width":"100%"},
+                                    color="secondary"
+                                ),
+                                dcc.Download(id="download-pdf")
+                            ],
+                            id="download-pdf-div",
+                            style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'inline-block'} # 'none' / 'inline-block'
+                        )
+
+        tab2_btn=html.Div( 
+                            [
+                                dbc.Button(
+                                    html.Span(
+                                        [ 
+                                            html.I(className="far fa-lg fa-save"),
+                                            " Results (xlsx)" 
+                                        ]
+                                    ),
+                                    id='save-excel-btn', 
+                                    style={"max-width":"150px","width":"100%"},
+                                    color="secondary"
+                                ),
+                                dcc.Download(id='save-excel')
+                            ],
+                            id="save-excel-div",
+                            style={"max-width":"150px","width":"100%","margin":"4px", 'display':'inline-block'} # 'none' / 'inline-block'
+                        )
+
+        tab3_btn=html.Div( 
+                            [
+                                dbc.Button(
+                                    html.Span(
+                                        [ 
+                                            html.I(className="far fa-lg fa-save"),
+                                            " Results (xlsx)" 
+                                        ]
+                                    ),
+                                    id='save-excel-btn3', 
+                                    style={"max-width":"150px","width":"100%"},
+                                    color="secondary"
+                                ),
+                                dcc.Download(id='save-excel')
+                            ],
+                            id="save-excel-div3",
+                            style={"max-width":"150px","width":"100%","margin":"4px", 'display':'inline-block'} # 'none' / 'inline-block'
+                        )
+
+        tab4_btn=html.Div( 
+                            [
+                                dbc.Button(
+                                    html.Span(
+                                        [ 
+                                            html.I(className="far fa-lg fa-save"),
+                                            " Results (xlsx)" 
+                                        ]
+                                    ),
+                                    id='save-excel-btn4', 
+                                    style={"max-width":"150px","width":"100%"},
+                                    color="secondary"
+                                ),
+                                dcc.Download(id='save-excel')
+                            ],
+                            id="save-excel-div4",
+                            style={"max-width":"150px","width":"100%","margin":"4px", 'display':'inline-block'} # 'none' / 'inline-block'
+                        )
+
+
+
+        if pa["groups_value"]:
+            df,fig,cph_coeff_,cph_stats=make_figure(df,pa)
+
+            fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
+            fig=dcc.Graph(figure=fig,config=fig_config,  id="graph") 
+
+            df_ = make_table(df, "sa_table", fixed_columns = False)
+            cph_coeff = make_table(cph_coeff_, "cph_coefficiants", fixed_columns = False)
+            cph_stats_ = make_table(cph_stats, "cph_stats", fixed_columns = False)
+
+            fig = dcc.Tabs([
+            dcc.Tab([fig, tab1_btn ], label = "Lifespan Curve", id = "tab-lifespanCurve") ,
+            dcc.Tab([df_, tab2_btn ], label = "Survival Analysis Table", id = "tab-saTable"),
+            dcc.Tab([cph_stats_, tab3_btn ], label = "CoxPH Model Statistics", id = "tab-cphTable_stats"),
+            dcc.Tab([cph_coeff, tab4_btn], label = "CoxPH Model Coefficients", id = "tab-cphTable_coeff")
+            ])
+
+        else:
+            df,fig=make_figure(df,pa)
+
+            fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
+            fig=dcc.Graph(figure=fig,config=fig_config,  id="graph") 
+
+            sa_table = make_table(df, "survivalanalysis_table", fixed_columns = False)
+            
+            fig = dcc.Tabs([
+            dcc.Tab([fig, tab1_btn ], label = "Lifespan Curve", id = "tab-lifespanCurve"),
+            dcc.Tab([sa_table, tab2_btn ], label = "Survival Analysis Table", id = "tab-saTable"),
+            ])
+            
+       
+        # # import plotly.graph_objects as go
         # fig = go.Figure( )
         # fig.update_layout( )
         # fig.add_trace(go.Scatter(x=[1,2,3,4], y=[2,3,4,8]))
@@ -1469,22 +1562,35 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         #             'xanchor': 'left',
         #             'yanchor': 'top' ,
         #             "font": {"size": 25, "color":"black"  } } )
-        fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph") 
+
+        #fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
+        #fig=dcc.Graph(figure=fig,config=fig_config,  id="graph") 
         
 
         # changed
         # return fig, None, session_data, None, download_buttons_style_show
         # as session data is no longer required for downloading the figure
 
-        return fig, None, None, None, download_buttons_style_show, None
+        return fig, None, None, None, None, None #download_buttons_style_hide, download_buttons_style_hide
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"lifespan")
         print(tb_str)
         #print(toast)
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide, None
+        return dash.no_update, toast, session_data, tb_str, None, None  #download_buttons_style_hide, download_buttons_style_hide
+
+
+@dashapp.callback(
+    Output('excel-filename-modal', 'is_open'),
+    [ Input('save-excel-btn',"n_clicks"),Input("excel-filename-download", "n_clicks"), Input('save-excel-btn3',"n_clicks"), Input('save-excel-btn4',"n_clicks")],
+    [ State("excel-filename-modal", "is_open")], 
+    prevent_initial_call=True
+)
+def download_excel_filename(n1, n2,n3,n4, is_open):
+    if n1 or n2 or n3 or n4:
+        return not is_open
+    return is_open
 
 @dashapp.callback(
     Output('export-filename-modal', 'is_open'),
