@@ -13,8 +13,8 @@ else
     repoName=${IMAGE_NAME:0:tagStart-1}
 fi
 
-echo ":: Repo: ${repoName}"
-echo ":: Date: $(date '+%d/%m/%Y %H:%M:%S')"
+echo "- Repo: ${repoName}"
+echo "- Date: $(date '+%d/%m/%Y %H:%M:%S')"
 
 if [ "${DOCKER_TAG}" == "latest" ] ;
     then 
@@ -32,7 +32,7 @@ elif [ "${1}" == "nightly" ] ;
         text=":: !FAILED! "
         git submodule update --recursive --remote && \
         docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-${2}" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-${2} . && \
-        text=":: "
+        text="- "
         echo "${text}build flaski:nightly-${2}"
         docker system prune -f 
 
