@@ -49,4 +49,4 @@ else
     echo ":: push tag: latest"
 fi
 
-echo ":: Finished"
+echo "- Finished"
