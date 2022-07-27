@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "${1}" == "nightly" ] ||  [ "${1}" == "aarch64" ] ;
+if [ "${1}" == "amd64" ] ||  [ "${1}" == "aarch64" ] ||  [ "${1}" == "arm64" ] ;
     then
         repoName="mpgagebioinformatics/flaski"
         IMAGE_NAME="flaski"
