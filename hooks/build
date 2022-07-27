@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "${1}" == "amd64" ] ||  [ "${1}" == "aarch64" ] ||  [ "${1}" == "arm64" ] ;
+if [ "${1}" == "nightly" ] ;
     then
         repoName="mpgagebioinformatics/flaski"
         IMAGE_NAME="flaski"
@@ -23,150 +23,18 @@ if [ "${DOCKER_TAG}" == "latest" ] ;
         docker build --build-arg APP_VERSION=${APP_VERSION} --no-cache -t ${repoName}:latest .
         docker push ${repoName}:latest && 
         echo ":: build & push tag: latest"
-        # docker buildx create --use
-        # docker buildx build --platform linux/amd64,linux/arm64 --no-cache --build-arg MYAPP_VERSION="${MYAPP_VERSION}" -t ${repoName}:latest -f services/server/Dockerfile . --push && \
 
-
-elif [ "${1}" == "amd64" ] ;
+elif [ "${1}" == "nightly" ] ;
     then 
 
         APP_VERSION=$(git rev-parse --short HEAD)
         echo ":: git #${APP_VERSION}"
         text=":: !FAILED! "
         git submodule update --recursive --remote && \
-        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-amd64" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-amd64 . && \
+        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-${2}" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-${2} . && \
         text=":: "
-        echo "${text}build flaski:nightly-amd64"
+        echo "${text}build flaski:nightly-${2}"
         docker system prune -f 
-    
-        # APP_VERSION=$(git rev-parse --short HEAD)
-        # echo ":: git #${APP_VERSION}"
-
-        # # text=":: !FAILED! "
-        # # docker build --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" --no-cache -t ${repoName}:nightly-amd64 -f services/server/Dockerfile . && \
-        # # text=":: "
-        # # echo "${text}build myapp:nightly-amd64"
-        # # docker system prune -f 
-
-        # text=":: !FAILED! "
-        # git submodule update --recursive --remote && \
-        # docker buildx create --use && \
-        # docker buildx build --platform linux/amd64,linux/arm64 --no-cache --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly" --build-arg APP_VERSION="nightly-${APP_VERSION}" -t ${repoName}:nightly . --push && \
-        # docker buildx build --platform linux/amd64,linux/arm64 --cache-from ${repoName}:nightly --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly" --build-arg APP_VERSION="nightly-${APP_VERSION}" -t ${repoName}:latest . --push && \
-        # text=":: "
-        # echo "${text}build & push tag: nightly"
-        # echo "${text}build & push tag: latest"
-        # # docker stop $(docker ps | grep buildkitd | awk '{print $7}' )
-        # # docker rm $(docker ps -a -q)
-        # docker system prune -f 
-
-        # tag=$(git describe --abbrev=0 --tags)
-        # if [[ ! "$(docker manifest inspect ${repoName}:${tag}-amd64 > /dev/null ; echo $? )" == "0" ]] 
-        #     then
-        #         text=":: !FAILED! "
-        #         docker pull ${repoName}:${tag} && \
-        #         docker tag ${repoName}:${tag} ${repoName}:${tag}-amd64 && \
-        #         docker tag ${repoName}:${tag} ${repoName}:stable-amd64 && \
-        #         docker push ${repoName}:${tag}-amd64 && \
-        #         docker push ${repoName}:stable-amd64 && \
-        #         text=":: "
-        #         echo "${text}add tag ${tag}-amd64"
-        #         echo "${text}add tag stable-amd64"
-        #         docker system prune -f 
-        # fi 
-
-        # if [[ ! "$(docker manifest inspect ${repoName}:${tag}-arm64 > /dev/null ; echo $? )" == "0" ]] 
-        #     then
-        #         text=":: !FAILED! "
-        #         docker buildx create --use && \
-        #         git checkout ${tag} && \
-        #         docker buildx build --platform linux/arm64 --no-cache --build-arg MYAPP_VERSION="${tag}" -t ${repoName}:${tag}-arm64 -f services/server/Dockerfile . --push && \
-        #         docker buildx build --platform linux/arm64 --build-arg MYAPP_VERSION="${tag}" -t ${repoName}:stable-arm64 -f services/server/Dockerfile . --push && \
-        #         text=":: "
-        #         echo "${text}build & push ${tag}-arm64"
-        #         echo "${text}add tag stable-arm64"
-        #         git checkout main
-        #         docker system prune -f      
-        # fi 
-
-        # for tag in $(git tag -l | tail -n 10 ) ; 
-        #     do
-        #         if [[ ! "$(docker manifest inspect ${repoName}:${tag}-amd64 > /dev/null ; echo $? )" == "0" ]] 
-        #             then
-        #                 text=":: !FAILED! "
-        #                 docker pull ${repoName}:${tag} && \
-        #                 docker tag ${repoName}:${tag} ${repoName}:${tag}-amd64 && \
-        #                 docker push ${repoName}:${tag}-amd64 && \
-        #                 text=":: "
-        #                 echo "${text}add tag ${tag}-amd64"
-        #                 docker system prune -f 
-        #         fi 
-        #         if [[ ! "$(docker manifest inspect ${repoName}:${tag}-arm64 > /dev/null ; echo $? )" == "0" ]] 
-        #             then 
-        #                 text=":: !FAILED! "
-        #                 docker buildx create --use && \
-        #                 git checkout ${tag} && \
-        #                 docker buildx build --platform linux/arm64 --no-cache --build-arg MYAPP_VERSION="${tag}" -t ${repoName}:${tag}-arm64 -f services/server/Dockerfile . --push && \
-        #                 text=":: "
-        #                 echo "${text}build & push ${tag}-arm64"
-        #                 git checkout main
-        #                 docker system prune -f 
-        #         fi
-
-        # done 
-
-elif [ "${1}" == "arm64" ] ;
-    then 
-        APP_VERSION=$(git rev-parse --short HEAD)
-        echo ":: git #${APP_VERSION}"
-        text=":: !FAILED! "
-        git submodule update --recursive --remote && \
-        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-arm64" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-arm64 . && \
-        text=":: "
-        echo "${text}build flaski:nightly-arm64"
-        docker system prune -f 
-
-elif [ "${1}" == "aarch64" ] ;
-    then 
-        APP_VERSION=$(git rev-parse --short HEAD)
-        echo ":: git #${APP_VERSION}"
-        text=":: !FAILED! "
-        git submodule update --recursive --remote && \
-        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-aarch64" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-aarch64 . && \
-        text=":: "
-        echo "${text}build flaski:nightly-aarch64"
-        docker system prune -f 
-
-        # tag=$(git describe --abbrev=0 --tags)
-        # if [[ ! "$(docker manifest inspect ${repoName}:${tag}-aarch64 > /dev/null ; echo $? )" == "0" ]] 
-        #     then
-        #         text=":: !FAILED! "
-        #         git checkout ${tag} && \
-        #         docker build --build-arg MYAPP_VERSION="${tag}" --no-cache -t ${repoName}:${tag}-aarch64 -f services/server/Dockerfile . && \
-        #         docker tag ${repoName}:${tag}-aarch64 ${repoName}:stable-aarch64 && \
-        #         docker push ${repoName}:${tag}-aarch64 && \
-        #         docker push ${repoName}:stable-aarch64 && \
-        #         text=":: "
-        #         echo "${text}build & push ${tag}-aarch64"
-        #         echo "${text}add tag stable-aarch64"
-        #         git checkout main
-        #         docker system prune -f 
-        # fi
-
-        # for tag in $(git tag -l | tail -n 10 ) ; 
-        #     do
-        #         if [[ ! "$(docker manifest inspect ${repoName}:${tag}-aarch64 > /dev/null ; echo $? )" == "0" ]] 
-        #             then
-        #                 text=":: !FAILED! "
-        #                 git checkout ${tag} && \
-        #                 docker build --build-arg MYAPP_VERSION="${tag}" --no-cache -t ${repoName}:${tag}-aarch64 -f services/server/Dockerfile . && \
-        #                 docker push ${repoName}:${tag}-aarch64
-        #                 text=":: "
-        #                 echo "${text}add tag ${tag}-aarch64"
-        #                 git checkout main
-        #                 docker system prune -f 
-        #         fi
-        # done
 
 else
     echo ":: Tag: ${DOCKER_TAG}"
