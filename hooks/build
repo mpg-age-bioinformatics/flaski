@@ -27,28 +27,38 @@ if [ "${DOCKER_TAG}" == "latest" ] ;
         # docker buildx build --platform linux/amd64,linux/arm64 --no-cache --build-arg MYAPP_VERSION="${MYAPP_VERSION}" -t ${repoName}:latest -f services/server/Dockerfile . --push && \
 
 
-elif [ "${1}" == "nightly" ] ;
+elif [ "${1}" == "amd64" ] ;
     then 
+
         APP_VERSION=$(git rev-parse --short HEAD)
         echo ":: git #${APP_VERSION}"
-
-        # text=":: !FAILED! "
-        # docker build --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" --no-cache -t ${repoName}:nightly-amd64 -f services/server/Dockerfile . && \
-        # text=":: "
-        # echo "${text}build myapp:nightly-amd64"
-        # docker system prune -f 
-
         text=":: !FAILED! "
         git submodule update --recursive --remote && \
-        docker buildx create --use && \
-        docker buildx build --platform linux/amd64,linux/arm64 --no-cache --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly" --build-arg APP_VERSION="nightly-${APP_VERSION}" -t ${repoName}:nightly . --push && \
-        docker buildx build --platform linux/amd64,linux/arm64 --cache-from ${repoName}:nightly --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly" --build-arg APP_VERSION="nightly-${APP_VERSION}" -t ${repoName}:latest . --push && \
+        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-amd64" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-amd64 . && \
         text=":: "
-        echo "${text}build & push tag: nightly"
-        echo "${text}build & push tag: latest"
-        # docker stop $(docker ps | grep buildkitd | awk '{print $7}' )
-        # docker rm $(docker ps -a -q)
+        echo "${text}build flaski:nightly-amd64"
         docker system prune -f 
+    
+        # APP_VERSION=$(git rev-parse --short HEAD)
+        # echo ":: git #${APP_VERSION}"
+
+        # # text=":: !FAILED! "
+        # # docker build --build-arg MYAPP_VERSION="nightly-${MYAPP_VERSION}" --no-cache -t ${repoName}:nightly-amd64 -f services/server/Dockerfile . && \
+        # # text=":: "
+        # # echo "${text}build myapp:nightly-amd64"
+        # # docker system prune -f 
+
+        # text=":: !FAILED! "
+        # git submodule update --recursive --remote && \
+        # docker buildx create --use && \
+        # docker buildx build --platform linux/amd64,linux/arm64 --no-cache --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly" --build-arg APP_VERSION="nightly-${APP_VERSION}" -t ${repoName}:nightly . --push && \
+        # docker buildx build --platform linux/amd64,linux/arm64 --cache-from ${repoName}:nightly --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly" --build-arg APP_VERSION="nightly-${APP_VERSION}" -t ${repoName}:latest . --push && \
+        # text=":: "
+        # echo "${text}build & push tag: nightly"
+        # echo "${text}build & push tag: latest"
+        # # docker stop $(docker ps | grep buildkitd | awk '{print $7}' )
+        # # docker rm $(docker ps -a -q)
+        # docker system prune -f 
 
         # tag=$(git describe --abbrev=0 --tags)
         # if [[ ! "$(docker manifest inspect ${repoName}:${tag}-amd64 > /dev/null ; echo $? )" == "0" ]] 
@@ -104,6 +114,17 @@ elif [ "${1}" == "nightly" ] ;
         #         fi
 
         # done 
+
+elif [ "${1}" == "arm64" ] ;
+    then 
+        APP_VERSION=$(git rev-parse --short HEAD)
+        echo ":: git #${APP_VERSION}"
+        text=":: !FAILED! "
+        git submodule update --recursive --remote && \
+        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-arm64" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-arm64 . && \
+        text=":: "
+        echo "${text}build flaski:nightly-arm64"
+        docker system prune -f 
 
 elif [ "${1}" == "aarch64" ] ;
     then 
