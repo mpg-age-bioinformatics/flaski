@@ -35,9 +35,9 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
     })
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
@@ -45,13 +45,13 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "strand", "DCC parameter"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, strand, dcc]}, index=list(range(9)))
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, strand, dcc_parameter]}, index=list(range(9)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".circRNA.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter)
 
 
 # base samples input dataframe and example dataframe
@@ -142,7 +142,7 @@ arguments=[ dbc.Row( [
                 ], style={"margin-top":10,"margin-bottom":10}),
             dbc.Row( [
                 dbc.Col( html.Label('DCC parameter') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='dcc', placeholder="e.g. 4 3", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( dcc.Input(id='dcc_parameter', placeholder="e.g. 4 3", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label('e.g. keep circRNAs supported by at least 4 reads in at least 3 samples.'),md=4  ), 
                 ], style={"margin-top":10}),
 ]
@@ -201,9 +201,9 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
     State('opt-strand', 'value'),
-    State('dcc', 'value'),
+    State('dcc_parameter', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc):
+def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
@@ -211,7 +211,7 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
     if CURRENTAPP not in apps:
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     # print(subdic["filename"])
