@@ -112,6 +112,7 @@ services:
       APP_VERSION: dev
   restart: always
   volumes:
+   - ~/flaski_23/submissions/:/submissions
    - data3:/flaski_data/users
    - ~/flaski_23/private/:/flaski_private:ro
    - ./static/dog-solid.png:/myapp/myapp/static/favicon.ico

@@ -19,7 +19,7 @@ from myapp.models import UserLogging, PrivateRoutes
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
-dashapp = dash.Dash("circrna",url_base_pathname=f'{PAGE_PREFIX}/circrna/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash("riboseq",url_base_pathname=f'{PAGE_PREFIX}/riboseq/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -61,12 +61,12 @@ dashapp.layout=html.Div(
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
-    eventlog = UserLogging(email=current_user.email, action="visit circrna")
+    eventlog = UserLogging(email=current_user.email, action="visit riboseq")
     db.session.add(eventlog)
     db.session.commit()
     protected_content=html.Div(
         [
-            make_navbar_logged("Circular RNA",current_user),
+            make_navbar_logged("Ribo-Seq",current_user),
             html.Div(id="app-content"),
             navbar_A,
         ],
@@ -75,68 +75,98 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter,wget):
+def generate_submission_file(rows, matching,email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet,wget):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter,wget):
+    def _generate_submission_file(rows, matching, email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Strand", "DCC parameter", "wget"],\
-                          "Value":[email, group, folder, md5sums, project_title, organism, ercc, strand, dcc_parameter, wget]}, index=list(range(10)) )
+
+        mdf=pd.DataFrame()
+        for row in matching:
+            if row['SampleID'] != "" :
+                df_=pd.DataFrame(row,index=[0])
+                mdf=pd.concat([mdf,df_])
+        mdf.reset_index(inplace=True, drop=True)
+
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures","wget"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget]}, index=list(range(15)))
         df=df.to_json()
         df_=df_.to_json()
-        filename=make_submission_file(".circRNA.xlsx")
+        mdf=mdf.to_json()
+        filename=make_submission_file(".riboseq.xlsx")
 
-        return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter, wget)
+        return {"filename": filename, "samples":df, "metadata":df_, "matching":mdf}
+    return _generate_submission_file(rows,matching, email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
     Input('session-id', 'data')
 )
 def make_app_content(session_id):
-    header_access, msg_access = check_access( 'circrna' )
+    header_access, msg_access = check_access( 'riboseq' )
     # header_access, msg_access = None, None # for local debugging 
 
     input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
     example_input=pd.DataFrame( 
         { 
-            "Sample":["A","B","C","D","E","F"] ,
-            "Group" : ['control','control','control','shRNA','shRNA','shRNA'] ,
-            "Replicate": ['1','2','3','1','2','3'],
+            "Sample":[ "R1","R2","R3","R4","R5","R6",\
+                        "T1","T2","T3","T4","T5","T6" ] ,
+            "Group" : ['WT_ribo','WT_ribo','WT_ribo','MUT_ribo','MUT_ribo','MUT_ribo',\
+                        'WT_rna','WT_rna','WT_rna','MUT_rna','MUT_rna','MUT_rna'] ,
+            "Replicate": ['1','2','3','1','2','3','1','2','3','1','2','3'],
             "Read 1": 
                 [ 
-                    "A006850092_131904_S2_L002_R1_001.fastq.gz,A003450092_131904_S2_L003_R1_001.fastq.gz",
-                    "A006850092_131924_S12_L002_R1_001.fastq.gz",
-                    "A006850092_131944_S22_L002_R1_001.fastq.gz",
-                    "A006850092_131906_S3_L002_R1_001.fastq.gz",
-                    "A006850094_131926_S3_L001_R1_001.fastq.gz",
-                    "A006850092_131956_S28_L002_R1_001.fastq.gz"
+                    "A006850135_148951_S1_L002_R1_001.fastq.gz",
+                    "A006850135_148959_S5_L002_R1_001.fastq.gz",
+                    "A006850135_148967_S9_L002_R1_001.fastq.gz",
+                    "A006850135_148953_S2_L002_R1_001.fastq.gz", 
+                    "A006850135_148961_S6_L002_R1_001.fastq.gz",
+                    "A006850135_148969_S10_L002_R1_001.fastq.gz",
+                    "A006850139_150187_S102_L003_R1_001.fastq.gz",
+                    "A006850139_150196_S106_L003_R1_001.fastq.gz",
+                    "A006850139_150204_S110_L003_R1_001.fastq.gz",
+                    "A006850139_150192_S104_L003_R1_001.fastq.gz",
+                    "A006850139_150200_S108_L003_R1_001.fastq.gz",
+                    "A006850139_150208_S112_L003_R1_001.fastq.gz,A006850143_150208_S61_L002_R1_001.fastq.gz"
                 ],
             "Read 2": 
                 [ 
-                "A003450092_131904_S2_L002_R2_001.fastq.gz,A003450092_131904_S2_L003_R2_001.fastq.gz",
-                "A006850092_131924_S12_L002_R2_001.fastq.gz",
-                "A006850092_131944_S22_L002_R2_001.fastq.gz",
-                "A006850092_131906_S3_L002_R2_001.fastq.gz",
-                "A006850094_131926_S3_L001_R2_001.fastq.gz",
-                "A006850092_131956_S28_L002_R2_001.fastq.gz"
-            ],
-            "Notes":  
-                [
-                    "eg. 2 files / sample", "","","","",""
-                ]
+                    "","","","","","",
+                    "A006850139_150187_S102_L003_R2_001.fastq.gz",
+                    "A006850139_150196_S106_L003_R2_001.fastq.gz",
+                    "A006850139_150204_S110_L003_R2_001.fastq.gz",
+                    "A006850139_150192_S104_L003_R2_001.fastq.gz",
+                    "A006850139_150200_S108_L003_R2_001.fastq.gz",
+                    "A006850139_150208_S112_L003_R2_001.fastq.gz,A006850143_150208_S61_L002_R2_001.fastq.gz"
+            ]
+            # "Notes":  
+            #     [
+            #         "eg. 2 files / sample", "","","","",""
+            #     ]
         }
     )
+    matching_df=pd.DataFrame(columns=["SampleID","RiboSeq","RNASeq","Group"])
+    example_matching=pd.DataFrame( { "SampleID":[ "WT_1","WT_2","WT_3", "MUT_1","MUT_2","MUT_3"],\
+                                     "RiboSeq" :["R1","R2","R3","R4","R5","R6"],\
+                                     "RNASeq":["T1","T2","T3","T1","T2","T3"],\
+                                     "Group": ["WT","WT","WT","MUT","MUT","MUT"] 
+                                    } 
+                                )
+
 
     # generate dropdown options
     organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
     organisms_=make_options(organisms)
     ercc_=make_options(["YES","NO"])
+    pair_=make_options(["single","paired"])
+    study_=make_options(["ribo_rna_matched","ribo_only"])
     strand_=make_options(["fr-firststrand","fr-secondstrand","unstranded"])
+    yesno_=make_options(["yes","no"])
+
 
     readme_age='''
 **New data**
@@ -225,6 +255,14 @@ Once you have been given access more information will be displayed on how to tra
     example_input=make_table(example_input,'example-table')
     example_input.style_cell=style_cell
 
+    matching_df=make_table(matching_df,'matching-table')
+    matching_df.editable=True
+    matching_df.row_deletable=True
+    matching_df.style_cell=style_cell
+
+    example_matching=make_table(example_matching,'matching-example-table')
+    example_matching.style_cell=style_cell
+
     # arguments 
     arguments=[ 
         dbc.Row( 
@@ -276,21 +314,56 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
             ], 
-            style={"margin-top":10}),  
+            style={"margin-top":10,"margin-bottom":10}),  
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Adapter') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='adapter', placeholder="ACTGTGCCGGAA", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('adapter sequence to be removed'),md=6  ), 
+            ], 
+            style={"margin-top":10}),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('RiboSeq') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-ribopair', options=pair_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Is the riboseq data paired end oder single end'),md=6  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('RNASeq') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-rnapair', options=pair_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Is the rnaseq data paired end oder single end'),md=6  ), 
+            ],
+             style={"margin-top":10,"margin-bottom":10}),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Study design') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-studydesign', options=study_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Do you have matched ribo/rna seq or just ribo seq'),md=6  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Strand') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-strand', options=strand_, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Most sequencing will be fr-firststrand or unstranded'),md=3  ), 
+                dbc.Col( html.Label('Most sequencing will be fr-firststrand or unstranded'),md=6  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Fragment size') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='fragsize', placeholder="29:35", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('Expected size of ribosome protected fragments'),md=6  ), 
             ], 
             style={"margin-top":10}),
         dbc.Row( 
             [
-                dbc.Col( html.Label('DCC parameter') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='dcc_parameter', placeholder="e.g. 4 3", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('e.g. keep circRNAs supported by at least 4 reads in at least 3 samples.'),md=4  ), 
+                dbc.Col( html.Label('Plot Rfeet pictures') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-rfeet', options=yesno_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('plotting pausing riboseq footprints around pausing sites. Generally takes a long time'),md=6  ), 
             ], 
-            style={"margin-top":10}),
+            style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
@@ -326,6 +399,7 @@ Once you have been given access more information will be displayed on how to tra
                     [
                         dcc.Tab( readme, label="Readme", id="tab-readme") ,
                         dcc.Tab( example_input,label="Samples (example)", id="tab-samples-example") ,
+                        dcc.Tab( example_matching ,label="Matching (example)", id="tab-matching-example") ,
                         dcc.Tab( 
                             [ 
                                 html.Div(
@@ -335,6 +409,16 @@ Once you have been given access more information will be displayed on how to tra
                                 html.Button('Add Sample', id='editing-rows-button', n_clicks=0, style={"margin-top":4, "margin-bottom":4})
                             ],
                             label="Samples", id="tab-samples",
+                        ),
+                        dcc.Tab( 
+                            [
+                                html.Div(
+                                    matching_df,
+                                    id="updatable-matching"
+                                ),
+                                html.Button('Add Sample', id='matching-rows-button', n_clicks=0, style={"margin-top":4, "margin-bottom":4})
+                            ],
+                            label="Matching", id="tab-matching",
                         ),
                         dcc.Tab( arguments ,label="Info", id="tab-info" ) ,
                     ]
@@ -363,6 +447,7 @@ Once you have been given access more information will be displayed on how to tra
 
 @dashapp.callback( 
     Output("updatable-df", 'children'),
+    Output("updatable-matching", 'children'),
     Output('email', 'value'),
     Output('opt-group', 'value'),
     Output('folder', 'value'),
@@ -370,8 +455,13 @@ Once you have been given access more information will be displayed on how to tra
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
     Output('opt-ercc', 'value'),
+    Output('adapter', 'value'),
+    Output('opt-ribopair', 'value'),
+    Output('opt-rnapair', 'value'),
+    Output('opt-studydesign', 'value'),
     Output('opt-strand', 'value'),
-    Output('dcc_parameter', 'value'),
+    Output('fragsize', 'value'),
+    Output('opt-rfeet', 'value'),
     Output('wget', 'value'), 
     Output('upload-data-text', 'children'),
     Input('upload-data', 'contents'),
@@ -387,10 +477,12 @@ def read_file(contents,filename,last_modified):
     exc=pd.ExcelFile(io.BytesIO(decoded))
     if "samples" not in exc.sheet_names :
         raise dash.exceptions.PreventUpdate
-    if "circRNA" not in exc.sheet_names :
+    if "riboseq" not in exc.sheet_names :
         raise dash.exceptions.PreventUpdate
     samples = pd.read_excel(io.BytesIO(decoded), sheet_name="samples")
-    circRNA = pd.read_excel(io.BytesIO(decoded), sheet_name="circRNA")
+    RiboSeq = pd.read_excel(io.BytesIO(decoded), sheet_name="riboseq")
+    Matching = pd.read_excel(io.BytesIO(decoded), sheet_name="matching")
+    print(RiboSeq)
 
     samples = samples[ samples.columns.tolist()[:6]]
 
@@ -400,11 +492,17 @@ def read_file(contents,filename,last_modified):
     input_df.style_cell=style_cell
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Strand", "DCC parameter", "wget" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures" ,"wget" ]
     for f in fields_to_return:
-        values_to_return.append(  circRNA[circRNA["Field"]==f]["Value"].tolist()[0]  )
+        print(f, RiboSeq[RiboSeq["Field"]==f]["Value"].tolist() )
+        values_to_return.append(  RiboSeq[RiboSeq["Field"]==f]["Value"].tolist()[0]  )
 
-    return [ input_df ] +  values_to_return + [ filename ]
+    matching_df=make_table(Matching,'matching-table')
+    matching_df.editable=True
+    matching_df.row_deletable=True
+    matching_df.style_cell=style_cell
+
+    return [ input_df ] + [ matching_df ] +  values_to_return + [ filename ]
 
 # main submission call
 @dashapp.callback(
@@ -413,6 +511,7 @@ def read_file(contents,filename,last_modified):
     # Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
+    State('matching-table', 'data'),
     State('email', 'value'),
     State('opt-group', 'value'),
     State('folder', 'value'),
@@ -420,22 +519,27 @@ def read_file(contents,filename,last_modified):
     State('project_title', 'value'),
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
+    State('adapter', 'value'),
+    State('opt-ribopair', 'value'),
+    State('opt-rnapair', 'value'),
+    State('opt-studydesign', 'value'),
     State('opt-strand', 'value'),
-    State('dcc_parameter', 'value'),
+    State('fragsize', 'value'),
+    State('opt-rfeet', 'value'),
     State('wget', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, strand, dcc_parameter, wget):
-    header, msg = check_access( 'circrna' )
+def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, project_title, organism, ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget):
+    header, msg = check_access( 'riboseq' )
     # header, msg = None, None # for local debugging 
     if msg :
         return header, msg
 
     if not wget:
         wget="NONE"
-    print(rows, email,group,folder,md5sums,project_title,organism,ercc, strand, dcc_parameter, wget)
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, strand, dcc_parameter, wget)
+    subdic=generate_submission_file(rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
+    matching=pd.read_json(subdic["matching"])
 
     validation=validate_metadata(metadata)
     if validation:
@@ -459,15 +563,26 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     EXCout=pd.ExcelWriter(subdic["filename"])
     samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"circRNA",index=None)
+    metadata.to_excel(EXCout,"riboseq",index=None)
+    matching.to_excel(EXCout,"matching",index=None)
     EXCout.save()
 
     if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="circRNA", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="riboseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
     else:
-        send_submission_ftp_email(user=current_user, submission_type="circRNA", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
 
     return header, msg
+
+@dashapp.callback(
+    Output('matching-table', 'data'),
+    Input('matching-rows-button', 'n_clicks'),
+    State('matching-table', 'data'),
+    State('matching-table', 'columns'))
+def add_row_matching(n_clicks, rows, columns):
+    if n_clicks > 0:
+        rows.append({c['id']: '' for c in columns})
+    return rows
 
 # add rows buttom 
 @dashapp.callback(

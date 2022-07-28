@@ -19,7 +19,7 @@ from myapp.models import UserLogging, PrivateRoutes
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
-dashapp = dash.Dash("circrna",url_base_pathname=f'{PAGE_PREFIX}/circrna/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash("varcal",url_base_pathname=f'{PAGE_PREFIX}/varcal/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -61,12 +61,12 @@ dashapp.layout=html.Div(
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
-    eventlog = UserLogging(email=current_user.email, action="visit circrna")
+    eventlog = UserLogging(email=current_user.email, action="visit varcal")
     db.session.add(eventlog)
     db.session.commit()
     protected_content=html.Div(
         [
-            make_navbar_logged("Circular RNA",current_user),
+            make_navbar_logged("variantCalling",current_user),
             html.Div(id="app-content"),
             navbar_A,
         ],
@@ -75,41 +75,42 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter,wget):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, model,targeted,wget):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter,wget):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,model,targeted,wget):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Strand", "DCC parameter", "wget"],\
-                          "Value":[email, group, folder, md5sums, project_title, organism, ercc, strand, dcc_parameter, wget]}, index=list(range(10)) )
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "model","targeted Exomes","wget"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,model,targeted, wget]}, index=list(range(10)))
         df=df.to_json()
         df_=df_.to_json()
-        filename=make_submission_file(".circRNA.xlsx")
+        filename=make_submission_file(".variantCalling.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter, wget)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,model,targeted,wget)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
     Input('session-id', 'data')
 )
 def make_app_content(session_id):
-    header_access, msg_access = check_access( 'circrna' )
+    header_access, msg_access = check_access( 'varcal' )
     # header_access, msg_access = None, None # for local debugging 
 
-    input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
+    input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2", "Background Sample"] )
     example_input=pd.DataFrame( 
         { 
-            "Sample":["A","B","C","D","E","F"] ,
-            "Group" : ['control','control','control','shRNA','shRNA','shRNA'] ,
-            "Replicate": ['1','2','3','1','2','3'],
+            "Sample":["A","B","C","D","E","F","G"] ,
+            "Group" : ['WT','MUT','MUT','MUT','MUT','MUT','MUT'] ,
+            "Replicate": ['1','1','2','3','4','5','6'],
             "Read 1": 
                 [ 
                     "A006850092_131904_S2_L002_R1_001.fastq.gz,A003450092_131904_S2_L003_R1_001.fastq.gz",
+                    "A006850092_131904_S21_L002_R1_001.fastq.gz",
                     "A006850092_131924_S12_L002_R1_001.fastq.gz",
                     "A006850092_131944_S22_L002_R1_001.fastq.gz",
                     "A006850092_131906_S3_L002_R1_001.fastq.gz",
@@ -119,16 +120,18 @@ def make_app_content(session_id):
             "Read 2": 
                 [ 
                 "A003450092_131904_S2_L002_R2_001.fastq.gz,A003450092_131904_S2_L003_R2_001.fastq.gz",
+                "A006850092_131904_S21_L002_R1_001.fastq.gz",
                 "A006850092_131924_S12_L002_R2_001.fastq.gz",
                 "A006850092_131944_S22_L002_R2_001.fastq.gz",
                 "A006850092_131906_S3_L002_R2_001.fastq.gz",
                 "A006850094_131926_S3_L001_R2_001.fastq.gz",
                 "A006850092_131956_S28_L002_R2_001.fastq.gz"
             ],
-            "Notes":  
-                [
-                    "eg. 2 files / sample", "","","","",""
-                ]
+            "Background Sample":  ["", "A", "A","A", "A","A","A"]
+            # "Notes":  
+            #     [
+            #         "eg. 2 files / sample", "","","","","",""
+            #     ]
         }
     )
 
@@ -136,7 +139,7 @@ def make_app_content(session_id):
     organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
     organisms_=make_options(organisms)
     ercc_=make_options(["YES","NO"])
-    strand_=make_options(["fr-firststrand","fr-secondstrand","unstranded"])
+    model_=make_options(["WES","WGS"])
 
     readme_age='''
 **New data**
@@ -276,21 +279,21 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
             ], 
-            style={"margin-top":10}),  
+            style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
-                dbc.Col( html.Label('Strand') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-strand', options=strand_, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Most sequencing will be fr-firststrand or unstranded'),md=3  ), 
+                dbc.Col( html.Label('model') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-model', options=model_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('WES: whole exome seq; WGS: whole genome seq'),md=6  ), 
             ], 
-            style={"margin-top":10}),
-        dbc.Row( 
-            [
-                dbc.Col( html.Label('DCC parameter') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='dcc_parameter', placeholder="e.g. 4 3", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('e.g. keep circRNAs supported by at least 4 reads in at least 3 samples.'),md=4  ), 
+            style={"margin-top":10,"margin-bottom":10}),
+            dbc.Row( 
+                [
+                dbc.Col( html.Label('targeted Exoms') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='targeted', placeholder="mm10.exons.bed", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('If WES, then bedfile with targeted exons (ce11, dm6,mm10, hg38,saccer3, nfur1) or none if no bedfile is available'),md=6  ), 
             ], 
-            style={"margin-top":10}),
+            style={"margin-top":10}),   
         dbc.Row( 
             [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
@@ -370,8 +373,8 @@ Once you have been given access more information will be displayed on how to tra
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
     Output('opt-ercc', 'value'),
-    Output('opt-strand', 'value'),
-    Output('dcc_parameter', 'value'),
+    Output('opt-model', 'value'),
+    Output('targeted', 'value'),
     Output('wget', 'value'), 
     Output('upload-data-text', 'children'),
     Input('upload-data', 'contents'),
@@ -387,10 +390,10 @@ def read_file(contents,filename,last_modified):
     exc=pd.ExcelFile(io.BytesIO(decoded))
     if "samples" not in exc.sheet_names :
         raise dash.exceptions.PreventUpdate
-    if "circRNA" not in exc.sheet_names :
+    if "variantCalling" not in exc.sheet_names :
         raise dash.exceptions.PreventUpdate
     samples = pd.read_excel(io.BytesIO(decoded), sheet_name="samples")
-    circRNA = pd.read_excel(io.BytesIO(decoded), sheet_name="circRNA")
+    variantCalling = pd.read_excel(io.BytesIO(decoded), sheet_name="variantCalling")
 
     samples = samples[ samples.columns.tolist()[:6]]
 
@@ -400,9 +403,9 @@ def read_file(contents,filename,last_modified):
     input_df.style_cell=style_cell
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Strand", "DCC parameter", "wget" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "model", "targeted Exomes", "wget" ]
     for f in fields_to_return:
-        values_to_return.append(  circRNA[circRNA["Field"]==f]["Value"].tolist()[0]  )
+        values_to_return.append(  variantCalling[variantCalling["Field"]==f]["Value"].tolist()[0]  )
 
     return [ input_df ] +  values_to_return + [ filename ]
 
@@ -420,20 +423,19 @@ def read_file(contents,filename,last_modified):
     State('project_title', 'value'),
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
-    State('opt-strand', 'value'),
-    State('dcc_parameter', 'value'),
+    State('opt-model', 'value'),
+    State('targeted', 'value'),
     State('wget', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, strand, dcc_parameter, wget):
-    header, msg = check_access( 'circrna' )
+def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, model,targeted,wget):
+    header, msg = check_access( 'varcal' )
     # header, msg = None, None # for local debugging 
     if msg :
         return header, msg
 
     if not wget:
         wget="NONE"
-    print(rows, email,group,folder,md5sums,project_title,organism,ercc, strand, dcc_parameter, wget)
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, strand, dcc_parameter, wget)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,model,targeted, wget)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
 
@@ -459,13 +461,13 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     EXCout=pd.ExcelWriter(subdic["filename"])
     samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"circRNA",index=None)
+    metadata.to_excel(EXCout,"variantCalling",index=None)
     EXCout.save()
 
     if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="circRNA", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="variantCalling", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
     else:
-        send_submission_ftp_email(user=current_user, submission_type="circRNA", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_ftp_email(user=current_user, submission_type="variantCalling", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
 
     return header, msg
 

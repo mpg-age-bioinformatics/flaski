@@ -104,23 +104,6 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
         return {"filename": filename, "samples":df, "input":dfi , "metadata":df_}
     return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget)
 
-# def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
-#     @cache.memoize(60*60*2) # 2 hours
-#     def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
-#         df=pd.DataFrame()
-#         for row in rows:
-#             if row['Read 1'] != "" :
-#                 df_=pd.DataFrame(row,index=[0])
-#                 df=pd.concat([df,df_])
-#         df.reset_index(inplace=True, drop=True)
-#         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget"],\
-#                           "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget]}, index=list(range(8)))
-#         df=df.to_json()
-#         df_=df_.to_json()
-#         filename=make_submission_file(".RNAseq.xlsx")
-
-#         return {"filename": filename, "samples":df, "metadata":df_}
-#     return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -130,8 +113,8 @@ def make_app_content(session_id):
     header_access, msg_access = check_access( 'atacseq' )
     # header_access, msg_access = None, None # for local debugging 
 
-    input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
-    example_input=pd.DataFrame( 
+    samples_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
+    samples_eg_df=pd.DataFrame( 
         { 
             "Sample":["A","B","C","D","E","F","G","H","I","J"] ,
             "Group" : ['WT_control','WT_control','MUT_control','MUT_control','WT_treated','WT_treated','MUT_treated','MUT_treated','WT_control_Input','MUT_control_Input'] ,
@@ -171,8 +154,8 @@ def make_app_content(session_id):
         }
     )
 
-    atac_input_df=pd.DataFrame(columns=["ChIP Sample", "Input Sample"])
-    atac_input_eg_df=pd.DataFrame( { "ChIP Sample" :["A","B","C", "D","E","F","G","H"] ,\
+    input_df=pd.DataFrame(columns=["ChIP Sample", "Input Sample"])
+    input_eg_df=pd.DataFrame( { "ChIP Sample" :["A","B","C", "D","E","F","G","H"] ,\
                                 "Input Sample" :[ "I","I","J","J","K","K", "L","L"] } )
 
 
@@ -263,22 +246,21 @@ Once you have been given access more information will be displayed on how to tra
         folder_row_style={"margin-top":10, 'display': 'none' }
         folder="FTP" 
 
-    input_df=make_table(input_df,'adding-rows-table')
+    samples_df=make_table(samples_df,'samples-table')
+    samples_df.editable=True
+    samples_df.row_deletable=True
+    samples_df.style_cell=style_cell
+
+    samples_eg_df=make_table(samples_eg_df,'example-table')
+    samples_eg_df.style_cell=style_cell
+
+    input_df=make_table(input_df,'input-table')
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
 
-    example_input=make_table(example_input,'example-table')
-    example_input.style_cell=style_cell
-
-    atac_input_df=make_table(atac_input_df,'adding-rows-table-ai')
-    atac_input_df.editable=True
-    atac_input_df.row_deletable=True
-    atac_input_df.style_cell=style_cell
-
-    atac_input_eg_df=make_table(atac_input_eg_df,'example-table-ai')
-    atac_input_eg_df.style_cell=style_cell
-
+    input_eg_df=make_table(input_eg_df,'input-example-table')
+    input_eg_df.style_cell=style_cell
 
     # arguments 
     arguments=[ 
@@ -394,12 +376,12 @@ Once you have been given access more information will be displayed on how to tra
                 dcc.Tabs(
                     [
                         dcc.Tab( readme, label="Readme", id="tab-readme") ,
-                        dcc.Tab( example_input,label="Samples (example)", id="tab-samples-example") ,
-                        dcc.Tab( atac_input_eg_df,label="Input (example)", id="tab-input-example"),
+                        dcc.Tab( samples_eg_df,label="Samples (example)", id="tab-samples-example") ,
+                        dcc.Tab( input_eg_df ,label="Input (example)", id="tab-input-example"),
                         dcc.Tab( 
                             [ 
                                 html.Div(
-                                    input_df,
+                                    samples_df,
                                     id="updatable-df"
                                 ),
                                 html.Button('Add Sample', id='editing-rows-button', n_clicks=0, style={"margin-top":4, "margin-bottom":4})
@@ -410,7 +392,7 @@ Once you have been given access more information will be displayed on how to tra
                         dcc.Tab( 
                             [ 
                                 html.Div(
-                                    atac_input_df,
+                                    input_df,
                                     id="updatable-df-ai"
                                 ),
                                 html.Button('Add Sample', id='input-rows-button', n_clicks=0, style={"margin-top":4, "margin-bottom":4})
@@ -481,22 +463,22 @@ def read_file(contents,filename,last_modified):
 
     samples = samples[ samples.columns.tolist()[:6]]
 
-    input_df=make_table(samples,'adding-rows-table')
+    samples_df=make_table(samples,'samples-table')
+    samples_df.editable=True
+    samples_df.row_deletable=True
+    samples_df.style_cell=style_cell
+
+    input_df=make_table(input,'input-table')
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
-
-    atac_input_df=make_table(input,'adding-rows-table-ai')
-    atac_input_df.editable=True
-    atac_input_df.row_deletable=True
-    atac_input_df.style_cell=style_cell
 
     values_to_return=[]
     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "seq", "Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "wget" ]
     for f in fields_to_return:
         values_to_return.append(  ATACseq[ATACseq["Field"]==f]["Value"].tolist()[0]  )
 
-    return [ input_df ] +  [ atac_input_df ] + values_to_return + [ filename ]
+    return [ samples_df ] +  [ input_df ] + values_to_return + [ filename ]
 
 # main submission call
 @dashapp.callback(
@@ -504,8 +486,8 @@ def read_file(contents,filename,last_modified):
     Output("modal_body", "children"),
     # Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
-    State('adding-rows-table', 'data'),
-    State('adding-rows-table-ai', 'data'),
+    State('samples-table', 'data'),
+    State('input-table', 'data'),
     State('email', 'value'),
     State('opt-group', 'value'),
     State('folder', 'value'),
@@ -520,8 +502,8 @@ def read_file(contents,filename,last_modified):
     State('wget', 'value'),
     prevent_initial_call=True )
 def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget ):
-    # header, msg = check_access( 'atacseq' )
-    header, msg = None, None # for local debugging 
+    header, msg = check_access( 'atacseq' )
+    # header, msg = None, None # for local debugging 
     if msg :
         return header, msg
 
@@ -568,20 +550,20 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
 
 # add rows buttom 
 @dashapp.callback(
-    Output('adding-rows-table', 'data'),
+    Output('samples-table', 'data'),
     Input('editing-rows-button', 'n_clicks'),
-    State('adding-rows-table', 'data'),
-    State('adding-rows-table', 'columns'))
+    State('samples-table', 'data'),
+    State('samples-table', 'columns'))
 def add_row(n_clicks, rows, columns):
     if n_clicks > 0:
         rows.append({c['id']: '' for c in columns})
     return rows
 
 @dashapp.callback(
-    Output('adding-rows-table-ai', 'data'),
+    Output('input-table', 'data'),
     Input('input-rows-button', 'n_clicks'),
-    State('adding-rows-table-ai', 'data'),
-    State('adding-rows-table-ai', 'columns'))
+    State('input-table', 'data'),
+    State('input-table', 'columns'))
 def add_input_row(n_clicks, rows, columns):
     if n_clicks > 0:
         rows.append({c['id']: '' for c in columns})

@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=['rnaseq']
 _PUBLIC_VIEWS=['rnaseq']
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=["circularbarplots","venndiagram", "lifespan", "rnaseq", "atacseq", "chipseq", "asplicing", "irfinder", "circrna", "mirna" ] #"circularbarplots"  "heatmap",
+    _DEV_ROUTES=["lifespan", "rnaseq", "atacseq", "chipseq", "asplicing", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq" ] #"circularbarplots"  "heatmap",
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -57,6 +57,9 @@ other_nav_dropdowns =[
                 "IRfinder":"/irfinder/",\
                 "Circular RNA":"/circrna/",\
                 "miRNA":"/mirna/",\
+                "16S":"/sixteens/",\
+                "Variant Calling":"/varcal/",\
+                "Ribo-Seq":"/riboseq/",\
             } \
     }
 ]

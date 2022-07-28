@@ -75,23 +75,23 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,adapter, wget):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,adapter, wget):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget]}, index=list(range(8)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","wget"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter, wget]}, index=list(range(9)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".miRNAseq.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,adapter, wget)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -278,6 +278,13 @@ Once you have been given access more information will be displayed on how to tra
             style={"margin-top":10,"margin-bottom":10}),  
         dbc.Row( 
             [
+                dbc.Col( html.Label('Adapter sequence') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input( id='adapter', placeholder="none",value="none",type='text',style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('potential adapter sequence to trim, e.g. transposase adapter'),md=6  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}),  
+        dbc.Row( 
+            [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
@@ -355,6 +362,7 @@ Once you have been given access more information will be displayed on how to tra
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
     Output('opt-ercc', 'value'),
+    Output('adapter', 'value'),
     Output('wget', 'value'), 
     Output('upload-data-text', 'children'),
     Input('upload-data', 'contents'),
@@ -383,7 +391,7 @@ def read_file(contents,filename,last_modified):
     input_df.style_cell=style_cell
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "wget" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC","Adapter sequence", "wget" ]
     for f in fields_to_return:
         values_to_return.append(  miRNAseq[miRNAseq["Field"]==f]["Value"].tolist()[0]  )
 
@@ -403,9 +411,10 @@ def read_file(contents,filename,last_modified):
     State('project_title', 'value'),
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
+    State('adapter','value'),
     State('wget', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
+def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc,adapter, wget):
     header, msg = check_access( 'mirna' )
     # header, msg = None, None # for local debugging 
     if msg :
@@ -413,7 +422,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     if not wget:
         wget="NONE"
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,adapter, wget)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
 
