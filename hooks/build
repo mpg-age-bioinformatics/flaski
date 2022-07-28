@@ -28,7 +28,7 @@ elif [ "${1}" == "nightly" ] ;
     then 
 
         APP_VERSION=$(git rev-parse --short HEAD)
-        echo ":: git #${APP_VERSION}"
+        echo "- git #${APP_VERSION}"
         text=":: !FAILED! "
         git submodule update --recursive --remote && \
         docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-${2}" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-${2} . && \
