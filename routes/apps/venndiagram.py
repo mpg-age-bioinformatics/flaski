@@ -227,7 +227,7 @@ def make_app_content(pathname):
                                     dbc.Row(
                                         [
                                             dbc.Col(
-                                                dcc.Textarea(value=pa["set1_values"], id='set1_values', placeholder="", style={"height":"100px","width":"100%"}),
+                                                dcc.Textarea(value=pa["set1_values"], id='set1_values', placeholder="one value per line", style={"height":"100px","width":"100%"}),
                                                 #dcc.Input(value=pa["set1_values"],id='set1_values', placeholder="", type='text', style=card_input_style),
                                             ),
                                         ],
@@ -346,7 +346,7 @@ def make_app_content(pathname):
                                     dbc.Row(
                                         [
                                             dbc.Col(
-                                                dcc.Textarea(value=pa["set2_values"], id='set2_values', placeholder="", style={"height":"100px","width":"100%"}),
+                                                dcc.Textarea(value=pa["set2_values"], id='set2_values', placeholder="one value per line", style={"height":"100px","width":"100%"}),
                                             ),
                                         ],
                                         className="g-1",
@@ -461,7 +461,7 @@ def make_app_content(pathname):
                                     dbc.Row(
                                         [
                                             dbc.Col(
-                                                dcc.Textarea(value=pa["set3_values"], id='set3_values', placeholder="", style={"height":"100px","width":"100%"}),
+                                                dcc.Textarea(value=pa["set3_values"], id='set3_values', placeholder="one value per line", style={"height":"100px","width":"100%"}),
                                             ),
                                         ],
                                         className="g-1",
