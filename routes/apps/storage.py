@@ -556,6 +556,24 @@ def saveas_makedir(mkdir_n,saveas_n,  contents, upload_filename, last_modified, 
     ctx = dash.callback_context
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
+    not_enough_disk_space=dbc.Modal(
+        [
+            dbc.ModalHeader("Disk space"), 
+            dbc.ModalBody(
+                [
+                    "Not enough disk space."
+                ]
+            ),
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Close", id="dirname-close", color="secondary", className="ms-auto", n_clicks=0
+                )
+            ),
+        ],
+        id="dirname-modal",
+        is_open=True,
+    )
+
     if button_id == "upload-data"  :
         if upload_filename : 
 
@@ -628,9 +646,22 @@ def saveas_makedir(mkdir_n,saveas_n,  contents, upload_filename, last_modified, 
                     return  failed_upload_modal, dash.no_update
             except:
                 return  failed_upload_modal, dash.no_update
-            
-            with open(os_path, "w") as file_out:
-                json.dump(session_import, file_out)
+
+            total_user=get_size(user_path)
+            user=User.query.filter_by(id=current_user.id).first()
+            disk_quota=user.disk_quota
+
+            if disk_quota > total_user :  
+                with open(os_path, "w") as file_out:
+                    json.dump(session_import, file_out)
+            else:
+                return not_enough_disk_space, dash.no_update
+
+            file_size=os.path.getsize(os_path)
+            new_total=total_user + file_size
+            if new_total > disk_quota :
+                os.remove(os_path)
+                return not_enough_disk_space, dash.no_update
 
             return  dash.no_update, pathname
 
@@ -700,8 +731,22 @@ def saveas_makedir(mkdir_n,saveas_n,  contents, upload_filename, last_modified, 
 
             os_path=os.path.join(os_path, filename )
 
-            with open(os_path, "w") as file_out:
-                json.dump(session_data, file_out)
+
+            total_user=get_size(user_path)
+            user=User.query.filter_by(id=current_user.id).first()
+            disk_quota=user.disk_quota
+
+            if disk_quota > total_user :  
+                with open(os_path, "w") as file_out:
+                    json.dump(session_data, file_out)
+            else:
+                return not_enough_disk_space, dash.no_update
+
+            file_size=os.path.getsize(os_path)
+            new_total=total_user + file_size
+            if new_total > disk_quota :
+                os.remove(os_path)
+                return not_enough_disk_space, dash.no_update
 
             return dash.no_update, f'{PAGE_PREFIX}/storage/{ui_path}'
 
