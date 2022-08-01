@@ -13,6 +13,7 @@ import os
 import uuid
 # import traceback
 import json
+import base64
 import pandas as pd
 # import time
 from werkzeug.utils import secure_filename
@@ -405,6 +406,14 @@ def make_app_content(pathname,sortby):
             style={"height": "30px",'margin-bottom':"24px",'margin-top':"0px"},
             justify="start"
         )
+        upload_file_style={
+            'width': '100%',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            "margin-bottom": "10px",
+            'display': 'none'
+        }
     else:
         save_and_make=dbc.Row(
             [
@@ -426,6 +435,13 @@ def make_app_content(pathname,sortby):
             style={"height": "30px",'margin-bottom':"24px",'margin-top':"0px"},
             justify="end"
         )
+        upload_file_style={
+            'width': '100%',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            "margin-bottom": "10px",
+        }
 
     page=html.Div(
         [   dcc.Store( data=finder_data, id='finder-data' ),
@@ -436,6 +452,15 @@ def make_app_content(pathname,sortby):
                             dbc.Progress(label=prog_label, value=disc_per, color=progress_color, style={"height": "30px",'margin-bottom':"14px",'margin-top':"80px"}),
                             dbc.Breadcrumb( items=full_paths,style={"height": "30px",'margin-bottom':"8px",'margin-top':"14px"}),
                             save_and_make,
+                            dcc.Upload(
+                                id='upload-data',
+                                children=html.Div(
+                                    [ html.A('upload a session file',id='upload-data-text') ],
+                                    style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                                ),
+                                style=upload_file_style,
+                                multiple=False,
+                            ),
                             html.Div( 
                                 finder,
                                 id="finder-div",
@@ -467,7 +492,7 @@ def make_app_content(pathname,sortby):
     State('sortby', 'data'),
     prevent_initial_call=True
 )
-def update_table( f_name, f_size, f_modified, finder_data, sortby ):
+def update_table( f_name, f_size, f_modified, finder_data, sortby):
 
     ctx = dash.callback_context
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
@@ -512,22 +537,103 @@ def update_table( f_name, f_size, f_modified, finder_data, sortby ):
 
     return sortby_, finder
 
-
 @dashapp.callback(
     Output( "mkdir-refresh", "children" ),
     Output( 'url', 'pathname' ),
     Input( "mkdir-btn", "n_clicks" ),
     Input( "saveas-btn", "n_clicks" ),
+    Input('upload-data', 'contents'),
+    Input('upload-data', 'filename'),
+    Input('upload-data', 'last_modified'),
     State( "makedir_dirname", "value"),
     State( "saveas_filename", "value"),
     State( 'saveas', 'data'),
     State( 'url', 'pathname' ),
     prevent_initial_call=True
 )
-def saveas_makedir(mkdir_n,saveas_n, dirname, filename, session_data, pathname):
+def saveas_makedir(mkdir_n,saveas_n,  contents, upload_filename, last_modified, dirname, filename, session_data, pathname):
 
     ctx = dash.callback_context
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if button_id == "upload-data"  :
+        if upload_filename : 
+
+            user_id=str(current_user.id)
+            users_data=app.config['USERS_DATA']
+            user_path=os.path.join(users_data, user_id)
+
+            if not os.path.isdir(user_path):
+                os.makedirs(user_path)
+
+            ui_path=pathname.split(f"{PAGE_PREFIX}/storage/", 1)[-1]
+
+            os_path=os.path.join( user_path, ui_path )
+
+            upload_filename=secure_filename(str(upload_filename))
+            if upload_filename.split(".")[-1] != "json":
+                upload_filename=f'{upload_filename}.json'  
+
+            os_path=os.path.join(os_path, upload_filename )
+
+            if os.path.exists(os_path):
+                mod=dbc.Modal(
+                    [
+                        dbc.ModalHeader("Session upload"), 
+                        dbc.ModalBody(
+                            [
+                                "File name already exists. Please delete file first."
+                            ]
+                        ),
+                        dbc.ModalFooter(
+                            dbc.Button(
+                                "Close", id="dirname-close", color="secondary", className="ms-auto", n_clicks=0
+                            )
+                        ),
+                    ],
+                    id="dirname-modal",
+                    is_open=True,
+                )
+                return mod, dash.no_update
+
+            ## validate session file
+            failed_upload_modal=dbc.Modal(
+                [
+                    dbc.ModalHeader("Session upload"), 
+                    dbc.ModalBody(
+                        [
+                            "Not a valid session file."
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        dbc.Button(
+                            "Close", id="dirname-close", color="secondary", className="ms-auto", n_clicks=0
+                        )
+                    ),
+                ],
+                id="dirname-modal",
+                is_open=True,
+            )
+            try:
+                content_type, content_string = contents.split(',')
+                decoded=base64.b64decode(content_string)
+                decoded=decoded.decode('utf-8')
+                session_import=json.loads(decoded)
+                print(type(session_import))
+                keys = list(session_import.keys())
+                for k in ["APP_VERSION","session_data"]:
+                    if k not in keys:
+                        return  failed_upload_modal, dash.no_update
+                if "app" not in list(session_import["session_data"].keys()) :
+                    return  failed_upload_modal, dash.no_update
+            except:
+                return  failed_upload_modal, dash.no_update
+            
+            with open(os_path, "w") as file_out:
+                json.dump(session_import, file_out)
+
+            return  dash.no_update, pathname
+
 
     if saveas_n :
         if button_id == "saveas-btn" :
