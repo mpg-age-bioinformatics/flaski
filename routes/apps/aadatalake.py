@@ -673,7 +673,7 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
             genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
             annotate_genes=annotate_genes+genenames_     
         volcano_plot, volcano_pa, volcano_df=make_volcano_plot(dge, dge_datasets[0], annotate_genes)
-        reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
+        # reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         volcano_pa["xcols"]=volcano_df.columns.tolist()
         volcano_pa["ycols"]=volcano_df.columns.tolist()
@@ -681,16 +681,41 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         
         volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: make_annotated_col(x, annotate_genes) )
         volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
-        volcano_pa["labels_col_value"]="select a column.."
+        # volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
+        # volcano_pa["labels_col_value"]="select a column.."
         volcano_df=volcano_df.drop(["___label___"],axis=1)
 
-        session["filename"]="<from RNAseq lake>"
-        session["plot_arguments"]=volcano_pa
-        session["COMMIT"]=app.config['COMMIT']
-        session["app"]="iscatterplot"
+        # ession_data={ "session_data": {"app": { "scatterplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
+        # session_data["APP_VERSION"]=app.config['APP_VERSION']
 
-        session["df"]=volcano_df.to_json()
-        return dcc.Location(pathname="/iscatterplot", id="index")
+        session_data={ "APP_VERSION": app.config['APP_VERSION'],
+            "session_data": 
+                {
+                    "app": 
+                    {
+                        "scatterplot": 
+                        {
+                            "df": volcano_df.to_json() ,
+                            "filename": "from.datalake.json", 
+                            "last_modified": datetime.now().timestamp(), 
+                            "pa": volcano_pa
+                        }
+                    }
+                }
+            }
+                        
+        session_data=encode_session_app(session_data)
+        session["session_data"]=session_data
+        from time import sleep
+        sleep(2)
+
+        # session["filename"]="<from RNAseq lake>"
+        # session["plot_arguments"]=volcano_pa
+        # session["COMMIT"]=app.config['COMMIT']
+        # session["app"]="iscatterplot"
+        # session["df"]=volcano_df.to_json()
+
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/scatterplot/", id="index")
 
 @dashapp.callback( 
     Output('ma-plot-table', 'children'),
@@ -771,7 +796,7 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
             genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
             annotate_genes=annotate_genes+genenames_     
         ma_plot, ma_pa, ma_df=make_ma_plot(dge, dge_datasets[0],annotate_genes )
-        reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
+        # reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         ma_pa["xcols"]=ma_df.columns.tolist()
         ma_pa["ycols"]=ma_df.columns.tolist()
@@ -788,7 +813,7 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         session["app"]="iscatterplot"
 
         session["df"]=ma_df.to_json()
-        return dcc.Location(pathname="/iscatterplot", id="index")
+        return dcc.Location(pathname="/scatterplot", id="index")
 
 @dashapp.callback(
     Output("redirect-pca", 'children'),
@@ -803,7 +828,7 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
         pca_data=filter_gene_expression(ids2labels,None,None,cache)
         selected_sets=list(set(selected_results_files["Set"]))
         pca_plot, pca_pa, pca_df=make_pca_plot(pca_data,selected_sets[0])
-        reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
+        # reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         pca_pa["xcols"]=pca_df.columns.tolist()
         pca_pa["ycols"]=pca_df.columns.tolist()
@@ -817,7 +842,7 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
         session["app"]="iscatterplot"
 
         session["df"]=pca_df.to_json()
-        return dcc.Location(pathname="/iscatterplot", id="index")
+        return dcc.Location(pathname="/scatterplot", id="index")
 
 @dashapp.callback(
     Output("download-samples", "data"),
