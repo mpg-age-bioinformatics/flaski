@@ -90,10 +90,17 @@ def make_layout(session_id):
     eventlog = UserLogging(email=current_user.email, action="visit aadatalake")
     db.session.add(eventlog)
     db.session.commit()
+
+    def make_loading(children,i):
+        return dcc.Loading(
+            id=f"menu-load-{i}",
+            type="default",
+            children=children,
+        )
+
     protected_content=html.Div(
         [
             make_navbar_logged("Data lake",current_user),
-            # html.Div(id="app-content"),
             html.Div(id="app_access"),
             html.Div(id="redirect-pca"),
             html.Div(id="redirect-volcano"),
@@ -103,32 +110,25 @@ def make_layout(session_id):
                 [
                     dbc.Col( 
                         [
-                            dcc.Loading(
+                            dbc.Card(
                                 [
-                                    dbc.Card(
-                                        [
-                                            html.H5("Filters", style={"margin-top":10}), 
-                                            html.Label('Data sets'), dcc.Dropdown( id='opt-datasets', multi=True),
-                                            html.Label('Groups',style={"margin-top":10}), dcc.Dropdown( id='opt-groups', multi=True),
-                                            html.Label('Samples',style={"margin-top":10}), dcc.Dropdown( id='opt-samples', multi=True),
-                                            html.Label('Gene names',style={"margin-top":10}), dcc.Dropdown( id='opt-genenames', multi=True),
-                                            html.Label('Gene IDs',style={"margin-top":10}), dcc.Dropdown( id='opt-geneids', multi=True),
-                                            html.Label('Download file prefix',style={"margin-top":10}), 
-                                            dcc.Input(id='download_name', value="data.lake", type='text',style={"width":"100%", "height":"34px"})
-                                        ],
-                                        body=True
-                                    ),
-                                    dbc.Button(
-                                        'Submit',
-                                        id='submit-button-state', 
-                                        color="secondary",
-                                        n_clicks=0, 
-                                        style={"width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
-                                    )
+                                    html.H5("Filters", style={"margin-top":10}), 
+                                    html.Label('Data sets'), make_loading( dcc.Dropdown( id='opt-datasets', multi=True), 1),
+                                    html.Label('Groups',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-groups', multi=True), 2 ),
+                                    html.Label('Samples',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-samples', multi=True), 3 ),
+                                    html.Label('Gene names',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-genenames', multi=True), 4 ),
+                                    html.Label('Gene IDs',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-geneids', multi=True), 5 ),
+                                    html.Label('Download file prefix',style={"margin-top":10}), 
+                                    dcc.Input(id='download_name', value="data.lake", type='text',style={"width":"100%", "height":"34px"})
                                 ],
-                                id="loading-output",
-                                type="default",
-                                style={"margin-top":"50%","height": "100%"} 
+                                body=True
+                            ),
+                            dbc.Button(
+                                'Submit',
+                                id='submit-button-state', 
+                                color="secondary",
+                                n_clicks=0, 
+                                style={"width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
                             )
                         ],
                         sm=12,md=6,lg=4,xl=3,
@@ -142,14 +142,12 @@ def make_layout(session_id):
                             children=[ html.Div(id="my-output")],
                             style={"margin-top":"50%","height": "100%"} 
                         ),
-                        # sm=12,md=6,lg=8,xl=9,#md=9, 
                         style={"height": "100%","width": "100%",'overflow': 'scroll'})
                 ],
                 align="start",
                 justify="left",
                 className="g-0",
                 style={"height":"86vh","width":"100%","overflow":"scroll"}
-                # style={"height":"86vh","width":"100%","overflow":"scroll"}#style={"min-height": "87vh"}
             ),
             navbar_A,
         ],
@@ -178,7 +176,6 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     results_files.columns=["Set","Group","Sample"]
     results_files=results_files.drop_duplicates()      
     results_files_=make_table(results_files,"results_files")
-    # results_files_ = dbc.Table.from_dataframe(results_files, striped=True, bordered=True, hover=True)
     download_samples=html.Div( 
         [
             html.Button(id='btn-samples', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
@@ -188,11 +185,10 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
     ## gene expression
     if datasets or groups or samples or  genenames or  geneids :
-        print("1 -- gene expression")
+        # print("1 -- gene expression")
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
         
         gene_expression_=make_table(gene_expression,"gene_expression")#,fixed_columns={'headers': True, 'data': 2} )
-        # gene_expression_ = dbc.Table.from_dataframe(gene_expression, striped=True, bordered=True, hover=True)
         download_geneexp=html.Div( 
             [
                 html.Button(id='btn-geneexp', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
@@ -206,7 +202,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     ## barPlot
     selected_sets=list(set(results_files["Set"]))
     if (genenames and len(genenames) == 1) or (geneids and len(geneids) == 1):
-        print("2 -- bar plot")
+        # print("2 -- bar plot")
 
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
         
@@ -234,7 +230,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     ## PCA
     selected_sets=list(set(selected_results_files["Set"]))
     if len(selected_sets) == 1 : 
-        print("3 -- PCA")
+        # print("3 -- PCA")
         pca_data=filter_gene_expression(ids2labels,None,None,cache)
         pca_plot, pca_pa, pca_df=make_pca_plot(pca_data,selected_sets[0])
         pca_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".pca" }}
@@ -258,7 +254,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     dge_bol=False
     volcano_plot=None
     if not samples:
-        print("4 -- DGE")
+        # print("4 -- DGE")
         if len(selected_sets) == 1 :
             dge_groups=list(set(selected_results_files["Group"]))
             if len(dge_groups) == 2:
@@ -343,7 +339,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                 dge_bol=True
 
     if  ( dge_bol ) & ( pca_bol ) & (gene_expression_bar_bol) :
-        print("5 -- dge, pca, bar plot" )
+        # print("5 -- dge, pca, bar plot" )
         minwidth=["Samples","Expression", "PCA", "Bar Plot", "DGE","Volcano","MA"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
@@ -395,7 +391,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
 
     elif  ( dge_bol ) & ( pca_bol ) :
-        print("6 -- dge, pca")
+        # print("6 -- dge, pca")
 
         minwidth=["Samples","Expression", "PCA", "DGE","Volcano","MA"]
         minwidth=len(minwidth) * 150
@@ -443,7 +439,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
 
     elif  (pca_bol) & (gene_expression_bar_bol) :
-        print("7 -- pca, barplot")
+        # print("7 -- pca, barplot")
 
         minwidth=["Samples","Expression", "PCA", "Bar Plot"]
         minwidth=len(minwidth) * 150
@@ -474,7 +470,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
 
     elif (gene_expression_bol) & (gene_expression_bar_bol) :
-        print("8 -- ge, bar plot")
+        # print("8 -- ge, bar plot")
         minwidth=["Samples","Expression", "Bar Plot"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
@@ -499,7 +495,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
 
     elif  pca_bol :
-        print("9 -- pca")
+        # print("9 -- pca")
 
         minwidth=["Samples","Expression", "PCA"]
         minwidth=len(minwidth) * 150
@@ -525,7 +521,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
     
     elif gene_expression_bar_bol :
-        print("10 -- bar plot")
+        # print("10 -- bar plot")
 
         minwidth=["Samples","Expression", "Bar Plot"]
         minwidth=len(minwidth) * 150
@@ -551,7 +547,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
 
     elif gene_expression_bol:
-        print("11 -- ge")
+        # print("11 -- ge")
 
         minwidth=["Samples","Expression"]
         minwidth=len(minwidth) * 150
@@ -572,7 +568,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
 
     else:
-        print("12 -- else")
+        # print("12 -- else")
         minwidth=["Samples"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
@@ -673,22 +669,17 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
             genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
             annotate_genes=annotate_genes+genenames_     
         volcano_plot, volcano_pa, volcano_df=make_volcano_plot(dge, dge_datasets[0], annotate_genes)
-        # reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         volcano_pa["xcols"]=volcano_df.columns.tolist()
         volcano_pa["ycols"]=volcano_df.columns.tolist()
         volcano_pa["groups"]=["None"]+volcano_df.columns.tolist()
         
         volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: make_annotated_col(x, annotate_genes) )
-        volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
-        # volcano_pa["labels_col"]=["select a column.."]+volcano_df.columns.tolist()
-        # volcano_pa["labels_col_value"]="select a column.."
+        volcano_pa["labels_col"]=volcano_df.columns.tolist()
         volcano_df=volcano_df.drop(["___label___"],axis=1)
 
-        # ession_data={ "session_data": {"app": { "scatterplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
-        # session_data["APP_VERSION"]=app.config['APP_VERSION']
-
-        session_data={ "APP_VERSION": app.config['APP_VERSION'],
+        session_data={ 
+            "APP_VERSION": app.config['APP_VERSION'],
             "session_data": 
                 {
                     "app": 
@@ -708,12 +699,6 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         session["session_data"]=session_data
         from time import sleep
         sleep(2)
-
-        # session["filename"]="<from RNAseq lake>"
-        # session["plot_arguments"]=volcano_pa
-        # session["COMMIT"]=app.config['COMMIT']
-        # session["app"]="iscatterplot"
-        # session["df"]=volcano_df.to_json()
 
         return dcc.Location(pathname=f"{PAGE_PREFIX}/scatterplot/", id="index")
 
@@ -796,24 +781,37 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
             genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
             annotate_genes=annotate_genes+genenames_     
         ma_plot, ma_pa, ma_df=make_ma_plot(dge, dge_datasets[0],annotate_genes )
-        # reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         ma_pa["xcols"]=ma_df.columns.tolist()
         ma_pa["ycols"]=ma_df.columns.tolist()
-        ma_pa["groups"]=["None"]+ma_df.columns.tolist()
+        ma_pa["groups"]=ma_df.columns.tolist()
 
         ma_df["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
         ma_df=ma_df.drop(["___label___"],axis=1)
-        ma_pa["labels_col"]=["select a column.."]+ma_df.columns.tolist()
-        ma_pa["labels_col_value"]="select a column.."
+        ma_pa["labels_col"]=ma_df.columns.tolist()
 
-        session["filename"]="<from RNAseq lake>"
-        session["plot_arguments"]=ma_pa
-        session["COMMIT"]=app.config['COMMIT']
-        session["app"]="iscatterplot"
+        session_data={ "APP_VERSION": app.config['APP_VERSION'],
+            "session_data": 
+                {
+                    "app": 
+                    {
+                        "scatterplot": 
+                        {
+                            "df": ma_df.to_json() ,
+                            "filename": "from.datalake.json", 
+                            "last_modified": datetime.now().timestamp(), 
+                            "pa": ma_pa
+                        }
+                    }
+                }
+            }
+                        
+        session_data=encode_session_app(session_data)
+        session["session_data"]=session_data
+        from time import sleep
+        sleep(2)
 
-        session["df"]=ma_df.to_json()
-        return dcc.Location(pathname="/scatterplot", id="index")
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/scatterplot/", id="index")
 
 @dashapp.callback(
     Output("redirect-pca", 'children'),
@@ -828,7 +826,6 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
         pca_data=filter_gene_expression(ids2labels,None,None,cache)
         selected_sets=list(set(selected_results_files["Set"]))
         pca_plot, pca_pa, pca_df=make_pca_plot(pca_data,selected_sets[0])
-        # reset_info=check_session_app(session,"iscatterplot",current_user.user_apps)
 
         pca_pa["xcols"]=pca_df.columns.tolist()
         pca_pa["ycols"]=pca_df.columns.tolist()
@@ -836,13 +833,29 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
         pca_pa["labels_col"]=["select a column.."]+pca_df.columns.tolist()
         pca_pa["labels_col_value"]="select a column.."
 
-        session["filename"]="<from RNAseq lake>"
-        session["plot_arguments"]=pca_pa
-        session["COMMIT"]=app.config['COMMIT']
-        session["app"]="iscatterplot"
+        session_data={ 
+            "APP_VERSION": app.config['APP_VERSION'],
+            "session_data": 
+                {
+                    "app": 
+                    {
+                        "scatterplot": 
+                        {
+                            "df": pca_df.to_json() ,
+                            "filename": "from.datalake.json", 
+                            "last_modified": datetime.now().timestamp(), 
+                            "pa": pca_pa
+                        }
+                    }
+                }
+            }
+                        
+        session_data=encode_session_app(session_data)
+        session["session_data"]=session_data
+        from time import sleep
+        sleep(2)
 
-        session["df"]=pca_df.to_json()
-        return dcc.Location(pathname="/scatterplot", id="index")
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/scatterplot/", id="index")
 
 @dashapp.callback(
     Output("download-samples", "data"),
