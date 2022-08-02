@@ -260,7 +260,7 @@ def make_pca_plot(df,dataset):
     cols=[ cols[0], fix_comp( cols[1] ),  fix_comp( cols[2] )]
     projected.columns=cols
 
-    samples=projected["row"].tolist()
+    samples=projected[cols[0]].tolist()
     groups=[ s[:-2] for s in samples ]
     projected["Group"]=groups
     groups=list(set(groups))
@@ -290,7 +290,7 @@ def make_pca_plot(df,dataset):
     pa["xlabel"]=cols[1]
     pa["ylabel"]=cols[2]
     pa["marker_alpha"]="1"
-    pa["labels_col_value"]="row"
+    pa["labels_col_value"]=cols[0]
     pa["groups_value"]="Group"
     pa["list_of_groups"]=list(groups.keys())
 

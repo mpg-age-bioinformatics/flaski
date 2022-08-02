@@ -85,43 +85,6 @@ card_body_style={ "padding":"2px", "padding-top":"4px"}
     Input('session-id', 'data')
     )
 def make_layout(session_id):
-    selected_results_files, ids2labels=filter_samples(datasets=None,groups=None, reps=None, cache=cache)    
-    
-    ## samples
-    results_files=selected_results_files[["Set","Group","Reps"]]
-    results_files.columns=["Set","Group","Sample"]
-    results_files=results_files.drop_duplicates()      
-    results_files_=make_table(results_files,"results_files")
-    # results_files_ = dbc.Table.from_dataframe(results_files, striped=True, bordered=True, hover=True)
-    download_samples=html.Div( 
-        [
-            html.Button(id='btn-samples', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-            dcc.Download(id="download-samples")
-        ]
-    )
-
-    print("12 -- else")
-    minwidth=["Samples"]
-    # minwidth=len(minwidth) * 150
-    # minwidth = str(minwidth) + "px"
-
-    # results_files_=change_table_minWidth(results_files_,minwidth)
-
-    out=dcc.Tabs( 
-        [ 
-            dcc.Tab(
-                [ 
-                    results_files_, 
-                    download_samples
-                ], 
-                label="Samples", id="tab-samples",
-                style={"margin-top":"0%"}
-            ),
-        ],  
-        mobile_breakpoint=0,
-        style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-    print(out)
-
 
     ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit aadatalake")
@@ -140,24 +103,32 @@ def make_layout(session_id):
                 [
                     dbc.Col( 
                         [
-                            dbc.Card(
+                            dcc.Loading(
                                 [
-                                    html.H5("Filters", style={"margin-top":10}), 
-                                    html.Label('Data sets'), dcc.Dropdown( id='opt-datasets', multi=True),
-                                    html.Label('Groups',style={"margin-top":10}), dcc.Dropdown( id='opt-groups', multi=True),
-                                    html.Label('Samples',style={"margin-top":10}), dcc.Dropdown( id='opt-samples', multi=True),
-                                    html.Label('Gene names',style={"margin-top":10}), dcc.Dropdown( id='opt-genenames', multi=True),
-                                    html.Label('Gene IDs',style={"margin-top":10}), dcc.Dropdown( id='opt-geneids', multi=True),
-                                    # html.Label('Download file prefix',style={"margin-top":10}), dcc.Input(id='download_name', value="data.lake", type='text')
+                                    dbc.Card(
+                                        [
+                                            html.H5("Filters", style={"margin-top":10}), 
+                                            html.Label('Data sets'), dcc.Dropdown( id='opt-datasets', multi=True),
+                                            html.Label('Groups',style={"margin-top":10}), dcc.Dropdown( id='opt-groups', multi=True),
+                                            html.Label('Samples',style={"margin-top":10}), dcc.Dropdown( id='opt-samples', multi=True),
+                                            html.Label('Gene names',style={"margin-top":10}), dcc.Dropdown( id='opt-genenames', multi=True),
+                                            html.Label('Gene IDs',style={"margin-top":10}), dcc.Dropdown( id='opt-geneids', multi=True),
+                                            html.Label('Download file prefix',style={"margin-top":10}), 
+                                            dcc.Input(id='download_name', value="data.lake", type='text',style={"width":"100%", "height":"34px"})
+                                        ],
+                                        body=True
+                                    ),
+                                    dbc.Button(
+                                        'Submit',
+                                        id='submit-button-state', 
+                                        color="secondary",
+                                        n_clicks=0, 
+                                        style={"width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
+                                    )
                                 ],
-                                body=True
-                            ),
-                            dbc.Button(
-                                'Submit',
-                                id='submit-button-state', 
-                                color="secondary",
-                                n_clicks=0, 
-                                style={"width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
+                                id="loading-output",
+                                type="default",
+                                style={"margin-top":"50%","height": "100%"} 
                             )
                         ],
                         sm=12,md=6,lg=4,xl=3,
@@ -197,9 +168,9 @@ def make_layout(session_id):
     State("opt-samples", "value"),
     State("opt-genenames", "value"),
     State("opt-geneids", "value"),
-    # State('download_name','value'),
+    State('download_name','value'),
 )
-def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids):
+def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
     
     ## samples
@@ -251,11 +222,11 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
         bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
  
-        download_bar=html.Div( 
-        [   
-            html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-            dcc.Download(id="download-bar")
-        ])      
+        # download_bar=html.Div( 
+        # [   
+        #     html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+        #     dcc.Download(id="download-bar")
+        # ])      
         gene_expression_bar_bol=True
     else:
         gene_expression_bar_bol=False
@@ -271,7 +242,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         
         iscatter_pca=html.Div( 
         [
-            html.Button(id='btn-iscatter_pca', n_clicks=0, children='iScatterplot', 
+            html.Button(id='btn-iscatter_pca', n_clicks=0, children='Scatterplot', 
             style={"margin-top":4, \
                 "margin-left":4,\
                 "margin-right":4,\
@@ -321,7 +292,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
                 iscatter_volcano=html.Div( 
                 [
-                    html.Button(id='btn-iscatter_volcano', n_clicks=0, children='iScatterplot', 
+                    html.Button(id='btn-iscatter_volcano', n_clicks=0, children='Scatterplot', 
                     style={"margin-top":4, \
                         "margin-left":4,\
                         "margin-right":4,\
@@ -336,7 +307,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
                 iscatter_ma=html.Div( 
                 [
-                    html.Button(id='btn-iscatter_ma', n_clicks=0, children='iScatterplot', 
+                    html.Button(id='btn-iscatter_ma', n_clicks=0, children='Scatterplot', 
                     style={"margin-top":4, \
                         "margin-left":4,\
                         "margin-right":4,\
@@ -344,29 +315,30 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                         "color":"white"})
                 ])
 
-                if len(genenames) == 1 or len(geneids) == 1:
-                    bar_df=dge.copy()
-                    
-                    cols_exclude=["gene id", "gene name","base Mean","log2 FC","lfc SE","p value","padj"]
+                if genenames or geneids:
+                    if len(genenames) == 1 or len(geneids) == 1:
+                        bar_df=dge.copy()
+                        
+                        cols_exclude=["gene id", "gene name","base Mean","log2 FC","lfc SE","p value","padj"]
 
-                    if genenames:
-                        label=genenames[0]
-                    elif geneids:
-                        label=geneids[0]
+                        if genenames:
+                            label=genenames[0]
+                        elif geneids:
+                            label=geneids[0]
 
-                    
-                    plot_height_=plot_height(selected_sets)
+                        
+                        plot_height_=plot_height(selected_sets)
 
-                    bar_plot=make_bar_plot(bar_df, cols_exclude, selected_sets, label)
-                    bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
-                    bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
-                    
-                    download_bar=html.Div( 
-                    [   
-                        html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-                        dcc.Download(id="download-bar")
-                    ])      
-                    gene_expression_bar_bol=True
+                        bar_plot=make_bar_plot(bar_df, cols_exclude, selected_sets, label)
+                        bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
+                        bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
+                        
+                        # download_bar=html.Div( 
+                        # [   
+                        #     html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+                        #     dcc.Download(id="download-bar")
+                        # ])      
+                        gene_expression_bar_bol=True
 
                 dge_bol=True
 
@@ -912,40 +884,40 @@ def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, filepre
     filename="%s.dge.xlsx" %fileprefix
     return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge", index=False)
 
-@dashapp.callback(
-    Output('download-bar', 'data'),
-    Input('btn-download-bar',"n_clicks"),
-    State('bar_plot', 'figure'),
-    State("opt-datasets", "value"),
-    State("opt-groups", "value"),
-    State("opt-samples", "value"),
-    State("download_name", "value"),
-    prevent_initial_call=True,
-)
-def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
-    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-    ## samples
-    results_files=selected_results_files[["Set","Group","Reps"]]
-    results_files.columns=["Set","Group","Sample"]
-    results_files=results_files.drop_duplicates()
-    selected_sets=list(set(results_files["Set"]))
+# @dashapp.callback(
+#     Output('download-bar', 'data'),
+#     Input('btn-download-bar',"n_clicks"),
+#     State('bar_plot', 'figure'),
+#     State("opt-datasets", "value"),
+#     State("opt-groups", "value"),
+#     State("opt-samples", "value"),
+#     State("download_name", "value"),
+#     prevent_initial_call=True,
+# )
+# def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
+#     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+#     ## samples
+#     results_files=selected_results_files[["Set","Group","Reps"]]
+#     results_files.columns=["Set","Group","Sample"]
+#     results_files=results_files.drop_duplicates()
+#     selected_sets=list(set(results_files["Set"]))
 
-    minheight=plot_height(selected_sets)
+#     minheight=plot_height(selected_sets)
 
-    fileprefix=secure_filename(str(download_name))
-    pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
+#     fileprefix=secure_filename(str(download_name))
+#     pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
     
-    if not pdf_filename:
-        pdf_filename="geneExp.bar.Plot.pdf"
-    pdf_filename=secure_filename(pdf_filename)
-    if pdf_filename.split(".")[-1] != "pdf":
-        pdf_filename=f'{pdf_filename}.pdf'
+#     if not pdf_filename:
+#         pdf_filename="geneExp.bar.Plot.pdf"
+#     pdf_filename=secure_filename(pdf_filename)
+#     if pdf_filename.split(".")[-1] != "pdf":
+#         pdf_filename=f'{pdf_filename}.pdf'
 
-    def write_image(figure, graph=figure):
-        fig=go.Figure(graph)
-        fig.write_image(figure, format="pdf", height=minheight, width=minheight)
+#     def write_image(figure, graph=figure):
+#         fig=go.Figure(graph)
+#         fig.write_image(figure, format="pdf", height=minheight, width=minheight)
         
-    return dcc.send_bytes(write_image, pdf_filename)
+#     return dcc.send_bytes(write_image, pdf_filename)
     
 
 @dashapp.callback(
