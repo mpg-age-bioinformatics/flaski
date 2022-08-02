@@ -1,4 +1,4 @@
-from myapp import app, PAGE_PREFIX
+from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
 from flask_login import current_user
 from flask_caching import Cache
 from flask import session
@@ -25,7 +25,7 @@ from datetime import datetime
 import shutil
 from time import sleep
 from myapp import db
-from myapp.models import UserLogging
+from myapp.models import UserLogging, PrivateRoutes
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge,\
         make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col, make_bar_plot, plot_height
@@ -85,6 +85,15 @@ card_body_style={ "padding":"2px", "padding-top":"4px"}
     Input('session-id', 'data')
     )
 def make_layout(session_id):
+    if "aadatalake" in PRIVATE_ROUTES :
+        appdb=PrivateRoutes.query.filter_by(route="aadatalake").first()
+        if not appdb:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        allowed_users=appdb.users
+        if not allowed_users:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        if current_user.id not in allowed_users :
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
 
     ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit aadatalake")
