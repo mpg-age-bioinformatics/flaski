@@ -78,7 +78,7 @@ def make_layout(pathname):
     db.session.commit()
     protected_content=html.Div(
         [
-            make_navbar_logged("Venndiagram",current_user),
+            make_navbar_logged("Venn diagram",current_user),
             html.Div(id="app-content"),
             navbar_A,
         ],

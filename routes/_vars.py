@@ -34,7 +34,7 @@ other_nav_dropdowns =[
                 "Violin plot":"/violinplot/",\
                 "Circular bar plot":"/circularbarplots/",\
                 "Dendrogram":"/dendrogram/",\
-                "Venndiagram":"/venndiagram/",\
+                "Venn diagram":"/venndiagram/",\
                 "GSEA plot":"/gseaplot/",\
                 "DAVID":"/david/",\
                 "Cell plot":"/cellplot/",\
