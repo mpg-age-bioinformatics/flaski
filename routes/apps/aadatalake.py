@@ -93,7 +93,9 @@ def make_layout(session_id):
         if not allowed_users:
             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
         if current_user.id not in allowed_users :
-            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+            allowed_domains=appdb.users_domains
+            if current_user.domain not in allowed_domains:
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
 
     ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit aadatalake")
