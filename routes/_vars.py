@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=['rnaseq', 'alphafold','aadatalake']
 _PUBLIC_VIEWS=['rnaseq', 'alphafold']
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=["lifespan", 'alphafold', "rnaseq", "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock", "aadatalake" ] #"circularbarplots"  "heatmap",
+    _DEV_ROUTES=["lifespan", 'alphafold', "rnaseq", "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock", "aadatalake" ] 
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -60,11 +60,8 @@ other_nav_dropdowns =[
                 "16S":"/sixteens/",\
                 "Variant Calling":"/varcal/",\
                 "Ribo-Seq":"/riboseq/",\
-<<<<<<< HEAD
                 "AlphaFold":"/alphafold/"\
-=======
                 "Methylation Clock":"/methylclock/",\
->>>>>>> d65695ce7d3a58d277c36df0a3cf9f84e68aaf6c
             } \
     }
 ]
