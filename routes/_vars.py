@@ -1,10 +1,10 @@
 import os
 
-_PRIVATE_ROUTES=['rnaseq','aadatalake']
-_PUBLIC_VIEWS=['rnaseq']
+_PRIVATE_ROUTES=['rnaseq', 'alphafold','aadatalake']
+_PUBLIC_VIEWS=['rnaseq', 'alphafold']
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=["lifespan", "rnaseq", "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "aadatalake" ] #"circularbarplots"  "heatmap",
+    _DEV_ROUTES=["lifespan", "rnaseq", 'alphafold', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq" ] #"circularbarplots"  "heatmap",
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -60,6 +60,7 @@ other_nav_dropdowns =[
                 "16S":"/sixteens/",\
                 "Variant Calling":"/varcal/",\
                 "Ribo-Seq":"/riboseq/",\
+                "AlphaFold":"/alphafold/"\
             } \
     }
 ]
