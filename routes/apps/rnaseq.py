@@ -64,10 +64,12 @@ def make_layout(pathname):
     eventlog = UserLogging(email=current_user.email, action="visit rnaseq")
     db.session.add(eventlog)
     db.session.commit()
+
     protected_content=html.Div(
         [
             make_navbar_logged("RNAseq",current_user),
-            html.Div(id="app-content"),
+            html.Div(id="app-content", style={"height":"84%","overflow":"scroll"}),
+            # html.Div(id="app-content", style={"height":"1380px","width":"100%","overflow":"scroll"}),
             navbar_A,
         ],
         style={"height":"100vh","verticalAlign":"center"}
@@ -342,7 +344,7 @@ Once you have been given access more information will be displayed on how to tra
             is_open=False,
         ),
     ]
-    
+
     return content
 
 
