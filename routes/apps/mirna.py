@@ -67,7 +67,7 @@ def make_layout(pathname):
     protected_content=html.Div(
         [
             make_navbar_logged("miRNA",current_user),
-            html.Div(id="app-content"),
+            html.Div(id="app-content", style={"height":"84%","overflow":"scroll"}),
             navbar_A,
         ],
         style={"height":"100vh","verticalAlign":"center"}

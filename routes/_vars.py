@@ -1,10 +1,10 @@
 import os
 
-_PRIVATE_ROUTES=['rnaseq', 'alphafold','aadatalake']
-_PUBLIC_VIEWS=['rnaseq', 'alphafold']
+_PRIVATE_ROUTES=['aadatalake',  'alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock"]
+_PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock"]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=["lifespan", 'alphafold', "rnaseq", "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock", "aadatalake" ] 
+    _DEV_ROUTES=[ "lifespan" ] 
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -60,7 +60,7 @@ other_nav_dropdowns =[
                 "16S":"/sixteens/",\
                 "Variant Calling":"/varcal/",\
                 "Ribo-Seq":"/riboseq/",\
-                "AlphaFold":"/alphafold/"\
+                "AlphaFold":"/alphafold/",\
                 "Methylation Clock":"/methylclock/",\
             } \
     }
