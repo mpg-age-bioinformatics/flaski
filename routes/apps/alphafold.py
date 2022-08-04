@@ -217,7 +217,7 @@ def update_output(n_clicks, email,group,name,sequence):
         df.to_csv(subdic["filename"].replace("json","tsv"), sep="\t", index=None, header=False)
         header="Success!"
         msg='''Please check your email for confirmation.'''
-        send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"].replace("json","tsv")), attachment_path=subdic["filename"].replace("json","tsv"))
 
     return header, msg
 

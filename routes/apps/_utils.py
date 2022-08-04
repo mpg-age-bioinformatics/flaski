@@ -491,10 +491,24 @@ def check_access(route):
         return header, msg
         
     users=route_obj.users
-    uid=current_user.id
-    if uid not in users :
-        header="ERROR"
-        msg='''You are not allowed to use this App.'''
-        return header, msg
+    if users:
+        uid=current_user.id
+        if uid not in users :
+            header="ERROR"
+            msg='''You are not allowed to use this App.'''
+            return header, msg
+    else:
+        udomain=current_user.domain 
+        domains=route_obj.users_domains
+        if ( udomain ) and ( domains ):
+            if udomain not in domains :
+                header="ERROR"
+                msg='''You are not allowed to use this App.'''
+                return header, msg
+
+        else:
+            header="ERROR"
+            msg='''This App needs to be configured. Please contact support.'''
+            return header, msg 
 
     return None, None
