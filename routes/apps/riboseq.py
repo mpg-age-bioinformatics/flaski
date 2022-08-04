@@ -494,9 +494,14 @@ def read_file(contents,filename,last_modified):
 
     values_to_return=[]
     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures" ,"wget" ]
+    # for f in fields_to_return:
+    #     # print(f, RiboSeq[RiboSeq["Field"]==f]["Value"].tolist() )
+    #     values_to_return.append(  RiboSeq[RiboSeq["Field"]==f]["Value"].tolist()[0]  )
+    
+    fields_on_file=RiboSeq["Field"].tolist()
     for f in fields_to_return:
-        print(f, RiboSeq[RiboSeq["Field"]==f]["Value"].tolist() )
-        values_to_return.append(  RiboSeq[RiboSeq["Field"]==f]["Value"].tolist()[0]  )
+        if f in  fields_on_file:
+            values_to_return.append(  RiboSeq[RiboSeq["Field"]==f]["Value"].tolist()[0]  )
 
     matching_df=make_table(Matching,'matching-table')
     matching_df.editable=True

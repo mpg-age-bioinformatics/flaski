@@ -393,8 +393,13 @@ def read_file(contents,filename,last_modified):
 
     values_to_return=[]
     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "rrbs", "wget" ]
+    # for f in fields_to_return:
+    #     values_to_return.append(  methylclock[methylclock["Field"]==f]["Value"].tolist()[0]  )
+
+    fields_on_file=methylclock["Field"].tolist()
     for f in fields_to_return:
-        values_to_return.append(  methylclock[methylclock["Field"]==f]["Value"].tolist()[0]  )
+        if f in  fields_on_file:
+            values_to_return.append(  methylclock[methylclock["Field"]==f]["Value"].tolist()[0]  )
 
     return [ input_df ] +  values_to_return + [ filename ]
 
