@@ -56,10 +56,18 @@ def make_layout(pathname):
                 route_obj=PrivateRoutes.query.filter_by(route=app_route).first()
                 if not route_obj :
                     continue
+
                 users=route_obj.users
+                if not users :
+                    continue
+
                 uid=current_user.id
                 if uid not in users :
-                    continue
+                    udomains=route_obj.users_domains
+                    if not udomains:
+                        continue
+                    if current_user.domain not in udomains :
+                        continue
             l_=links_dic[l]
             link_icon=dbc.Col(
                 [

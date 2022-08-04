@@ -1,6 +1,6 @@
 import os
 
-_PRIVATE_ROUTES=['aadatalake',  'alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock"]
+_PRIVATE_ROUTES=['aadatalake', 'alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock"]
 _PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock"]
 
 if os.environ['FLASK_ENV'] != "development" :
