@@ -18,9 +18,54 @@ from myapp.models import UserLogging, PrivateRoutes
 from werkzeug.utils import secure_filename
 from flask import jsonify, request
 
-@app.route('/v3/ip', methods=['GET'])
-def get_tasks():
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-        return jsonify({'REMOTE_ADDR': request.environ['REMOTE_ADDR']}), 200
-    else:
-        return jsonify({'REMOTE_ADDR': request.environ['REMOTE_ADDR'],'HTTP_X_FORWARDED_FOR': request.environ['HTTP_X_FORWARDED_FOR']}), 200
+# @app.route('/v3/ip', methods=['GET'])
+# def get_tasks():
+#     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+#         return jsonify({'REMOTE_ADDR': request.environ['REMOTE_ADDR']}), 200
+#     else:
+#         return jsonify({'REMOTE_ADDR': request.environ['REMOTE_ADDR'],'HTTP_X_FORWARDED_FOR': request.environ['HTTP_X_FORWARDED_FOR']}), 200
+
+
+FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+
+dashapp = dash.Dash("ip",url_base_pathname=f'{PAGE_PREFIX}/ip/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"],  assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/") update_title='Load...', 
+
+protect_dashviews(dashapp)
+
+if app.config["SESSION_TYPE"] == "sqlalchemy":
+    import sqlalchemy
+    engine = sqlalchemy.create_engine(app.config["SQLALCHEMY_DATABASE_URI"] , echo=True)
+    app.config["SESSION_SQLALCHEMY"] = engine
+elif app.config["CACHE_TYPE"] == "RedisCache" :
+    cache = Cache(dashapp.server, config={
+        'CACHE_TYPE': 'RedisCache',
+        'CACHE_REDIS_URL': 'redis://:%s@%s' %( os.environ.get('REDIS_PASSWORD'), app.config['REDIS_ADDRESS'] )  #'redis://localhost:6379'),
+    })
+elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
+    cache = Cache(dashapp.server, config={
+        'CACHE_TYPE': 'RedisSentinelCache',
+        'CACHE_REDIS_SENTINELS': [ 
+            [ os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port') ]
+        ],
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
+    })
+
+dashapp.layout=html.Div( 
+    [ 
+        dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
+        dcc.Location( id='url', refresh=True ),
+        html.Div( id="protected-content" ),
+    ] 
+)
+
+@dashapp.callback(
+    Output('protected-content', 'children'),
+    Input('url', 'pathname'))
+def make_layout(pathname):
+    headers_list = request.headers.getlist("HTTP_X_FORWARDED_FOR")
+    ip = headers_list[0] if headers_list else request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    return [ ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'] ]
+    # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+    #     return [ 'REMOTE_ADDR','\n', request.environ['REMOTE_ADDR'] ]
+    # else:
+    #     return [ 'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'] ]
