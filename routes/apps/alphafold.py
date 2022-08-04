@@ -7,7 +7,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
+from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_submission_file, send_submission_email, GROUPS_INITALS
 import os
 import uuid
 import io
@@ -200,10 +200,10 @@ GSRAHSSHLKSKKGQSTSRH\n\
     State('sequence', 'value'),
     prevent_initial_call=True )
 def update_output(n_clicks, email,group,name,sequence):
-    # header, msg = check_access( 'alphafold' )
+    header, msg = check_access( 'alphafold' )
     # header, msg = None, None    
-    # if msg :
-    #     return header, msg
+    if msg :
+        return header, msg
 
     subdic=make_submission_json( email,group, name, sequence)
 
