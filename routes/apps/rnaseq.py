@@ -15,6 +15,7 @@ import base64
 import pandas as pd
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
+from werkzeug.utils import secure_filename
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -280,9 +281,9 @@ Once you have been given access more information will be displayed on how to tra
             style={"margin-top":10,"margin-bottom":10}),  
         dbc.Row( 
             [
-                dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
+                dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right", 'display': 'none'}), 
+                dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%", 'display': 'none'} ) ,md=3 ),
+                dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3 , style={'display': 'none'}), 
             ], 
             style={"margin-top":10,"margin-bottom":10}),       
     ]

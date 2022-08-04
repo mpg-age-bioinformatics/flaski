@@ -15,6 +15,7 @@ import base64
 import pandas as pd
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
+from werkzeug.utils import secure_filename
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"

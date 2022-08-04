@@ -15,6 +15,8 @@ import base64
 import pandas as pd
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
+from werkzeug.utils import secure_filename
+
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -141,7 +143,7 @@ GSRAHSSHLKSKKGQSTSRH\n\
                 dbc.Row( 
                     [
                         dbc.Col( html.Label('email') ,md=2, style={"textAlign":"right" }), 
-                        dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value="", type='text', style={ "width":"100%"} ) ,md=5 ),
+                        dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value=current_user.email, type='text', style={ "width":"100%"} ) ,md=5 ),
                         dbc.Col( html.Label('your email address'),md=4  ), 
                     ], 
                     style={"margin-top":10}),
