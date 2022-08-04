@@ -64,7 +64,11 @@ dashapp.layout=html.Div(
 def make_layout(pathname):
     headers_list = request.headers.getlist("HTTP_X_FORWARDED_FOR")
     ip = headers_list[0] if headers_list else request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-    return [ ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'] ]
+    l=request.headers.getlist("X-Forwarded-For")
+    l="--".join(l)
+    r=request.access_route
+    r="--".join(r)
+    return ["r::", r, "//", "l::", l, "//", "X-Real-IP", request.headers['X-Real-IP'], "//","ip::", ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'] ]
     # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
     #     return [ 'REMOTE_ADDR','\n', request.environ['REMOTE_ADDR'] ]
     # else:
