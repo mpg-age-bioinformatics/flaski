@@ -16,8 +16,8 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
 find /backup/mariadb -maxdepth 1 -name 'latest.flaski.sql.gz' | tail -1 | xargs /restore.sh
 fi
 
-echo "${CRON_TIME} /backup.sh >> /mysql_backup.log 2>&1" > /crontab.conf
-echo "${CRON_TIME} rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ >> /rsync.log 2>&1" >> /crontab.conf
+echo "${CRON_TIME} /backup.sh >> /backup/backup.log 2>&1" > /crontab.conf
+# echo "${CRON_TIME} rsync -rtvh --delete /flaski_data/users/ /backup/users_data/ >> /rsync.log 2>&1" >> /crontab.conf
 crontab /crontab.conf
 echo "=> Running cron task manager"
 exec crond -f

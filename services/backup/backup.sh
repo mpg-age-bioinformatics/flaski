@@ -38,4 +38,8 @@ then
   done
 fi
 
+rsync -rtvh --delete /flaski_data/users/ /backup/users_data/
+
+chown -R flaski:flaski /backup/users_data
+
 echo "=> Backup process finished at $(date "+%Y-%m-%d %H:%M:%S")"
