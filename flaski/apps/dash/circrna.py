@@ -35,23 +35,23 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
     })
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc]}, index=list(range(7)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "strand", "DCC parameter"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, strand, dcc_parameter]}, index=list(range(9)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".circRNA.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter)
 
 
 # base samples input dataframe and example dataframe
@@ -97,6 +97,7 @@ external_=make_options(["External"])
 organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
 organisms_=make_options(organisms)
 ercc_=make_options(["YES","NO"])
+strand_=make_options(["fr-firststrand","fr-secondstrand","unstranded"])
 
 # arguments 
 arguments=[ dbc.Row( [
@@ -133,7 +134,17 @@ arguments=[ dbc.Row( [
                 dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
-                ], style={"margin-top":10,"margin-bottom":10}),        
+                ], style={"margin-top":10,"margin-bottom":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('Strand') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-strand', options=strand_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Most sequencing will be fr-firststrand or unstranded'),md=3  ), 
+                ], style={"margin-top":10,"margin-bottom":10}),
+            dbc.Row( [
+                dbc.Col( html.Label('DCC parameter') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='dcc_parameter', placeholder="e.g. 4 3", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('e.g. keep circRNAs supported by at least 4 reads in at least 3 samples.'),md=4  ), 
+                ], style={"margin-top":10}),
 ]
 
 # input 
@@ -189,8 +200,10 @@ dashapp.layout = html.Div( [ html.Div(id="navbar"), dbc.Container(
     State('project_title', 'value'),
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
+    State('opt-strand', 'value'),
+    State('dcc_parameter', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc):
+def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter):
     apps=read_private_apps(current_user.email,app)
     apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
@@ -198,7 +211,7 @@ def update_output(session_id, n_clicks, rows, email,group,folder,md5sums,project
     if CURRENTAPP not in apps:
         return dbc.Alert('''You do not have access to this App.''',color="danger")
 
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,strand,dcc_parameter)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     # print(subdic["filename"])
