@@ -25,6 +25,9 @@ from time import sleep
 from myapp import db
 from myapp.models import UserLogging
 
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
+
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 

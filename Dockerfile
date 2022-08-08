@@ -8,6 +8,9 @@ LABEL maintainer "bioinformatics@age.mpg.de"
 ARG APP_VERSION
 ENV APP_VERSION ${APP_VERSION}
 
+ARG PYFLASKI_VERSION
+ENV PYFLASKI_VERSION ${PYFLASKI_VERSION}
+
 USER root
 
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt

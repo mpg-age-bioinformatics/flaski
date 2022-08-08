@@ -1,4 +1,9 @@
 from myapp import app
+import os
+
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
+
 v=app.config["APP_VERSION"]
 v=str(v)
 
@@ -41,5 +46,5 @@ The Bioinformatics Core Facility of the Max Planck Institute for Biology of Agei
 
 ##### Version
 
-{v}
+{v} // pyflaski #{PYFLASKI_VERSION}
 '''

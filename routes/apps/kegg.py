@@ -77,7 +77,8 @@ def make_table_kegg(df,id,page_size=50,fixed_columns=False):
 
     return report_table
 
-
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
 dashapp = dash.Dash("kegg",url_base_pathname=f'{PAGE_PREFIX}/kegg/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
