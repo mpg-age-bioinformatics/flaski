@@ -181,9 +181,8 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
     #style_table={"height": "75vh", "maxHeight": "75vh",'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
 
     def reshape_tables(table):
-        # del(table.style_table["height"])
         table.style_table["height"]="68vh"
-        table.style_table["min-height"]="68vh"
+        # table.style_table["min-height"]="68vh"
         return table
 
     input_df=make_table(input_df,'adding-rows-table')
@@ -389,7 +388,7 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     # if CURRENTAPP not in apps:
     #     return dbc.Alert('''You do not have access to this App.''',color="danger")
     header, msg = check_access( 'rnaseq' )
-    header, msg = None, None # for local debugging 
+    # header, msg = None, None # for local debugging 
     if msg :
         return header, msg
 
