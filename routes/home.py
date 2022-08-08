@@ -41,7 +41,7 @@ def make_layout(pathname):
             ),
             align="center",
             justify="center",
-            style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%"}
+            style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%", "background-color":"#4d4d4d","color":"white","height":"150px","width":"100%"}
         )
 
         container_children.append(label_title)
@@ -78,7 +78,7 @@ def make_layout(pathname):
                         ],
                         href=f'{PAGE_PREFIX}{l_}',
                         refresh=True,
-                        style={"color":"black","text-decoration": "none"}
+                        style={"color":"#4d4d4d","text-decoration": "none"}
                     )                        
                 ],
                 align="center",
@@ -117,7 +117,7 @@ def make_layout(pathname):
             ),
             navbar_A
         ],
-        style={"height":"100vh","verticalAlign":"center"}
+        style={"height":"100vh","verticalAlign":"center","width":"100%","padding":"0px","margin":"0px"}
     )
     return protected_content
 
