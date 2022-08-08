@@ -68,7 +68,7 @@ def make_layout(pathname):
     protected_content=html.Div(
         [
             make_navbar_logged("GSEA",current_user),
-            html.Div(id="app-content", style={"height":"84%","overflow":"scroll"}),
+            html.Div(id="app-content", style={"height":"87%","overflow":"scroll"}),
             # html.Div(id="app-content", style={"height":"1380px","width":"100%","overflow":"scroll"}),
             navbar_A,
         ],
@@ -178,19 +178,33 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
             'whiteSpace': 'normal'
         }
 
+    #style_table={"height": "75vh", "maxHeight": "75vh",'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
+
+    def reshape_tables(table):
+        # del(table.style_table["height"])
+        table.style_table["height"]="68vh"
+        table.style_table["min-height"]="68vh"
+        return table
+
     input_df=make_table(input_df,'adding-rows-table')
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df=reshape_tables(input_df)
+
 
     example_input=make_table(example_input,'example-table')
     example_input.style_cell=style_cell
+    example_input=reshape_tables(example_input)
+
 
     exp_matrix=exp_matrix.split("\n")
     exp_matrix=[ s.split("\t") for s in exp_matrix ]
     exp_matrix=pd.DataFrame(exp_matrix[1:], columns=exp_matrix[0])
     exp_matrix=make_table(exp_matrix,'expression-table')
     exp_matrix.style_cell=style_cell
+    exp_matrix=reshape_tables(exp_matrix)
+
 
     genes_sets=genes_sets.split("\n")
     genes_sets=[ s.split("\t") for s in genes_sets ]
@@ -204,6 +218,8 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
     genes_sets=pd.DataFrame(genes_sets, columns=genes_sets_cols)
     genes_sets=make_table(genes_sets,'genes_sets-table')
     genes_sets.style_cell=style_cell
+    genes_sets=reshape_tables(genes_sets)
+
 
     # generate dropdown options
     groups_=make_options(GROUPS)
@@ -211,6 +227,17 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
     organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri"]
     organisms_=make_options(organisms)
     ercc_=make_options(["YES","NO"])
+
+    user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+
+    #if user_domain[-len(mps_domain):] == mps_domain :
+    if user_domain =="age.mpg.de" :
+        groups_=make_options(GROUPS)
+        groups_val=None
+    else:
+        groups_=make_options(["External"])
+        groups_val="External"
 
     # arguments 
     arguments=[ dbc.Row( [
@@ -220,7 +247,7 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
                 ], style={"margin-top":10, "margin-bottom":5}),
             dbc.Row( [
                 dbc.Col( html.Label('Group') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, style={ "width":"100%","height":"35px"}),md=3 ),
+                dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, value=groups_val, style={ "width":"100%","height":"35px"}),md=3 ),
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
                 ], style={"margin-top":5, "margin-bottom":5}),
             dbc.Row( [
@@ -298,8 +325,19 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
             ],
             body=False),
             html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
-            html.Div(id="message"),
-            html.Div(id="message2")
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),
+                    dbc.ModalBody("If this message does not change in a few seconds than something went wrong!", id="modal_body"),
+                    dbc.ModalFooter(
+                        dbc.Button(
+                            "Close", id="close", className="ms-auto", n_clicks=0
+                        )
+                    ),
+                ],
+                id="modal",
+                is_open=False,
+            ),
     ]
 
     return main_input
@@ -330,7 +368,8 @@ def upload_genesets(session_id, contents,filename, last_modified):
     return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
     
 @dashapp.callback(
-    Output('message', component_property='children'),
+    Output("modal_header", "children"),
+    Output("modal_body", "children"),
     Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
@@ -343,12 +382,16 @@ def upload_genesets(session_id, contents,filename, last_modified):
     State('reference_group', 'value'),
     prevent_initial_call=True )
 def update_output(session_id, n_clicks, rows, expression, genessets, email,group,project_title,organism,ref):
-    apps=read_private_apps(current_user.email,app)
-    apps=[ s["link"] for s in apps ]
+    # apps=read_private_apps(current_user.email,app)
+    # apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None
-    if CURRENTAPP not in apps:
-        return dbc.Alert('''You do not have access to this App.''',color="danger")
+    # if CURRENTAPP not in apps:
+    #     return dbc.Alert('''You do not have access to this App.''',color="danger")
+    header, msg = check_access( 'rnaseq' )
+    header, msg = None, None # for local debugging 
+    if msg :
+        return header, msg
 
     subdic=generate_submission_file(rows, expression, genessets,  email,group,project_title,organism,ref)
     samples=pd.read_json(subdic["samples"])
@@ -361,19 +404,18 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     #{"filename": filename, "samples":df, "metadata":df_}
     validation=validate_metadata(metadata)
     if validation:
-        msg='''
-#### !! ATTENTION !!
-
-'''+validation
-        return dcc.Markdown(msg, style={"margin-top":"15px"} )
+        header="Attention"
+        return header, validation
 
     if os.path.isfile(subdic["filename"]):
+        header="Attention"
         msg='''You have already submitted this data. Re-submission will not take place.'''
     else:
-        msg='''**Submission successful**. Please check your email for confirmation.'''
+        header="Success!"
+        msg='''Please check your email for confirmation.'''
     
-    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
-        subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
+    # if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
+    #     subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
 
     # {"filename": filename, "samples":df, "expression":edf ,"metadata":df_, "gene_sets":gdf}
     EXCout=pd.ExcelWriter(subdic["filename"])
@@ -388,7 +430,7 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
         os.remove(subdic["filename"])
 
-    return dcc.Markdown(msg, style={"margin-top":"10px"} )
+    return header, msg
 
 # add rows buttom 
 @dashapp.callback(
@@ -401,20 +443,15 @@ def add_row(n_clicks, rows, columns):
         rows.append({c['id']: '' for c in columns})
     return rows
 
-# options and values based on in-house vs external users
-@dashapp.callback( 
-    Output("opt-group","options"),
-    Output("opt-group","value"),
-    Input('session-id', 'data') 
+@dashapp.callback(
+    Output("modal", "is_open"),
+    [Input("submit-button-state", "n_clicks"), Input("close", "n_clicks")],
+    [State("modal", "is_open")],
 )
-def make_readme(session_id):
-    apps=read_private_apps(current_user.email,app)
-    apps=[ s["link"] for s in apps ] 
-    
-    if "@age.mpg.de" in current_user.email:
-        return groups_, None
-    else:
-        return external_, "External"
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 @dashapp.callback(
     Output("navbar-collapse", "is_open"),
@@ -425,3 +462,5 @@ def toggle_navbar_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+
