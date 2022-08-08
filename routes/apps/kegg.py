@@ -530,6 +530,8 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         session_data={ "session_data": {"app": { "kegg": {"filename":upload_data_text,"last_modified":last_modified,"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
+        session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
