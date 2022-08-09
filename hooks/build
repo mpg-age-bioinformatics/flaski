@@ -20,7 +20,8 @@ if [ "${DOCKER_TAG}" == "latest" ] ;
     then 
         echo ":: Tag: ${DOCKER_TAG}"
         APP_VERSION=$(git rev-parse --short HEAD)
-        docker build --build-arg APP_VERSION=${APP_VERSION} --no-cache -t ${repoName}:latest .
+        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
+        docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest .
         docker push ${repoName}:latest && 
         echo ":: build & push tag: latest"
 
@@ -28,17 +29,19 @@ elif [ "${1}" == "nightly" ] ;
     then 
 
         APP_VERSION=$(git rev-parse --short HEAD)
+        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
         echo "- git #${APP_VERSION}"
         text=":: !FAILED! "
         git submodule update --recursive --remote && \
-        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-${2}" --build-arg APP_VERSION="nightly-${APP_VERSION}" --no-cache -t ${repoName}:nightly-${2} . && \
+        docker build --build-arg MYAPP_IMAGE="mpgagebioinformatics/myapp:nightly-${2}" --build-arg APP_VERSION="nightly-${APP_VERSION}" --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:nightly-${2} . && \
         text="- "
         echo "${text}build flaski:nightly-${2}"
         docker system prune -f 
 
 else
-    echo ":: Tag: ${DOCKER_TAG}"
-    docker build --build-arg APP_VERSION=${DOCKER_TAG} --no-cache -t ${repoName}:latest .
+    echo ":: Tag: ${DOCKER_TAG}"       
+    cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
+    docker build --build-arg APP_VERSION=${DOCKER_TAG} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest .
     docker tag ${repoName}:latest ${repoName}:${DOCKER_TAG}
     docker tag ${repoName}:latest ${repoName}:stable
     docker push ${repoName}:stable

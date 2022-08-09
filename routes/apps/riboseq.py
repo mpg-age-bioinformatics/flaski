@@ -252,17 +252,25 @@ Once you have been given access more information will be displayed on how to tra
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df.style_table["height"]="62vh"
+
 
     example_input=make_table(example_input,'example-table')
     example_input.style_cell=style_cell
+    example_input.style_table["height"]="68vh"
+
 
     matching_df=make_table(matching_df,'matching-table')
     matching_df.editable=True
     matching_df.row_deletable=True
     matching_df.style_cell=style_cell
+    matching_df.style_table["height"]="62vh"
+
 
     example_matching=make_table(example_matching,'matching-example-table')
     example_matching.style_cell=style_cell
+    example_matching.style_table["height"]="68vh"
+
 
     # arguments 
     arguments=[ 
@@ -371,7 +379,7 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
             ], 
-            style={"margin-top":10,"margin-bottom":10}),       
+            style={"margin-top":10,"margin-bottom":10, 'display': 'none'}),       
     ]
 
     content = [
@@ -483,7 +491,7 @@ def read_file(contents,filename,last_modified):
     samples = pd.read_excel(io.BytesIO(decoded), sheet_name="samples")
     RiboSeq = pd.read_excel(io.BytesIO(decoded), sheet_name="riboseq")
     Matching = pd.read_excel(io.BytesIO(decoded), sheet_name="matching")
-    print(RiboSeq)
+    # print(RiboSeq)
 
     samples = samples[ samples.columns.tolist()[:6]]
 
@@ -491,6 +499,8 @@ def read_file(contents,filename,last_modified):
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df.style_table["height"]="62vh"
+
 
     values_to_return=[]
     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures" ,"wget" ]
@@ -507,6 +517,8 @@ def read_file(contents,filename,last_modified):
     matching_df.editable=True
     matching_df.row_deletable=True
     matching_df.style_cell=style_cell
+    matching_df.style_table["height"]="62vh"
+
 
     return [ input_df ] + [ matching_df ] +  values_to_return + [ filename ]
 

@@ -25,6 +25,9 @@ from time import sleep
 from myapp import db
 from myapp.models import UserLogging
 
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
+
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
@@ -1431,9 +1434,13 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         if filename2:
             session_data={ "session_data": {"app": { "cellplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa, 'filename2':upload_data2_text, "df_ge": df_ge.to_json()} } } }
             session_data["APP_VERSION"]=app.config['APP_VERSION']
+            session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+
         else:
             session_data={ "session_data": {"app": { "cellplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa, 'filename2':upload_data2_text, "df_ge": df_ge} } } }
             session_data["APP_VERSION"]=app.config['APP_VERSION']
+            session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+
             
         
     except Exception as e:

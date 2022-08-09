@@ -251,17 +251,21 @@ Once you have been given access more information will be displayed on how to tra
     samples_df.editable=True
     samples_df.row_deletable=True
     samples_df.style_cell=style_cell
+    samples_df.style_table["height"]="62vh"
 
     samples_eg_df=make_table(samples_eg_df,'example-table')
     samples_eg_df.style_cell=style_cell
+    samples_eg_df.style_table["height"]="68vh"
 
     input_df=make_table(input_df,'input-table')
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df.style_table["height"]="62vh"
 
     input_eg_df=make_table(input_eg_df,'input-example-table')
     input_eg_df.style_cell=style_cell
+    input_eg_df.style_table["height"]="68vh"
 
     # arguments 
     arguments=[ 
@@ -349,7 +353,7 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
             ], 
-            style={"margin-top":10,"margin-bottom":10}), 
+            style={"margin-top":10,"margin-bottom":10, 'display': 'none'}), 
     ]
 
     content = [
@@ -468,11 +472,14 @@ def read_file(contents,filename,last_modified):
     samples_df.editable=True
     samples_df.row_deletable=True
     samples_df.style_cell=style_cell
+    samples_df.style_table["height"]="68vh"
+
 
     input_df=make_table(input,'input-table')
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df.style_table["height"]="68vh"
 
     values_to_return=[]
     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "seq", "Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "wget" ]

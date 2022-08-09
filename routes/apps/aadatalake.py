@@ -29,6 +29,9 @@ from myapp.models import UserLogging, PrivateRoutes
 from ._aadatalake import read_results_files, read_gene_expression, read_genes, read_significant_genes, \
     filter_samples, filter_genes, filter_gene_expression, nFormat, read_dge,\
         make_volcano_plot, make_ma_plot, make_pca_plot, make_annotated_col, make_bar_plot, plot_height
+        
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"

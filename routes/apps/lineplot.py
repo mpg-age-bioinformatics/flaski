@@ -25,7 +25,8 @@ from time import sleep
 from myapp import db
 from myapp.models import UserLogging
 
-
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
 dashapp = dash.Dash("lineplot",url_base_pathname=f'{PAGE_PREFIX}/lineplot/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
@@ -1244,6 +1245,8 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
 
         session_data={ "session_data": {"app": { "lineplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
+        session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))

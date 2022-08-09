@@ -225,9 +225,12 @@ Once you have been given access more information will be displayed on how to tra
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df.style_table["height"]="62vh"
 
     example_input=make_table(example_input,'example-table')
     example_input.style_cell=style_cell
+    example_input.style_table["height"]="68vh"
+
 
     # arguments 
     arguments=[ 
@@ -301,7 +304,7 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
             ], 
-            style={"margin-top":10,"margin-bottom":10}),       
+            style={"margin-top":10,"margin-bottom":10, 'display': 'none'}),       
     ]
 
     content = [
@@ -402,6 +405,7 @@ def read_file(contents,filename,last_modified):
     input_df.editable=True
     input_df.row_deletable=True
     input_df.style_cell=style_cell
+    input_df.style_table["height"]="62vh"
 
     values_to_return=[]
     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "model", "targeted Exomes", "wget" ]
