@@ -1301,10 +1301,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     
     try:
         fig, clusters_cols, clusters_rows, df_=make_figure(df,pa)
-        print(clusters_cols)
-        print(clusters_rows)
-        print(df_)
-        print(pa)
+        # print(clusters_cols)
+        # print(clusters_rows)
+        # print(df_)
+        # print(pa)
         # import plotly.graph_objects as go
         # fig = go.Figure( )
         # fig.update_layout( )

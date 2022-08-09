@@ -110,6 +110,7 @@ services:
     dockerfile: Dockerfile
     args:
       APP_VERSION: dev
+      PYFLASKI_VERSION: dev
   restart: always
   volumes:
    - ~/flaski23/submissions/:/submissions
@@ -197,7 +198,7 @@ services:
     args:
       BUILD_NAME: flaski
       MYAPP_VERSION: dev
-      UPGRADE_REQS: "no"  
+      UPGRADE_REQS: "no"
   entrypoint: /flaski/services/backup/entrypoint.sh
   user: root
   depends_on:
