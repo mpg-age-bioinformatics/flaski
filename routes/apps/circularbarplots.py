@@ -114,7 +114,7 @@ def make_app_content(pathname):
                     [
                         dbc.Col(
                                 [
-                                    dbc.Label("Angular Values"),
+                                    dbc.Label("Angular Values", style={"margin-bottom":"2px"}),
                                     dcc.Dropdown( placeholder="Angle column", id='angvals', multi=False)
                                 ],
                         ),
@@ -127,7 +127,7 @@ def make_app_content(pathname):
                     [
                         dbc.Col(
                                 [
-                                    dbc.Label("Radial Values" ),
+                                    dbc.Label("Radial Values", style={"margin-bottom":"2px", "margin-top":"10px"} ),
                                     dcc.Dropdown( placeholder="Radial column", id='radvals', multi=False)
                                 ],
                         ),
@@ -140,7 +140,7 @@ def make_app_content(pathname):
                     [
                         dbc.Col(
                                 [
-                                    dbc.Label("Bar Groups" ),
+                                    dbc.Label("Bar Groups", style={"margin-bottom":"2px", "margin-top":"10px"} ),
                                     dcc.Dropdown(placeholder="Groups column", id='groupval', multi=False)
                                 ],
                         ),
