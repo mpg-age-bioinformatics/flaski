@@ -309,8 +309,11 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
 
         users=User.query.filter_by(administrator=True)
         for u in users:
-            sfolder=os.path.join(app.config["USERS_DATA"], str(u.id) ,"__shared_sessions__" )
-            if not os.path.islink(sfolder):
+            ufolder=os.path.join( app.config["USERS_DATA"], str(u.id) )
+            sfolder=os.path.join( ufolder, "__shared_sessions__" )
+            if not os.path.islink( sfolder ):
+                if not os.path.isdir( ufolder ):
+                    os.mkdir( ufolder )
                 os.symlink(share_folder, sfolder)
 
     else:
