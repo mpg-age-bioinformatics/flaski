@@ -14,7 +14,7 @@ from datetime import datetime, date
 from flask import render_template
 from dash import dash_table
 import re
-from myapp.models import FTPSubmissions, PrivateRoutes
+from myapp.models import FTPSubmissions, PrivateRoutes, User
 import pymysql.cursors
 import hashlib
 import random
@@ -304,8 +304,15 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
         if not os.path.isdir(share_folder):
             os.makedirs(share_folder)
         session_file=tempfile.NamedTemporaryFile(dir=share_folder, suffix=".ses")
-        with open(session_file,"w") as fout:
+        with open(session_file.name,"w") as fout:
             json.dump(session_data, fout)
+
+        users=User.query.filter_by(administrator=True)
+        for u in users:
+            sfolder=os.path.join(app.config["USERS_DATA"], str(u.id) ,"__shared_sessions__" )
+            if not os.path.islink(sfolder):
+                os.symlink(share_folder, sfolder)
+
     else:
         session_file="no session file for this Exception"
 
@@ -313,9 +320,9 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
         sender=app.config['MAIL_USERNAME'],
         recipients=app.config['ADMINS'],
         text_body=render_template('email/app_help.txt',
-                                    user=user, eapp=current_app, emsg=tb_str, etime=str(datetime.now()), session_file=session_file),
+                                    user=user, eapp=current_app, emsg=tb_str, etime=str(datetime.now()), session_file=session_file.name),
         html_body=render_template('email/app_help.html',
-                                    user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file),\
+                                    user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file.name),\
         reply_to=user.email )      
 
 def send_submission_email(user,submission_type,submission_file, attachment_path,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):

@@ -125,7 +125,7 @@ def make_finder(contents, contents_df, sortby, user_path):
                 [
                     filename
                 ],
-                href=f'{PAGE_PREFIX}{ui_path_}', 
+                href=f'{PAGE_PREFIX}/storage/{ui_path_}', 
                 refresh=False
             )
         else:
@@ -210,8 +210,12 @@ def make_app_content(pathname,sortby):
     users_data=app.config['USERS_DATA']
     user_path=os.path.join(users_data, user_id)
 
+    # print( user_path, os.listdir(user_path) )
+
     if not os.path.isdir(user_path):
         os.makedirs(user_path)
+
+    # print("pathname",pathname)
 
     ui_path=pathname.split(f"{PAGE_PREFIX}/storage/", 1)[-1]
 
@@ -248,6 +252,8 @@ def make_app_content(pathname,sortby):
 
     os_path=os.path.join(user_path, ui_path)
 
+    # print("os_path", os_path)
+
     if load : 
         if not os.path.isfile(os_path):
             return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
@@ -278,7 +284,7 @@ def make_app_content(pathname,sortby):
 
         return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update, session_data
 
-    if not os.path.isdir( os_path ):
+    if ( not os.path.isdir( os_path ) ) and ( not os.path.islink(os_path) ):
         return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/", id='index'), dash.no_update, session_data
 
     ### demo dev section
@@ -637,7 +643,7 @@ def saveas_makedir(mkdir_n,saveas_n,  contents, upload_filename, last_modified, 
                 decoded=base64.b64decode(content_string)
                 decoded=decoded.decode('utf-8')
                 session_import=json.loads(decoded)
-                print(type(session_import))
+                # print(type(session_import))
                 keys = list(session_import.keys())
                 for k in ["APP_VERSION","session_data"]:
                     if k not in keys:
