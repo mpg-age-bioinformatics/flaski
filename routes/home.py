@@ -35,13 +35,14 @@ def make_layout(pathname):
         label_title=dbc.Row( 
             dbc.Col(
                 [
-                    html.H1(label, style={"font-size":"60px"} )
+                    html.H1(label, style={"font-size":"60px","width":"100%"} )
                 ],
-                align="center",
+                align="center"#,
+                #style={'textAlign':'center',"width":"100%"}
             ),
             align="center",
             justify="center",
-            style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%", "background-color":"#4d4d4d","color":"white","height":"150px","width":"100%"}
+            style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%", "background-color":"#4d4d4d","color":"white","height":"150px","min-width":"375px"}
         )
 
         container_children.append(label_title)
@@ -105,7 +106,7 @@ def make_layout(pathname):
             children=row,
             align="center",
             justify="evenly",
-            style={'textAlign':'center'}
+            style={'textAlign':'center',"width":"100%"}
         )
         container_children.append(row)
 
@@ -113,7 +114,7 @@ def make_layout(pathname):
         [
             dbc.Container(
                 container_children,
-                style={"min-height": "80vh"}
+                style={"min-height": "80vh","width":"100%"}
             ),
             navbar_A
         ],
