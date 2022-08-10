@@ -242,7 +242,7 @@ def make_app_content(pathname):
                                             [
                                                 dbc.Label("X label:",html_for='xlabel',style={"width":"60px","margin-top":"10px","text-align":"left"}),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["xlabel"],id='xlabel', placeholder=pa["xlabel"], type='text', style={"height":"35px","width":"280px", "margin-top":"5px"} ) , 
+                                                    dcc.Input(value=pa["xlabel"],id='xlabel', placeholder=pa["xlabel"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                     style={"margin-right":"5px"},
                                                 ),
                                                 
@@ -263,7 +263,7 @@ def make_app_content(pathname):
                                             [
                                                 dbc.Label("Y label:",html_for='ylabel',style={"width":"60px","margin-top":"10px"}),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["ylabel"],id='ylabel', placeholder=pa["ylabel"], type='text', style={"height":"35px","width":"280px", "margin-top":"5px"} ) , 
+                                                    dcc.Input(value=pa["ylabel"],id='ylabel', placeholder=pa["ylabel"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                     style={"margin-right":"5px"},
                                                 ),
                                                 dbc.Label("Size:",html_for='ylabels',style={"width":"40px","margin-top":"10px", "text-align":"left"}),
@@ -290,8 +290,8 @@ def make_app_content(pathname):
                                                             
                                                         ],
                                                         value=pa["show_axis"],
-                                                        labelStyle={'display': 'inline-block', "margin-right":"60px"},#,"height":"35px"}, "margin-right":"110px",
-                                                        style={"height":"35px","margin-top":"10px", "width":"100%" },
+                                                        labelStyle={'display': 'inline-block', "margin-right":"10px"},#,"height":"35px"}, "margin-right":"110px",
+                                                        style={"height":"35px","margin-top":"16px", "width":"100%" },
                                                         #inputStyle={"margin-right": "20px"},
                                                         id="show_axis"
                                                     ),
@@ -933,13 +933,13 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Width:", style={"margin-top":"10px", "width":"80px"}),
+                                        dbc.Label("Width:", style={"margin-top":"10px", "width":"60px"}),
                                         dbc.Col(
                                             dcc.Input(value=gpa["linewidth_write"], placeholder=gpa["linewidth_write"], type='text', id={'type':"linewidth_write","index":str(card_id)}, style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                             style={"margin-right":"5px"},
                                         ),
 
-                                        dbc.Label("Style:", style={"margin-top":"10px", "width":"80px"}),
+                                        dbc.Label("Style:", style={"margin-top":"10px", "width":"60px"}),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["linestyles"]), value=gpa["linestyle_value"], placeholder=gpa["linestyle_value"], 
                                             id={'type':"linestyle_value","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
@@ -953,7 +953,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Color:", style={"margin-top":"10px", "width":"80px"}),
+                                        dbc.Label("Color:", style={"margin-top":"10px", "width":"60px"}),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["line_colors"]), value=gpa["line_color_value"], placeholder=gpa["line_color_value"], 
                                             id={'type':"line_color_value","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
@@ -981,7 +981,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 dbc.Row(
                                     [
 
-                                        dbc.Label("Plot Settings:", style={'font-weight': 'bold', "margin-top":"20px"}),
+                                        dbc.Label("Plot Settings:", style={'font-weight': 'bold', "margin-top":"10px"}),
                                     ],
                                     className="g-1",
                                 ),
@@ -999,7 +999,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                                 ],
                                                 value=gpa["model_settings"],
                                                 labelStyle={'display': 'inline-block', "margin-right":"20px"},#,"height":"35px"}, "margin-right":"110px",
-                                                style={"height":"35px", "width":"100%" , "margin-bottom":"10px"}, #"margin-top":"2px
+                                                style={"height":"35px", "width":"100%" , "margin-bottom":"30px"}, #"margin-top":"2px
                                                 #inputStyle={"margin-right": "20px"},
                                                 id={'type':"model_settings","index":str(card_id)}
                                             ),
@@ -1091,14 +1091,14 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Shape:", style={"margin-top":"10px", "width":"80px"}),
+                                        dbc.Label("Shape:", style={"margin-top":"10px", "width":"60px"}),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["censor_marker"]), value=gpa["censor_marker_value"], placeholder=gpa["censor_marker_value"], 
                                             id={'type':"censor_marker_value","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
                                             style={"margin-right":"5px"},
                                         ),
 
-                                        dbc.Label("Size:", style={"margin-top":"10px", "width":"80px"}),
+                                        dbc.Label("Size:", style={"margin-top":"10px", "width":"60px"}),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["censor_marker_size"]), value=gpa["censor_marker_size_val"], placeholder=gpa["censor_marker_size_val"], 
                                             id={'type':"censor_marker_size_val","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
@@ -1112,14 +1112,14 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ############################################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Edge width:", style={"margin-top":"10px", "width":"120px"}),
+                                        dbc.Label("Edge width:", style={"margin-top":"10px", "width":"100px"}),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["edge_linewidths"]), value=gpa["edge_linewidth"], placeholder=gpa["edge_linewidth"], 
                                             id={'type':"edge_linewidth","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
                                             style={"margin-right":"5px"},
                                         ),
 
-                                        dbc.Label("Face color:", style={"margin-top":"10px", "width":"120px"}),
+                                        dbc.Label("Face color:", style={"margin-top":"10px", "width":"100px"}),
                                         dbc.Col(
                                             dcc.Dropdown( options=make_options(pa["marker_color"]), value=gpa["markerc"], placeholder=gpa["markerc"], 
                                             id={'type':"markerc","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
@@ -1184,8 +1184,8 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
 
                             ],
                         ),
-                        #style=card_body_style),
-                        style={"margin-top":"2px","margin-bottom":"2px"} ),
+                        style=card_body_style),
+                        #style={"margin-top":"2px","margin-bottom":"2px"} ),
                     id={'type':"collapse-dynamic-card","index":str(card_id)},
                     is_open=False,
                 ),

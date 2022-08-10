@@ -221,7 +221,7 @@ def make_app_content(pathname):
                                             dbc.Label("Title color:",html_for="title_color", style={"margin-top":"10px", "width":"90px"}), #"margin-top":"8px",
                                             dbc.Col(
                                                 dcc.Dropdown( options=make_options(pa["title_colors"]), value=pa["title_color"], placeholder=pa["title_color"], 
-                                                id='title_color', multi=False, clearable=False, style={"margin-top":"5px", "width":"167px"}),
+                                                id='title_color', multi=False, clearable=False, style={"margin-top":"5px", "width":"100%"}),
                                                 
                                             ) 
                                         ],
@@ -374,13 +374,13 @@ def make_app_content(pathname):
                                     [ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Background:",html_for='legend_bgcolor', style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Background:",html_for='legend_bgcolor', style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_colors"]), value=pa["legend_bgcolor"], placeholder=pa["legend_bgcolor"], 
                                                     id='legend_bgcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Border:",html_for='legend_bordercolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Border:",html_for='legend_bordercolor',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_colors"]), value=pa["legend_bordercolor"], placeholder=pa["legend_bordercolor"], 
                                                     id='legend_bordercolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
@@ -393,12 +393,12 @@ def make_app_content(pathname):
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Borderwidth:",html_for='legend_borderwidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Borderwidth:",html_for='legend_borderwidth',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["legend_borderwidth"],id='legend_borderwidth', placeholder=pa["legend_borderwidth"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                 style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Orientation:",html_for='legend_orientation', style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Orientation:",html_for='legend_orientation', style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_orientations"]), value=pa["legend_orientation"], placeholder=pa["legend_orientation"], 
                                                     id='legend_orientation', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
@@ -411,13 +411,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Label font:",html_for='legend_title_font',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Label font:",html_for='legend_title_font',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_title_sizes"]), value=pa["legend_title_font"], placeholder=pa["legend_title_font"], 
                                                     id='legend_title_font', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"},
                                                 ),
-                                                dbc.Label("Title font:",html_for='legend_text_font',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Title font:",html_for='legend_text_font',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["legend_text_sizes"]), value=pa["legend_text_font"], placeholder=pa["legend_text_font"], 
                                                     id='legend_text_font', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
@@ -465,8 +465,8 @@ def make_app_content(pathname):
                                                             
                                                         ],
                                                         value=["angular_ticklabels"],
-                                                        labelStyle={'display': 'inline-block', "margin-right":"110px"},#,"height":"35px"}, "margin-right":"110px",
-                                                        style={"height":"35px","margin-top":"10px", "width":"100%" },
+                                                        labelStyle={'display': 'inline-block', "margin-right":"40px"},#,"height":"35px"}, "margin-right":"110px",
+                                                        style={"height":"35px","margin-top":"16px", "width":"100%" },
                                                         #inputStyle={"margin-right": "20px"},
                                                         id="angular_features"
                                                     ),
@@ -479,13 +479,13 @@ def make_app_content(pathname):
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Grid color:",html_for='angular_gridcolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Grid color:",html_for='angular_gridcolor',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_gridcolors"]), value=pa["angular_gridcolor"], placeholder=pa["angular_gridcolor"], 
                                                     id='angular_gridcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Grid width:",html_for='angular_gridwidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Grid width:",html_for='angular_gridwidth',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["angular_gridwidth"],id='angular_gridwidth', placeholder=pa["angular_gridwidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 ),
@@ -497,13 +497,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Line color:",html_for='angular_linecolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Line color:",html_for='angular_linecolor',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_linecolors"]), value=pa["angular_linecolor"], placeholder=pa["angular_linecolor"], 
                                                     id='angular_linecolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Line width:",html_for='angular_linewidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Line width:",html_for='angular_linewidth',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["angular_linewidth"],id='angular_linewidth', placeholder=pa["angular_linewidth"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                 
@@ -516,13 +516,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick color:",html_for='angular_tickcolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick color:",html_for='angular_tickcolor',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_tickcolors"]), value=pa["angular_tickcolor"], placeholder=pa["angular_tickcolor"], 
                                                     id='angular_tickcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Tick length:",html_for='angular_ticklen',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick length:",html_for='angular_ticklen',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["angular_ticklen"],id='angular_ticklen', placeholder=pa["angular_ticklen"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 
@@ -535,13 +535,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick angle:",html_for='angular_tickangle',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick angle:",html_for='angular_tickangle',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["angular_tickangle"],id='angular_tickangle', placeholder=pa["angular_tickangle"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 style={"margin-right":"5px"}
                                                 
                                                 ),
-                                                dbc.Label("Tick width:",html_for='angular_tickwidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick width:",html_for='angular_tickwidth',style={"margin-top":"10px", "width":"90px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["angular_tickwidth"],id='angular_tickwidth', placeholder=pa["angular_tickwidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 
@@ -557,8 +557,8 @@ def make_app_content(pathname):
                                                 dbc.Label("Tick direction:",html_for='angular_ticks',style={"margin-top":"10px", "width":"120px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["angular_tickDirections"]), value=pa["angular_ticks"], placeholder=pa["angular_ticks"], 
-                                                    id='angular_ticks', multi=False, clearable=False, style={"width":"140px", "margin-top":"5px", "text-align":"left"}),
-                                                    style={"margin-right":"5px"}
+                                                    id='angular_ticks', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
+                                                    
                                                 ),
 
                                             ],
@@ -603,7 +603,7 @@ def make_app_content(pathname):
                                                             
                                                         ],
                                                         value=["radial_visibility"],
-                                                        labelStyle={'display': 'inline-block',"margin-right":"60px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block',"margin-right":"10px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="radial_features"
                                                     ),
@@ -616,13 +616,13 @@ def make_app_content(pathname):
                                         #################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Grid color:",html_for='radial_gridcolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Grid color:",html_for='radial_gridcolor',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_gridcolors"]), value=pa["radial_gridcolor"], placeholder=pa["radial_gridcolor"], 
                                                     id='radial_gridcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Grid width:",html_for='radial_gridwidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Grid width:",html_for='radial_gridwidth',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["radial_gridwidth"],id='radial_gridwidth', placeholder=pa["radial_gridwidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 ),
@@ -634,13 +634,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Line color:",html_for='radial_linecolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Line color:",html_for='radial_linecolor',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_linecolors"]), value=pa["radial_linecolor"], placeholder=pa["radial_linecolor"], 
                                                     id='radial_linecolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Line width:",html_for='radial_linewidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Line width:",html_for='radial_linewidth',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["radial_linewidth"],id='radial_linewidth', placeholder=pa["radial_linewidth"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 
@@ -653,13 +653,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Radial angle:",html_for='radial_angle',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Radial angle:",html_for='radial_angle',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["radial_angle"],id='radial_angle', placeholder=pa["radial_angle"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) ,
                                                 style={"margin-right":"5px"} 
                                                 
                                                 ),
-                                                dbc.Label("Tick angle:",html_for='radial_tickangle',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick angle:",html_for='radial_tickangle',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["radial_tickangle"],id='radial_tickangle', placeholder=pa["radial_tickangle"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                 
@@ -672,13 +672,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick length:",html_for='radial_ticklen',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick length:",html_for='radial_ticklen',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["radial_ticklen"],id='radial_ticklen', placeholder=pa["radial_ticklen"], type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) , 
                                                 style={"margin-right":"5px"}
                                                 
                                                 ),
-                                                dbc.Label("Tick width:",html_for='radial_tickwidth',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick width:",html_for='radial_tickwidth',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                 dcc.Input(value=pa["radial_tickwidth"],id='radial_tickwidth', placeholder=pa["radial_tickwidth"], type='text', style={"height":"35px","width":"100%", "margin-top":"5px"} ) , 
                                                 
@@ -691,13 +691,13 @@ def make_app_content(pathname):
                                         ####################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Tick color:",html_for='radial_tickcolor',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick color:",html_for='radial_tickcolor',style={"margin-top":"10px", "width":"100px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_tickcolors"]), value=pa["radial_tickcolor"], placeholder=pa["radial_tickcolor"], 
                                                     id='radial_tickcolor', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Label("Tick direction:",html_for='radial_tickside',style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Tick direction:",html_for='radial_tickside',style={"margin-top":"10px", "width":"110px"}),
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["radial_ticksides"]), value=pa["radial_tickside"], placeholder=pa["radial_tickside"], 
                                                     id='radial_tickside', multi=False, clearable=False, style={"width":"100%", "margin-top":"5px", "text-align":"left"}),
@@ -1066,9 +1066,9 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
                             ############################################
                                 dbc.Row(
                                     [
-                                        dbc.Label("Bar Color:", style={"margin-top":"10px", "width":"100px"}),
+                                        dbc.Label("Bar Color:", style={"margin-top":"10px", "width":"80px"}),
                                         dbc.Col(
-                                            dcc.Dropdown( options=make_options(pa["bar_colours"]), value=gpa["bar_colour_val"], placeholder="Color", id={'type':"bar_colour_val","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"220px","margin-top":"5px"} ),
+                                            dcc.Dropdown( options=make_options(pa["bar_colours"]), value=gpa["bar_colour_val"], placeholder="Color", id={'type':"bar_colour_val","index":str(card_id)}, multi=False, clearable=False, style={"height":"35px","width":"100%","margin-top":"5px"} ),
                                             
                                         ),
                                     ],
