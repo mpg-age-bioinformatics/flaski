@@ -122,7 +122,7 @@ services:
    - ./routes/apps:/myapp/myapp/routes/apps
   #  - ~/myapp/myapp/routes/login.py:/myapp/myapp/routes/login.py
   #  - ~/myapp/myapp/routes/register.py:/myapp/myapp/routes/register.py
-  #  - ~/myapp/myapp/models.py:/myapp/myapp/models.py
+   - ~/myapp/myapp/models.py:/myapp/myapp/models.py
    - ~/myapp/myapp/routes/_utils.py:/myapp/myapp/routes/_utils.py
    - ./routes/_routes.py:/myapp/myapp/routes/_routes.py
    - ./routes/home.py:/myapp/myapp/routes/home.py
