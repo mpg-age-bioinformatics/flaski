@@ -194,9 +194,27 @@ def make_layout(sessionid, ui_path):
     return protected_content
 
 @dashapp.callback( 
+    Output('saveas','data'),
+    Input('session-id', 'data'),
+    State('url', 'pathname'),
+)
+def check_session_data(session_id,pathname):
+    ui_path=pathname.split(f"{PAGE_PREFIX}/storage/", 1)[-1]
+    if ui_path[:len("saveas/")] == "saveas/":
+        ui_path=ui_path.split("saveas/", 1)[-1]
+        saveas=True
+        if "session_data" in list( session.keys() ) :
+            session_data = session["session_data"]
+            del(session["session_data"])
+            sleep(2)
+            return session_data
+    return None
+
+
+@dashapp.callback( 
     Output('app-content', 'children'),
     Output("download-session",'data'), 
-    Output('saveas','data'),
+    # Output('saveas','data'),
     Input('url', 'pathname'),
     State('sortby', 'data'))
 def make_app_content(pathname,sortby):
@@ -241,9 +259,9 @@ def make_app_content(pathname,sortby):
         elif ui_path[:len("saveas/")] == "saveas/":
             ui_path=ui_path.split("saveas/", 1)[-1]
             saveas=True
-            if "session_data" in list( session.keys() ) :
-                session_data = session["session_data"]
-                del(session["session_data"])
+            # if "session_data" in list( session.keys() ) :
+            #     session_data = session["session_data"]
+            #     del(session["session_data"])
 
     if ( ui_path ):
         if ( not download ) & ( not load ) & ( not delete ):
@@ -256,24 +274,24 @@ def make_app_content(pathname,sortby):
 
     if load : 
         if not os.path.isfile(os_path):
-            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
+            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update #, session_data
         session_data=encode_session_file(os_path, current_user )
         load_app=session_data["app_name"]
         session["session_data"]=session_data
         from time import sleep
         sleep(2)
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/{load_app}/", id='index'), dash.no_update, session_data
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/{load_app}/", id='index'), dash.no_update #, session_data
 
     if download : 
         if not os.path.isfile( os_path ):
-            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
+            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update #, session_data
         ui_path=ui_path.split( os.path.basename(os_path) )[0]
         ui_path=f'{PAGE_PREFIX}/storage/{ui_path}'
-        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dcc.send_file( os_path ), session_data
+        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dcc.send_file( os_path ) # , session_data
 
     if delete : 
         if not os.path.exists( os_path ):
-            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update, session_data
+            return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update#  , session_data
         if os.path.isdir(os_path):
             shutil.rmtree(os_path)
         if os.path.isfile(os_path):
@@ -282,10 +300,10 @@ def make_app_content(pathname,sortby):
         ui_path="/".join( ui_path.split("/")[:-1] )
         ui_path=f'{PAGE_PREFIX}/storage/{ui_path}'
 
-        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update, session_data
+        return dcc.Location(pathname=ui_path, refresh=True, id='index'), dash.no_update #, session_data
 
     if ( not os.path.isdir( os_path ) ) and ( not os.path.islink(os_path) ):
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/", id='index'), dash.no_update, session_data
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/", id='index'), dash.no_update #, session_data
 
     ### demo dev section
     # def touch_file(filepath):
@@ -360,7 +378,10 @@ def make_app_content(pathname,sortby):
         info['original_size']=sz
         info['Size']=humanize.naturalsize(sz)
         info["path"] = filepath
-        info["ui_path"] = os.path.join(ui_path, filename)
+        if ( ft == "dir" ) and  ( saveas ) :
+            info["ui_path"] = os.path.join(ui_path, "saveas/", filename)
+        else:
+            info["ui_path"] = os.path.join(ui_path, "saveas/", filename)
         info["Delete"] = os.path.join("delete", ui_path, filename)
         info["Load"] = os.path.join("load", ui_path, filename)
         info["Download"] = os.path.join("download", ui_path, filename)
@@ -381,7 +402,7 @@ def make_app_content(pathname,sortby):
 
     home_path=f"{PAGE_PREFIX}/storage/"
     if saveas :
-        home_path=f'{home_path}/{saveas}/'
+        home_path=f'{home_path}saveas/'
 
     full_paths=[{"label": "Home", "href": home_path, "external_link": False, "active": home_active }]
     for p in ui_path.split("/")[:-1] :
@@ -486,7 +507,7 @@ def make_app_content(pathname,sortby):
         ]
 
     )
-    return page, dash.no_update, session_data
+    return page, dash.no_update #, session_data
 
 @dashapp.callback(
     Output('sortby', 'data'),
