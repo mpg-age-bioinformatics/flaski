@@ -1,6 +1,7 @@
 from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
 from flask_login import current_user
 from flask_caching import Cache
+import plotly.graph_objects as go
 from flask import session
 import dash
 from dash import dcc, html
@@ -232,11 +233,11 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
         bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
         bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
  
-        # download_bar=html.Div( 
-        # [   
-        #     html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-        #     dcc.Download(id="download-bar")
-        # ])      
+        download_bar=html.Div( 
+        [   
+            html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+            dcc.Download(id="download-bar")
+        ])      
         gene_expression_bar_bol=True
     else:
         gene_expression_bar_bol=False
@@ -343,11 +344,11 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                         bar_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".bar" }}
                         bar_plot=dcc.Graph(figure=bar_plot, config=bar_config, style={"width":"100%","overflow-x":"auto", "height":plot_height_}, id="bar_plot")
                         
-                        # download_bar=html.Div( 
-                        # [   
-                        #     html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-                        #     dcc.Download(id="download-bar")
-                        # ])      
+                        download_bar=html.Div( 
+                        [   
+                            html.Button(id='btn-download-bar', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+                            dcc.Download(id="download-bar")
+                        ])      
                         gene_expression_bar_bol=True
 
                 dge_bol=True
@@ -936,40 +937,40 @@ def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, filepre
     filename="%s.dge.xlsx" %fileprefix
     return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge", index=False)
 
-# @dashapp.callback(
-#     Output('download-bar', 'data'),
-#     Input('btn-download-bar',"n_clicks"),
-#     State('bar_plot', 'figure'),
-#     State("opt-datasets", "value"),
-#     State("opt-groups", "value"),
-#     State("opt-samples", "value"),
-#     State("download_name", "value"),
-#     prevent_initial_call=True,
-# )
-# def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
-#     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-#     ## samples
-#     results_files=selected_results_files[["Set","Group","Reps"]]
-#     results_files.columns=["Set","Group","Sample"]
-#     results_files=results_files.drop_duplicates()
-#     selected_sets=list(set(results_files["Set"]))
+@dashapp.callback(
+    Output('download-bar', 'data'),
+    Input('btn-download-bar',"n_clicks"),
+    State('bar_plot', 'figure'),
+    State("opt-datasets", "value"),
+    State("opt-groups", "value"),
+    State("opt-samples", "value"),
+    State("download_name", "value"),
+    prevent_initial_call=True,
+)
+def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
+    selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    ## samples
+    results_files=selected_results_files[["Set","Group","Reps"]]
+    results_files.columns=["Set","Group","Sample"]
+    results_files=results_files.drop_duplicates()
+    selected_sets=list(set(results_files["Set"]))
 
-#     minheight=plot_height(selected_sets)
+    minheight=plot_height(selected_sets)
 
-#     fileprefix=secure_filename(str(download_name))
-#     pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
+    fileprefix=secure_filename(str(download_name))
+    pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
     
-#     if not pdf_filename:
-#         pdf_filename="geneExp.bar.Plot.pdf"
-#     pdf_filename=secure_filename(pdf_filename)
-#     if pdf_filename.split(".")[-1] != "pdf":
-#         pdf_filename=f'{pdf_filename}.pdf'
+    if not pdf_filename:
+        pdf_filename="geneExp.bar.Plot.pdf"
+    pdf_filename=secure_filename(pdf_filename)
+    if pdf_filename.split(".")[-1] != "pdf":
+        pdf_filename=f'{pdf_filename}.pdf'
 
-#     def write_image(figure, graph=figure):
-#         fig=go.Figure(graph)
-#         fig.write_image(figure, format="pdf", height=minheight, width=minheight)
+    def write_image(figure, graph=figure):
+        fig=go.Figure(graph)
+        fig.write_image(figure, format="pdf", height=minheight, width=minheight)
         
-#     return dcc.send_bytes(write_image, pdf_filename)
+    return dcc.send_bytes(write_image, pdf_filename)
     
 
 @dashapp.callback(
