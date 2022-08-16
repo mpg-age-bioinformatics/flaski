@@ -381,7 +381,7 @@ def make_app_content(pathname,sortby):
         if ( ft == "dir" ) and  ( saveas ) :
             info["ui_path"] = os.path.join(ui_path, "saveas/", filename)
         else:
-            info["ui_path"] = os.path.join(ui_path, "saveas/", filename)
+            info["ui_path"] = os.path.join(ui_path, filename)
         info["Delete"] = os.path.join("delete", ui_path, filename)
         info["Load"] = os.path.join("load", ui_path, filename)
         info["Download"] = os.path.join("download", ui_path, filename)
