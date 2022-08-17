@@ -323,6 +323,8 @@ def make_app_content(pathname,sortby):
     user=User.query.filter_by(id=current_user.id).first()
     disk_quota=user.disk_quota
     disc_per=total_user/disk_quota*100
+    
+
 
     if disc_per < 1:
         disc_per=1
@@ -337,7 +339,8 @@ def make_app_content(pathname,sortby):
     if disc_per >= 30 :
         prog_label=f'{humanize.naturalsize(total_user)}/{humanize.naturalsize(disk_quota)}'
     elif disc_per >= 5 :
-        prog_label=f'{disc_per}%'
+        disc_per_="{:.2f}".format(disc_per)
+        prog_label=f'{disc_per_}%'
     else:
         prog_label=""
 
