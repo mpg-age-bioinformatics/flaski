@@ -1078,13 +1078,12 @@ read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
 @dashapp.callback( 
     [ Output('xvals', 'options'),
     Output('yvals', 'options'),
-    Output('findrow', 'options'),
+    #Output('findrow', 'options'),
     Output('upload-data','children'),
     Output('toast-read_input_file','children'),
     Output({ "type":"traceback", "index":"read_input_file" },'data'),
     Output('xvals', 'value'),
-    Output('yvals', 'value'),
-    Output('findrow', 'children'),]+ read_input_updates_outputs ,
+    Output('yvals', 'value')] + read_input_updates_outputs ,
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
@@ -1125,16 +1124,47 @@ def read_input_file(contents,filename,last_modified,session_id):
             [ html.A(filename, id='upload-data-text') ],
             style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
         )
-        return [ cols_, cols_, available_rows_, upload_text, None, None,  xvals, yvals, available_rows] + pa_outputs
+        return [ cols_, cols_,upload_text, None, None,  xvals, yvals ] + pa_outputs #  available_rows_,  available_rows
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        print(tb_str)
+        # print(tb_str)
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"heatmap")
-        print(toast)
-        return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update, dash.no_update ] + pa_outputs
+        # print(toast)
+        return [ dash.no_update, dash.no_update,  dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
    
+@dashapp.callback( Output('findrow', 'options'), 
+    Input('xvals', 'value'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    prevent_initial_call=True)
+def findrow_options(xvals,contents,filename,last_modified):
+    if filename.split(".")[-1] == "json":
+        app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "heatmap")
+        df=pd.read_json(app_data["df"])
+        cols=df.columns.tolist()
+        # cols_=make_options(cols)
+        filename=app_data["filename"]
+        xvals=app_data['pa']["xvals"]
+        # yvals=app_data['pa']["yvals"]
+        available_rows=df[xvals].tolist()
+        available_rows_=make_options(available_rows)
 
+        pa=app_data["pa"]
+
+        pa_outputs=[pa[k] for k in  read_input_updates ]
+
+    else:
+        df=parse_table(contents,filename,last_modified,current_user.id,cache,"heatmap")
+        app_data=dash.no_update
+        cols=df.columns.tolist()
+        cols_=make_options(cols)
+        # xvals=cols[0]
+        # yvals=cols[1:]
+        available_rows=df[xvals].tolist()
+        available_rows_=make_options(available_rows)
+    return available_rows_
 
 states=[State('xvals', 'value'),
     State('yvals', 'value'),
