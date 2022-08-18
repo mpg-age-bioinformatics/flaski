@@ -303,7 +303,7 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
         share_folder=os.path.join(app.config["USERS_DATA"], 'shared_sessions')
         if not os.path.isdir(share_folder):
             os.makedirs(share_folder)
-        session_file=tempfile.NamedTemporaryFile(dir=share_folder, suffix=".ses", delete=False)
+        session_file=tempfile.NamedTemporaryFile(dir=share_folder, suffix=".json", delete=False)
         with open(session_file.name,"w") as fout:
             json.dump(session_data, fout)
 
