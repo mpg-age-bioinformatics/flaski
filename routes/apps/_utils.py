@@ -299,7 +299,11 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
 def ask_for_help(tb_str, user, current_app, session_data=None ):
     
     if session_data:
-        session_data=session_data["session_data"]
+        PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+        PYFLASKI_VERSION=str(PYFLASKI_VERSION)
+        session_data={ "session_data": session_data["session_data"], "APP_VERSION": app.config['APP_VERSION'], "PYFLASKI_VERSION":PYFLASKI_VERSION }
+ 
+           
         share_folder=os.path.join(app.config["USERS_DATA"], 'shared_sessions')
         if not os.path.isdir(share_folder):
             os.makedirs(share_folder)
