@@ -19,15 +19,15 @@ RUN pip3 install -r /pyflaski.requirements.txt
 COPY requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
 
-RUN mkdir -p /myapp/data /mpcdf /submissions_ftp /flaski_private /backup/oc_data /oc_data
+RUN mkdir -p /myapp/data/kegg /myapp/data/david /mpcdf /submissions_ftp /flaski_private /backup/oc_data /oc_data
 RUN chown -R ${BUILD_NAME}:${BUILD_NAME} /submissions /flaski_private /mpcdf /backup/oc_data /oc_data /submissions_ftp
 
 
 COPY ./static/dog-solid.png /myapp/myapp/static/favicon.ico
 COPY ./static/dog-solid.png /myapp/myapp/static/logo.png
 COPY ./pyflaski/pyflaski /myapp/pyflaski
-COPY ./pyflaski/data/david /myapp/data/david
-COPY ./pyflaski/data/kegg /myapp/data/kegg
+COPY ./pyflaski/data/david /myapp/pyflaski/data/david
+COPY ./pyflaski/data/kegg /myapp/pyflaski/data/kegg
 COPY ./routes/home.py /myapp/myapp/routes/home.py
 COPY ./routes/apps /myapp/myapp/routes/apps
 COPY ./routes/_routes.py /myapp/myapp/routes/_routes.py
