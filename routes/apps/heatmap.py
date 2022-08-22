@@ -311,24 +311,16 @@ def make_app_content(pathname):
 
                                         dbc.Row(
                                             [
+
+                                                dbc.Label("Columns:", html_for="col_color_threshold", style={"margin-top":"10px", "width":"80px"}),
                                                 dbc.Col(
-                                                    dbc.Label("Columns:", html_for="col_color_threshold", style={"margin-top":"5px", "width":"120px"}),
-                                                    #width=3,
-                                                    #style={"textAlign":"left","padding-right":"2px"}
-                                                ),
-                                                dbc.Col(
-                                                    
                                                     dcc.Input(value=pa["col_color_threshold"],id='col_color_threshold', placeholder="", type='text',  style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
                                                     style={"margin-right":"5px"}
                                                 ),
-                                                dbc.Col(
-                                                    dbc.Label("Rows:", html_for="row_color_threshold", style={"margin-top":"5px", "width":"120px"}),
-                                                    #width=3,
-                                                    #style={"textAlign":"right","padding-right":"2px"}
-                                                ),
+
+                                                dbc.Label("Rows:", html_for="row_color_threshold", style={"margin-top":"10px", "width":"80px"}),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["row_color_threshold"],id='row_color_threshold', placeholder="", type='text',  style={"height":"35px", "width":"100%", "margin-top":"5px"}  ) ,
-                                                    #width=3,
                                                 )
                                             ],
                                             className="g-1",
@@ -347,23 +339,15 @@ def make_app_content(pathname):
 
                                         dbc.Row(
                                             [
+                                                dbc.Label("Columns:", html_for="row_dendogram_ratio", style={"margin-top":"10px", "width":"80px"}),
                                                 dbc.Col(
-                                                    dbc.Label("Columns:", html_for="row_dendogram_ratio", style={"margin-top":"5px"}),
-                                                    width=3,
-                                                    style={"textAlign":"left","padding-right":"2px"}
+                                                    dcc.Input(value=pa["row_dendogram_ratio"], id='row_dendogram_ratio', placeholder="", type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
+                                                    style={"margin-right":"5px"}
                                                 ),
+                                                dbc.Label("Rows:", html_for="col_dendogram_ratio", style={"margin-top":"10px", "width":"80px"}),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["row_dendogram_ratio"], id='row_dendogram_ratio', placeholder="", type='text', style=card_input_style ) ,
-                                                    width=3
-                                                ),
-                                                dbc.Col(
-                                                    dbc.Label("Rows:", html_for="col_dendogram_ratio", style={"margin-top":"5px"}),
-                                                    width=3,
-                                                    style={"textAlign":"right","padding-right":"2px"}
-                                                ),
-                                                dbc.Col(
-                                                    dcc.Input(value=pa["col_dendogram_ratio"], id='col_dendogram_ratio', placeholder="", type='text', style=card_input_style ) ,
-                                                    width=3
+                                                    dcc.Input(value=pa["col_dendogram_ratio"], id='col_dendogram_ratio', placeholder="", type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
+                                                    #width=3
                                                 )
                                             ],
                                             className="g-1",
@@ -371,26 +355,16 @@ def make_app_content(pathname):
                                     ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Col(
-                                                    dbc.Label("Method:",html_for='method_value', style={"width":"80px","margin-top":"10px","text-align":"left"}),
-                                                    #width=3,
-                                                    #style={"textAlign":"left","padding-right":"2px"}
-                                                ),                                               
+                                                dbc.Label("Method:",html_for='method_value', style={"width":"80px","margin-top":"10px"}),                                              
                                                 dbc.Col(
                                                     dcc.Dropdown(options=make_options(pa["method"]), value=pa["method_value"], placeholder=pa["method_value"], id='method_value' , 
-                                                    multi=False, clearable=False, style={"width":"100%","margin-top":"5px","text-align":"left"}),
-                                                    style={"margin-right":"5px"},
-                                                    #width=3,    
+                                                    multi=False, clearable=False, style={"width":"100%","margin-top":"5px"}),
+                                                    style={"margin-right":"5px"},    
                                                 ),
-                                                dbc.Col(
-                                                    dbc.Label("Distance:",html_for='distance_value',style={"width":"80px","margin-top":"10px","text-align":"left"}), 
-                                                    #width=3,
-                                                    #style={"textAlign":"right","padding-right":"2px"}
-                                                ),
+                                                dbc.Label("Distance:",html_for='distance_value',style={"width":"80px","margin-top":"10px"}), 
                                                 dbc.Col(
                                                     dcc.Dropdown( options=make_options(pa["distance"]), value=pa["distance_value"], id="distance_value",placeholder=pa["distance_value"],
-                                                     multi=False, clearable=False, style={"width":"100%","margin-top":"5px","text-align":"left"} ),
-                                                    #width=3
+                                                     multi=False, clearable=False, style={"width":"100%","margin-top":"5px"} ),
                                                 )
                                             ],
                                             className="g-1",
@@ -491,7 +465,7 @@ def make_app_content(pathname):
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Show labels: ",html_for='show_labels', style={"margin-top":"10px", "width":"150px"}),
+                                                dbc.Label("Show labels: ",html_for='show_labels', style={"margin-top":"10px", "width":"280px"}),
                                                 dbc.Col(
                                                     dcc.Checklist(
                                                         options=[
@@ -500,7 +474,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_labels"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block',"margin-right":"120px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block', "margin-right":"55px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="show_labels"
                                                     ),
@@ -515,16 +489,16 @@ def make_app_content(pathname):
                                         
                                         dbc.Row(
                                             [
-                                                dbc.Label("Labels font size:", style={"margin-top":"10px", "width":"140px"}),
+                                                dbc.Label("Labels font size:", style={"margin-top":"10px", "width":"280px"}),
                                                 
                                                 dbc.Label("Columns:", html_for="yaxis_font_size", style={"margin-top":"10px", "width":"80px"}),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["yaxis_font_size"], id='yaxis_font_size', placeholder="", type='text', style={"height":"35px", "width":"40px", "margin-top":"5px"} ) ,
+                                                    dcc.Input(value=pa["yaxis_font_size"], id='yaxis_font_size', placeholder="", type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
                                                 ),
 
                                                 dbc.Label("Rows:", html_for="xaxis_font_size", style={"margin-top":"10px","width":"60px"}),
                                                 dbc.Col(
-                                                    dcc.Input(value=pa["xaxis_font_size"], id='xaxis_font_size', placeholder="", type='text', style={"height":"35px", "width":"40px", "margin-top":"5px"} ) ,
+                                                    dcc.Input(value=pa["xaxis_font_size"], id='xaxis_font_size', placeholder="", type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
                                                 )
                                             ],
                                             className="g-1",
@@ -560,7 +534,7 @@ def make_app_content(pathname):
                                                             
                                                             value=[], 
                                                             id="reverse_color_scale", 
-                                                            style={"width":"32px","margin-top":"5px"}, 
+                                                            style={"width":"100%","margin-top":"5px"}, # 32px
                                                     ),
                                                 ),
                                             ],
@@ -586,21 +560,21 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 #dbc.Col(
-                                                dbc.Label("", style={"margin-top":"10px", "width":"140px"}),
+                                                dbc.Label("", style={"margin-top":"10px", "width":"102px"}),
                                                 #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
                                                 # ),
-                                                # dbc.Col(
-                                                dbc.Label("Lower", style={"margin-top":"10px", "width":"110px", "margin-right":"20px"}),
+                                                dbc.Col(
+                                                dbc.Label("Lower", style={"margin-top":"10px", "width":"100%", "margin-right":"0px"}),
                                                 #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
-                                                # ),
-                                                # dbc.Col(
-                                                dbc.Label("Centre", style={"margin-top":"10px", "width":"110px", "margin-right":"20px"}),
+                                                ),
+                                                dbc.Col(
+                                                dbc.Label("Centre", style={"margin-top":"10px", "width":"100%", "margin-right":"0px"}),
                                                 #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
-                                                # ),
-                                                #dbc.Col(
-                                                dbc.Label("Upper", style={"margin-top":"10px", "width":"110px"}),
+                                                ),
+                                                dbc.Col(
+                                                dbc.Label("Upper", style={"margin-top":"10px", "width":"100%"}),
                                                 #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
-                                                # ),
+                                                ),
                                             ],
                                             className="g-1",
                                             justify="center",
@@ -612,20 +586,17 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 # dbc.Col(
-                                                dbc.Label("Value: ", style={"margin-top":"10px", "width":"120px"}),
+                                                dbc.Label("Value: ", style={"margin-top":"10px", "width":"60px"}),
                                                 # ),
-                                                # dbc.Col(
-                                                dbc.Input(value=pa["lower_value"], id="lower_value", placeholder="", type="text",  style={"width":"130px", "margin-top":"5px", "margin-right":"5px"} ),
-                                                    #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
-                                                # ),
-                                                # dbc.Col(
-                                                dbc.Input(value=pa["center_value"], id="center_value", placeholder="", type="text", style={"width":"130px", "margin-top":"5px", "margin-right":"5px"}),
-                                                    #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
-                                                # ),
-                                                # dbc.Col(
-                                                dbc.Input(value=pa["upper_value"], id="upper_value", placeholder="", type="text", style={"width":"130px", "margin-top":"5px"}),
-                                                    #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
-                                                # ),
+                                                dbc.Col(
+                                                dbc.Input(value=pa["lower_value"], id="lower_value", placeholder="", type="text",  style={"width":"100%", "margin-top":"5px", "margin-right":"5px"} ),
+                                                ),
+                                                dbc.Col(
+                                                dbc.Input(value=pa["center_value"], id="center_value", placeholder="", type="text", style={"width":"100%", "margin-top":"5px", "margin-right":"5px"}), 
+                                                ),
+                                                dbc.Col(
+                                                dbc.Input(value=pa["upper_value"], id="upper_value", placeholder="", type="text", style={"width":"100%", "margin-top":"5px"}),
+                                                ),
                                             ],
                                             className="g-1",
                                            # style={"margin-top":"5px"},
@@ -637,20 +608,17 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 #dbc.Col(
-                                                dbc.Label("Color: ",  style={"width":"120px"}),
+                                                dbc.Label("Color: ",  style={"margin-top":"10px", "width":"60px"}),
                                                 # ),
-                                                # dbc.Col(
-                                                dbc.Input(value=pa["lower_color"], id="lower_color", placeholder="", type="text", style={"width":"130px", "margin-top":"10px", "margin-right":"5px"} ),
-                                                    #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
-                                                # ),
-                                                # dbc.Col(
-                                                dbc.Input(value=pa["center_color"], id="center_color", placeholder="", type="text", style={"width":"130px", "margin-top":"10px", "margin-right":"5px"} ),
-                                                    #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
-                                                # ),
-                                                # dbc.Col(
-                                                dbc.Input(value=pa["upper_color"], id="upper_color", placeholder="", type="text", style={"width":"130px", "margin-top":"10px"} ),
-                                                    #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
-                                                # ),
+                                                dbc.Col(
+                                                dbc.Input(value=pa["lower_color"], id="lower_color", placeholder="", type="text", style={"width":"100%", "margin-top":"5px", "margin-right":"5px"} ),
+                                                ),
+                                                dbc.Col(
+                                                dbc.Input(value=pa["center_color"], id="center_color", placeholder="", type="text", style={"width":"100%", "margin-top":"5px", "margin-right":"5px"} ),
+                                                ),
+                                                dbc.Col(
+                                                dbc.Input(value=pa["upper_color"], id="upper_color", placeholder="", type="text", style={"width":"100%", "margin-top":"5px"} ),
+                                                ),
                                             ],
                                             className="g-1",
                                             #style={"margin-top":"5px"},
@@ -662,7 +630,7 @@ def make_app_content(pathname):
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dbc.Label("Color bar "),
+                                                    dbc.Label("Color bar ", style={"margin-top":"10px"}),
                                                 ),
                                             ],
                                             className="g-1",
