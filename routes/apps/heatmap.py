@@ -258,7 +258,7 @@ def make_app_content(pathname):
                                         ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Clusters:",html_for='show_clusters',style={"width":"280px"}),
+                                                dbc.Label("Clusters:",html_for='show_clusters',style={"width":"190px"}),
                                                 dbc.Col(
                                                     
                                                     dcc.Checklist(
@@ -268,7 +268,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_clusters"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block',"margin-right":"55px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block',"margin-right":"4px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="show_clusters"
                                                     ),
@@ -281,14 +281,14 @@ def make_app_content(pathname):
                                     ############################################
                                         dbc.Row(
                                                 [
-                                                    dbc.Label("Cluster distance values:", html_for="dendogram_dist", style={"width":"280px", "margin-top":"10px"}), #"width":"64px"
+                                                    dbc.Label("Cluster distance values:", html_for="dendogram_dist", style={"width":"190px", "margin-top":"10px"}), #"width":"64px"
                                                     dbc.Col(
                                                         dcc.Checklist(options=[ {'label' : 'Columns' , 'value':'col_dendogram_dist'},
                                                                                 {'label' : 'Rows' , 'value':'row_dendogram_dist'}
                                                         ],
                                                         value=pa["dendogram_dist"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block',"margin-right":"55px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block',"margin-right":"4px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id='dendogram_dist',
                                                         ) ,
@@ -465,7 +465,7 @@ def make_app_content(pathname):
                                         ############################################ 
                                         dbc.Row(
                                             [
-                                                dbc.Label("Show labels: ",html_for='show_labels', style={"margin-top":"10px", "width":"280px"}),
+                                                dbc.Label("Show labels: ",html_for='show_labels', style={"margin-top":"10px", "width":"140px"}),
                                                 dbc.Col(
                                                     dcc.Checklist(
                                                         options=[
@@ -474,7 +474,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_labels"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block', "margin-right":"55px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block', "margin-right":"4px"},#,"height":"35px"},55px
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="show_labels"
                                                     ),
@@ -489,14 +489,14 @@ def make_app_content(pathname):
                                         
                                         dbc.Row(
                                             [
-                                                dbc.Label("Labels font size:", style={"margin-top":"10px", "width":"280px"}),
+                                                dbc.Label("Labels font size:", style={"margin-top":"10px", "width":"140px"}),
                                                 
                                                 dbc.Label("Columns:", html_for="yaxis_font_size", style={"margin-top":"10px", "width":"80px"}),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["yaxis_font_size"], id='yaxis_font_size', placeholder="", type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
                                                 ),
 
-                                                dbc.Label("Rows:", html_for="xaxis_font_size", style={"margin-top":"10px","width":"60px"}),
+                                                dbc.Label("Rows:", html_for="xaxis_font_size", style={"margin-top":"10px","width":"50px"}),
                                                 dbc.Col(
                                                     dcc.Input(value=pa["xaxis_font_size"], id='xaxis_font_size', placeholder="", type='text', style={"height":"35px", "width":"100%", "margin-top":"5px"} ) ,
                                                 )
@@ -559,26 +559,25 @@ def make_app_content(pathname):
 
                                         dbc.Row(
                                             [
-                                                #dbc.Col(
-                                                dbc.Label("", style={"margin-top":"10px", "width":"102px"}),
-                                                #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
-                                                # ),
                                                 dbc.Col(
-                                                dbc.Label("Lower", style={"margin-top":"10px", "width":"100%", "margin-right":"0px"}),
-                                                #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                                    dbc.Label("", style={'display':'inline-block'}),
+                                                    width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
                                                 ),
                                                 dbc.Col(
-                                                dbc.Label("Centre", style={"margin-top":"10px", "width":"100%", "margin-right":"0px"}),
-                                                #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                                    dbc.Label("Lower", style={'display':'inline-block'}),
+                                                    width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
                                                 ),
                                                 dbc.Col(
-                                                dbc.Label("Upper", style={"margin-top":"10px", "width":"100%"}),
-                                                #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                                    dbc.Label("Center", style={'display':'inline-block'}),
+                                                    width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Label("Upper", style={'display':'inline-block'}),
+                                                    width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
                                                 ),
                                             ],
                                             className="g-1",
                                             justify="center",
-                                            align="center",
                                         ),
 
                                         ############################################
