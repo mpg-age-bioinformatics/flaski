@@ -258,7 +258,7 @@ def make_app_content(pathname):
                                         ############################################
                                         dbc.Row(
                                             [
-                                                dbc.Label("Clusters:",html_for='show_clusters',style={"width":"280px"}),
+                                                dbc.Label("Clusters:",html_for='show_clusters',style={"width":"190px"}),
                                                 dbc.Col(
                                                     
                                                     dcc.Checklist(
@@ -268,7 +268,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_clusters"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block',"margin-right":"55px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block',"margin-right":"4px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="show_clusters"
                                                     ),
@@ -281,14 +281,14 @@ def make_app_content(pathname):
                                     ############################################
                                         dbc.Row(
                                                 [
-                                                    dbc.Label("Cluster distance values:", html_for="dendogram_dist", style={"width":"280px", "margin-top":"10px"}), #"width":"64px"
+                                                    dbc.Label("Cluster distance values:", html_for="dendogram_dist", style={"width":"190px", "margin-top":"10px"}), #"width":"64px"
                                                     dbc.Col(
                                                         dcc.Checklist(options=[ {'label' : 'Columns' , 'value':'col_dendogram_dist'},
                                                                                 {'label' : 'Rows' , 'value':'row_dendogram_dist'}
                                                         ],
                                                         value=pa["dendogram_dist"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block',"margin-right":"55px"},#,"height":"35px"},
+                                                        labelStyle={'display': 'inline-block',"margin-right":"4px"},#,"height":"35px"},
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id='dendogram_dist',
                                                         ) ,
@@ -474,7 +474,7 @@ def make_app_content(pathname):
                                                         ],
                                                         value=pa["show_labels"],
                                                         #inputStyle={"margin-right": "3px"},
-                                                        labelStyle={'display': 'inline-block', "margin-right":"20px"},#,"height":"35px"},55px
+                                                        labelStyle={'display': 'inline-block', "margin-right":"4px"},#,"height":"35px"},55px
                                                         style={"height":"35px","margin-top":"10px", "width":"100%"},
                                                         id="show_labels"
                                                     ),
