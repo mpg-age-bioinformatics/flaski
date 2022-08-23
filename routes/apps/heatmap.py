@@ -1108,6 +1108,10 @@ def read_input_file(contents,filename,last_modified,session_id):
     State('upload-data', 'last_modified'),
     prevent_initial_call=True)
 def findrow_options(xvals,contents,filename,last_modified):
+    if not xvals:
+        available_rows_=make_options([])
+        return available_rows_
+        
     if filename.split(".")[-1] == "json":
         app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "heatmap")
         df=pd.read_json(app_data["df"])
