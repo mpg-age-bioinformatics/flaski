@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=['aadatalake', 'alphafold', 'rnaseq', "atacseq", "chipseq", "asp
 _PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq", "methylclock", "gsea"]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=[ ] 
+    _DEV_ROUTES=[ "crispr" ] 
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 user_navbar_links={
@@ -62,7 +62,8 @@ other_nav_dropdowns =[
                 "Ribo-Seq":"/riboseq/",\
                 "AlphaFold":"/alphafold/",\
                 "Methylation Clock":"/methylclock/",\
-                "GSEA":"/gsea/"
+                "GSEA":"/gsea/",\
+                "CRISPR" : "/crispr/"
             } \
     }
 ]
