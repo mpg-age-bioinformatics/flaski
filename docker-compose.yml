@@ -118,7 +118,7 @@ services:
    - ~/flaski23/private/:/flaski_private:ro
    - ./static/dog-solid.png:/myapp/myapp/static/favicon.ico
    - ./static/dog-solid.png:/myapp/myapp/static/logo.png
-  #  - ./pyflaski/pyflaski:/myapp/pyflaski
+   - ./pyflaski/pyflaski:/myapp/pyflaski
    - ./routes/apps:/myapp/myapp/routes/apps
   #  - ~/myapp/myapp/routes/login.py:/myapp/myapp/routes/login.py
   #  - ~/myapp/myapp/routes/register.py:/myapp/myapp/routes/register.py

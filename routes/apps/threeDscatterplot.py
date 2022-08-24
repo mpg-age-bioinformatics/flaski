@@ -1499,7 +1499,7 @@ def generate_markers(session_id,groups,contents,filename,last_modified,generate_
             cols=df.columns.tolist()
             cols_=make_options(cols)
         else:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"scatterplot")
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"threeDscatterplot")
             cols=df.columns.tolist()
             cols_=make_options(cols)
     else:
