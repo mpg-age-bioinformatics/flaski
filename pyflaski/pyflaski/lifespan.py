@@ -1,1 +1,0 @@
-../../flaski/apps/main/lifespan.py

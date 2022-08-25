@@ -1,4 +1,0 @@
-app	name	id	link	java	description	allowed submission
-aarnaseqlake	RNAseq lake	aarnaseqlake_more	aarnaseqlake	javascript:ReverseDisplay('aarnaseqlake_more')	RNAseq data lake of the Antebi group.	jboucas@gmail.com
-submissions	Submissions	submissions_more	submissions	javascript:ReverseDisplay('submissions_more')	Samples submissions.	jboucas@age.mpg.de
-aadatalake	Data lake	aadatalake_more	aadatalake	javascript:ReverseDisplay('aadatalake_more')	An RNAseq data lake.	jboucas@gmail.com

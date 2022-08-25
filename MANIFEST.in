@@ -1,4 +1,0 @@
-graft flaski/static
-graft flask/templates
-graft flaski/plots
-global-exclude *.pyc

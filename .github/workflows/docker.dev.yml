@@ -3,7 +3,7 @@ name: dev
 on:
   push:
     branches:
-    - master
+    - v2.x.x
     tags-ignore:
     - '**'
     
@@ -16,6 +16,7 @@ jobs:
     - name: Build the Docker image
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
+        git checkout v2.x.x
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:dev
         docker tag docker.io/flaski/flaski:dev docker.io/mpgagebioinformatics/flaski2:dev
         docker push docker.io/flaski/flaski:dev

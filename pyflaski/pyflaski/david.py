@@ -1,1 +1,0 @@
-../../flaski/apps/main/david.py
