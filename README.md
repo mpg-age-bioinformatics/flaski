@@ -52,6 +52,6 @@ Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:
 
 ## Credits
 
-Flaski was build using the [Bootstrap admin theme](https://github.com/BlackrockDigital/startbootstrap-sb-admin-2) created by Start Bootstrap and the [Font-Awesome](https://github.com/FortAwesome/Font-Awesome) toolkit. Please consult the respective projects for license information.
+Flaski was build using [Font-Awesome](https://github.com/FortAwesome/Font-Awesome) toolkit. Please consult the respective project for license information.
 
 The Bioinformatics Core Facility of the Max Planck Institute for Biology of Ageing, Cologne, Germany.
