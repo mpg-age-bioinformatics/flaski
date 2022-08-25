@@ -13,10 +13,12 @@ from pyflaski.scatterplot import make_figure, figure_defaults
 from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
+import io
 import traceback
 import json
 import pandas as pd
 import time
+import base64
 import plotly.express as px
 # from plotly.io import write_image
 import plotly.graph_objects as go
@@ -93,7 +95,7 @@ style_cell={
     }
 
 def make_ed_table(field_id, columns=None , df=None):
-    if not df:
+    if  type(df) != type( pd.DataFrame() ):
         df=pd.DataFrame( columns=columns )
     df=make_table(df,field_id)
     df.editable=True
@@ -103,10 +105,16 @@ def make_ed_table(field_id, columns=None , df=None):
     return df
 
 def make_df_from_rows(rows):
-    df=pd.DataFrame()
+    rows_=[]
     for row in rows:
-        df_=pd.DataFrame(row,index=[0])
-        df=pd.concat([df,df_])
+        row=[ row[k] for k in list(row.keys()) ]
+        rows_.append(row)
+    df=pd.DataFrame(rows_,columns=list(rows[0].keys()))
+    # df=pd.DataFrame(rows)
+    # for row in rows:
+    #     # print("!!!", row)
+    #     df_=pd.DataFrame(row,index=[0])
+    #     df=pd.concat([df,df_])
     df.reset_index(inplace=True, drop=True)
     df=df.to_json()
     return df
@@ -164,7 +172,7 @@ def generate_submission_file(samplenames, \
         library_df=make_df_from_rows(library)
 
         df_=pd.DataFrame({
-            "Field":[
+            "Arg":[
                 "email", \
                 "group",\
                 "experiment_name",\
@@ -207,8 +215,11 @@ def generate_submission_file(samplenames, \
                 mageckflute_organism 
                 ]
              }, index=list(range(19)))
+
+        df_=df_.to_json()
      
         filename=make_submission_file(".crispr.xlsx")
+
 
         return {"filename": filename, "sampleNames":samplenames_df, "samples":samples_df, "library":library_df, "arguments":df_}
     return _generate_submission_file(
@@ -273,7 +284,7 @@ def make_app_content(pathname):
         dbc.Row( 
             [
                 dbc.Col( html.Label('Group') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, value=groups_val, style={ "width":"100%"}),md=3 ),
+                dbc.Col( dcc.Dropdown( id='group', options=groups_, value=groups_val, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
             ], 
             style={"margin-top":10}
@@ -479,12 +490,25 @@ def make_app_content(pathname):
             style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
         ),
         dbc.Button(
-                    'Submit',
-                    id='submit-button-state', 
-                    color="secondary",
-                    n_clicks=0, 
-                    style={"max-width":"372px","width":"200px","margin-top":"8px", "margin-left":"4px"}#,"max-width":"375px","min-width":"375px"}
-                )
+            'Submit',
+            id='submit-button-state', 
+            color="secondary",
+            n_clicks=0, 
+            style={"max-width":"372px","width":"200px","margin-top":"8px", "margin-left":"4px"}#,"max-width":"375px","min-width":"375px"}
+        ),
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Info",id="modal_header") ),
+                dbc.ModalBody("Generating submission file. Check your page or tab status, if this message does not change in a few seconds than something went wrong!", id="modal_body"),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close", id="close", className="ms-auto", n_clicks=0
+                    )
+                ),
+            ],
+            id="modal",
+            is_open=False,
+        )
     ]
 
     app_content=html.Div(
@@ -597,112 +621,193 @@ def make_app_content(pathname):
     return app_content
 
 
-# @dashapp.callback( 
-#     Output("updatable-df", 'children'),
-#     Output('email', 'value'),
-#     Output('opt-group', 'value'),
-#     Output('folder', 'value'),
-#     Output('md5sums', 'value'),
-#     Output('project_title', 'value'),
-#     Output('opt-organism', 'value'),
-#     Output('opt-ercc', 'value'),
-#     Output('wget', 'value'), 
-#     Output('upload-data-text', 'children'),
-#     Input('upload-data', 'contents'),
-#     State('upload-data', 'filename'),
-#     State('upload-data', 'last_modified'),
-#     prevent_initial_call=True)
-# def read_file(contents,filename,last_modified):
-#     content_type, content_string = contents.split(',')
-#     decoded = base64.b64decode(content_string)
-#     extension=filename.split(".")[-1]
-#     if extension not in ['xls', "xlsx"] :
-#         raise dash.exceptions.PreventUpdate
-#     exc=pd.ExcelFile(io.BytesIO(decoded))
-#     if "samples" not in exc.sheet_names :
-#         raise dash.exceptions.PreventUpdate
-#     if "RNAseq" not in exc.sheet_names :
-#         raise dash.exceptions.PreventUpdate
-#     samples = pd.read_excel(io.BytesIO(decoded), sheet_name="samples")
-#     RNAseq = pd.read_excel(io.BytesIO(decoded), sheet_name="RNAseq")
+###
+### Work from here on:
+###
 
-#     samples = samples[ samples.columns.tolist()[:6]]
+fields = [     
+    "email", \
+    "group",\
+    "experiment_name",\
+    "folder",\
+    "md5sums",\
+    "cnv_line",\
+    "upstreamseq",\
+    "sgRNA_size",\
+    "gmt_file",\
+    "mageck_test_remove_zero",\
+    "mageck_test_remove_zero_threshold",\
+    "species",\
+    "assembly",\
+    "use_bowtie",\
+    "depmap",\
+    "depmap_cell_line",\
+    "BAGEL_ESSENTIAL",\
+    "BAGEL_NONESSENTIAL",\
+    "mageckflute_organism"
+]
 
-#     input_df=make_table(samples,'adding-rows-table')
-#     input_df.editable=True
-#     input_df.row_deletable=True
-#     input_df.style_cell=style_cell
-#     input_df.style_table["height"]="62vh"
+outputs = [ Output(o, 'value') for o in fields ]
+
+@dashapp.callback( 
+    [ Output('upload-data-text', 'children'), 
+    Output("updatable-samplenames", 'children'),
+    Output("updatable-samples", 'children'),
+    Output("updatable-library", 'children') 
+    ] + outputs ,
+    Input('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified'),
+    prevent_initial_call=True)
+def read_file(contents,filename,last_modified):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    extension=filename.split(".")[-1]
+    if extension not in ['xls', "xlsx"] :
+        raise dash.exceptions.PreventUpdate
+    exc=pd.ExcelFile(io.BytesIO(decoded))
+
+    if "sampleNames" in exc.sheet_names :
+        samplenames=pd.read_excel(io.BytesIO(decoded), sheet_name="sampleNames")
+        samplenames=make_ed_table('adding-rows-samplenames', df=samplenames )
+    else:
+        samplenames= dash.no_update
+
+    if "samples" in exc.sheet_names :
+        samples=pd.read_excel(io.BytesIO(decoded), sheet_name="samples")
+        samples=make_ed_table('adding-rows-samples', df=samples )
+    else:
+        samples=dash.no_update
+
+    if "library" in exc.sheet_names :
+        library=pd.read_excel(io.BytesIO(decoded), sheet_name="library")
+        library=make_ed_table('adding-rows-library', df=library )
+    else:
+        library=dash.no_update
+    
+    if "arguments" not in exc.sheet_names :
+        arguments=[ dash.no_update for f in fields ]
+    else:
+        arguments_df=pd.read_excel(io.BytesIO(decoded), sheet_name="arguments")
+        arguments_list=arguments_df["Arg"].tolist()
+        arguments=[]
+        for f in fields :
+            if f in arguments_list :
+                val= arguments_df[arguments_df["Arg"]==f]["Value"].tolist()[0]
+                arguments.append(val)
+            else:
+                arguments.append( dash.no_update )
+            
+    return [ filename ] + [ samplenames, samples, library ] +  arguments 
 
 
-#     values_to_return=[]
-#     fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "wget" ]
-#     fields_on_file=RNAseq["Field"].tolist()
-#     for f in fields_to_return:
-#         if f in  fields_on_file:
-#             values_to_return.append(  RNAseq[RNAseq["Field"]==f]["Value"].tolist()[0]  )
-
-#     return [ input_df ] +  values_to_return + [ filename ]
+states=[ State(f, 'value') for f in fields ]
 
 # # main submission call
-# @dashapp.callback(
-#     Output("modal_header", "children"),
-#     Output("modal_body", "children"),
-#     # Input('session-id', 'data'),
-#     Input('submit-button-state', 'n_clicks'),
-#     State('adding-rows-table', 'data'),
-#     State('email', 'value'),
-#     State('opt-group', 'value'),
-#     State('folder', 'value'),
-#     State('md5sums', 'value'),
-#     State('project_title', 'value'),
-#     State('opt-organism', 'value'),
-#     State('opt-ercc', 'value'),
-#     State('wget', 'value'),
-#     prevent_initial_call=True )
-# def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
-#     header, msg = check_access( 'rnaseq' )
-#     # header, msg = None, None # for local debugging 
-#     if msg :
-#         return header, msg
+@dashapp.callback(
+    Output("modal_header", "children"),
+    Output("modal_body", "children"),
+    # Input('session-id', 'data'),
+    Input('submit-button-state', 'n_clicks'),
+    [ State("adding-rows-samplenames", 'data'),
+    State("adding-rows-samples", 'data'),
+    State("adding-rows-library", 'data') 
+    ]+states,
+    prevent_initial_call=True )
+def update_output(n_clicks, \
+        samplenames, \
+        samples, \
+        library, \
+        email, \
+        group,\
+        experiment_name,\
+        folder,\
+        md5sums,\
+        cnv_line,\
+        upstreamseq,\
+        sgRNA_size,\
+        gmt_file,\
+        mageck_test_remove_zero,\
+        mageck_test_remove_zero_threshold,\
+        species,\
+        assembly,\
+        use_bowtie,\
+        depmap,\
+        depmap_cell_line,\
+        BAGEL_ESSENTIAL,\
+        BAGEL_NONESSENTIAL,\
+        mageckflute_organism ):
+    # header, msg = check_access( 'rnaseq' )
+    # header, msg = None, None # for local debugging 
+    # if msg :
+    #     return header, msg
+    # if not wget:
+    #     wget="NONE"
 
-#     if not wget:
-#         wget="NONE"
-#     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
-#     samples=pd.read_json(subdic["samples"])
-#     metadata=pd.read_json(subdic["metadata"])
+    subdic=generate_submission_file( samplenames, \
+        samples, \
+        library, \
+        email, \
+        group,\
+        experiment_name,\
+        folder,\
+        md5sums,\
+        cnv_line,\
+        upstreamseq,\
+        sgRNA_size,\
+        gmt_file,\
+        mageck_test_remove_zero,\
+        mageck_test_remove_zero_threshold,\
+        species,\
+        assembly,\
+        use_bowtie,\
+        depmap,\
+        depmap_cell_line,\
+        BAGEL_ESSENTIAL,\
+        BAGEL_NONESSENTIAL,\
+        mageckflute_organism )
 
-#     validation=validate_metadata(metadata)
-#     if validation:
-#         header="Attention"
-#         return header, validation
+    # samples=pd.read_json(subdic["samples"])
+    # metadata=pd.read_json(subdic["metadata"])
 
-#     if os.path.isfile(subdic["filename"]):
-#         header="Attention"
-#         msg='''You have already submitted this data. Re-submission will not take place.'''
-#     else:
-#         header="Success!"
-#         msg='''Please check your email for confirmation.'''
+    # validation=validate_metadata(metadata)
+    # if validation:
+    #     header="Attention"
+    #     return header, validation
+
+    if os.path.isfile(subdic["filename"]):
+        header="Attention"
+        msg='''You have already submitted this data. Re-submission will not take place.'''
+    else:
+        header="Success!"
+        msg='''Please check your email for confirmation.'''
     
 
-#     user_domain=current_user.email
-#     user_domain=user_domain.split("@")[-1]
-#     mps_domain="mpg.de"
-#     # if user_domain[-len(mps_domain):] == mps_domain :
-#     if user_domain !="age.mpg.de" :
-#         subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    user_domain=current_user.email
+    # user_domain=user_domain.split("@")[-1]
+    # mps_domain="mpg.de"
+    # if user_domain[-len(mps_domain):] == mps_domain :
+    # if user_domain !="age.mpg.de" :
+        # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
-#     EXCout=pd.ExcelWriter(subdic["filename"])
-#     samples.to_excel(EXCout,"samples",index=None)
-#     metadata.to_excel(EXCout,"RNAseq",index=None)
-#     EXCout.save()
+    sampleNames=pd.read_json(subdic["sampleNames"])
+    samples=pd.read_json(subdic["samples"])
+    library=pd.read_json(subdic["library"])
+    arguments=pd.read_json(subdic["arguments"])
 
-#     if user_domain == "age.mpg.de" :
-#         send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
-#     else:
-#         send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+    EXCout=pd.ExcelWriter(subdic["filename"])
+    sampleNames.to_excel(EXCout,"sampleNames",index=None)
+    samples.to_excel(EXCout,"samples",index=None)
+    library.to_excel(EXCout,"library",index=None)
+    arguments.to_excel(EXCout,"arguments",index=None)
+    EXCout.save()
 
-#     return header, msg
+    # if user_domain == "age.mpg.de" :
+    send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+    # else:
+    #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+
+    return header, msg
 
 @dashapp.callback(
     Output('adding-rows-samplenames', 'data'),
@@ -733,6 +838,16 @@ def add_row(n_clicks, rows, columns):
     if n_clicks > 0:
         rows.append({c['id']: '' for c in columns})
     return rows
+
+@dashapp.callback(
+    Output("modal", "is_open"),
+    [Input("submit-button-state", "n_clicks"), Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 @dashapp.callback(
     Output("navbar-collapse", "is_open"),
