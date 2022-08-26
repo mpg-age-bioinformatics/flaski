@@ -156,7 +156,7 @@ def make_finder(contents, contents_df, sortby, user_path):
             ]
         ),
         body=False,
-        # style={"overflow":"scroll"}
+        style={"overflow":"scroll"}
     )
 
     return finder
