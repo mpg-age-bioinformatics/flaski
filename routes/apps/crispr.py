@@ -74,7 +74,7 @@ card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
-    header_access, msg_access = check_access( 'rnaseq' )
+    header_access, msg_access = check_access( 'crispr' )
     if header_access :
         return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
 

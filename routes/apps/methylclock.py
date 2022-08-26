@@ -62,6 +62,11 @@ dashapp.layout=html.Div(
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    
+    header_access, msg_access = check_access( 'crispr' )
+    if header_access :
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+
     eventlog = UserLogging(email=current_user.email, action="visit methylclock")
     db.session.add(eventlog)
     db.session.commit()
