@@ -125,7 +125,7 @@ def make_app_content(pathname):
                 ],
                 sm=9,md=6, lg=5, xl=5, 
                 align="center",
-                style={ "margin-left":2, "margin-right":2 ,'margin-bottom':"50px"}
+                style={ "margin-left":0, "margin-right":0 ,'margin-bottom':"50px",'max-width':"375px"}
             ),
         ],
         align="center",
