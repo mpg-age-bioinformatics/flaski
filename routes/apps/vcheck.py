@@ -101,22 +101,26 @@ def make_app_content(pathname):
                                     id='upload-data',
                                     children=html.Div(
                                         [ html.A('drop a file here',id='upload-data-text') ],
-                                        style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                                        style={ 'textAlign': 'center', "padding-top": 35, "margin-bottom": 4,  }
                                     ),
                                     style={
                                         'width': '100%',
-                                        'borderWidth': '0px',
+                                        'borderWidth': '1px',
                                         'borderStyle': 'dashed',
                                         'borderRadius': '0px',
                                         "margin-bottom": "0px",
-                                        'max-width':"375px"
+                                        'max-width':"375px",
+                                        'min-height':"100px",
+                                        # "verticalAlign":"center"
                                     },
                                     multiple=False,
                                 ),
                                 html.Div( id="app-version"), 
                             ]
-                        )
-                        , body=True
+                        ),
+                        body=True,
+                        outline=False,
+                        color="white",
                     ),
                 ],
                 sm=9,md=6, lg=5, xl=5, 
