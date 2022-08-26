@@ -13,6 +13,7 @@ jobs:
     - name: Build the Docker image
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
+        git fetch 
         git switch v2.x.x
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/flaski/flaski:nightly
         docker tag docker.io/flaski/flaski:nightly docker.io/mpgagebioinformatics/flaski2:nightly
