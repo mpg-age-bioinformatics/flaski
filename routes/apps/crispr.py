@@ -74,6 +74,22 @@ card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    header_access, msg_access = check_access( 'rnaseq' )
+    if header_access :
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+
+    # if "crispr" in PRIVATE_ROUTES :
+    #     appdb=PrivateRoutes.query.filter_by(route="crispr").first()
+    #     if not appdb:
+    #         return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+    #     allowed_users=appdb.users
+    #     if not allowed_users:
+    #         return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+    #     if current_user.id not in allowed_users :
+    #         allowed_domains=appdb.users_domains
+    #         if current_user.domain not in allowed_domains:
+    #             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+
     eventlog = UserLogging(email=current_user.email, action="visit crispr")
     db.session.add(eventlog)
     db.session.commit()

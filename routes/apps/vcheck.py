@@ -14,6 +14,7 @@ import os
 import uuid
 import traceback
 import json
+import base64
 import pandas as pd
 import time
 import plotly.express as px
@@ -88,85 +89,50 @@ def make_layout(pathname):
     Output('app-content', 'children'),
     Input('url', 'pathname'))
 def make_app_content(pathname):
-    # pa=figure_defaults()
-    # side_bar=[
-    #     dbc.Card( 
-    #         [   
-    #             html.Div(
-    #                 dcc.Upload(
-    #                     id='upload-data',
-    #                     children=html.Div(
-    #                         [ 'Drag and Drop or ',html.A('Select File',id='upload-data-text') ],
-    #                         style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-    #                     ),
-    #                     style={
-    #                         'width': '100%',
-    #                         'borderWidth': '1px',
-    #                         'borderStyle': 'dashed',
-    #                         'borderRadius': '5px',
-    #                         "margin-bottom": "10px",
-    #                     },
-    #                     multiple=False,
-    #                 ),
-    #             ),
-    #         ],
-    #         align="start",
-    #         justify="left",
-    #         className="g-0",
-    #         style={"height":"86vh","width":"100%","overflow":"scroll"}
-    #     )
-    # ]
 
-    app_content=html.Div(
+    app_content=dbc.Row( 
         [
-            dbc.Row( 
-                [
-                    dbc.Col(
-                        [
-                            dcc.Upload(
-                                id='upload-data',
-                                children=html.Div(
-                                    [ 'Drag and Drop or ',html.A('Select File',id='upload-data-text') ],
-                                    style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+            dbc.Col( 
+                [ 
+                    dbc.Card(
+                        dbc.Form(
+                            [ 
+                                dcc.Upload(
+                                    id='upload-data',
+                                    children=html.Div(
+                                        [ html.A('drop a file here',id='upload-data-text') ],
+                                        style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                                    ),
+                                    style={
+                                        'width': '100%',
+                                        'borderWidth': '0px',
+                                        'borderStyle': 'dashed',
+                                        'borderRadius': '0px',
+                                        "margin-bottom": "0px",
+                                        'max-width':"375px"
+                                    },
+                                    multiple=False,
                                 ),
-                                style={
-                                    'width': '100%',
-                                    'borderWidth': '1px',
-                                    'borderStyle': 'dashed',
-                                    'borderRadius': '5px',
-                                    "margin-bottom": "10px",
-                                },
-                                multiple=False,
-                            ),
-                            html.Div( id="app-version"  )
-                        ],
-                        width={"size": 10, "offset": 1},
-                        # align="center",
-                        # style={"padding":"0px","overflow":"scroll", "verticalAlign":"center"},
+                                html.Div( id="app-version"), 
+                            ]
+                        )
+                        , body=True
                     ),
                 ],
+                sm=9,md=6, lg=5, xl=5, 
                 align="center",
-                # justify="evenly",
-                className="g-0",
-                style={"height":"86vh","overflow":"scroll", "padding":"5px", "verticalAlign":"center"} #"max-width":"375px",
+                style={ "margin-left":2, "margin-right":2 ,'margin-bottom':"50px"}
             ),
-            html.Div(
-                [
-                    html.Div( id="toast-read_input_file"  ),
-                    dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
-                    html.Div(id="toast-email"),  
-                ],
-                style={"position": "fixed", "top": 66, "right": 10, "width": 350}
-            )
-        ]
-    )
-                
+        ],
+        align="center",
+        justify="center",
+        style={"min-height": "86vh", 'verticalAlign': 'center'}
+    ) 
+
     return app_content
 
 @dashapp.callback( 
-    Output('app-version', 'children'),
-    Output('toast-read_input_file','children'),
-    Output({ "type":"traceback", "index":"read_input_file" },'data'),
+    Output('upload-data', 'children'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
@@ -175,16 +141,38 @@ def make_app_content(pathname):
 def read_input_file(contents,filename,last_modified,session_id):
     if not filename :
         raise dash.exceptions.PreventUpdate
-
-    try:
+    # try:
         # app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
-        app_data="something"
-        return dash.no_update, dash.no_update, dash.no_update
+    content_type, content_string = contents.split(',')
+    decoded=base64.b64decode(content_string)
+    decoded=decoded.decode('utf-8')
+    session=json.loads(decoded)
 
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"vcheck")
-        return toast, tb_str, dash.no_update
+    FLASKI_version=session["APP_VERSION"]
+    PYFLASKI_version=session["PYFLASKI_VERSION"]
+    APP=list(session["session_data"]["app"].keys())[0]
+
+    message=dcc.Markdown(f"**Session info**\
+        \n\n\
+         Flaski: {FLASKI_version}\
+        \n\
+        pyflaski: {PYFLASKI_version}\
+        \n\
+        App: {APP}")
+
+    children=html.Div(
+        [ html.A(message,id='upload-data-text') ],
+        style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+    )        
+    return children
+
+    # except:
+    #     children=html.Div(
+    #         [ html.A("! file could not be read !",id='upload-data-text') ],
+    #         style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+    #     )
+    #     return  children
+
 
 @dashapp.callback(
     Output( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
