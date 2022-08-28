@@ -137,7 +137,7 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            dcc.Textarea(id='ids', placeholder=pa["ids"], style={"height":"100px","width":"100%"}),
+                            dcc.Textarea(id='ids', placeholder="Enter target genes here...", style={"height":"100px","width":"100%"}),
                         ),
                     ],
                     align="start",
@@ -152,7 +152,7 @@ def make_app_content(pathname):
                 dbc.Row(
                     [
                         dbc.Col(
-                            dcc.Textarea( id='ids_bg', placeholder=pa["ids_bg"], style={"height":"100px","width":"100%"}),
+                            dcc.Textarea( id='ids_bg', placeholder='Leave empty if you want to use all annotated genes for your organism', style={"height":"100px","width":"100%"}),
                         ),
                     ],
                     align="start",
@@ -381,7 +381,7 @@ def make_app_content(pathname):
                                         width=6
                                     ),
                                     dbc.Col(
-                                        dcc.Input(placeholder=pa["user"], id='user',style=card_input_style),
+                                        dcc.Input(placeholder="your.email@provider.com", id='user',style=card_input_style),
                                         width=6
                                     ),
                                     ],
@@ -962,6 +962,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
         session_data={ "session_data": {"app": { "david": {"filename":upload_data_text,'last_modified':last_modified,"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
+        session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
         
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
@@ -983,7 +984,6 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
     if button_id == "save-session-btn" :
         try:
-            print("here")
             if filename and filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
                 return dash.no_update, toast, None, None, dash.no_update,dash.no_update,dash.no_update,dash.no_update,dash.no_update, None, None, None
