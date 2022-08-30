@@ -117,6 +117,19 @@ def scatterplot_import(session_import, last_modified="need a value here"):
     else:
         pan["grid_value"]=[]
 
+    groups_settings=[]
+    if pa["groups_value"] :
+        ref={"name": "A", "marker": "circle", "markers": "4", "markersizes_col": None, "markerc": "black", "lower_size_value": "", "upper_size_value": "", "lower_size": "", "upper_size": "", "markerc_col": None, "reverse_color_scale": "", "lower_value": "", "center_value": "", "upper_value": "", "lower_color": "", "center_color": "", "upper_color": "", "color_legend": "", "colorscaleTitle": "", "markerc_write": None, "marker_alpha": "1", "colorscale_value": "blues", "edge_linewidth": "0", "edgecolor": "black", "edgecolor_write": None}
+        for g in pa["groups_settings"]:
+            g_=ref.copy()
+            for k in list(g.keys()):
+                if g[k] in maps_keys:
+                    g_[k] = maps[ g[k] ]
+                else:
+                    g_[k] = g[k]
+            groups_settings.append(g_)
+        pan["groups_settings"]=groups_settings
+
     show_axis=[]
     for k in [ "left_axis","right_axis","upper_axis","lower_axis"] :
         if k in pa_keys :
