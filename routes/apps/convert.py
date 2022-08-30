@@ -190,7 +190,7 @@ def make_layout(pathname):
     db.session.commit()
     protected_content=html.Div(
         [
-            make_navbar_logged("Version check",current_user),
+            make_navbar_logged("v2 to v3 converter",current_user),
             html.Div(id="app-content"),
             navbar_A,
         ],
@@ -240,12 +240,12 @@ def make_app_content(pathname):
                 align="center",
                 style={ "margin-left":0, "margin-right":0 ,'margin-bottom':"50px",'max-width':"375px"}
             ),
+            dcc.Download( id="download-file1" ),
+            dcc.Download( id="download-file2" ),
         ],
         align="center",
         justify="center",
         style={"min-height": "86vh", 'verticalAlign': 'center'},
-        dcc.Download( id="download-file1" ),
-        dcc.Download( id="download-file2" ),
     ) 
 
     return app_content
@@ -260,45 +260,63 @@ def make_app_content(pathname):
     State('session-id', 'data'),
     prevent_initial_call=True)
 def read_input_file(contents,filename,last_modified,session_id):
+    filename=secure_filename( filename )
     if not filename :
         raise dash.exceptions.PreventUpdate
-    # try:
-        # app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "scatterplot")
+    message=dcc.Markdown(f"Not a valid session file.")
+    children=html.Div(
+        [ html.A(message,id='upload-data-text') ],
+        style={ 'textAlign': 'center', "margin-top": 35, "margin-bottom": 4}
+    )   
+    if filename.split(".")[-1] not in [ "ses"]:#, "arg" ]:     
+        return children, None, None
+
+    filename=filename.replace(".ses", ".json").replace(".arg",".json")
+
     content_type, content_string = contents.split(',')
     decoded=base64.b64decode(content_string)
     decoded=decoded.decode('utf-8')
-    session=json.loads(decoded)
+    session_data=json.loads(decoded)
 
+    session_app=session_data["app"]
 
-    ## make conversions here
+    if session_app == "iscatterplot" :
+        session_data=scatterplot_import(session_data, last_modified=last_modified)
+    
+        def write_json(filename,session_data=session_data):
+            filename.write(json.dumps(session_data).encode())
 
+        return dash.no_update,  dcc.send_bytes(write_json, filename), dash.no_update
+    elif session_app == "david" :
+        session_data, david_df, report_stats = david_import(session_data, last_modified=last_modified)
 
+        david_df=pd.read_json(david_df)
+        report_stats=pd.read_json(report_stats)
 
-    FLASKI_version=session["APP_VERSION"]
-    PYFLASKI_version=session["PYFLASKI_VERSION"]
-    APP=list(session["session_data"]["app"].keys())[0]
+        import io
+        output = io.BytesIO()
+        writer= pd.ExcelWriter(output)
+        david_df.to_excel(writer, sheet_name = 'david', index = None)
+        report_stats.to_excel(writer, sheet_name = 'stats', index = None)
+        writer.save()
+        data=output.getvalue()
+        excel_filename=filename.replace(".json", ".xlsx")
 
-    message=dcc.Markdown(f"**Session info**\
-        \n\n\
-         Flaski: {FLASKI_version}\
-        \n\
-        pyflaski: {PYFLASKI_version}\
-        \n\
-        App: {APP}")
+        def write_json(filename,session_data=session_data):
+            filename.write(json.dumps(session_data).encode())
 
-    children=html.Div(
-        [ html.A(message,id='upload-data-text') ],
-        style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-    )        
-    return children, None, None
+        return dash.no_update,  dcc.send_bytes(write_json, filename), dcc.send_bytes(data, excel_filename)
 
-    # except:
-    #     children=html.Div(
-    #         [ html.A("! file could not be read !",id='upload-data-text') ],
-    #         style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-    #     )
-    #     return  children
+    elif session_app == "icellplot" :
+        session_data = cellplot_import(session_data, last_modified=last_modified)
+    
+        def write_json(filename,session_data=session_data):
+            filename.write(json.dumps(session_data).encode())
 
+        return dash.no_update,  dcc.send_bytes(write_json, filename), dash.no_update
+
+    else:
+        return children, dash.no_update, dash.no_update
 
 @dashapp.callback(
     Output( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
