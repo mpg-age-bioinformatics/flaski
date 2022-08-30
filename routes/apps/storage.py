@@ -270,8 +270,6 @@ def make_app_content(pathname,sortby):
 
     os_path=os.path.join(user_path, ui_path)
 
-    # print("os_path", os_path)
-
     if load : 
         if not os.path.isfile(os_path):
             return dcc.Location(pathname=f'{PAGE_PREFIX}/storage/', refresh=True, id='index'), dash.no_update #, session_data

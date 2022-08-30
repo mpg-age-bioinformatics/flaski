@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, check_app, scatterplot_import, david_import
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
@@ -24,7 +24,8 @@ from werkzeug.utils import secure_filename
 from myapp import db
 from myapp.models import UserLogging
 from time import sleep
-import pyflaski as flaski
+
+# import pyflaski as flaski
 import sys
 import json
 
@@ -53,115 +54,6 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         ],
         'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
-
-def check_app(file):
-    if file.split(".")[-1] not in [ "ses", "arg" ]:
-        return None, None, "Not a valid file."
-    with open(file, "r") as f:
-        session_content=json.load(f)
-    return session_content, session_content["app"], None
-
-def scatterplot_import(session_import, last_modified="need a value here"):
-    pa=session_import["plot_arguments"]
-    pan=flaski.scatterplot.figure_defaults()
-    pa_keys=list(pa.keys())
-    pan_keys=list(pan.keys())
-
-    maps={'select a column..':None, 'None':None, ".off":None, "off":None, ".on":True, "on":True} 
-    maps_keys=list(maps.keys())
-    for k in pan_keys:
-        if k not in ["show_axis", "tick_axis", "show_legend", "labels_arrows_value", "grid_value" ] :
-            if k in pa_keys :
-                if pa[k] in maps_keys:
-                    pan[k] = maps[ pa[k] ]
-                else:
-                    pan[k] = pa[k]
-
-    if pa["show_legend"] in [".on" , "on" ]:
-        pan["show_legend"]=["show_legend"]
-    else:
-        pan["show_legend"]=[]
-
-    if pa["labels_arrows_value"] != 'None' :
-        pan["labels_arrows_value"]=pa["labels_arrows_value"]
-    else:
-        pan["labels_arrows_value"]=[]
-
-    if pa["grid_value"] != 'None' :
-        pan["grid_value"]=pa["grid_value"]
-    else:
-        pan["grid_value"]=[]
-
-    show_axis=[]
-    for k in [ "left_axis","right_axis","upper_axis","lower_axis"] :
-        if pa[k] in [".on", "on" ] :
-            show_axis.append(k)
-    pan["show_axis"] = show_axis
-
-    tick_axis=[]
-    for k in ["tick_x_axis","tick_y_axis"] :
-        if pa[k] in [".on", "on" ] :
-            tick_axis.append(k)
-    pan["tick_axis"] = tick_axis
-
-    df=session_import["df"]
-        
-    session_data={ "session_data": {"app": { "scatterplot": {"filename":session_import['filename'] ,'last_modified':last_modified,"df":df,"pa":pan} } } }
-    session["APP_VERSION"]=app.config['APP_VERSION']
-    session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
-    
-    return session_data
-
-def david_import(session_import, last_modified="need a value here"):
-    pa=session_import["plot_arguments"]
-    pan=flaski.david.figure_defaults()
-    pa_keys=list(pa.keys())
-    pan_keys=list(pan.keys())
-    for k in pan_keys:
-        if k in pa_keys :
-            pan[k] = pa[k]
-            
-    if pan["ids"] == "Enter target genes here..." :
-        pan["ids"]=None
-    if "Leave empty if you want to use all annotated genes for your organism" in pan["ids_bg"] :
-        pan["ids_bg"]=None  
-    if pan["user"] == "" :
-        pan["user"]=None
-        
-    david_df=session_import["david_df"]
-    report_stats=session_import["report_stats"]
-    
-    session_data={ "session_data": {"app": { "david": {"filename":session_import["filename"],'last_modified':last_modified,"pa":pan} } } }
-    session_data["APP_VERSION"]=app.config['APP_VERSION']
-    session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
-    return session_data, david_df, report_stats
-
-def cellplot_import(session_import,last_modified="need a value here"):
-    pa=session_import["plot_arguments"]
-    pan=flaski.cellplot.figure_defaults()
-    pa_keys=list(pa.keys())
-    pan_keys=list(pan.keys())
-
-    maps_off={".off":None, "off":None, "":None, "none":None}
-    maps_on=[".on","on"]
-    for k in pan_keys:
-        if k not in ["log10transform", "reverse_color_scale", "write_n_terms", "reverse_y_order", \
-                     "xaxis_line", "topxaxis_line", "yaxis_line", "rightyaxis_line" , "grid" ] :
-            if k in pa_keys :
-                if pa[k] in list( maps_off.keys() ) :
-                    pan[k] = maps_off[ pa[k] ]
-                if pa[k] in maps_on :
-                    pan[k] = None
-                else:
-                    pan[k] = pa[k]
-                    
-    df=session_import["df"]
-    df_ge=session_import["ge_df"]
-    
-    session_data={ "session_data": {"app": { "cellplot": {"filename":session_import["filename"] ,'last_modified':last_modified,"df":df,"pa":pan, 'filename2':session_import["ge_filename"], "df_ge": df_ge} } } }
-    session_data["APP_VERSION"]=app.config['APP_VERSION']
-    session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
-    return session_data
 
 
 dashapp.layout=html.Div( 

@@ -20,6 +20,15 @@ import hashlib
 import random
 import string
 import openpyxl
+# from myapp.routes.apps.convert import check_app, scatterplot_import, david_import
+import pyflaski as flaski
+import sys
+import json
+from flask import session
+from datetime import datetime
+
+PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
+PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 
 APP_URL=app.config['APP_URL']
 
@@ -68,6 +77,123 @@ GROUPS_INITALS={"Adam_Antebi":"AA",\
 "Sara_Wickstroem":"SW",\
 "Thomas_Langer":"TL",\
 "External":"ext"}
+
+
+def check_app(file):
+    if file.split(".")[-1] not in [ "ses", "arg" ]:
+        return None, None, "Not a valid file."
+    with open(file, "r") as f:
+        session_content=json.load(f)
+    return session_content, session_content["app"], None
+
+def scatterplot_import(session_import, last_modified="need a value here"):
+    pa=session_import["plot_arguments"]
+    pan=flaski.scatterplot.figure_defaults()
+    pa_keys=list(pa.keys())
+    pan_keys=list(pan.keys())
+
+    maps={'select a column..':None, 'None':None, ".off":None, "off":None, ".on":True, "on":True} 
+    maps_keys=list(maps.keys())
+    for k in pan_keys:
+        if k not in ["show_axis", "tick_axis", "show_legend", "labels_arrows_value", "grid_value" ] :
+            if k in pa_keys :
+                if pa[k] in maps_keys:
+                    pan[k] = maps[ pa[k] ]
+                else:
+                    pan[k] = pa[k]
+
+    if pa["show_legend"] in [".on" , "on" ]:
+        pan["show_legend"]=["show_legend"]
+    else:
+        pan["show_legend"]=[]
+
+    if pa["labels_arrows_value"] != 'None' :
+        pan["labels_arrows_value"]=pa["labels_arrows_value"]
+    else:
+        pan["labels_arrows_value"]=[]
+
+    if pa["grid_value"] != 'None' :
+        pan["grid_value"]=pa["grid_value"]
+    else:
+        pan["grid_value"]=[]
+
+    show_axis=[]
+    for k in [ "left_axis","right_axis","upper_axis","lower_axis"] :
+        if pa[k] in [".on", "on" ] :
+            show_axis.append(k)
+    pan["show_axis"] = show_axis
+
+    tick_axis=[]
+    for k in ["tick_x_axis","tick_y_axis"] :
+        if pa[k] in [".on", "on" ] :
+            tick_axis.append(k)
+    pan["tick_axis"] = tick_axis
+
+    df=session_import["df"]
+        
+    filename_out=session_import['filename'].replace(".ses",".json").replace(".arg",".json")
+    session_data={ "session_data": {"app": { "scatterplot": {"filename": filename_out,'last_modified':last_modified,"df":df,"pa":pan} } } }
+    session["APP_VERSION"]=app.config['APP_VERSION']
+    session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+    
+    return session_data
+
+def david_import(session_import, last_modified="need a value here"):
+    pa=session_import["plot_arguments"]
+    pan=flaski.david.figure_defaults()
+    pa_keys=list(pa.keys())
+    pan_keys=list(pan.keys())
+    for k in pan_keys:
+        if k in pa_keys :
+            pan[k] = pa[k]
+            
+    if pan["ids"] == "Enter target genes here..." :
+        pan["ids"]=None
+    if "Leave empty if you want to use all annotated genes for your organism" in pan["ids_bg"] :
+        pan["ids_bg"]=None  
+    if pan["user"] == "" :
+        pan["user"]=None
+        
+    david_df=session_import["david_df"]
+    report_stats=session_import["report_stats"]
+
+    filename_out=session_import['filename'].replace(".ses",".json").replace(".arg",".json")
+
+    session_data={ "session_data": {"app": { "david": {"filename":filename_out,'last_modified':last_modified,"pa":pan} } } }
+    session_data["APP_VERSION"]=app.config['APP_VERSION']
+    session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+    return session_data, david_df, report_stats
+
+def cellplot_import(session_import,last_modified="need a value here"):
+    pa=session_import["plot_arguments"]
+    pan=flaski.cellplot.figure_defaults()
+    pa_keys=list(pa.keys())
+    pan_keys=list(pan.keys())
+
+    maps_off={".off":None, "off":None, "":None, "none":None}
+    maps_on=[".on","on"]
+    for k in pan_keys:
+        if k not in ["log10transform", "reverse_color_scale", "write_n_terms", "reverse_y_order", \
+                     "xaxis_line", "topxaxis_line", "yaxis_line", "rightyaxis_line" , "grid" ] :
+            if k in pa_keys :
+                if pa[k] in list( maps_off.keys() ) :
+                    pan[k] = maps_off[ pa[k] ]
+                if pa[k] in maps_on :
+                    pan[k] = None
+                else:
+                    pan[k] = pa[k]
+                    
+    df=session_import["df"]
+    df_ge=session_import["ge_df"]
+
+    filename_out=session_import['filename'].replace(".ses",".json").replace(".arg",".json")
+    filename_out2=session_import['ge_filename'].replace(".ses",".json").replace(".arg",".json")
+    
+    session_data={ "session_data": {"app": { "cellplot": {"filename":filename_out ,'last_modified':last_modified,"df":df,"pa":pan, 'filename2':filename_out2, "df_ge": df_ge} } } }
+    session_data["APP_VERSION"]=app.config['APP_VERSION']
+    session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+    return session_data
+
 
 def user_generator():
     name_upper_chars = string.ascii_uppercase
@@ -176,6 +302,8 @@ def make_save_toast(filename,id, header="Save"):
     return toast
 
 def save_session(session_data, filename,current_user, func ):
+    if filename.split(".")[-1] == "ses":
+        filename=filename.replace(".ses",".json")
     if filename.split(".")[-1] == "json" :
         ## check that path is user path
         user_path, file_path= check_user_path(filename,current_user)
@@ -190,7 +318,27 @@ def save_session(session_data, filename,current_user, func ):
     return toast
 
 def load_session( filename,current_user ):
-    if filename.split(".")[-1] == "json" :
+    if filename.split(".")[-1] == "ses" :
+        
+        ## check that path is user path
+        user_path, file_path= check_user_path(filename,current_user)
+        if file_path :
+            dt = datetime.now()
+            ts = datetime.timestamp(dt)
+            session_data, session_app, msg = check_app(filename)
+            if session_app == "iscatterplot" :
+                session_data=scatterplot_import(session_data, last_modified=ts)
+ 
+            elif session_app == "david" :
+                session_data, david_df, report_stats = david_import(session_data, last_modified=ts)
+
+            elif session_app == "icellplot" :
+                session_data = cellplot_import(session_data, last_modified=ts)
+    
+        else:
+            raise Exception("Target does not belong to user.")
+
+    elif filename.split(".")[-1] == "json" :
         ## check that path is user path
         user_path, file_path= check_user_path(filename,current_user)
         if file_path :
@@ -199,6 +347,7 @@ def load_session( filename,current_user ):
             # toast=make_save_toast(file_path,func,header="Load")
         else:
             raise Exception("Target does not belong to user.")
+
     else:
         raise Exception("Not a session file.")
 
@@ -214,6 +363,7 @@ def encode_session_file(filename, current_user ):
     session_import=base64.b64encode(session_import.encode('utf-8'))
     session_import=session_import.decode('utf-8')
     session_import=f'data:application/json;base64,{session_import}'
+    filename=filename.replace(".ses",".json").replace(".arg",".json")
     return { "session_import":session_import, "last_modified":last_modified, "app_name":app_name, "sessionfilename": filename }
 
 def encode_session_app(session_data):
