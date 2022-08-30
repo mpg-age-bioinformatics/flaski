@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, check_app, scatterplot_import, david_import
+from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, check_app, scatterplot_import, david_import, cellplot_import
 from pyflaski.scatterplot import make_figure, figure_defaults
 import os
 import uuid
@@ -170,7 +170,11 @@ def read_input_file(contents,filename,last_modified,session_id):
     decoded=decoded.decode('utf-8')
     session_data=json.loads(decoded)
 
+    # print(session_data.keys())
+
     session_app=session_data["app"]
+
+    # print(session_app)
 
     if session_app == "iscatterplot" :
         session_data=scatterplot_import(session_data, last_modified=last_modified)

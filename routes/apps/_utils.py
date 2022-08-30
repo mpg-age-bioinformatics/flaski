@@ -119,14 +119,16 @@ def scatterplot_import(session_import, last_modified="need a value here"):
 
     show_axis=[]
     for k in [ "left_axis","right_axis","upper_axis","lower_axis"] :
-        if pa[k] in [".on", "on" ] :
-            show_axis.append(k)
+        if k in pa_keys :
+            if pa[k] in [".on", "on" ] :
+                show_axis.append(k)
     pan["show_axis"] = show_axis
 
     tick_axis=[]
     for k in ["tick_x_axis","tick_y_axis"] :
-        if pa[k] in [".on", "on" ] :
-            tick_axis.append(k)
+        if k in pa_keys:
+            if pa[k] in [".on", "on" ] :
+                tick_axis.append(k)
     pan["tick_axis"] = tick_axis
 
     df=session_import["df"]
