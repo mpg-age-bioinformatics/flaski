@@ -147,6 +147,8 @@ def generate_submission_file(samplenames, \
     cnv_line,\
     upstreamseq,\
     sgRNA_size,\
+    efficiency_matrix,\
+    SSC_sgRNA_size,\
     gmt_file,\
     mageck_test_remove_zero,\
     mageck_test_remove_zero_threshold,\
@@ -171,6 +173,8 @@ def generate_submission_file(samplenames, \
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
+        efficiency_matrix,\
+        SSC_sgRNA_size,\
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
@@ -197,6 +201,8 @@ def generate_submission_file(samplenames, \
                 "cnv_line",\
                 "upstreamseq",\
                 "sgRNA_size",\
+                "efficiency_matrix",\
+                "SSC_sgRNA_size",\
                 "gmt_file",\
                 "mageck_test_remove_zero",\
                 "mageck_test_remove_zero_threshold",\
@@ -218,6 +224,8 @@ def generate_submission_file(samplenames, \
                 cnv_line,\
                 upstreamseq,\
                 sgRNA_size,\
+                efficiency_matrix,\
+                SSC_sgRNA_size,\
                 gmt_file,\
                 mageck_test_remove_zero,\
                 mageck_test_remove_zero_threshold,\
@@ -250,6 +258,8 @@ def generate_submission_file(samplenames, \
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
+        efficiency_matrix,\
+        SSC_sgRNA_size,\
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
@@ -350,6 +360,22 @@ def make_app_content(pathname):
                 dbc.Col( html.Label('sgRNA size') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='sgRNA_size', placeholder="20", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label('sgRNA size'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Efficiency matrix') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='efficiency_matrix', placeholder="human_CRISPRi_20bp.matrix", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('Eff. matrix'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('SSC sgRNA size') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='SSC_sgRNA_size', placeholder="20", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('SSC sgRNA size'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -655,6 +681,8 @@ fields = [
     "cnv_line",\
     "upstreamseq",\
     "sgRNA_size",\
+    "efficiency_matrix",\
+    "SSC_sgRNA_size",\
     "gmt_file",\
     "mageck_test_remove_zero",\
     "mageck_test_remove_zero_threshold",\
@@ -706,18 +734,20 @@ def read_file(contents,filename,last_modified):
     else:
         library=dash.no_update
     
-    if "arguments" not in exc.sheet_names :
+    if "crispr" not in exc.sheet_names :
         arguments=[ dash.no_update for f in fields ]
     else:
-        arguments_df=pd.read_excel(io.BytesIO(decoded), sheet_name="arguments")
-        arguments_list=arguments_df["Arg"].tolist()
+        arguments_df=pd.read_excel(io.BytesIO(decoded), sheet_name="crispr")
+        arguments_list=arguments_df["Field"].tolist()
         arguments=[]
         for f in fields :
             if f in arguments_list :
-                val= arguments_df[arguments_df["Arg"]==f]["Value"].tolist()[0]
+                val= arguments_df[arguments_df["Field"]==f]["Value"].tolist()[0]
                 arguments.append(val)
             else:
                 arguments.append( dash.no_update )
+
+    print(  arguments )
             
     return [ filename ] + [ samplenames, samples, library ] +  arguments 
 
@@ -747,6 +777,8 @@ def update_output(n_clicks, \
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
+        efficiency_matrix,\
+        SSC_sgRNA_size,\
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
@@ -776,6 +808,8 @@ def update_output(n_clicks, \
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
+        efficiency_matrix,\
+        SSC_sgRNA_size,\
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
