@@ -538,9 +538,9 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
         return header, validation
 
     if os.path.isfile(subdic["filename"]):
-        print(subdic["filename"])
         header="Attention"
         msg='''You have already submitted this data. Re-submission will not take place.'''
+        return header, msg
     else:
         header="Success!"
         msg='''Please check your email for confirmation.'''

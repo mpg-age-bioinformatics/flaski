@@ -572,6 +572,7 @@ def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, pr
     if os.path.isfile(subdic["filename"]):
         header="Attention"
         msg='''You have already submitted this data. Re-submission will not take place.'''
+        return header, msg
     else:
         header="Success!"
         msg='''Please check your email for confirmation.'''

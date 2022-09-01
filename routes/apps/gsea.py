@@ -415,6 +415,7 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     if os.path.isfile(subdic["filename"]):
         header="Attention"
         msg='''You have already submitted this data. Re-submission will not take place.'''
+        return header, msg
     else:
         header="Success!"
         msg='''Please check your email for confirmation.'''
