@@ -245,7 +245,7 @@ def generate_submission_file(samplenames, \
         filename=make_submission_file(".crispr.xlsx")
 
 
-        return {"filename": filename, "sampleNames":samplenames_df, "samples":samples_df, "library":library_df, "arguments":df_}
+        return {"filename": filename, "sampleNames":samplenames_df, "samples":samples_df, "library":library_df, "crispr":df_}
     return _generate_submission_file(
         samplenames, \
         samples, \
@@ -854,17 +854,17 @@ def update_output(n_clicks, \
         sampleNames=pd.read_json(subdic["sampleNames"])
         samples=pd.read_json(subdic["samples"])
         library=pd.read_json(subdic["library"])
-        arguments=pd.read_json(subdic["arguments"])
+        arguments=pd.read_json(subdic["crispr"])
 
         EXCout=pd.ExcelWriter(subdic["filename"])
         sampleNames.to_excel(EXCout,"sampleNames",index=None)
         samples.to_excel(EXCout,"samples",index=None)
         library.to_excel(EXCout,"library",index=None)
-        arguments.to_excel(EXCout,"arguments",index=None)
+        arguments.to_excel(EXCout,"crispr",index=None)
         EXCout.save()
 
         # if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="crispr", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
         # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
     except:
