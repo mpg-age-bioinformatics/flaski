@@ -238,7 +238,7 @@ def generate_submission_file(samplenames, \
                 BAGEL_NONESSENTIAL,\
                 mageckflute_organism 
                 ]
-             }, index=list(range(19)))
+             }, index=list(range(21)))
 
         df_=df_.to_json()
      
