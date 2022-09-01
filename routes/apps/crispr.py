@@ -192,11 +192,14 @@ def generate_submission_file(samplenames, \
         library_df=make_df_from_rows(library)
 
         df_=pd.DataFrame({
-            "Field":[
+            "Arg":[
                 "email", \
                 "group",\
+                "Group",
                 "experiment_name",\
+                "Project title",\
                 "folder",\
+                "Folder",\
                 "md5sums",\
                 "cnv_line",\
                 "upstreamseq",\
@@ -218,7 +221,10 @@ def generate_submission_file(samplenames, \
             "Value":[
                 email, \
                 group,\
+                group,\
                 experiment_name,\
+                experiment_name,\
+                folder,\
                 folder,\
                 md5sums,\
                 cnv_line,\
