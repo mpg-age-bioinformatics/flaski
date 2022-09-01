@@ -449,10 +449,15 @@ def make_app_content(pathname):
                 html.Div(
                     dcc.Upload(
                         id='upload-data',
-                        children=html.Div(
-                            [ html.A('upload a file or fill up the form',id='upload-data-text') ],
-                            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-                        ),
+                        children=dcc.Loading(
+                            id=f"data-load",
+                            type="default",
+                            children=html.Div(
+                                [ html.A('upload a file or fill up the form',id='upload-data-text') ],
+                                style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
+                            ),
+                        ),               
+
                         style={
                             'width': '100%',
                             'borderWidth': '1px',
