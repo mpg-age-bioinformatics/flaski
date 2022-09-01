@@ -192,7 +192,7 @@ def generate_submission_file(samplenames, \
         library_df=make_df_from_rows(library)
 
         df_=pd.DataFrame({
-            "Arg":[
+            "Field":[
                 "email", \
                 "group",\
                 "experiment_name",\
