@@ -26,6 +26,13 @@ Create local folders:
 mkdir -p ~/flaski23/backup/stats ~/flaski23/backup/users_data2 ~/flaski23/backup/users_data3 ~/flaski23/backup/mariadb ~/flaski23/private ~/flaski23/mpcdf ~/flaski23/submissions
 ```
 
+Switch brach on the Flaski (v2) repo:
+```
+cd ~/flaski
+git switch v2.x.x
+cd ~/flaski-3.0.0
+```
+
 To deploy flaski edit the docker-compose.yml accordingly and then:
 ```
 docker-compose up -d --build
