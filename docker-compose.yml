@@ -132,6 +132,7 @@ services:
    - ./routes/_vars.py:/myapp/myapp/routes/_vars.py
    - ./routes/_privacy.py:/myapp/myapp/routes/_privacy.py
    - ./routes/_about.py:/myapp/myapp/routes/_about.py
+   - ~/myapp/myapp/routes/about.py:/myapp/myapp/routes/about.py
    - ./email/app_exception.html:/myapp/myapp/templates/email/app_exception.html
    - ./email/app_exception.txt:/myapp/myapp/templates/email/app_exception.txt
    - ./email/app_help.html:/myapp/myapp/templates/email/app_help.html
