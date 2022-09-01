@@ -542,17 +542,22 @@ def make_app_content(pathname):
             color="secondary",
             n_clicks=0, 
             style={"max-width":"372px","width":"200px","margin-top":"8px", "margin-left":"4px","margin-bottom":"50px"}#,"max-width":"375px","min-width":"375px"}
-        ),
+        ),  
         dbc.Modal(
-            [
-                dbc.ModalHeader(dbc.ModalTitle("Info",id="modal_header") ),
-                dbc.ModalBody("Generating submission file. Check your page or tab status, if this message does not change in a few seconds than something went wrong!", id="modal_body"),
-                dbc.ModalFooter(
-                    dbc.Button(
-                        "Close", id="close", className="ms-auto", n_clicks=0
-                    )
-                ),
-            ],
+            dcc.Loading(
+                id=f"modal-load",
+                type="default",
+                children=
+                    [
+                        dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),
+                        dbc.ModalBody("something went wrong!", id="modal_body"),
+                        dbc.ModalFooter(
+                            dbc.Button(
+                                "Close", id="close", className="ms-auto", n_clicks=0
+                            )
+                        ),
+                    ],
+            ),
             id="modal",
             is_open=False,
         )
@@ -746,8 +751,6 @@ def read_file(contents,filename,last_modified):
                 arguments.append(val)
             else:
                 arguments.append( dash.no_update )
-
-    print(  arguments )
             
     return [ filename ] + [ samplenames, samples, library ] +  arguments 
 
@@ -797,70 +800,76 @@ def update_output(n_clicks, \
     # if not wget:
     #     wget="NONE"
 
-    subdic=generate_submission_file( samplenames, \
-        samples, \
-        library, \
-        email, \
-        group,\
-        experiment_name,\
-        folder,\
-        md5sums,\
-        cnv_line,\
-        upstreamseq,\
-        sgRNA_size,\
-        efficiency_matrix,\
-        SSC_sgRNA_size,\
-        gmt_file,\
-        mageck_test_remove_zero,\
-        mageck_test_remove_zero_threshold,\
-        species,\
-        assembly,\
-        use_bowtie,\
-        depmap,\
-        depmap_cell_line,\
-        BAGEL_ESSENTIAL,\
-        BAGEL_NONESSENTIAL,\
-        mageckflute_organism )
+    try:
 
-    # samples=pd.read_json(subdic["samples"])
-    # metadata=pd.read_json(subdic["metadata"])
+        subdic=generate_submission_file( samplenames, \
+            samples, \
+            library, \
+            email, \
+            group,\
+            experiment_name,\
+            folder,\
+            md5sums,\
+            cnv_line,\
+            upstreamseq,\
+            sgRNA_size,\
+            efficiency_matrix,\
+            SSC_sgRNA_size,\
+            gmt_file,\
+            mageck_test_remove_zero,\
+            mageck_test_remove_zero_threshold,\
+            species,\
+            assembly,\
+            use_bowtie,\
+            depmap,\
+            depmap_cell_line,\
+            BAGEL_ESSENTIAL,\
+            BAGEL_NONESSENTIAL,\
+            mageckflute_organism )
 
-    # validation=validate_metadata(metadata)
-    # if validation:
-    #     header="Attention"
-    #     return header, validation
+        # samples=pd.read_json(subdic["samples"])
+        # metadata=pd.read_json(subdic["metadata"])
 
-    if os.path.isfile(subdic["filename"]):
-        header="Attention"
-        msg='''You have already submitted this data. Re-submission will not take place.'''
-    else:
-        header="Success!"
-        msg='''Please check your email for confirmation.'''
-    
+        # validation=validate_metadata(metadata)
+        # if validation:
+        #     header="Attention"
+        #     return header, validation
 
-    user_domain=current_user.email
-    # user_domain=user_domain.split("@")[-1]
-    # mps_domain="mpg.de"
-    # if user_domain[-len(mps_domain):] == mps_domain :
-    # if user_domain !="age.mpg.de" :
-        # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+        if os.path.isfile(subdic["filename"]):
+            header="Attention"
+            msg='''You have already submitted this data. Re-submission will not take place.'''
+            return header, msg
+        else:
+            header="Success!"
+            msg='''Please check your email for confirmation.'''
+        
 
-    sampleNames=pd.read_json(subdic["sampleNames"])
-    samples=pd.read_json(subdic["samples"])
-    library=pd.read_json(subdic["library"])
-    arguments=pd.read_json(subdic["arguments"])
+        user_domain=current_user.email
+        # user_domain=user_domain.split("@")[-1]
+        # mps_domain="mpg.de"
+        # if user_domain[-len(mps_domain):] == mps_domain :
+        # if user_domain !="age.mpg.de" :
+            # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    sampleNames.to_excel(EXCout,"sampleNames",index=None)
-    samples.to_excel(EXCout,"samples",index=None)
-    library.to_excel(EXCout,"library",index=None)
-    arguments.to_excel(EXCout,"arguments",index=None)
-    EXCout.save()
+        sampleNames=pd.read_json(subdic["sampleNames"])
+        samples=pd.read_json(subdic["samples"])
+        library=pd.read_json(subdic["library"])
+        arguments=pd.read_json(subdic["arguments"])
 
-    # if user_domain == "age.mpg.de" :
-    send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
-    # else:
-    #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        EXCout=pd.ExcelWriter(subdic["filename"])
+        sampleNames.to_excel(EXCout,"sampleNames",index=None)
+        samples.to_excel(EXCout,"samples",index=None)
+        library.to_excel(EXCout,"library",index=None)
+        arguments.to_excel(EXCout,"arguments",index=None)
+        EXCout.save()
+
+        # if user_domain == "age.mpg.de" :
+        send_submission_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        # else:
+        #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+    except:
+        header=dash.no_update
+        msg=dash.no_update
 
     return header, msg
 

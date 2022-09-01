@@ -322,21 +322,27 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
                     ]
                 )
             ],
-            body=False),
-            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),
-                    dbc.ModalBody("If this message does not change in a few seconds than something went wrong!", id="modal_body"),
-                    dbc.ModalFooter(
-                        dbc.Button(
-                            "Close", id="close", className="ms-auto", n_clicks=0
-                        )
-                    ),
-                ],
-                id="modal",
-                is_open=False,
+            body=False
+        ),
+        html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
+        dbc.Modal(
+            dcc.Loading(
+                id=f"modal-load",
+                type="default",
+                children=
+                    [
+                        dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),
+                        dbc.ModalBody("something went wrong!", id="modal_body"),
+                        dbc.ModalFooter(
+                            dbc.Button(
+                                "Close", id="close", className="ms-auto", n_clicks=0
+                            )
+                        ),
+                    ],
             ),
+            id="modal",
+            is_open=False,
+        )
     ]
 
     return main_input
