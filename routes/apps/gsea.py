@@ -68,7 +68,7 @@ def make_layout(pathname):
     protected_content=html.Div(
         [
             make_navbar_logged("GSEA",current_user),
-            html.Div(id="app-content", style={"height":"87%","overflow":"scroll"}),
+            html.Div(id="app-content", style={"height":"100%","overflow":"scroll"}),
             # html.Div(id="app-content", style={"height":"1380px","width":"100%","overflow":"scroll"}),
             navbar_A,
         ],
@@ -323,7 +323,7 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
                 )
             ],
             body=False),
-            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
+            html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
             dbc.Modal(
                 [
                     dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),

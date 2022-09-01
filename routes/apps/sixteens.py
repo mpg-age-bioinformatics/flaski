@@ -362,7 +362,7 @@ Once you have been given access more information will be displayed on how to tra
             ],
             body=False
         ),
-        html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
+        html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),

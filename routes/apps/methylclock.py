@@ -62,7 +62,7 @@ dashapp.layout=html.Div(
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
-    
+
     header_access, msg_access = check_access( 'crispr' )
     if header_access :
         return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
@@ -73,7 +73,7 @@ def make_layout(pathname):
     protected_content=html.Div(
         [
             make_navbar_logged("Methylation Clock",current_user),
-            html.Div(id="app-content", style={"height":"84%","overflow":"scroll"}),
+            html.Div(id="app-content", style={"height":"100%","overflow":"scroll"}),
             navbar_A,
         ],
         style={"height":"100vh","verticalAlign":"center"}
@@ -345,7 +345,7 @@ Once you have been given access more information will be displayed on how to tra
             ],
             body=False
         ),
-        html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":4}),
+        html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Whoopss..",id="modal_header") ),

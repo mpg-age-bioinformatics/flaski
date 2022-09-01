@@ -510,7 +510,7 @@ def make_app_content(pathname):
             id='submit-button-state', 
             color="secondary",
             n_clicks=0, 
-            style={"max-width":"372px","width":"200px","margin-top":"8px", "margin-left":"4px"}#,"max-width":"375px","min-width":"375px"}
+            style={"max-width":"372px","width":"200px","margin-top":"8px", "margin-left":"4px","margin-bottom":"50px"}#,"max-width":"375px","min-width":"375px"}
         ),
         dbc.Modal(
             [
@@ -630,7 +630,7 @@ def make_app_content(pathname):
             align="start",
             justify="left",
             className="g-0",
-            style={"height":"86vh","width":"100%","overflow":"scroll"} #"86vh" "64vh"
+            style={"height":"100%","width":"100%","overflow":"scroll"} #"86vh" "64vh"
             ),
         ]
     )
