@@ -244,7 +244,7 @@ def generate_submission_file(samplenames, \
                 BAGEL_NONESSENTIAL,\
                 mageckflute_organism 
                 ]
-             }, index=list(range(21)))
+             }, index=list(range(24)))
 
         df_=df_.to_json()
      
@@ -584,92 +584,7 @@ def make_app_content(pathname):
                         sm=12,md=12,lg=12,xl=12,
                         align="top",
                         style={"padding":"0px","overflow":"scroll"},
-                    ),
-                    # dbc.Col(
-                    #     [
-                    #         dcc.Loading(id="loading-stored-file", children= html.Div(id='stored-file'), style={"height":"100%"}),
-                    #         dcc.Loading(
-                    #             id="loading-fig-output",
-                    #             type="default",
-                    #             children=[
-                    #                 html.Div(id="fig-output"),
-                    #                 html.Div( 
-                    #                     [
-                    #                         dbc.Button(
-                    #                             html.Span(
-                    #                                 [ 
-                    #                                     html.I(className="fas fas fa-file-pdf"),
-                    #                                     " PDF" 
-                    #                                 ]
-                    #                             ),
-                    #                             id='download-pdf-btn', 
-                    #                             style={"max-width":"150px","width":"100%"},
-                    #                             color="secondary"
-                    #                         ),
-                    #                         dcc.Download(id="download-pdf")
-                    #                     ],
-                    #                     id="download-pdf-div",
-                    #                     style={"max-width":"150px","width":"100%","margin":"4px", 'display': 'none'} # 'none' / 'inline-block'
-                    #                 )
-                    #             ],
-                    #             style={"height":"100%"}
-                    #         ),
-                    #         html.Div(
-                    #             [
-                    #                 html.Div( id="toast-read_input_file"  ),
-                    #                 dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
-                    #                 html.Div( id="toast-update_labels_field"  ),
-                    #                 dcc.Store( id={ "type":"traceback", "index":"update_labels_field" }), 
-                    #                 html.Div( id="toast-generate_markers" ),
-                    #                 dcc.Store( id={ "type":"traceback", "index":"generate_markers" }), 
-                    #                 html.Div( id="toast-make_fig_output" ),
-                    #                 dcc.Store( id={ "type":"traceback", "index":"make_fig_output" }), 
-                    #                 html.Div(id="toast-email"),  
-                    #             ],
-                    #             style={"position": "fixed", "top": 66, "right": 10, "width": 350}
-                    #         ),
-                    #     ],
-                    #     id="col-fig-output",
-                    #     sm=12,md=6,lg=7,xl=8,
-                    #     align="top",
-                    #     style={"height":"100%"}
-                    # ),
-
-                    # dbc.Modal(
-                    #     [
-                    #         dbc.ModalHeader("File name"), # dbc.ModalTitle(
-                    #         dbc.ModalBody(
-                    #             [
-                    #                 dcc.Input(id='pdf-filename', value="scatterplot.pdf", type='text', style={"width":"100%"})
-                    #             ]
-                    #         ),
-                    #         dbc.ModalFooter(
-                    #             dbc.Button(
-                    #                 "Download", id="pdf-filename-download", className="ms-auto", n_clicks=0
-                    #             )
-                    #         ),
-                    #     ],
-                    #     id="pdf-filename-modal",
-                    #     is_open=False,
-                    # ),
-
-                    # dbc.Modal(
-                    #     [
-                    #         dbc.ModalHeader("File name"), 
-                    #         dbc.ModalBody(
-                    #             [
-                    #                 dcc.Input(id='export-filename', value="scatterplot.json", type='text', style={"width":"100%"})
-                    #             ]
-                    #         ),
-                    #         dbc.ModalFooter(
-                    #             dbc.Button(
-                    #                 "Download", id="export-filename-download", className="ms-auto", n_clicks=0
-                    #             )
-                    #         ),
-                    #     ],
-                    #     id="export-filename-modal",
-                    #     is_open=False,
-                    # )
+                    )
                 ],
             align="start",
             justify="left",
@@ -873,7 +788,7 @@ def update_output(n_clicks, \
 
         # if user_domain == "age.mpg.de" :
         send_submission_email(user=current_user, submission_type="crispr", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
-        # else:
+    # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
     except:
         header=dash.no_update
