@@ -54,5 +54,7 @@ The Bioinformatics Core Facility of the Max Planck Institute for Biology of Agei
 
 ##### Version
 
-{v} // pyflaski #{PYFLASKI_VERSION}
+flaski: {v}
+
+pyflaski: #{PYFLASKI_VERSION}
 '''
