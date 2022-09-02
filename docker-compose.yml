@@ -24,7 +24,7 @@ services:
    - ~/flaski23/backup/mariadb:/backup/mariadb:ro
    - ./_models.py:/myapp/myapp/_models.py
   environment:
-   APP_NAM: myapp
+   APP_NAME: myapp
    FLASK_ENV: init
    RESTORE_DB: 1
    RESTORE_USERS_DATA: 1
