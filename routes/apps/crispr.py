@@ -299,9 +299,11 @@ def make_app_content(pathname):
     assembly=make_options(["hg19"])
     assembly_value="hg19"
 
-    TRUE_FALSE=make_options(["TRUE","FALSE"])
+    TRUE_FALSE=make_options(["True","False"])
 
     mageckflute_organism=make_options(["hsa"])
+
+    mageck_test_remove_zero_=make_options([ "none","control","treatment","both","any" ]) # {none,control,treatment,both,any}
 
 
     arguments=[
@@ -309,7 +311,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('email') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value=current_user.email, type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('your email address'),md=3  ), 
+                dbc.Col( html.Label('Your email address.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -317,7 +319,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Group') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='group', options=groups_, value=groups_val, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
+                dbc.Col( html.Label('Select from dropdown menu.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -325,7 +327,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Experiment name') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='experiment_name', placeholder="PinAPL-py_demo", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Name of your choice'),md=3  ), 
+                dbc.Col( html.Label('Name of your choice.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -333,7 +335,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", type='text', style={ "width":"100%" } ) ,md=3 ),
-                dbc.Col( html.Label('Folder containing your files'),md=3  ), 
+                dbc.Col( html.Label('Folder on smb://octopus.age.mpg.de/group_bit_automation/ containing your files. No subfolders.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -341,7 +343,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='md5sums', placeholder="md5sums.file.txt", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('File with md5sums'),md=3  ), 
+                dbc.Col( html.Label('File with md5sums of your fastq.gz files.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -349,7 +351,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('CNV line') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='cnv_line', placeholder="T98G_CENTRAL_NERVOUS_SYSTEM", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('CNV line to take as reference'),md=3  ), 
+                dbc.Col( html.Label('[mageck test] The name of the cell line to be used for copy number variation  to normalize CNV-biased sgRNA scores prior to gene ranking.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -357,7 +359,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Upstream sequence') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='upstreamseq',placeholder="TCTTGTGGAAAGGACGAAACNNNN", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Upstream sequence'),md=3  ), 
+                dbc.Col( html.Label('[cutadapt] Upstream sequence for trimming.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -365,7 +367,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('sgRNA size') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='sgRNA_size', placeholder="20", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('sgRNA size'),md=3  ), 
+                dbc.Col( html.Label('[cutadapt] sgRNA size used for trimming. [bowtie2] Generate full mapping stats.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -373,7 +375,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Efficiency matrix') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='efficiency_matrix', placeholder="human_CRISPRi_20bp.matrix", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Eff. matrix'),md=3  ), 
+                dbc.Col( html.Label('[SSC] Weight matrix provided in the SSC source for calculating sgRNA efficiencies. If not given SSC will be skipped.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -381,7 +383,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('SSC sgRNA size') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='SSC_sgRNA_size', placeholder="20", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('SSC sgRNA size'),md=3  ), 
+                dbc.Col( html.Label('[SSC] sgRNA size used for calculating sgRNA efficiencies.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -389,23 +391,23 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('GMT file') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='gmt_file', placeholder="msigdb.v7.2.symbols.gmt_", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('GMT file'),md=3  ), 
+                dbc.Col( html.Label('[mageck pathway] GMT file used for GSEA.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Mageck test remove zero') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='mageck_test_remove_zero', value="both", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Remove zeros'),md=3  ), 
+                dbc.Col( dcc.Dropdown( id='mageck_test_remove_zero', options=mageck_test_remove_zero_, value='none', style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[mageck test] Whether to remove zero-count sgRNAs in control and/or treatment experiments. Default: none (do not remove those zero-count sgRNAs).'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Zero threshold') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='mageck_test_remove_zero_threshold', value="0", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Zero value'),md=3  ), 
+                dbc.Col( dcc.Input(id='mageck_test_remove_zero_threshold', value="0", type='text', style={ "width":"100%"} ) ,md=3 ), 
+                dbc.Col( html.Label('[mageck test] Zero value'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -413,7 +415,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Species') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='species', options=species, value=species_value, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Species'),md=3  ), 
+                dbc.Col( html.Label('[vispr] Species'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -421,23 +423,23 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Assembly') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='assembly', options=assembly, value=assembly_value, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Organism assembly'),md=3  ), 
+                dbc.Col( html.Label('[vispr] Organism assembly'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Bowtie') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='use_bowtie', options=TRUE_FALSE, value="FALSE", style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Use Bowtie to map reads'),md=3  ), 
+                dbc.Col( dcc.Dropdown( id='use_bowtie', options=TRUE_FALSE, value="False", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[bowtie2] Use Bowtie to map reads.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Depmap') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='depmap', options=TRUE_FALSE, value="FALSE", style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Use Depmap as reference'),md=3  ), 
+                dbc.Col( dcc.Dropdown( id='depmap', options=TRUE_FALSE, value="False", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[FluteMLE] Use Depmap as reference. A character vector, specifying the names of control samples. If there is no controls in your CRISPR screen, you can specify "Depmap" as ctrlname'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -445,23 +447,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Depmap cell line') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='depmap_cell_line', type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Compare to specific Depmap cell line'),md=3  ), 
-            ], 
-            style={"margin-top":10}
-        ),
-        dbc.Row( 
-            [
-                dbc.Col( html.Label('Bagel essential') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='BAGEL_ESSENTIAL', value="/bagel/CEGv2.txt", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Bagel essential genes list'),md=3  ), 
-            ], 
-            style={"margin-top":10}
-        ),
-        dbc.Row( 
-            [
-                dbc.Col( html.Label('Bagel essential') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='BAGEL_NONESSENTIAL', value="/bagel/NEGv1.txt", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('Bagel non essential genes list'),md=3  ), 
+                dbc.Col( html.Label('[FluteMLE] A character vector, specifying the cell lines in Depmap to be considered. If none is given than the most close one will be identified automaticaly from the depmap collection.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -469,7 +455,23 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('Mageckflute organism') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='mageckflute_organism', options=mageckflute_organism, value="hsa", style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('Mageckflute reference organism'),md=3  ), 
+                dbc.Col( html.Label('[FluteMLE] Mageckflute reference organism'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Bagel essential') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='BAGEL_ESSENTIAL', value="/bagel/CEGv2.txt", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[bagel] Bagel essential genes list'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Bagel essential') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='BAGEL_NONESSENTIAL', value="/bagel/NEGv1.txt", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[bagel] Bagel non essential genes list'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
