@@ -435,6 +435,8 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
 
     if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
         os.remove(subdic["filename"])
+    else:
+        values_to_return.append( dash.no_update )
 
     return header, msg
 

@@ -403,6 +403,8 @@ def read_file(contents,filename,last_modified):
     for f in fields_to_return:
         if f in  fields_on_file:
             values_to_return.append(  alternativeSplicing[alternativeSplicing["Field"]==f]["Value"].tolist()[0]  )
+        else:
+            values_to_return.append( dash.no_update )
 
     return [ input_df ] +  values_to_return + [ filename ]
 

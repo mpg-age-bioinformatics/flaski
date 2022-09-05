@@ -517,6 +517,8 @@ def read_file(contents,filename,last_modified):
     for f in fields_to_return:
         if f in  fields_on_file:
             values_to_return.append(  RiboSeq[RiboSeq["Field"]==f]["Value"].tolist()[0]  )
+        else:
+            values_to_return.append( dash.no_update )
 
     matching_df=make_table(Matching,'matching-table')
     matching_df.editable=True
