@@ -774,6 +774,7 @@ def make_app_content(pathname):
             className="g-0",
             style={"height":"100%","width":"100%","overflow":"scroll"} #"86vh" "64vh"
             ),
+            dcc.Download( id="download-file" )
         ]
     )
     return app_content
@@ -867,6 +868,7 @@ states=[ State(f, 'value') for f in fields ]
 @dashapp.callback(
     Output("modal_header", "children"),
     Output("modal_body", "children"),
+    Output("download-file","data"),
     # Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     [ State("adding-rows-samplenames", 'data'),
@@ -944,10 +946,10 @@ def update_output(n_clicks, \
         if os.path.isfile(subdic["filename"]):
             header="Attention"
             msg='''You have already submitted this data. Re-submission will not take place.'''
-            return header, msg
+            return header, msg, dash.no_update
         else:
             header="Success!"
-            msg='''Please check your email for confirmation.'''
+            msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
         
 
         user_domain=current_user.email
@@ -969,17 +971,15 @@ def update_output(n_clicks, \
         arguments.to_excel(EXCout,"crispr",index=None)
         EXCout.save()
 
-        print(subdic["filename"])
 
         # if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="crispr", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="crispr", submission_file=None, attachment_path=None)
+        return header, msg, dcc.send_file( subdic["filename"] )
     # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
     except:
-        header=dash.no_update
-        msg=dash.no_update
-
-    return header, msg
+        return dash.no_update, dash.no_update, dash.no_update
+    
 
 @dashapp.callback(
     Output('adding-rows-samplenames', 'data'),

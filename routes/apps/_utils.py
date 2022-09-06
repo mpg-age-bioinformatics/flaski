@@ -497,22 +497,22 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
                                     user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file.name),\
         reply_to=user.email )      
 
-def send_submission_email(user,submission_type,submission_file, attachment_path,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
+def send_submission_email(user,submission_type,submission_tag, submission_file=None, attachment_path=None,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
     with app.app_context():
         send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
                 sender=app.config['MAIL_USERNAME'],
                 recipients=[user.email, 'automation@age.mpg.de' ], 
                 text_body=render_template('email/submissions.age.txt',
-                                            user=user, submission_type=submission_type, attachment_path=attachment_path),
+                                            user=user, submission_type=submission_type, submission_tag=submission_tag),
                 html_body=render_template('email/submissions.age.html',
-                                            user=user, submission_type=submission_type, attachment_path=attachment_path),\
+                                            user=user, submission_type=submission_type, submission_tag=submission_tag),\
                 reply_to='bioinformatics@age.mpg.de',\
                 attachment=submission_file ,
                 attachment_path=attachment_path ,\
                 open_type=open_type,\
                 attachment_type=attachment_type)
 
-def send_submission_ftp_email(user,submission_type,submission_file, attachment_path,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
+def send_submission_ftp_email(user,submission_type,submission_tag, submission_file=None, attachment_path=None,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
     submission=FTPSubmissions.query.filter_by(file_name=submission_file).first()
     if submission:
         return "Error"
@@ -577,6 +577,7 @@ def send_submission_ftp_email(user,submission_type,submission_file, attachment_p
                                             user=user, 
                                             filename=submission_file,
                                             submission_type=submission_type,
+                                            submission_tag=submission_tag,
                                             PUREFTPD_MYSQL_SERVER=PUREFTPD_MYSQL_SERVER,
                                             ftp_user=ftp_user,
                                             ftp_pass=ftp_pass,
@@ -585,6 +586,7 @@ def send_submission_ftp_email(user,submission_type,submission_file, attachment_p
                                             user=user, 
                                             filename=submission_file,
                                             submission_type=submission_type, 
+                                            submission_tag=submission_tag,
                                             PUREFTPD_MYSQL_SERVER=PUREFTPD_MYSQL_SERVER,
                                             ftp_user=ftp_user,
                                             ftp_pass=ftp_pass,

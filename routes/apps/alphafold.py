@@ -189,7 +189,8 @@ GSRAHSSHLKSKKGQSTSRH\n\
             ),
             id="modal",
             is_open=False,
-        )
+        ),
+        dcc.Download( id="download-file" )
     ]
 
     return content
@@ -198,6 +199,7 @@ GSRAHSSHLKSKKGQSTSRH\n\
 @dashapp.callback(
     Output("modal_header", "children"),
     Output("modal_body", "children"),
+    Output("download-file","data"),
     Input('submit-button-state', 'n_clicks'),
     State('email', 'value'),
     State('opt-group', 'value'),
@@ -208,7 +210,7 @@ def update_output(n_clicks, email,group,name,sequence):
     header, msg = check_access( 'alphafold' )
     # header, msg = None, None    
     if msg :
-        return header, msg
+        return header, msg, dash.no_update
 
     subdic=make_submission_json( email,group, name, sequence)
 
@@ -221,10 +223,10 @@ def update_output(n_clicks, email,group,name,sequence):
         df.reset_index(inplace=True, drop=False)
         df.to_csv(subdic["filename"].replace("json","tsv"), sep="\t", index=None, header=False)
         header="Success!"
-        msg='''Please check your email for confirmation.'''
-        send_submission_email(user=current_user, submission_type="AlphaFold", submission_file=os.path.basename(subdic["filename"].replace("json","tsv")), attachment_path=subdic["filename"].replace("json","tsv"))
+        msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
+        send_submission_email(user=current_user, submission_type="AlphaFold", submission_file=None, attachment_path=None)
 
-    return header, msg
+    return header, msg, dcc.send_file(subdic["filename"].replace("json","tsv"))
 
 @dashapp.callback(
     Output("modal", "is_open"),

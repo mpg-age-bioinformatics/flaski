@@ -342,7 +342,8 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
             ),
             id="modal",
             is_open=False,
-        )
+        ),
+        dcc.Download( id="download-file" )
     ]
 
     return main_input
@@ -375,6 +376,7 @@ def upload_genesets(session_id, contents,filename, last_modified):
 @dashapp.callback(
     Output("modal_header", "children"),
     Output("modal_body", "children"),
+    Output("download-file","data"),
     Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
@@ -396,7 +398,7 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     header, msg = check_access( 'rnaseq' )
     # header, msg = None, None # for local debugging 
     if msg :
-        return header, msg
+        return header, msg, dash.no_update
 
     subdic=generate_submission_file(rows, expression, genessets,  email,group,project_title,organism,ref)
     samples=pd.read_json(subdic["samples"])
@@ -410,15 +412,15 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     validation=validate_metadata(metadata)
     if validation:
         header="Attention"
-        return header, validation
+        return header, validation, dash.no_update
 
     if os.path.isfile(subdic["filename"]):
         header="Attention"
         msg='''You have already submitted this data. Re-submission will not take place.'''
-        return header, msg
+        return header, msg, dash.no_update
     else:
         header="Success!"
-        msg='''Please check your email for confirmation.'''
+        msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
     
     # if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
     #     subdic["filename"]=subdic["filename"].replace("/submissions/", "/tmp/")
@@ -431,14 +433,14 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     gene_sets.to_excel(EXCout,"GeneSets",index=None)
     EXCout.save()
 
-    send_submission_email(user=current_user, submission_type="GSEA", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+    send_submission_email(user=current_user, submission_type="GSEA", submission_file=None, attachment_path=None)
 
-    if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
-        os.remove(subdic["filename"])
-    else:
-        values_to_return.append( dash.no_update )
+    # if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
+    #     os.remove(subdic["filename"])
+    # else:
+    #     values_to_return.append( dash.no_update )
 
-    return header, msg
+    return header, msg, dcc.send_file( subdic["filename"] )
 
 # add rows buttom 
 @dashapp.callback(

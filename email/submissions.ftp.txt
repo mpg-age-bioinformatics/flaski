@@ -16,8 +16,8 @@ Once you've transfered all your files click on the following link to start the a
 
 {{ token_link }}
 
-Submission file attached.
-
 Cheers!
 
 Flaski
+
+Submission: {{ submission_tag }}

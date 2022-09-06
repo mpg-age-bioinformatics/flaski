@@ -367,7 +367,8 @@ Once you have been given access more information will be displayed on how to tra
             ),
             id="modal",
             is_open=False,
-        )
+        ),
+        dcc.Download( id="download-file" )
     ]
     
     return content
@@ -423,6 +424,7 @@ def read_file(contents,filename,last_modified):
 @dashapp.callback(
     Output("modal_header", "children"),
     Output("modal_body", "children"),
+    Output("download-file","data"),
     # Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
@@ -441,7 +443,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     header, msg = check_access( 'varcal' )
     # header, msg = None, None # for local debugging 
     if msg :
-        return header, msg
+        return header, msg, dash.no_update
 
     if not wget:
         wget="NONE"
@@ -452,15 +454,15 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     validation=validate_metadata(metadata)
     if validation:
         header="Attention"
-        return header, validation
+        return header, validation, dash.no_update
 
     if os.path.isfile(subdic["filename"]):
         header="Attention"
         msg='''You have already submitted this data. Re-submission will not take place.'''
-        return header, msg
+        return header, msg, dash.no_update
     else:
         header="Success!"
-        msg='''Please check your email for confirmation.'''
+        msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
     
 
     user_domain=current_user.email
@@ -476,11 +478,11 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     EXCout.save()
 
     if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="variantCalling", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_email(user=current_user, submission_type="variantCalling", submission_file=None, attachment_path=None)
     else:
-        send_submission_ftp_email(user=current_user, submission_type="variantCalling", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
+        send_submission_ftp_email(user=current_user, submission_type="variantCalling", submission_file=None, attachment_path=None)
 
-    return header, msg
+    return header, msg, dcc.send_file( subdic["filename"] )
 
 # add rows buttom 
 @dashapp.callback(
