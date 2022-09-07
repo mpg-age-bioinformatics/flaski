@@ -474,7 +474,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     if user_domain == "age.mpg.de" :
         send_submission_email(user=current_user, submission_type="miRNAseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     else:
-        send_submission_ftp_email(user=current_user, submission_type="miRNAseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+        send_submission_ftp_email(user=current_user, submission_type="miRNAseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
 
     return header, msg, dcc.send_file( subdic["filename"] )
 

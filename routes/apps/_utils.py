@@ -592,10 +592,10 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
                                             ftp_pass=ftp_pass,
                                             token_link=token_link ),\
                 reply_to='bioinformatics@age.mpg.de',\
-                attachment=submission_file ,
-                attachment_path=attachment_path ,\
-                open_type=open_type,\
-                attachment_type=attachment_type)
+                attachment=None ,
+                attachment_path=None ,\
+                open_type=None,\
+                attachment_type=None)
 
 def make_min_width(x, factor=7):
     name_length = len(x)
