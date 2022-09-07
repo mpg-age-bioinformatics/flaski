@@ -78,23 +78,23 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget]}, index=list(range(8)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget", "ftp"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget, ftp]}, index=list(range(9)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".RNAseq.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -431,7 +431,13 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     if not wget:
         wget="NONE"
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
+
+    if current_user.domain != "age.mpg.de" :
+        ftp=1
+    else:
+        ftp=0
+
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
 
