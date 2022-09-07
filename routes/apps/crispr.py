@@ -973,7 +973,7 @@ def update_output(n_clicks, \
 
 
         # if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="crispr", submission_file=None, attachment_path=None)
+        send_submission_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
         return header, msg, dcc.send_file( subdic["filename"] )
     # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])

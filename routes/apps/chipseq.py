@@ -564,9 +564,9 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
     EXCout.save()
 
     if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="ChIPseq", submission_file=None, attachment_path=None)
+        send_submission_email(user=current_user, submission_type="ChIPseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     else:
-        send_submission_ftp_email(user=current_user, submission_type="ChIPseq", submission_file=None, attachment_path=None)
+        send_submission_ftp_email(user=current_user, submission_type="ChIPseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
 
     return header, msg, dcc.send_file( subdic["filename"] )
 

@@ -224,7 +224,7 @@ def update_output(n_clicks, email,group,name,sequence):
         df.to_csv(subdic["filename"].replace("json","tsv"), sep="\t", index=None, header=False)
         header="Success!"
         msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
-        send_submission_email(user=current_user, submission_type="AlphaFold", submission_file=None, attachment_path=None)
+        send_submission_email(user=current_user, submission_type="AlphaFold", submission_tag=subdic["filename"].replace("json","tsv"), submission_file=None, attachment_path=None)
 
     return header, msg, dcc.send_file(subdic["filename"].replace("json","tsv"))
 

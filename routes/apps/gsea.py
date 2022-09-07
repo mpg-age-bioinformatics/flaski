@@ -433,7 +433,7 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     gene_sets.to_excel(EXCout,"GeneSets",index=None)
     EXCout.save()
 
-    send_submission_email(user=current_user, submission_type="GSEA", submission_file=None, attachment_path=None)
+    send_submission_email(user=current_user, submission_type="GSEA",  submission_tag=subdic["filename"],submission_file=None, attachment_path=None)
 
     # if metadata[  metadata["Field"] == "Group"][ "Value" ].values[0] == "External" :
     #     os.remove(subdic["filename"])

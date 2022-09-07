@@ -596,9 +596,9 @@ def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, pr
     EXCout.save()
 
     if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="riboseq", submission_file=None, attachment_path=None)
+        send_submission_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     else:
-        send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_file=None, attachment_path=None)
+        send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
 
     return header, msg, dcc.send_file( subdic["filename"] )
 
