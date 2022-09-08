@@ -178,9 +178,9 @@ def release_request(n_clicks, pathname):
         sender=app.config['MAIL_USERNAME'],
         recipients=[user.email, 'automation@age.mpg.de' ], 
         text_body=render_template('email/submissions.ftp.data.txt',
-                                    user=user, submission_tag=submission_tag, submission_type=submission_type),
+                                    user=user, filename=os.path.basename(submission_tag), submission_tag=submission_tag, submission_type=submission_type),
         html_body=render_template('email/submissions.ftp.data.html',
-                                    user=user, submission_tag=submission_tag, submission_type=submission_type),\
+                                    user=user, filename=os.path.basename(submission_tag), submission_tag=submission_tag, submission_type=submission_type),\
         reply_to='bioinformatics@age.mpg.de',\
         attachment=None ,
         attachment_path=None, 
