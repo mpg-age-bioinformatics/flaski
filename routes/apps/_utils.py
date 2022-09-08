@@ -549,14 +549,14 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
         connection.commit()
 
     ##### add ftp user name to excel file in a new sheet called ftp 
-    ftp_df=pd.DataFrame({ "user":ftp_user}, index=[0])
-    workbook = openpyxl.load_workbook(attachment_path)
-    writer = pd.ExcelWriter(attachment_path, engine='openpyxl')
-    writer.book = workbook
-    writer.sheets = dict((ws.title, ws) for ws in workbook.worksheets)
-    ftp_df.to_excel(writer, 'ftp')
-    writer.save()
-    writer.close()
+    # ftp_df=pd.DataFrame({ "user":ftp_user}, index=[0])
+    # workbook = openpyxl.load_workbook(attachment_path)
+    # writer = pd.ExcelWriter(attachment_path, engine='openpyxl')
+    # writer.book = workbook
+    # writer.sheets = dict((ws.title, ws) for ws in workbook.worksheets)
+    # ftp_df.to_excel(writer, 'ftp')
+    # writer.save()
+    # writer.close()
 
     # generate submission and respective token
     submission = FTPSubmissions(file_name=attachment_path, user_id=current_user.id, ftp_user=ftp_user )
@@ -596,6 +596,8 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
                 attachment_path=None ,\
                 open_type=None,\
                 attachment_type=None)
+    
+    return ftp_user
 
 def make_min_width(x, factor=7):
     name_length = len(x)
