@@ -572,7 +572,7 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
     with app.app_context():
         send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
                 sender=app.config['MAIL_USERNAME'],
-                recipients=[user.email, 'automation@age.mpcdf.de' ], 
+                recipients=[user.email, 'automation@age.mpg.de' ], 
                 text_body=render_template('email/submissions.ftp.txt',
                                             user=user, 
                                             filename=submission_file,
