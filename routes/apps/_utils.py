@@ -575,7 +575,7 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
                 recipients=[user.email, 'automation@age.mpg.de' ], 
                 text_body=render_template('email/submissions.ftp.txt',
                                             user=user, 
-                                            filename=submission_file,
+                                            filename=os.path.basename(submission_tag) ,
                                             submission_type=submission_type,
                                             submission_tag=submission_tag,
                                             PUREFTPD_MYSQL_SERVER=PUREFTPD_MYSQL_SERVER,
@@ -584,7 +584,7 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
                                             token_link=token_link ),\
                 html_body=render_template('email/submissions.ftp.html',
                                             user=user, 
-                                            filename=submission_file,
+                                            filename=os.path.basename(submission_tag),
                                             submission_type=submission_type, 
                                             submission_tag=submission_tag,
                                             PUREFTPD_MYSQL_SERVER=PUREFTPD_MYSQL_SERVER,
