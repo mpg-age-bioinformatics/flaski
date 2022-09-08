@@ -11,6 +11,7 @@ from myapp.routes._utils import META_TAGS, navbar_A
 from flask import render_template
 from myapp.models import User, FTPSubmissions
 import pymysql.cursors
+import shutil
 
 dashapp = dash.Dash("transfer",url_base_pathname=f'{PAGE_PREFIX}/transfer/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
@@ -169,7 +170,7 @@ def release_request(n_clicks, pathname):
 
     user=User.query.get(s.user_id)
 
-    os.rename(submission_file, dest)
+    shutil.move(submission_file, dest)
 
     submission_tag=os.path.basename(dest)
 
