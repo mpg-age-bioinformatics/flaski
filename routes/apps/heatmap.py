@@ -1277,11 +1277,20 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         data=output.getvalue()
         return dash.no_update, None, None, None, dash.no_update,dash.no_update, dash.no_update, dcc.send_bytes(data, excel_filename)
 
+    # Output('fig-output', 'children'),
+    # Output( 'toast-make_fig_output','children'),
+    # Output('session-data','data'),
+    # Output({ "type":"traceback", "index":"make_fig_output" },'data'),
+    # Output('save-excel-div', 'style'),
+    # Output('download-pdf-div', 'style'),
+    # Output('export-session','data'),
+    # Output('save-excel', 'data'),
+
     if button_id == "save-session-btn" :
         try:
             if filename.split(".")[-1] == "json" :
                 toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update, None
+                return dash.no_update, toast, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
             else:
                 session["session_data"]=session_data
                 return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
