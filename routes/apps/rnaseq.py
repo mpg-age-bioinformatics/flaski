@@ -466,8 +466,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
         send_submission_email(user=current_user, submission_type="RNAseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     else:
         ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=subdic["filename"],submission_file=None, attachment_path=subdic["filename"])
-
-    metadata.loc[metadata["Field"]=="ftp", "Value"] = ftp_user
+        metadata.loc[metadata["Field"]=="ftp", "Value"] = ftp_user
 
     EXCout=pd.ExcelWriter(subdic["filename"])
     samples.to_excel(EXCout,"samples",index=None)
