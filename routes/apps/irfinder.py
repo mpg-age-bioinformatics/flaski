@@ -464,7 +464,13 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     if user_domain == "age.mpg.de" :
         send_submission_email(user=current_user, submission_type="IRfinder", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     else:
-        send_submission_ftp_email(user=current_user, submission_type="IRfinder", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="IRfinder", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
+        metadata=pd.concat([metadata,ftp_user])
+
+    EXCout=pd.ExcelWriter(subdic["filename"])
+    samples.to_excel(EXCout,"samples",index=None)
+    metadata.to_excel(EXCout,"IRfinder",index=None)
+    EXCout.save()
 
     return header, msg, dcc.send_file( subdic["filename"] )
 

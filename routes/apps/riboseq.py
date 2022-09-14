@@ -589,16 +589,17 @@ def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, pr
     if user_domain !="age.mpg.de" :
         subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
+    if user_domain == "age.mpg.de" :
+        send_submission_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+    else:
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
+        metadata=pd.concat([metadata,ftp_user])
+
     EXCout=pd.ExcelWriter(subdic["filename"])
     samples.to_excel(EXCout,"samples",index=None)
     metadata.to_excel(EXCout,"riboseq",index=None)
     matching.to_excel(EXCout,"matching",index=None)
     EXCout.save()
-
-    if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
-    else:
-        send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
 
     return header, msg, dcc.send_file( subdic["filename"] )
 
