@@ -677,9 +677,19 @@ def check_access(route):
     if users:
         uid=current_user.id
         if uid not in users :
-            header="ERROR"
-            msg='''You are not allowed to use this App.'''
-            return header, msg
+            udomain=current_user.domain 
+            domains=route_obj.users_domains
+            if ( udomain ) and ( domains ):
+                for domain in domains:
+                    if udomain[-len(domain):] == domain :
+                        return None, None
+                header="ERROR"
+                msg='''You are not allowed to use this App.'''
+                return header, msg
+            else:
+                header="ERROR"
+                msg='''This App needs to be configured. Please contact support.'''
+                return header, msg 
     else:
         udomain=current_user.domain 
         domains=route_obj.users_domains
