@@ -600,7 +600,7 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
                 open_type=None,\
                 attachment_type=None)
     
-    ftp_user=pd.DataFrame({"Field":"ftp", "Value":ftp_user})
+    ftp_user=pd.DataFrame({"Field":["ftp"], "Value":[ftp_user]}, index=[0])
 
     return ftp_user
 
