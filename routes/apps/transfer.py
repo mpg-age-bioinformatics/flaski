@@ -128,6 +128,9 @@ def release_request(n_clicks, pathname):
                                     user=PUREFTPD_MYSQL_USER,
                                     password=PUREFTPD_MYSQL_PASS,
                                     database=PUREFTPD_MYSQL_DB,
+                                    ssl_ca='/etc/mysql/certs/ca-cert.pem',
+                                    ssl_key='/etc/mysql/certs/client-key.pem',
+                                    ssl_cert='/etc/mysql/certs/client-cert.pem',
                                     cursorclass=pymysql.cursors.DictCursor)
 
         with connection:
