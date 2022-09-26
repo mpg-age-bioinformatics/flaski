@@ -260,6 +260,8 @@ def parse_import_json(contents,filename,last_modified,session_id,cache,appname):
     return _parse_import_json(contents,filename,last_modified,session_id,cache,appname)
 
 def parse_table(contents,filename,last_modified,session_id,cache,appname):
+    if not filename:
+        raise Exception("No data to parse.")
     @cache.memoize(timeout=3600)
     def _parse_table(contents,filename,last_modified,session_id,cache):
         content_type, content_string = contents.split(',')
