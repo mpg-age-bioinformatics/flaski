@@ -484,17 +484,17 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
                 if not os.path.isdir( ufolder ):
                     os.mkdir( ufolder )
                 os.symlink(share_folder, sfolder)
-
+        session_file_name=session_file.name
     else:
-        session_file="no session file for this Exception"
+        session_file_name="no session data for this Exception"
 
     send_email('[Flaski] help needed: %s ' %current_app,
         sender=app.config['MAIL_USERNAME'],
         recipients=app.config['ADMINS'],
         text_body=render_template('email/app_help.txt',
-                                    user=user, eapp=current_app, emsg=tb_str, etime=str(datetime.now()), session_file=session_file.name),
+                                    user=user, eapp=current_app, emsg=tb_str, etime=str(datetime.now()), session_file=session_file_name),
         html_body=render_template('email/app_help.html',
-                                    user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file.name),\
+                                    user=user, eapp=current_app, emsg=tb_str.split("\n"), etime=str(datetime.now()), session_file=session_file_name),\
         reply_to=user.email )      
 
 def send_submission_email(user,submission_type,submission_tag, submission_file=None, attachment_path=None,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
