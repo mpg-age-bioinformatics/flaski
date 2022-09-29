@@ -157,7 +157,6 @@ def make_layout(session_id):
                             children=[ html.Div(id="my-output")],
                             style={"margin-top":"50%","height": "100%"} 
                         ),
-                        sm=12,md=6,lg=10,xl=9,
                         style={"height": "100%","width": "100%",'overflow': 'scroll',"margin-bottom":"50px"})
                 ],
                 align="start",
