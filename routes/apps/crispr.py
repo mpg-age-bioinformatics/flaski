@@ -159,7 +159,8 @@ def generate_submission_file(samplenames, \
     depmap_cell_line,\
     BAGEL_ESSENTIAL,\
     BAGEL_NONESSENTIAL,\
-    mageckflute_organism ):
+    mageckflute_organism,\
+    ONLY_COUNT ):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(
         samplenames, \
@@ -185,7 +186,8 @@ def generate_submission_file(samplenames, \
         depmap_cell_line,\
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
-        mageckflute_organism 
+        mageckflute_organism,\
+        ONLY_COUNT
         ):
         samplenames_df=make_df_from_rows(samplenames)
         samples_df=make_df_from_rows(samples)
@@ -216,7 +218,8 @@ def generate_submission_file(samplenames, \
                 "depmap_cell_line",\
                 "BAGEL_ESSENTIAL",\
                 "BAGEL_NONESSENTIAL",\
-                "mageckflute_organism "
+                "mageckflute_organism",\
+                "ONLY_COUNT"
                 ],\
             "Value":[
                 email, \
@@ -242,9 +245,10 @@ def generate_submission_file(samplenames, \
                 depmap_cell_line,\
                 BAGEL_ESSENTIAL,\
                 BAGEL_NONESSENTIAL,\
-                mageckflute_organism 
+                mageckflute_organism,\
+                ONLY_COUNT
                 ]
-             }, index=list(range(24)))
+             }, index=list(range(25)))
 
         df_=df_.to_json()
      
@@ -276,7 +280,8 @@ def generate_submission_file(samplenames, \
         depmap_cell_line,\
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
-        mageckflute_organism 
+        mageckflute_organism ,\
+        ONLY_COUNT
     )
 
 @dashapp.callback( 
@@ -658,6 +663,14 @@ def make_app_content(pathname):
             ], 
             style={"margin-top":10}
         ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Only count') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown(id='ONLY_COUNT', options=TRUE_FALSE, value="False", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[mageck] Stop workflow after mageck count'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
     ]
 
     card=[
@@ -805,7 +818,8 @@ fields = [
     "depmap_cell_line",\
     "BAGEL_ESSENTIAL",\
     "BAGEL_NONESSENTIAL",\
-    "mageckflute_organism"
+    "mageckflute_organism",\
+    "ONLY_COUNT"
 ]
 
 outputs = [ Output(o, 'value') for o in fields ]
@@ -900,7 +914,8 @@ def update_output(n_clicks, \
         depmap_cell_line,\
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
-        mageckflute_organism ):
+        mageckflute_organism,\
+        ONLY_COUNT ):
     # header, msg = check_access( 'rnaseq' )
     # header, msg = None, None # for local debugging 
     # if msg :
@@ -933,7 +948,8 @@ def update_output(n_clicks, \
             depmap_cell_line,\
             BAGEL_ESSENTIAL,\
             BAGEL_NONESSENTIAL,\
-            mageckflute_organism )
+            mageckflute_organism,\
+            ONLY_COUNT )
 
         # samples=pd.read_json(subdic["samples"])
         # metadata=pd.read_json(subdic["metadata"])
