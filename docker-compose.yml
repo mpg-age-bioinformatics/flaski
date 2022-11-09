@@ -128,6 +128,7 @@ services:
    - ~/myapp/myapp/routes/admin.py:/myapp/myapp/routes/admin.py
    - ./routes/_routes.py:/myapp/myapp/routes/_routes.py
    - ./routes/home.py:/myapp/myapp/routes/home.py
+   - ./routes/index.py:/myapp/myapp/routes/index.py
    - ./routes/_impressum.py:/myapp/myapp/routes/_impressum.py
    - ./routes/_vars.py:/myapp/myapp/routes/_vars.py
    - ./routes/_privacy.py:/myapp/myapp/routes/_privacy.py

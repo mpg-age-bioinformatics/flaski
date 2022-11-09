@@ -29,6 +29,7 @@ COPY ./pyflaski/pyflaski /myapp/pyflaski
 COPY ./pyflaski/data/david /myapp/pyflaski/data/david
 COPY ./pyflaski/data/kegg /myapp/pyflaski/data/kegg
 COPY ./routes/home.py /myapp/myapp/routes/home.py
+COPY ./routes/index.py /myapp/myapp/routes/index.py
 COPY ./routes/apps /myapp/myapp/routes/apps
 COPY ./routes/_routes.py /myapp/myapp/routes/_routes.py
 COPY ./routes/_impressum.py /myapp/myapp/routes/_impressum.py

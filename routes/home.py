@@ -99,7 +99,7 @@ def make_layout(pathname):
             i=i+1
             if i == 4:
                 i=0
-        if ( i != 0 ) & ( len(row) > 4 ):
+        if ( i != 0 ) & ( len(row) > 1 ):
             while i < 4:
                 link_icon=dbc.Col(
                     [  ],
