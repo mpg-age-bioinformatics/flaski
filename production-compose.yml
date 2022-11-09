@@ -16,9 +16,9 @@ services:
   user: root
   volumes:
    - data3:/myapp_data/users
-   - ~/flaski23/backup/stats:/backup/stats
-   - ~/flaski23/backup/users_data3:/backup/users_data
-   - ~/flaski23/backup/mariadb:/backup/mariadb:ro
+   - ~/flaski_data/backup/stats:/backup/stats
+   - ~/flaski_data/backup/users_data:/backup/users_data
+   - ~/flaski_data/backup/mariadb:/backup/mariadb:ro
   environment:
    APP_NAME: myapp
    FLASK_ENV: init
@@ -112,9 +112,9 @@ services:
    - mariadb
    - init
   volumes:
-   - ~/flaski23/backup/stats:/backup/stats
-   - ~/flaski23/backup/users_data:/backup/users_data
-   - ~/flaski23/backup/mariadb:/backup/mariadb:ro
+   - ~/flaski_data/backup/stats:/backup/stats
+   - ~/flaski_data/backup/users_data:/backup/users_data
+   - ~/flaski_data/backup/mariadb:/backup/mariadb:ro
    - data3:/myapp_data/users:ro
   environment:
    APP_NAME: flaski

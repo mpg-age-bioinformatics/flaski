@@ -1,4 +1,4 @@
-# DEPLOYING
+# CONTRIBUTING
 
 For additional info please check the `myapp` repository.
 
