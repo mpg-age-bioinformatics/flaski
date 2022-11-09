@@ -29,6 +29,7 @@ dashapp.layout=html.Div( [
     Input('url', 'pathname'))
 def make_layout(pathname):
     container_children=[]
+    # print(1)
     for o in other_nav_dropdowns :
         label= list(o.keys())[0]
 
@@ -54,6 +55,13 @@ def make_layout(pathname):
         for l in list( links_keys ) :
             app_route=links_dic[l].split("/")[1]
             if app_route in _PR :
+                if not current_user :
+                    continue
+                if not current_user.is_authenticated :
+                    continue
+                if not current_user.active :
+                    continue
+
                 route_obj=PrivateRoutes.query.filter_by(route=app_route).first()
                 if not route_obj :
                     continue
@@ -84,7 +92,7 @@ def make_layout(pathname):
                 ],
                 align="center",
                 xs=6, sm=3, md=3, lg=3,
-                style={"margin-top":"40px", "margin-bottom":"40px"} 
+                style={"margin-top":"30px", "margin-bottom":"30px"} 
             )
             
             row.append(link_icon)        
@@ -97,7 +105,7 @@ def make_layout(pathname):
                     [  ],
                     align="center",
                     xs=6, sm=3, md=3, lg=3,
-                    style={"margin-top":"40px", "margin-bottom":"40px"} 
+                    style={"margin-top":"30px", "margin-bottom":"30px"} 
                 )
                 row.append(link_icon)
                 i=i+1
@@ -110,10 +118,57 @@ def make_layout(pathname):
         )
         container_children.append(row)
 
+    links_style={"color":"#35443f", "margin-left":"12px", "margin-right":"12px", "font-weight": "bold","text-decoration": "none"}
+
+    open_content=html.Div(
+        [
+            dbc.Row( 
+                html.Footer( 
+                    [ 
+                        html.A("Login", style=links_style, href=f"{PAGE_PREFIX}/login/"),
+                        html.A("About", style=links_style, href=f"{PAGE_PREFIX}/about/"),
+                        html.A("Privacy", style=links_style, href=f"{PAGE_PREFIX}/privacy/"),
+                        html.A("Contact", style=links_style, href=f"{PAGE_PREFIX}/contact/"),
+                    ] , 
+                style={"margin-top": 0, "margin-bottom": 50,},
+                ),
+                align="center",
+                justify="evenly",
+                style={'textAlign':'center',"width":"100%"}
+            )
+            ],
+            style={"height":"10px"}
+    )
+
+
+    if current_user :
+        if current_user.is_authenticated :
+            if current_user.active :
+                    open_content=html.Div(
+                        [
+                            dbc.Row( 
+                                html.Footer( 
+                                    [ 
+                                        html.A("About", style=links_style, href=f"{PAGE_PREFIX}/about/"),
+                                        html.A("Settings", style=links_style, href=f"{PAGE_PREFIX}/settings/"),
+                                        html.A("Storage", style=links_style, href=f"{PAGE_PREFIX}/storage/"),
+                                        html.A("Logout", style=links_style, href=f"{PAGE_PREFIX}/logout/")
+                                    ] , 
+                                style={"margin-top": 0, "margin-bottom": 100,},
+                                ),
+                                align="center",
+                                justify="evenly",
+                                style={'textAlign':'center',"width":"100%"}
+                            )
+                            ],
+                            style={"height":"10px"}
+                    )
+
+    container_children.append(open_content)
+
     protected_content=html.Div(
         [
-            dbc.Container(
-                container_children,
+            dbc.Container( container_children,
                 style={"min-height": "80vh","width":"100%"}
             ),
             navbar_A
