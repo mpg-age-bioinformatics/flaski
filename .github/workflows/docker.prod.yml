@@ -17,7 +17,7 @@ jobs:
         git clone https://github.com/mpg-age-bioinformatics/flaski.git ${CURRENT_TAG}
         cd ${CURRENT_TAG}
         git checkout ${CURRENT_TAG}
-        docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/mpgagebioinformatics/flaski:latest
+        docker build . --tag docker.io/mpgagebioinformatics/flaski:latest
     # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:${CURRENT_TAG}
     # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:dev
 
