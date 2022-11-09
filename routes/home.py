@@ -16,7 +16,7 @@ FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
 dashapp = dash.Dash("home",url_base_pathname=f'{PAGE_PREFIX}/home/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
-protect_dashviews(dashapp)
+# protect_dashviews(dashapp)
 
 dashapp.layout=html.Div( [ 
                 dcc.Location(id='url', refresh=False),
