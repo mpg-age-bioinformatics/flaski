@@ -16,6 +16,7 @@ jobs:
     - name: Build the Docker image
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
+        git submodule update --init --recursive
         docker build . --tag docker.io/mpgagebioinformatics/flaski:dev
   # docker push docker.io/mpgagebioinformatics/flaski:dev
 
