@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server3
+  namespace: flaski
+  labels:
+    app: server3
+spec:
+  selector:
+    app: server3
+  ports:
+  - name: server3
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server3
+  namespace: flaski
+  labels:
+    app: server3
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: server3
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: server3
+    spec:
+      containers:
+      - name: server
+        image: mpgagebioinformatics/flaski:stable
+        imagePullPolicy: Always
+        env:
+        - name: N_WORKERS
+          value: "4"
+        - name: ADMINS
+          value: flaski@age.mpg.de
+        - name: APP_NAME
+          value: myapp
+        - name: APP_TITLE
+          value: flaski
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: SECRET_KEY
+        - name: APP_URL
+          value: https://flaski.age.mpg.de
+        - name: PAGE_PREFIX
+          value: ""
+        - name: FLASK_ENV
+          value: production
+        - name: LOGS
+          value: /var/log/myapp/
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaskimailpass
+              key: pass
+        - name: MAIL_PORT
+          value: "587"
+        - name: MAIL_SERVER
+          value: mail.age.mpg.de
+        - name: MAIL_USERNAME
+          value: flaski@age.mpg.de
+        - name: MAIL_USE_TLS
+          value: "1"
+        - name: MYSQL_HOST
+          value: galeraprod-mariadb-galera.galeraprod.svc.cluster.local
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: GALERA_PASS_PROD
+        - name: DB_NAME
+          value: flaski
+        - name: MYSQL_USER
+          value: flaski
+        - name: CACHE_TYPE
+          value: RedisSentinelCache
+        - name: CACHE_REDIS_SENTINELS_address
+          value: redisprod.redisprod.svc.cluster.local
+        - name: CACHE_REDIS_SENTINEL_MASTER
+          value: mymaster
+        - name: CACHE_REDIS_SENTINELS_port
+          value: "26379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: REDIS_REPLICAS_PROD
+        - name: PUREFTPD_MYSQL_SERVER
+          value: flaski-ftp.hpccloud.mpg.de
+        - name: PUREFTPD_MYSQL_PORT
+          value: "3306"
+        - name: PUREFTPD_MYSQL_USER
+          value: pureftpd
+        - name: PUREFTPD_MYSQL_DB
+          value: pureftpd
+        - name: PUREFTPD_AUTH_SALT
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: PUREFTPD_AUTH_SALT
+        - name: PUREFTPD_MYSQL_PASS
+          valueFrom:
+            secretKeyRef:
+              name: flaski-secrets
+              key: PUREFTPD_MYSQL_PASS
+        ports:
+          - name: http
+            containerPort: 8000
+        resources: {}
+        volumeMounts:
+        - name: users-volume-mount
+          mountPath: /myapp_data/users/
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: dockerlogin
+      volumes:
+      - name: users-volume-mount
+        persistentVolumeClaim:
+          claimName: users3-pvc
+status: {}

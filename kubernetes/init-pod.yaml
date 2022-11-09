@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init3
+  namespace: flaski
+  labels:
+    app: init3
+spec:
+  containers:
+  - image: mpgagebioinformatics/flaski:stable
+    imagePullPolicy: Always
+    name: init3
+    command: ["/myapp/services/init/entrypoint.sh"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsUser: 0
+    env:
+    - name: APP_NAME
+      value: myapp
+    - name: APP_TITLE
+      value: myapp
+    - name: SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: flaski-secrets
+          key: SECRET_KEY
+    - name: FLASK_ENV
+      value: init
+    - name: RESTORE_DB
+      value: "0"
+    - name: RESTORE_USERS_DATA
+      value: "0"
+    - name: MAIL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: flaskimailpass
+          key: pass
+    - name: MYSQL_HOST
+      value: galeraprod-mariadb-galera.galeraprod.svc.cluster.local
+    - name: MYSQL_PORT
+      value: "3306"
+    - name: MYSQL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: flaski-secrets
+          key: GALERA_PASS_PROD
+    - name: MYSQL_USER
+      value: flaski
+    - name: DB_NAME
+      value: flaski
+    - name: REDIS_ADDRESS
+      value: redis:6379/0
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: flaski-secrets
+          key: REDIS_PASSWORD
+    - name: ADMINS
+      value: flaski@age.mpg.de
+    resources: {}
+    volumeMounts:
+    - name: users-volume-mount
+      mountPath: /myapp_data/users/
+  restartPolicy: OnFailure
+  imagePullSecrets:
+    - name: dockerlogin
+  volumes:
+  - name: users-volume-mount
+    persistentVolumeClaim:
+      claimName: users3-pvc
+
+status: {}
