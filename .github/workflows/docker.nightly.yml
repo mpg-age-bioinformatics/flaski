@@ -14,7 +14,7 @@ jobs:
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         docker build . --file ./services/server/dockerfiles/Dockerfile --tag docker.io/mpgagebioinformatics/flaski:nightly
-        # docker push docker.io/mpgagebioinformatics/flaski:nightly
+    # docker push docker.io/mpgagebioinformatics/flaski:nightly
 
     # security scanning is done nightly on docker.io/mpgagebioinformatics/flaski2:nightly
 
