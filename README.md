@@ -54,8 +54,15 @@ Feel free to contact us if you would like to deploy Flaski at your institution o
 mkdir -p ~/flaski_data/backup/stats ~/flaski_data/backup/users_data ~/flaski_data/backup/mariadb
 git clone git@github.com:mpg-age-bioinformatics/flaski.git
 cd flaski
+cat << EOF > .env
+MYSQL_PASSWORD=$(openssl rand -base64 20)
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
+REDIS_PASSWORD=$(openssl rand -base64 20)
+SECRET_KEY=$(openssl rand -base64 20)
+EOF
 docker-compose -f production-compose.yml up -d
 ```
+
 Email logging:
 ```bash
 docker-compose -f production-compose.yml exec server3 python3 -m smtpd -n -c DebuggingServer localhost:8025
