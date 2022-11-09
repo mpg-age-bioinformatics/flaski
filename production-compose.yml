@@ -1,0 +1,172 @@
+version: '3.7'
+
+services:
+
+ init:
+  container_name: init
+  image: mpgagebioinformatics/flaski:latest
+  build:
+    context: ~/myapp
+    dockerfile: services/server/Dockerfile
+    args:
+      BUILD_NAME: myapp
+      MYAPP_VERSION: dev
+      UPGRADE_REQS: "no"
+  entrypoint: /myapp/services/init/entrypoint.sh
+  user: root
+  volumes:
+   - data3:/myapp_data/users
+   - ~/flaski23/backup/stats:/backup/stats
+   - ~/flaski23/backup/users_data3:/backup/users_data
+   - ~/flaski23/backup/mariadb:/backup/mariadb:ro
+  environment:
+   APP_NAME: myapp
+   FLASK_ENV: init
+   RESTORE_DB: 1
+   RESTORE_USERS_DATA: 1
+   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+   SECRET_KEY: ${SECRET_KEY}
+   REDIS_ADDRESS: redis:6379/0
+   REDIS_PASSWORD: ${REDIS_PASSWORD}
+   MYSQL_USER: flaski
+   MYSQL_PASSWORD: ${MYSQL_PASSWORD} 
+   MYSQL_HOST: mariadb
+   MYSQL_PORT: 3306
+   DB_NAME: flaski
+  links:
+   - mariadb
+  depends_on:
+   - mariadb
+
+ server3:
+  container_name: server3
+  image: mpgagebioinformatics/flaski:stable
+  build:
+    context: ./
+    dockerfile: Dockerfile
+    args:
+      APP_VERSION: dev
+      PYFLASKI_VERSION: dev
+  restart: always
+  volumes:
+   - data3:/flaski_data/users
+  environment:
+   N_WORKERS: 4
+   ADMINS: flaski@age.mpg.de
+   APP_NAME: myapp
+   APP_TITLE: flaski(local)
+   INSTANCE: local
+   SECRET_KEY: ${SECRET_KEY}
+   APP_URL: https://flaski.localhost
+   PAGE_PREFIX: ""
+   FLASK_ENV: production
+  #  MAIL_PASSWORD: ${MAIL_PASSWORD}
+  #  MAIL_PORT: 587
+  #  MAIL_SERVER: mail.age.mpg.de
+   MAIL_USERNAME: flaski@age.mpg.de
+   ADMINS: flaski@age.mpg.de
+  #  MAIL_USE_TLS: '1'
+   MYSQL_HOST: mariadb
+   MYSQL_PORT: 3306
+   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+   MYSQL_USER: flaski
+   DB_NAME: flaski
+   REDIS_ADDRESS: redis:6379/0
+   REDIS_PASSWORD: ${REDIS_PASSWORD}
+   PUREFTPD_AUTH_SALT: ${PUREFTPD_AUTH_SALT}
+   PUREFTPD_MYSQL_SERVER: ${PUREFTPD_MYSQL_SERVER}
+   PUREFTPD_MYSQL_PORT: 3306
+   PUREFTPD_MYSQL_USER: pureftpd
+   PUREFTPD_MYSQL_PASS: ${PUREFTPD_MYSQL_PASS}
+   PUREFTPD_MYSQL_DB: pureftpd
+  labels:
+   - traefik.http.services.server3.loadbalancer.server.port=8000
+   - traefik.http.middlewares.server3_https.redirectscheme.scheme=https
+   - traefik.http.routers.server3.entrypoints=web
+   - traefik.http.routers.server3.rule=Host(`flaski.localhost`)
+   - traefik.http.routers.server3.middlewares=server3_https@docker
+   - traefik.http.routers.server3_https.rule=Host(`flaski.localhost`)
+   - traefik.http.routers.server3_https.tls=true
+   - traefik.http.routers.server3_https.entrypoints=websecure
+  links:
+   - mariadb
+   - redis
+  depends_on:
+   - init
+   - mariadb
+   - redis
+
+ backup:
+  container_name: backup
+  image: mpgagebioinformatics/myapp:latest
+  build:
+    context: ~/myapp
+    dockerfile: services/server/Dockerfile
+    args:
+      BUILD_NAME: flaski
+      MYAPP_VERSION: dev
+      UPGRADE_REQS: "no"
+  entrypoint: /flaski/services/backup/entrypoint.sh
+  user: root
+  depends_on:
+   - mariadb
+   - init
+  volumes:
+   - ~/flaski23/backup/stats:/backup/stats
+   - ~/flaski23/backup/users_data:/backup/users_data
+   - ~/flaski23/backup/mariadb:/backup/mariadb:ro
+   - data3:/myapp_data/users:ro
+  environment:
+   APP_NAME: flaski
+   INSTANCE: backup
+   FLASK_ENV: backup
+   LOGS: /var/log/flaski/
+   MYSQL_HOST: mariadb
+   MYSQL_PORT: 3306
+   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+   MYSQL_USER: flaski
+   DB_NAME: flaski
+  restart: unless-stopped
+  links:
+   - mariadb
+
+ mariadb:
+  container_name: mariadb
+  image: mariadb:10.5
+  restart: always
+  volumes:
+   - db:/var/lib/mysql
+  environment:
+    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+ redis:
+  container_name: redis
+  image: redis:7
+  restart: always
+  command: redis-server --requirepass ${REDIS_PASSWORD}
+
+ reverse-proxy:
+  image: traefik:v2.6
+  command: 
+    - --api.insecure=true
+    - --providers.docker=true
+    - --entrypoints.websecure.address=:443
+    - --entrypoints.web.address=:80
+  ports:
+    - "80:80"
+    - "443:443"
+    - "8080:8080"
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  labels:
+    - traefik.enable=false
+  depends_on:
+   - server3
+
+volumes:
+ data3:
+  external: false
+ db:
+  external: false
+ oc:
+  external: false

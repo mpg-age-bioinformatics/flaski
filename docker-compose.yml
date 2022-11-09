@@ -48,59 +48,59 @@ services:
   depends_on:
    - mariadb
 
- server:
-  container_name: server
-  image: flaski/flaski:latest
-  build:
-    context: ~/flaski
-    dockerfile: services/server/dockerfiles/Dockerfile
-  restart: always
-  volumes:
-   - ~/flaski/utils/dev.py:/flaski/flaski/apps/external.py # this needs to be the first volume as otherwise it will be overwritten by `- ./:/flaski`
-   - data:/flaski_data/users
-   - ~/flaski:/flaski
-   - ~/flaski23/private:/flaski_private:ro
-   - ~/flaski23/mpcdf:/mpcdf
-   - ~/flaski23/submissions:/submissions
-  environment:
-   N_WORKERS: 4
-   ADMINS: flaski@age.mpg.de
-   APP_NAME: flaski
-   INSTANCE: backup
-   SECRET_KEY: ${SECRET_KEY}
-   PRIVATE_APPS: /flaski_private/private.apps.tsv
-   APP_URL: https://flaski.localhost
-   FLASK_ENV: development #development #production
-   LOGS: /var/log/flaski/
-  #  MAIL_PASSWORD: ${MAIL_PASSWORD}
-  #  MAIL_PORT: 587
-  #  MAIL_SERVER: mail.age.mpg.de
-  #  MAIL_USE_TLS: '1'
-   MAIL_USERNAME: flaski@age.mpg.de
-   ADMINS: flaski@age.mpg.de
-   MYSQL_HOST: mariadb
-   MYSQL_PORT: 3306
-   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-   MYSQL_USER: flaski
-   DB_NAME: flaski
-   REDIS_ADDRESS: redis:6379/0
-   REDIS_PASSWORD: ${REDIS_PASSWORD}
-  labels:
-   - traefik.http.services.server.loadbalancer.server.port=8000
-   - traefik.http.middlewares.server_https.redirectscheme.scheme=https
-   - traefik.http.routers.server.entrypoints=web
-   - traefik.http.routers.server.rule=Host(`flaski.localhost`)
-   - traefik.http.routers.server.middlewares=server_https@docker
-   - traefik.http.routers.server_https.rule=Host(`flaski.localhost`)
-   - traefik.http.routers.server_https.tls=true
-   - traefik.http.routers.server_https.entrypoints=websecure
-  links:
-   - mariadb
-   - redis
-  depends_on:
-   - init
-   - mariadb
-   - redis
+#  server:
+#   container_name: server
+#   image: flaski/flaski:latest
+#   build:
+#     context: ~/flaski
+#     dockerfile: services/server/dockerfiles/Dockerfile
+#   restart: always
+#   volumes:
+#    - ~/flaski/utils/dev.py:/flaski/flaski/apps/external.py # this needs to be the first volume as otherwise it will be overwritten by `- ./:/flaski`
+#    - data:/flaski_data/users
+#    - ~/flaski:/flaski
+#    - ~/flaski23/private:/flaski_private:ro
+#    - ~/flaski23/mpcdf:/mpcdf
+#    - ~/flaski23/submissions:/submissions
+#   environment:
+#    N_WORKERS: 4
+#    ADMINS: flaski@age.mpg.de
+#    APP_NAME: flaski
+#    INSTANCE: backup
+#    SECRET_KEY: ${SECRET_KEY}
+#    PRIVATE_APPS: /flaski_private/private.apps.tsv
+#    APP_URL: https://flaski.localhost
+#    FLASK_ENV: development #development #production
+#    LOGS: /var/log/flaski/
+#   #  MAIL_PASSWORD: ${MAIL_PASSWORD}
+#   #  MAIL_PORT: 587
+#   #  MAIL_SERVER: mail.age.mpg.de
+#   #  MAIL_USE_TLS: '1'
+#    MAIL_USERNAME: flaski@age.mpg.de
+#    ADMINS: flaski@age.mpg.de
+#    MYSQL_HOST: mariadb
+#    MYSQL_PORT: 3306
+#    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#    MYSQL_USER: flaski
+#    DB_NAME: flaski
+#    REDIS_ADDRESS: redis:6379/0
+#    REDIS_PASSWORD: ${REDIS_PASSWORD}
+#   labels:
+#    - traefik.http.services.server.loadbalancer.server.port=8000
+#    - traefik.http.middlewares.server_https.redirectscheme.scheme=https
+#    - traefik.http.routers.server.entrypoints=web
+#    - traefik.http.routers.server.rule=Host(`flaski.localhost`)
+#    - traefik.http.routers.server.middlewares=server_https@docker
+#    - traefik.http.routers.server_https.rule=Host(`flaski.localhost`)
+#    - traefik.http.routers.server_https.tls=true
+#    - traefik.http.routers.server_https.entrypoints=websecure
+#   links:
+#    - mariadb
+#    - redis
+#   depends_on:
+#    - init
+#    - mariadb
+#    - redis
 
  server3:
   container_name: server3
@@ -191,11 +191,10 @@ services:
    - mariadb
    - redis
 
-
- # this backup is currently only backing up the data from v2 
+#  this backup is currently only backing up the data from v2 
  backup:
   container_name: backup
-  image: mpgagebioinformatics/myapp-flaski2:latest
+  image: mpgagebioinformatics/myapp:latest
   build:
     context: ~/myapp
     dockerfile: services/server/Dockerfile
@@ -213,7 +212,7 @@ services:
    - ~/flaski23/backup/stats:/backup/stats
    - ~/flaski23/backup/users_data:/backup/users_data
    - ~/flaski23/backup/mariadb:/backup/mariadb:ro
-   - data:/flaski_data/users:ro
+   - data3:/myapp_data/users:ro
   environment:
    APP_NAME: flaski
    INSTANCE: backup
@@ -227,6 +226,42 @@ services:
   restart: unless-stopped
   links:
    - mariadb
+
+ # this backup is currently only backing up the data from v2 
+#  backup:
+#   container_name: backup
+#   image: mpgagebioinformatics/myapp-flaski2:latest
+#   build:
+#     context: ~/myapp
+#     dockerfile: services/server/Dockerfile
+#     args:
+#       BUILD_NAME: flaski
+#       MYAPP_VERSION: dev
+#       UPGRADE_REQS: "no"
+#   entrypoint: /flaski/services/backup/entrypoint.sh
+#   user: root
+#   depends_on:
+#    - mariadb
+#    - init
+#   volumes:
+#    - ~/myapp:/flaski
+#    - ~/flaski23/backup/stats:/backup/stats
+#    - ~/flaski23/backup/users_data:/backup/users_data
+#    - ~/flaski23/backup/mariadb:/backup/mariadb:ro
+#    - data:/flaski_data/users:ro
+#   environment:
+#    APP_NAME: flaski
+#    INSTANCE: backup
+#    FLASK_ENV: backup
+#    LOGS: /var/log/flaski/
+#    MYSQL_HOST: mariadb
+#    MYSQL_PORT: 3306
+#    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#    MYSQL_USER: flaski
+#    DB_NAME: flaski
+#   restart: unless-stopped
+#   links:
+#    - mariadb
 
 #  uploads:
 #   container_name: uploads
@@ -289,7 +324,7 @@ services:
   labels:
     - traefik.enable=false
   depends_on:
-   - server
+  #  - server
    - server3
 
 #  nginx:
@@ -318,8 +353,8 @@ services:
 #    - server3
 
 volumes:
- data:
-  external: false
+#  data:
+#   external: false
  data3:
   external: false
  db:
