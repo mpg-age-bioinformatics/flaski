@@ -15,6 +15,7 @@ user_navbar_links={
     "About":"/about/",\
     "Impressum":"/impressum/",\
     "Privacy":"/privacy/",\
+    "Issues":"https://github.com/mpg-age-bioinformatics/flaski/issues",\
     "fixed_separator":"-",\
     "Configuration":"__title__", \
     "Settings":"/settings/",\
