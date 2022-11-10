@@ -4,7 +4,7 @@
 
 # Flaski
 
-Flaski is a (myapp)[https://github.com/mpg-age-bioinformatics/myapp] based collection of web apps for life sciences. 
+Flaski is a [myapp](https://github.com/mpg-age-bioinformatics/myapp) based collection of web apps for life sciences. 
 
 ![flaski](/Flaski.Readme.png)
 
