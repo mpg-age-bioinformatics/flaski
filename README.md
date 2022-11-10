@@ -25,6 +25,7 @@ Flaski provides:
 - scalable
 - continuous delivery
 - full stack ready
+- multiplatform: *amd64*, *arm64*, and * aarch64*
 
 Flaski can be user for free on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
 
