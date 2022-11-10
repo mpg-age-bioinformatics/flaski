@@ -24,7 +24,7 @@ Flaski provides:
 - on-the-fly error reporting
 - scalable
 - continuous delivery
-- full stack
+- full stack ready
 
 Flaski can be user for free on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
 
