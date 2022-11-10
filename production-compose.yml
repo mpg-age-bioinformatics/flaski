@@ -103,7 +103,7 @@ services:
     context: ~/myapp
     dockerfile: services/server/Dockerfile
     args:
-      BUILD_NAME: flaski
+      BUILD_NAME: myapp
       MYAPP_VERSION: dev
       UPGRADE_REQS: "no"
   entrypoint: /flaski/services/backup/entrypoint.sh
