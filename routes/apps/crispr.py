@@ -113,6 +113,8 @@ style_cell={
 def make_ed_table(field_id, columns=None , df=None):
     if  type(df) != type( pd.DataFrame() ):
         df=pd.DataFrame( columns=columns )
+        if columns:
+            df=df[columns]
     df=make_table(df,field_id)
     df.editable=True
     df.row_deletable=True
@@ -470,8 +472,8 @@ def make_app_content(pathname):
 
     samplenames=make_ed_table('adding-rows-samplenames', columns=["Files","Name"] )
     samples=make_ed_table('adding-rows-samples', columns=["Label","Pairness (paired or unpaired)",\
-        "List of treated samples","List of control sgRNAs",\
-        "List of control genes" ] )
+        "List of control samples","List of treated samples",\
+        "List of control sgRNAs", "List of control genes" ] )
     librarydf=make_ed_table(  'adding-rows-library', columns=["gene_id","UID","seq","annotation"])
 
     groups_=make_options(GROUPS)
@@ -981,11 +983,12 @@ def update_output(n_clicks, \
         arguments=pd.read_json(subdic["crispr"])
 
         EXCout=pd.ExcelWriter(subdic["filename"])
-        sampleNames.to_excel(EXCout,"sampleNames",index=None)
-        samples.to_excel(EXCout,"samples",index=None)
-        library.to_excel(EXCout,"library",index=None)
+        sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
+        samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs",   "List of control genes" ]].to_excel(EXCout,"samples",index=None)
+        library[["gene_id","UID","seq","annotation"]].to_excel(EXCout,"library",index=None)
         arguments.to_excel(EXCout,"crispr",index=None)
         EXCout.save()
+
 
 
         # if user_domain == "age.mpg.de" :
