@@ -474,7 +474,7 @@ def make_app_content(pathname):
     samples=make_ed_table('adding-rows-samples', columns=["Label","Pairness (paired or unpaired)",\
         "List of control samples","List of treated samples",\
         "List of control sgRNAs", "List of control genes" ] )
-    librarydf=make_ed_table(  'adding-rows-library', columns=["gene_id","UID","seq","annotation"])
+    librarydf=make_ed_table(  'adding-rows-library', columns=["gene_ID","UID","seq","Annotation"])
 
     groups_=make_options(GROUPS)
     groups_val="CRISPR_Screening"
@@ -925,79 +925,79 @@ def update_output(n_clicks, \
     # if not wget:
     #     wget="NONE"
 
-    try:
+    # try:
 
-        subdic=generate_submission_file( samplenames, \
-            samples, \
-            library, \
-            email, \
-            group,\
-            experiment_name,\
-            folder,\
-            md5sums,\
-            cnv_line,\
-            upstreamseq,\
-            sgRNA_size,\
-            efficiency_matrix,\
-            SSC_sgRNA_size,\
-            gmt_file,\
-            mageck_test_remove_zero,\
-            mageck_test_remove_zero_threshold,\
-            species,\
-            assembly,\
-            use_bowtie,\
-            depmap,\
-            depmap_cell_line,\
-            BAGEL_ESSENTIAL,\
-            BAGEL_NONESSENTIAL,\
-            mageckflute_organism,\
-            ONLY_COUNT )
+    subdic=generate_submission_file( samplenames, \
+        samples, \
+        library, \
+        email, \
+        group,\
+        experiment_name,\
+        folder,\
+        md5sums,\
+        cnv_line,\
+        upstreamseq,\
+        sgRNA_size,\
+        efficiency_matrix,\
+        SSC_sgRNA_size,\
+        gmt_file,\
+        mageck_test_remove_zero,\
+        mageck_test_remove_zero_threshold,\
+        species,\
+        assembly,\
+        use_bowtie,\
+        depmap,\
+        depmap_cell_line,\
+        BAGEL_ESSENTIAL,\
+        BAGEL_NONESSENTIAL,\
+        mageckflute_organism,\
+        ONLY_COUNT )
 
-        # samples=pd.read_json(subdic["samples"])
-        # metadata=pd.read_json(subdic["metadata"])
+    # samples=pd.read_json(subdic["samples"])
+    # metadata=pd.read_json(subdic["metadata"])
 
-        # validation=validate_metadata(metadata)
-        # if validation:
-        #     header="Attention"
-        #     return header, validation
+    # validation=validate_metadata(metadata)
+    # if validation:
+    #     header="Attention"
+    #     return header, validation
 
-        if os.path.isfile(subdic["filename"]):
-            header="Attention"
-            msg='''You have already submitted this data. Re-submission will not take place.'''
-            return header, msg, dash.no_update
-        else:
-            header="Success!"
-            msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
-        
+    if os.path.isfile(subdic["filename"]):
+        header="Attention"
+        msg='''You have already submitted this data. Re-submission will not take place.'''
+        return header, msg, dash.no_update
+    else:
+        header="Success!"
+        msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
+    
 
-        user_domain=current_user.email
-        # user_domain=user_domain.split("@")[-1]
-        # mps_domain="mpg.de"
-        # if user_domain[-len(mps_domain):] == mps_domain :
-        # if user_domain !="age.mpg.de" :
-            # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    user_domain=current_user.email
+    # user_domain=user_domain.split("@")[-1]
+    # mps_domain="mpg.de"
+    # if user_domain[-len(mps_domain):] == mps_domain :
+    # if user_domain !="age.mpg.de" :
+        # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
-        sampleNames=pd.read_json(subdic["sampleNames"])
-        samples=pd.read_json(subdic["samples"])
-        library=pd.read_json(subdic["library"])
-        arguments=pd.read_json(subdic["crispr"])
+    sampleNames=pd.read_json(subdic["sampleNames"])
+    samples=pd.read_json(subdic["samples"])
+    library=pd.read_json(subdic["library"])
+    arguments=pd.read_json(subdic["crispr"])
 
-        EXCout=pd.ExcelWriter(subdic["filename"])
-        sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
-        samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs",   "List of control genes" ]].to_excel(EXCout,"samples",index=None)
-        library[["gene_id","UID","seq","annotation"]].to_excel(EXCout,"library",index=None)
-        arguments.to_excel(EXCout,"crispr",index=None)
-        EXCout.save()
+    EXCout=pd.ExcelWriter(subdic["filename"])
+    sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
+    samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs",   "List of control genes" ]].to_excel(EXCout,"samples",index=None)
+    library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
+    arguments.to_excel(EXCout,"crispr",index=None)
+    EXCout.save()
 
 
 
-        # if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
-        return header, msg, dcc.send_file( subdic["filename"] )
+    # if user_domain == "age.mpg.de" :
+    send_submission_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+    return header, msg, dcc.send_file( subdic["filename"] )
     # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
-    except:
-        return dash.no_update, dash.no_update, dash.no_update
+    # except:
+    #     return dash.no_update, dash.no_update, dash.no_update
     
 
 @dashapp.callback(
