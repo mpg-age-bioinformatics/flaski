@@ -73,7 +73,7 @@ docker-compose -f production-compose.yml exec server3 python3 -m smtpd -n -c Deb
 
 Flaski is now accessible under [https://flaski.localhost](https://flaski.localhost). Depending on your local machine, it might take a few seconds until the server is up and running. You might need to edit your `/etc/hosts` file to include:
 ```
-127.0.0.1       localhost
+127.0.0.1       flaski.localhost
 ```
 ___
 
