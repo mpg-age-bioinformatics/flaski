@@ -1428,7 +1428,6 @@ def read_input_file(contents,filename,last_modified,session_id):
     )
 def generate_extras(session_id,groups, layout,contents,filename,last_modified,generate_extras_import):
     pa=figure_defaults()
-    print("extra cards")
     if filename :
         if ( filename.split(".")[-1] == "json") and ( not generate_extras_import ):
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "histogram")
