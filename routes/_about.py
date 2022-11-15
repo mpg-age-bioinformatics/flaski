@@ -8,7 +8,8 @@ v=app.config["APP_VERSION"]
 v=str(v)
 
 _about=f'''
-Flaski is a flask and dash based collection of web apps for life sciences. 
+
+Flaski is a [myapp](https://github.com/mpg-age-bioinformatics/myapp) based collection of web apps for life sciences. 
 
 Flaski provides:
 
@@ -21,12 +22,15 @@ Flaski provides:
 - App2App communication
 - server based
 - background jobs
-- databases
-- scalable
-- continuous delivery
+- access to databases
 - usage statistics
 - on-the-fly error reporting
-- full stack
+- scalable
+- continuous delivery
+- full stack ready
+- multiplatform: *amd64*, *arm64*, and * aarch64*
+
+Flaski can be used for free on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
 
 Check our how-to videos on [YouTube](https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA).
 
@@ -36,9 +40,13 @@ Issues: [https://github.com/mpg-age-bioinformatics/flaski/issues](https://github
 
 Source: [https://github.com/mpg-age-bioinformatics/flaski](https://github.com/mpg-age-bioinformatics/flaski).
 
+Please check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before doing any contribution or opening an issue.
+
 ##### Citing
 
 Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515
+
+##### Versioning
 
 We recommend that you allways export your session along with your results so that you can in future reproduce them.
 

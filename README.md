@@ -27,7 +27,7 @@ Flaski provides:
 - full stack ready
 - multiplatform: *amd64*, *arm64*, and * aarch64*
 
-Flaski can be user for free on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
+Flaski can be used for free on [https://flaski.age.mpg.de](https://flaski.age.mpg.de).
 
 <!-- Apps documentation can be found on the project's [wiki](https://github.com/mpg-age-bioinformatics/flaski/wiki).  -->
 
@@ -80,6 +80,16 @@ ___
 ## Citing
 
 Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515
+
+
+## Versioning
+
+We recommend that you allways export your session along with your results so that you can in future reproduce them.
+
+Current version can be seen at the end of this page and old sessions version can be checked under [https://flaski.age.mpg.de/vcheck/](https://flaski.age.mpg.de/vcheck/).
+
+If you wish to open an older session under the same package version please use the [pyflaski](https://github.com/mpg-age-bioinformatics/pyflaski) companion package. 
+
 ___
 
 ## Credits
