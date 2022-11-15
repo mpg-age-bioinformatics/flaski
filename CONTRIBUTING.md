@@ -61,14 +61,14 @@ docker-compose exec server3 python3 -m smtpd -n -c DebuggingServer localhost:802
 
 pyflaski was added as a submodule of flaski:
 ```
-cd ~/flaski-3.0.0
+cd ~/flaski
 git submodule add git@github.com:mpg-age-bioinformatics/pyflaski.git pyflaski
 git submodule init pyflaski
 ```
 
 If making a fresh clone you will need to:
 ```
-cd ~/flaski-3.0.0
+cd ~/flaski
 git submodule update --init --recursive
 ```
 
@@ -79,7 +79,7 @@ git submodule update --recursive --remote
 
 Commiting changes:
 ```
-cd ~/flaski-3.0.0/pyflaski
+cd ~/flaski/pyflaski
 git add -A . 
 git commit -m "<describe your changes here>"
 git push origin HEAD:master
@@ -87,7 +87,7 @@ git push origin HEAD:master
 
 then tell the main project to start tracking the updated version:
 ```
-cd ~/flaski-3.0.0
+cd ~/flaski
 git add pyflaski
 git commit -m pyflaski
 git push
