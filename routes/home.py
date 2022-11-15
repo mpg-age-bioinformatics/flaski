@@ -130,7 +130,7 @@ def make_layout(pathname):
                         html.A("Privacy", style=links_style, href=f"{PAGE_PREFIX}/privacy/"),
                         html.A("Contact", style=links_style, href=f"{PAGE_PREFIX}/contact/"),
                     ] , 
-                style={"margin-top": 0, "margin-bottom": 50,},
+                style={"margin-top": 50, "margin-bottom": 100,},
                 ),
                 align="center",
                 justify="evenly",
@@ -154,7 +154,7 @@ def make_layout(pathname):
                                         html.A("Storage", style=links_style, href=f"{PAGE_PREFIX}/storage/"),
                                         html.A("Logout", style=links_style, href=f"{PAGE_PREFIX}/logout/")
                                     ] , 
-                                style={"margin-top": 0, "margin-bottom": 100,},
+                                style={"margin-top": 50, "margin-bottom": 100,},
                                 ),
                                 align="center",
                                 justify="evenly",
