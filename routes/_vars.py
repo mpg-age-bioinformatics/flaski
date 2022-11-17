@@ -42,7 +42,7 @@ other_nav_dropdowns =[
                 "KEGG":"/kegg/",\
                 "PCA":"/pca/",\
                 "MDS":"/mds/",\
-                "tSNE":"/tsne/",\
+                "t-SNE":"/tsne/",\
                 "Lifespan":"/lifespan/",\
                 "Datalake":"/aadatalake/",\
                 "Version check":"/vcheck/",\

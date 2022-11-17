@@ -125,10 +125,10 @@ def make_layout(pathname):
             dbc.Row( 
                 html.Footer( 
                     [ 
-                        html.A("Login", style=links_style, href=f"{PAGE_PREFIX}/login/"),
-                        html.A("About", style=links_style, href=f"{PAGE_PREFIX}/about/"),
-                        html.A("Privacy", style=links_style, href=f"{PAGE_PREFIX}/privacy/"),
-                        html.A("Contact", style=links_style, href=f"{PAGE_PREFIX}/contact/"),
+                        html.A("Login", style=links_style, target='_blank', href=f"{PAGE_PREFIX}/login/"),
+                        html.A("About", style=links_style, target='_blank', href=f"{PAGE_PREFIX}/about/"),
+                        html.A("Privacy", style=links_style, target='_blank', href=f"{PAGE_PREFIX}/privacy/"),
+                        html.A("Contact", style=links_style, target='_blank', href=f"{PAGE_PREFIX}/contact/"),
                     ] , 
                 style={"margin-top": 50, "margin-bottom": 100,},
                 ),
@@ -149,10 +149,10 @@ def make_layout(pathname):
                             dbc.Row( 
                                 html.Footer( 
                                     [ 
-                                        html.A("About", style=links_style, href=f"{PAGE_PREFIX}/about/"),
-                                        html.A("Settings", style=links_style, href=f"{PAGE_PREFIX}/settings/"),
-                                        html.A("Storage", style=links_style, href=f"{PAGE_PREFIX}/storage/"),
-                                        html.A("Logout", style=links_style, href=f"{PAGE_PREFIX}/logout/")
+                                        html.A("About", target='_blank', style=links_style, href=f"{PAGE_PREFIX}/about/"),
+                                        html.A("Settings", target='_blank', style=links_style, href=f"{PAGE_PREFIX}/settings/"),
+                                        html.A("Storage", target='_blank', style=links_style, href=f"{PAGE_PREFIX}/storage/"),
+                                        html.A("Logout", target='_blank', style=links_style, href=f"{PAGE_PREFIX}/logout/")
                                     ] , 
                                 style={"margin-top": 50, "margin-bottom": 100,},
                                 ),
