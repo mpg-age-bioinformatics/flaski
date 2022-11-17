@@ -7,6 +7,14 @@ if os.environ['FLASK_ENV'] != "development" :
     _DEV_ROUTES=[  ] 
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
+_META_TAGS=[{'property':'og:title', 'content':'Flaski' },\
+{'property':'og:image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
+{'property':'og:description', 'content':'A collection of web apps for life sciences.' },\
+{'property':'og:url', 'content':'https://flaski.age.mpg.de' },\
+{'property':'og:image:width', 'content':'512' },\
+{'property':'og:image:height', 'content':'481' },\
+{'property':'og:type', 'content':'website' }]
+
 user_navbar_links={
     "Home":"/home/",\
     "Storage":"/storage/",\
