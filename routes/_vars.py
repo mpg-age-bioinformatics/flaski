@@ -7,16 +7,25 @@ if os.environ['FLASK_ENV'] != "development" :
     _DEV_ROUTES=[  ] 
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
-_META_TAGS=[{'name':'title', 'content':'Flaski' },\
-{'name':'image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
-{'name':'description', 'content':'A collection of web Apps for life sciences.' },\
-{'property':'og:title', 'content':'Flaski' },\
-{'property':'og:image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
-{'property':'og:description', 'content':'A collection of web apps for life sciences.' },\
+_META_TAGS=[{'name':'title', 'property':'og:title', 'content':'Flaski' },\
+{'name':'image','property':'og:image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
+{'name':'description','property':'og:description', 'content':'A collection of web apps for life sciences.' },\
 {'property':'og:url', 'content':'https://flaski.age.mpg.de' },\
 {'property':'og:image:width', 'content':'512' },\
 {'property':'og:image:height', 'content':'481' },\
 {'property':'og:type', 'content':'website' }]
+
+# [{'name':'title', 'content':'Flaski' },\
+# {'name':'image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
+# {'name':'description', 'content':'A collection of web Apps for life sciences.' },\
+# {'name':'title', 'property':'og:title', 'content':'Flaski' },\
+# {'name':'image','property':'og:image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
+# {'name':'description','property':'og:description', 'content':'A collection of web apps for life sciences.' },\
+# {'property':'og:url', 'content':'https://flaski.age.mpg.de' },\
+# {'property':'og:image:width', 'content':'512' },\
+# {'property':'og:image:height', 'content':'481' },\
+# {'property':'og:type', 'content':'website' }]
+
 
 user_navbar_links={
     "Home":"/home/",\
