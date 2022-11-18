@@ -12,7 +12,7 @@ _META_TAGS=[{'name':'title', 'property':'og:title', 'content':'flaski' },\
 {'name':'description','property':'og:description', 'content':'Flaski is a myapp based collection of web apps for life \
     sciences with session management and versioning. Flaski is built thinking of interactions between code experienced \
     and non-experienced users for which sessions created over the web interface can be opened in python as standard \
-    plotly objects and vice-versa. Error reporting includes a session sharing option for optimal 1st level \
+    plotly objects and vice-versa. Among other things, error reporting includes a session sharing option for optimal 1st level \
     support. Flaski is open-source under the MIT License. ' },\
 {'property':'og:url', 'content':'https://flaski.age.mpg.de' },\
 {'property':'og:image:width', 'content':'512' },\
