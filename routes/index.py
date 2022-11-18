@@ -16,17 +16,8 @@ from ._utils import META_TAGS
 import pandas as pd
 import os
 
-print(META_TAGS)
-
 
 dashapp = dash.Dash("index", url_base_pathname=f"{PAGE_PREFIX}/", meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
-
-# dash.register_page(
-# 	__name__,
-#     title='Flaski',
-#     image='https://i.ibb.co/9pJr1cb/dog-solid.png',
-#     description='A collection of web Apps for life sciences.'
-# )
 
 # protect_dashviews(dashapp)
 
