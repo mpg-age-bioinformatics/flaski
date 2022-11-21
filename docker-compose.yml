@@ -155,6 +155,7 @@ services:
    APP_URL: https://flaski.localhost/v3
    PAGE_PREFIX: /v3
    FLASK_ENV: development #development #production
+   FLASK_DEBUG: 1
   #  MAIL_PASSWORD: ${MAIL_PASSWORD}
   #  MAIL_PORT: 587
   #  MAIL_SERVER: mail.age.mpg.de
