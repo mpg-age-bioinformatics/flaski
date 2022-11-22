@@ -8,27 +8,16 @@ if os.environ['FLASK_ENV'] != "development" :
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 _META_TAGS=[{'name':'title', 'property':'og:title', 'content':'flaski' },\
-{'name':'image','property':'og:image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
+{'name':'image','property':'og:image', 'content':'https://i.ibb.co/pRL0sM1/Flaski.jpg' },\
 {'name':'description','property':'og:description', 'content':'Flaski is a myapp based collection of web apps for life \
-    sciences with session management and versioning. Flaski is built thinking of interactions between code experienced \
-    and non-experienced users for which sessions created over the web interface can be opened in python as standard \
-    plotly objects and vice-versa. Among other things, error reporting includes a session sharing option for optimal 1st level \
-    support. Flaski is open-source under the MIT License. ' },\
-{'property':'og:url', 'content':'https://flaski.age.mpg.de' },\
-{'property':'og:image:width', 'content':'512' },\
-{'property':'og:image:height', 'content':'481' },\
+sciences with session management and versioning. Flaski is built thinking of interactions between code experienced \
+and non-experienced users for which sessions created over the web interface can be opened in python as standard \
+plotly objects and vice-versa. Among other things, error reporting includes a session sharing option for optimal 1st level \
+support. Flaski is open-source under the MIT License. ' },\
+{'property':'og:url', 'content':os.getenv("APP_URL") },\
+{'property':'og:image:width', 'content':'1200' },\
+{'property':'og:image:height', 'content':'675' },\
 {'property':'og:type', 'content':'website' }]
-
-# [{'name':'title', 'content':'Flaski' },\
-# {'name':'image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
-# {'name':'description', 'content':'A collection of web Apps for life sciences.' },\
-# {'name':'title', 'property':'og:title', 'content':'Flaski' },\
-# {'name':'image','property':'og:image', 'content':'https://i.ibb.co/9pJr1cb/dog-solid.png' },\
-# {'name':'description','property':'og:description', 'content':'A collection of web apps for life sciences.' },\
-# {'property':'og:url', 'content':'https://flaski.age.mpg.de' },\
-# {'property':'og:image:width', 'content':'512' },\
-# {'property':'og:image:height', 'content':'481' },\
-# {'property':'og:type', 'content':'website' }]
 
 
 user_navbar_links={
