@@ -9,7 +9,7 @@ v=str(v)
 
 _about=f'''
 
-Flaski is a [myapp](https://github.com/mpg-age-bioinformatics/myapp) based collection of web apps for life sciences. 
+Flaski is a [myapp](https://github.com/mpg-age-bioinformatics/myapp) based collection of web apps for data analysis and visualization in life sciences. 
 
 Flaski provides:
 
