@@ -1,0 +1,19 @@
+Hi {{ user.firstname }},
+
+Welcome! Thanks for signing up. Please follow this link to activate your account:
+
+{{app_url}}/login/{{token}}
+
+{{app_name}} works better on Google Chrome, both on your laptop, on your iPad or on your phone.
+
+You can find several how-to videos on {{app_name}}'s YouTube channel - https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA.
+
+For documentation please visit {{app_name}}'s GitHub page - https://bioinformatics.age.mpg.de/flaski.
+
+Citing: Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515 - https://github.com/mpg-age-bioinformatics/flaski#citing. 
+
+Cheers!
+
+Sincerely,
+
+{{app_name}}
