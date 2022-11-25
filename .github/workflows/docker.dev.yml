@@ -18,6 +18,7 @@ jobs:
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         git submodule update --init --recursive
         docker buildx create --name mybuilder --driver docker-container --bootstrap --use
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
         docker buildx build --platform linux/amd64,linux/arm64 -t docker.io/mpgagebioinformatics/flaski:dev .
   
   # docker build . --tag docker.io/mpgagebioinformatics/flaski:dev
