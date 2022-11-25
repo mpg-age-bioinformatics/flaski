@@ -24,9 +24,10 @@ if [ "${DOCKER_TAG}" == "latest" ] ;
     then 
         echo ":: Tag: ${DOCKER_TAG}"
         APP_VERSION=$(git rev-parse --short HEAD)
-        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
-        docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest .
-        docker push ${repoName}:latest && 
+        git submodule update --recursive --remote && \
+        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../ && \
+        docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest . && \
+        docker push ${repoName}:latest && \
         echo ":: build & push tag: latest"
 
 elif [ "${1}" == "nightly" ] ;
@@ -43,7 +44,8 @@ elif [ "${1}" == "nightly" ] ;
         docker system prune -f 
 
 else
-    echo ":: Tag: ${DOCKER_TAG}"       
+    echo ":: Tag: ${DOCKER_TAG}"
+    git submodule update --recursive --remote && \       
     cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
     docker build --build-arg APP_VERSION=${DOCKER_TAG} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest .
     docker tag ${repoName}:latest ${repoName}:${DOCKER_TAG}
