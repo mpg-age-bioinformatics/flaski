@@ -14,7 +14,13 @@ jobs:
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         git submodule update --init --recursive
-        docker build . --tag docker.io/mpgagebioinformatics/flaski:nightly
+        APP_VERSION=$(git rev-parse --short HEAD)
+        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
+
+        docker buildx create --name mybuilder --driver docker-container --bootstrap --use
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:nightly --push .
+  
     # docker push docker.io/mpgagebioinformatics/flaski:nightly
 
     # security scanning is done nightly on docker.io/mpgagebioinformatics/flaski2:nightly
@@ -60,7 +66,7 @@ jobs:
   #       SLACK_USERNAME: github_action_bot
   #       SLACK_CHANNEL: flaski
   #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  #       SLACK_TITLE: "Nightly build and push completed."
+  #       SLACK_TITLE: "[flaski] nightly build and push completed"
 
   #
 

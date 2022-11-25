@@ -19,6 +19,16 @@ jobs:
         git checkout ${CURRENT_TAG}
         git submodule update --init --recursive
         docker build . --tag docker.io/mpgagebioinformatics/flaski:latest
+
+        APP_VERSION=${GITHUB_REF#refs/*/}
+        git clone https://github.com/mpg-age-bioinformatics/flaski.git ${APP_VERSION}
+        cd ${APP_VERSION}
+        git submodule update --init --recursive
+        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
+        docker buildx create --name mybuilder --driver docker-container --bootstrap --use
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:${APP_VERSION} -t docker.io/mpgagebioinformatics/flaski:latest --push .
+ 
     # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:${CURRENT_TAG}
     # docker tag docker.io/flaski/flaski:latest docker.io/flaski/flaski:dev
 
@@ -72,7 +82,7 @@ jobs:
   #       SLACK_USERNAME: github_action_bot
   #       SLACK_CHANNEL: flaski
   #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  #       SLACK_TITLE: "Production build and push completed."
+  #       SLACK_TITLE: "[flaski] ${GITHUB_REF#refs/*/} build and push completed"
 
   #
 

@@ -8,6 +8,10 @@ if [ "${1}" == "nightly" ] ;
         IMAGE_NAME="flaski"
         DOCKER_TAG="nightly"
 else
+
+    # # currently using github actions to build images
+    exit
+
     # Parse image name for repo name
     tagStart=$(expr index "$IMAGE_NAME" :)
     repoName=${IMAGE_NAME:0:tagStart-1}

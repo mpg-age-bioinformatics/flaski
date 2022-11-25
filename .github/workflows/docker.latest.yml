@@ -1,4 +1,4 @@
-name: dev
+name: latest
 
 on:
   push:
@@ -17,9 +17,11 @@ jobs:
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
         git submodule update --init --recursive
+        APP_VERSION=$(git rev-parse --short HEAD)
+        cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
         docker buildx create --name mybuilder --driver docker-container --bootstrap --use
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-        docker buildx build --platform linux/amd64,linux/arm64 -t docker.io/mpgagebioinformatics/flaski:dev .
+        docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest --push .
   
   # docker build . --tag docker.io/mpgagebioinformatics/flaski:dev
   # docker push docker.io/mpgagebioinformatics/flaski:dev
@@ -37,5 +39,5 @@ jobs:
   #       SLACK_USERNAME: github_action_bot
   #       SLACK_CHANNEL: flaski
   #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  #       SLACK_TITLE: "Dev build and push completed."
+  #       SLACK_TITLE: "[flaski] latest build and push completed"
 
