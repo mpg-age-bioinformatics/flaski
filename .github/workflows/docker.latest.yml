@@ -19,7 +19,12 @@ jobs:
         git submodule update --init --recursive
         APP_VERSION=$(git rev-parse --short HEAD)
         cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
-        docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest .
+        docker buildx create --name mybuilder --driver docker-container --bootstrap --use
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest .
+  
+
+  # docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest .
 
   # docker buildx create --name mybuilder --driver docker-container --bootstrap --use
   # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
