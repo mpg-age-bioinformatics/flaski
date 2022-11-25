@@ -145,6 +145,8 @@ services:
    - ./_models.py:/myapp/myapp/_models.py
    - ./email/submissions.mpcdf.data.html:/myapp/myapp/templates/email/submissions.mpcdf.data.html
    - ./email/submissions.mpcdf.data.txt:/myapp/myapp/templates/email/submissions.mpcdf.data.txt
+   - ./email/validate_email.html:/myapp/myapp/templates/email/validate_email.html
+   - ./email/validate_email.txt:/myapp/myapp/templates/email/validate_email.txt
   environment:
    N_WORKERS: 4
    ADMINS: flaski@age.mpg.de

@@ -50,6 +50,8 @@ COPY ./email/submissions.ftp.html /myapp/myapp/templates/email/submissions.ftp.h
 COPY ./email/submissions.ftp.txt /myapp/myapp/templates/email/submissions.ftp.txt
 COPY ./email/submissions.ftp.data.html /myapp/myapp/templates/email/submissions.ftp.data.html
 COPY ./email/submissions.ftp.data.txt /myapp/myapp/templates/email/submissions.ftp.data.txt
+COPY ./email/validate_email.html /myapp/myapp/templates/email/validate_email.html
+COPY ./email/validate_email.txt /myapp/myapp/templates/email/validate_email.txt
 COPY ./_models.py /myapp/myapp/_models.py
 
 USER myapp
