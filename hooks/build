@@ -10,7 +10,7 @@ if [ "${1}" == "nightly" ] ;
 else
 
     # # currently using github actions to build images
-    # exit
+    exit
 
     # Parse image name for repo name
     tagStart=$(expr index "$IMAGE_NAME" :)
