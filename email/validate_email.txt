@@ -4,7 +4,7 @@ Welcome! Thanks for signing up. Please follow this link to activate your account
 
 {{app_url}}/login/{{token}}
 
-{{app_name}} works better on Google Chrome, both on your laptop, on your iPad or on your phone.
+{{app_name}} works best on Google Chrome, both on your laptop, on your iPad or on your phone.
 
 You can find several how-to videos on {{app_name}}'s YouTube channel - https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA.
 
