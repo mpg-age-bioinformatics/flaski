@@ -10,7 +10,7 @@ if [ "${1}" == "nightly" ] ;
 else
 
     # # currently using github actions to build images
-    exit
+    # exit
 
     # Parse image name for repo name
     tagStart=$(expr index "$IMAGE_NAME" :)
@@ -27,9 +27,9 @@ if [ "${DOCKER_TAG}" == "latest" ] ;
         git submodule update --init --recursive && \
         git submodule update --recursive --remote && \
         cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../ && \
-        docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest . && \
-        docker push ${repoName}:latest && \
-        echo ":: build & push tag: latest"
+        docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest . #&& \
+        # docker push ${repoName}:latest && \
+        # echo ":: build & push tag: latest"
 
 elif [ "${1}" == "nightly" ] ;
     then 
@@ -51,14 +51,14 @@ else
     git submodule update --recursive --remote && \       
     cd pyflaski && PYFLASKI_VERSION=$(git rev-parse --short HEAD) && cd ../
     docker build --build-arg APP_VERSION=${DOCKER_TAG} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t ${repoName}:latest .
-    docker tag ${repoName}:latest ${repoName}:${DOCKER_TAG}
-    docker tag ${repoName}:latest ${repoName}:stable
-    docker push ${repoName}:stable
-    echo ":: push tag: stable"
-    docker push ${repoName}:${DOCKER_TAG}
-    echo ":: push tag: ${DOCKER_TAG}"
-    docker push ${repoName}:latest
-    echo ":: push tag: latest"
+    # docker tag ${repoName}:latest ${repoName}:${DOCKER_TAG}
+    # docker tag ${repoName}:latest ${repoName}:stable
+    # docker push ${repoName}:stable
+    # echo ":: push tag: stable"
+    # docker push ${repoName}:${DOCKER_TAG}
+    # echo ":: push tag: ${DOCKER_TAG}"
+    # docker push ${repoName}:latest
+    # echo ":: push tag: latest"
 fi
 
 echo "- Finished"
