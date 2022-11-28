@@ -22,29 +22,32 @@ jobs:
         docker buildx create --name mybuilder --driver docker-container --bootstrap --use
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
         docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest --push .
-  
-
-  # docker build --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest .
-
-  # docker buildx create --name mybuilder --driver docker-container --bootstrap --use
-  # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  # docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:latest --push .
-   
-  # docker build . --tag docker.io/mpgagebioinformatics/flaski:dev
-  # docker push docker.io/mpgagebioinformatics/flaski:dev
-
-
-  # slackNotification:
-  #   needs: build
-  #   name: Slack Notification
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Slack Notification
-  #     uses: rtCamp/action-slack-notify@v2
-  #     env:
-  #       SLACK_USERNAME: github_action_bot
-  #       SLACK_CHANNEL: flaski
-  #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  #       SLACK_TITLE: "[flaski] latest build and push completed"
+    - name: Set Success env
+      run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+    - name: Slack Success Notification
+      run: | 
+        generate_post_data()
+        {
+          cat << EOF
+        {
+          "text": "flaski $GITHUB_SHA_SHORT build and push completed"
+        }
+        EOF
+        } 
+        curl -H "Content-Type: application/json" -X POST -d "$(generate_post_data)" ${{ secrets.SLACK_WEBHOOK }}
+    - name: Set Failure env
+      if: failure()
+      run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+    - name: Slack Failure Notification
+      if: failure()
+      run: | 
+        generate_post_data()
+        {
+          cat << EOF
+        {
+          "text": "flaski $GITHUB_SHA_SHORT build and push FAILED"
+        }
+        EOF
+        } 
+        curl -H "Content-Type: application/json" -X POST -d "$(generate_post_data)" ${{ secrets.SLACK_WEBHOOK }}
 
