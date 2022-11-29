@@ -26,10 +26,10 @@ user_navbar_links={
     "separator_1":"-",\
     "General":"__title__",\
     "About":"/about/",\
-    "Tutorials":"https://www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA",\
+    "Tutorials":"/ext/www.youtube.com/channel/UCQCHNHJ23FGyXo9usEC_TbA",\
     "Impressum":"/impressum/",\
     "Privacy":"/privacy/",\
-    "Issues":"https://github.com/mpg-age-bioinformatics/flaski/issues",\
+    "Issues":"/ext/github.com/mpg-age-bioinformatics/flaski/issues",\
     "fixed_separator":"-",\
     "Configuration":"__title__", \
     "Settings":"/settings/",\

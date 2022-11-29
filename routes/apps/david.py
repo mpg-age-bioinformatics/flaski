@@ -494,7 +494,7 @@ def make_app_content(pathname):
                                     [
                                         html.P([
                                             "Calculate Z-scores to visualize terms in ", 
-                                            html.A("plotGODESeq", href='https://nlenov.wordpress.com/2018/10/19/plotgodeseq-differential-expression-and-gene-ontology-enrichment-on-one-plot/', target="_blank"), 
+                                            html.A("plotGODESeq", href='/ext/nlenov.wordpress.com/2018/10/19/plotgodeseq-differential-expression-and-gene-ontology-enrichment-on-one-plot/', target="_blank"), 
                                             html.Br(), "The Z-score for each term is calculated as:", html.Br(),
                                             "\"z-score = (# up genes - # down genes)/ sqrt(# up genes + # down genes)\"", html.Br(),
                                             html.Hr(style={'width' : "100%", "height" :'2px', "margin-top":"15px" }),
@@ -713,7 +713,7 @@ def make_app_content(pathname):
                                                 html.Span(
                                                     [ 
                                                         html.I(className="fas fa-scroll fa-sm text-white-50"),
-                                                        html.A(" Citation", href='https://github.com/mpg-age-bioinformatics/flaski/wiki/DAVID?#citing', target="_blank", style={"color":"white", "text-decoration":"none"}) 
+                                                        html.A(" Citation", href='/ext/github.com/mpg-age-bioinformatics/flaski/wiki/DAVID?#citing', target="_blank", style={"color":"white", "text-decoration":"none"}) 
                                                     ]
                                                 ),
                                                 id='citation-session-btn', 
