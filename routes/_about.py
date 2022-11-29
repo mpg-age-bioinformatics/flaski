@@ -43,7 +43,7 @@ Issues: [https://github.com/mpg-age-bioinformatics/flaski/issues]({EXT_URL}githu
 
 Source: [https://github.com/mpg-age-bioinformatics/flaski]({EXT_URL}github.com/mpg-age-bioinformatics/flaski).
 
-Please check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before doing any contribution or opening an issue.
+Please check our [CODE_OF_CONDUCT.md]({EXT_URL}github.com/mpg-age-bioinformatics/flaski/blob/main/CODE_OF_CONDUCT.md) before doing any contribution or opening an issue.
 
 ##### Citing
 
@@ -55,7 +55,7 @@ We recommend that you allways export your session along with your results so tha
 
 Current version can be seen at the end of this page and old sessions version can be checked under [https://flaski.age.mpg.de/vcheck/](https://flaski.age.mpg.de/vcheck/).
 
-If you wish to open an older session under the same package version please use the [pyflaski]{EXT_URL}github.com/mpg-age-bioinformatics/pyflaski) companion package. 
+If you wish to open an older session under the same package version please use the [pyflaski]({EXT_URL}github.com/mpg-age-bioinformatics/pyflaski) companion package. 
 
 ##### Credits
 
