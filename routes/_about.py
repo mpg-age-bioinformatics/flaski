@@ -5,7 +5,7 @@ PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
 PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 
 EXT_URL=os.environ["APP_URL"]
-EXT_URL=f"{{APP_URL}}/ext/"
+EXT_URL=f"{EXT_URL}/ext/"
 
 v=app.config["APP_VERSION"]
 v=str(v)
