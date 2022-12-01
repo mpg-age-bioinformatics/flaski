@@ -174,7 +174,7 @@ def make_app_content(pathname):
                 ),
                 ############################
                 dbc.Row(
-                        dbc.Label("Target Genes"), #"height":"35px",
+                        dbc.Label("Target Metabolites"), #"height":"35px",
                 ),
                 ############################
                 dbc.Row(
