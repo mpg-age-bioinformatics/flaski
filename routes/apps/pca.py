@@ -279,7 +279,7 @@ def make_app_content(pathname):
 
                 ),
             ],
-            style={ "min-width":"372px","width":"100%", "display": "none"},
+            style={ "min-width":"372px","width":"100%"},
             className="g-0",    
             # style={ "margin-left":"0px" , "margin-right":"0px"}
         ),
@@ -662,7 +662,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
                 for i, a_ in enumerate(a) :
                     pa[k_]=a_
 
-        session_data={ "session_data": {"app": { "pca": {'last_modified':last_modified,"pa":pa} } } }
+        session_data={ "session_data": {"app": { "pca": {"filename":upload_data_text,'last_modified':last_modified,"df":df.to_json(),"pa":pa} } } }
         session_data["APP_VERSION"]=app.config['APP_VERSION']
         session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
 
