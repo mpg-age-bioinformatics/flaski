@@ -104,7 +104,7 @@ services:
 
  server3:
   container_name: server3
-  image: mpgagebioinformatics/flaski:stable
+  image: mpgagebioinformatics/flaski:latest
   build:
     context: ./
     dockerfile: Dockerfile
