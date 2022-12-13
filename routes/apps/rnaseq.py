@@ -7,10 +7,11 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
+from myapp.routes.apps._utils import check_access, make_options, GROUPS, GROUPS_INITALS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
 import io
+import json
 import base64
 import pandas as pd
 from myapp import db
@@ -79,7 +80,7 @@ def make_layout(pathname):
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
-    @cache.memoize(60*60*2) # 2 hours
+    @cache.memoize(1) # 2 hours 60*60*2
     def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
         df=pd.DataFrame()
         for row in rows:
@@ -92,8 +93,128 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".RNAseq.xlsx")
+        filename=os.path.basename(filename)
 
-        return {"filename": filename, "samples":df, "metadata":df_}
+        json_filename=filename.replace(".xlsx",".json")
+
+        meta={
+            "email":email,
+            "group":group,
+            "folder":folder,
+            "md5sums":md5sums,
+            "project_title":project_title,
+            "organism":organism,
+            "ercc":ercc,
+            "wget":wget
+        }
+
+        ercc_dic={
+            "ercc_label" : "ercc92" ,
+            "url_ercc_gtf" : "https://datashare.mpcdf.mpg.de/s/MOxbNrXeBNcg9wt/download" ,
+            "url_ercc_fa" : "https://datashare.mpcdf.mpg.de/s/H9PQu3vDRi9saqV/download"
+        }
+
+        species={
+            "celegans":{
+                "current_release":"107",
+                "107":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    "release" : "107",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-107/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-107/fasta/caenorhabditis_elegans/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"celegans_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            }
+        }
+
+        if group != "External" :
+            if group in GROUPS :
+                project_folder=group+"/"+GROUPS_INITALS[group]+"_at_"+secure_filename(project_title)
+            else:
+                project_folder=group+"/at_"+secure_filename(project_title)
+        else:
+            project_folder="Bioinformatics/bit_ext_at_"+secure_filename(project_title)
+
+        paths={
+            "r2d2":{
+                "code":"/beegfs/group_bit/data/projects/departments/",
+                "raw_data":"/beegfs/group_bit/data/raw_data/departments/",
+                "run_data":"/beegfs/group_bit/data/projects/departments/"
+            },
+            "raven":{
+                "code":"/beegfs/group_bit/data/projects/departments/",
+                "raw_data":"/beegfs/group_bit/data/raw_data/departments/",
+                "run_data":"/beegfs/group_bit/data/projects/departments/"
+            },
+            "local":{
+                "raw_data":"<path_to_raw_data>",
+                "run_data":"<path_to_run_data>",
+            }
+        }
+
+        nf={
+            "r2d2":{
+                "cytoscape_host":"/beegfs/group_bit/data/projects/departments/Bioinformatics/bit_automation/cytoscape.ip.txt",
+                "cytoscape_ip_mount":"-B /beegfs/group_bit/data/projects/departments/Bioinformatics/bit_automation/cytoscape.ip.txt_inuse:/cytoscape.ip.txt",
+                "homefolder":"/beegfs/group_bit/home/JBoucas", 
+                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["r2d2"]["code"], filename),
+                "fastqc_raw_data" :  os.path.join(paths["r2d2"]["raw_data"], project_folder) ,
+                "kallisto_raw_data" : os.path.join(paths["r2d2"]["raw_data"], project_folder) ,
+                "featurecounts_raw_data" : os.path.join(paths["r2d2"]["raw_data"], project_folder) ,
+                "genomes" : "/beegfs/common/genomes/nextflow_builds" ,
+                "DAVIDUSER":"<your.david.registered@email.com>",
+                "circRNA":"None",
+            },
+            "raven":{
+                "cytoscape_ip_mount":"",
+                "homefolder":"", 
+                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["raven"]["code"], filename),
+                "fastqc_raw_data" :  os.path.join(paths["raven"]["raw_data"], folder) ,
+                "kallisto_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
+                "featurecounts_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
+                "genomes" : "/beegfs/common/genomes/nextflow_builds" ,
+                "circRNA":"None",
+            },
+            "local":{
+                "homefolder":"",
+                "project_folder" : "<path_to_run_data>" ,
+                "samplestable": f"<path_to_run_data>/{filename}",
+                "fastqc_raw_data" :  "<path_to_raw_data>" ,
+                "kallisto_raw_data" : "<path_to_raw_data>" ,
+                "featurecounts_raw_data" : "<path_to_raw_data>" ,
+                "genomes" : "<path_to_run_data>" ,
+                "circRNA":"None",
+            }
+        }
+
+        for k in list(meta.keys()):
+            for s in ["r2d2","raven","local"] :
+                nf[s][k]=meta[k]
+        
+        if ercc != "NO" :
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","local"] :
+                    nf[s][k]=ercc_dic[k]
+
+        species_release=species[organism]["current_release"]
+        species_release=species[organism][species_release]
+        for k in list(species_release.keys()):
+            for s in ["r2d2","raven","local"] :
+                nf[s][k]=species_release[k]
+
+        # print("1111", type(nf), nf)
+        nf=json.dumps(nf)
+        # print("2222", type(nf), nf)
+
+        json_config={filename:{"samples":df, "RNAseq":df_ }, json_filename:nf }
+        
+        return {"filename": filename, "json_filename":json_filename, "json":json_config}
     return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
 
 @dashapp.callback(
@@ -102,7 +223,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 )
 def make_app_content(session_id):
     header_access, msg_access = check_access( 'rnaseq' )
-    # header_access, msg_access = None, None # for local debugging 
+    header_access, msg_access = None, None # for local debugging 
 
     input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
     example_input=pd.DataFrame( 
@@ -351,7 +472,9 @@ Once you have been given access more information will be displayed on how to tra
             id="modal",
             is_open=False,
         ),
-        dcc.Download( id="download-file" )
+        dcc.Download( id="download-file" ),
+        dcc.Download( id="download-file-json" )
+
     ]
 
     return content
@@ -411,6 +534,7 @@ def read_file(contents,filename,last_modified):
     Output("modal_header", "children"),
     Output("modal_body", "children"),
     Output("download-file","data"),
+    Output("download-file-json","data"),
     # Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
@@ -425,16 +549,20 @@ def read_file(contents,filename,last_modified):
     prevent_initial_call=True )
 def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
     header, msg = check_access( 'rnaseq' )
-    # header, msg = None, None # for local debugging 
+    header, msg = None, None # for local debugging 
     if msg :
-        return header, msg, dash.no_update
+        return header, msg, dash.no_update, dash.no_update
 
     if not wget:
         wget="NONE"
 
     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
-    samples=pd.read_json(subdic["samples"])
-    metadata=pd.read_json(subdic["metadata"])
+    filename=subdic["filename"]
+    json_filename=subdic["json_filename"]
+    json_config=subdic["json"]
+
+    samples=pd.read_json(json_config[filename]["samples"])
+    metadata=pd.read_json(json_config[filename]["RNAseq"])
 
     validation=validate_metadata(metadata)
     if validation:
@@ -453,22 +581,59 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
     mps_domain="mpg.de"
-    # if user_domain[-len(mps_domain):] == mps_domain :
-    if user_domain !="age.mpg.de" :
-        subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    if user_domain[-len(mps_domain):] == mps_domain :
 
-    if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="RNAseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+        if user_domain !="age.mpg.de" :
+            filename=os.path.join("/submissions_ftp/",filename)
+            json_filename=os.path.join("/submissions_ftp/",json_filename)
+
+            EXCout=pd.ExcelWriter(filename)
+            samples.to_excel(EXCout,"samples",index=None)
+            metadata.to_excel(EXCout,"RNAseq",index=None)
+            EXCout.save()
+
+            with open(json_filename, "w") as out:
+                json.dump(json_config,out)
+
+            ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename)
+            
+            metadata=pd.concat([metadata,ftp_user])
+
+            EXCout=pd.ExcelWriter(filename)
+            samples.to_excel(EXCout,"samples",index=None)
+            metadata.to_excel(EXCout,"RNAseq",index=None)
+            EXCout.save()
+
+            ftp_user=ftp_user["Value"].tolist()[0]
+            json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
+
+            with open(json_filename, "w") as out:
+                json.dump(json_config, out)
+
+        else:
+            filename=os.path.join("/submissions/",filename)
+            json_filename=os.path.join("/submissions/",json_filename)
+
+            EXCout=pd.ExcelWriter(filename)
+            samples.to_excel(EXCout,"samples",index=None)
+            metadata.to_excel(EXCout,"RNAseq",index=None)
+            EXCout.save()
+
+            with open(json_filename, "w") as out:
+                json.dump(json_config,out)
+
+            send_submission_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename)
+
+        json_config=json.dumps(json_config)
+
+        return header, msg, dcc.send_file( filename ), dict(content=json_config, filename=os.path.basename(json_filename))
+
     else:
-        ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=subdic["filename"],submission_file=None, attachment_path=subdic["filename"])
-        metadata=pd.concat([metadata,ftp_user])
+        json_config=json.dumps(json_config)
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"RNAseq",index=None)
-    EXCout.save()
+        return header, msg, dash.no_update, dict(content=json_config, filename=os.path.basename(json_filename))
 
-    return header, msg, dcc.send_file( subdic["filename"] )
+
 
 # add rows buttom 
 @dashapp.callback(
