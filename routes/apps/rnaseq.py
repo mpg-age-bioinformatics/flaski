@@ -80,7 +80,7 @@ def make_layout(pathname):
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
-    @cache.memoize(1) # 2 hours 60*60*2
+    @cache.memoize(60*60*2) # 2 hours 60*60*2
     def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
         df=pd.DataFrame()
         for row in rows:
@@ -114,22 +114,97 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "url_ercc_fa" : "https://datashare.mpcdf.mpg.de/s/H9PQu3vDRi9saqV/download"
         }
 
+        # organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
+        # organisms_=make_options(organisms)
+        # ercc_=make_options(["YES","NO"])
+
         species={
             "celegans":{
-                "current_release":"107",
+                "current_release":"105",
                 "107":{
                     "organism" : "caenorhabditis_elegans" ,
                     "species":"caenorhabditis elegans",
                     "spec":"celegans",
-                    "release" : "107",
-                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-107/gtf/caenorhabditis_elegans/",
-                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-107/fasta/caenorhabditis_elegans/dna/" ,
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/caenorhabditis_elegans/dna/" ,
                     "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
                     "biomart_dataset":"celegans_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
                 }
-            }
+            },
+            "mmusculus":{
+                "current_release":"105",
+                "105":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/mus_musculus/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"mmusculus_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "hsapiens":{
+                "current_release":"105",
+                "105":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"hsapiens_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "dmelanogaster":{
+                "current_release":"105",
+                "105":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/drosophila_melanogaster/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"dmelanogaster_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },
+            },
+            "nfurzeri":{
+                "current_release":"105",
+                "105":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/nothobranchius_furzeri/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"nfurzeri_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "scerevisiae":{
+                "current_release":"105",
+                "105":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"scerevisiae_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
         }
+
 
         if group != "External" :
             if group in GROUPS :
@@ -208,9 +283,13 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             for s in ["r2d2","raven","local"] :
                 nf[s][k]=species_release[k]
 
-        # print("1111", type(nf), nf)
+        if organism in ["scerevisiae","nfurzeri"] :
+            del nf["r2d2"]["DAVIDUSER"]
+            del nf["r2d2"]["cytoscape_host"]
+            nf["r2d2"]["cytoscape_ip_mount"]=""
+        
+
         nf=json.dumps(nf)
-        # print("2222", type(nf), nf)
 
         json_config={filename:{"samples":df, "RNAseq":df_ }, json_filename:nf }
         
