@@ -90,8 +90,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         df.reset_index(inplace=True, drop=True)
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget"],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget]}, index=list(range(8)))
+        df_deseq2=df[["Read 1","Group"]]
+        df_deseq2.columns=["files","group"]
         df=df.to_json()
         df_=df_.to_json()
+        df_deseq2=df_deseq2.to_json()
         filename=make_submission_file(".RNAseq.xlsx")
         filename=os.path.basename(filename)
 
@@ -121,7 +124,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         species={
             "celegans":{
                 "current_release":"105",
-                "107":{
+                "105":{
                     "organism" : "caenorhabditis_elegans" ,
                     "species":"caenorhabditis elegans",
                     "spec":"celegans",
@@ -257,6 +260,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "circRNA":"None",
             },
             "local":{
+                "cytoscape_ip_mount":"",
                 "homefolder":"",
                 "project_folder" : "<path_to_run_data>" ,
                 "samplestable": f"<path_to_run_data>/{filename}",
@@ -276,6 +280,10 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             for k in list(ercc_dic.keys()):
                 for s in ["r2d2","raven","local"] :
                     nf[s][k]=ercc_dic[k]
+        else:
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","local"] :
+                    nf[s][k]=""
 
         species_release=species[organism]["current_release"]
         species_release=species[organism][species_release]
@@ -291,7 +299,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
         nf=json.dumps(nf)
 
-        json_config={filename:{"samples":df, "RNAseq":df_ }, json_filename:nf }
+        json_config={filename:{"deseq2":df_deseq2, "samples":df, "RNAseq":df_ }, json_filename:nf }
         
         return {"filename": filename, "json_filename":json_filename, "json":json_config}
     return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
@@ -628,9 +636,9 @@ def read_file(contents,filename,last_modified):
     prevent_initial_call=True )
 def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
     header, msg = check_access( 'rnaseq' )
-    header, msg = None, None # for local debugging 
-    if msg :
-        return header, msg, dash.no_update, dash.no_update
+    # header, msg = None, None # for local debugging 
+    # if msg :
+    #     return header, msg, dash.no_update, dash.no_update
 
     if not wget:
         wget="NONE"
@@ -660,7 +668,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
     mps_domain="mpg.de"
-    if user_domain[-len(mps_domain):] == mps_domain :
+    if ( user_domain[-len(mps_domain):] == mps_domain ) or ( not msg) :
 
         if user_domain !="age.mpg.de" :
             filename=os.path.join("/submissions_ftp/",filename)
