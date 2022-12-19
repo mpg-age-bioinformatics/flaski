@@ -240,7 +240,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "cytoscape_ip_mount":"-B /beegfs/group_bit/data/projects/departments/Bioinformatics/bit_automation/cytoscape.ip.txt_inuse:/cytoscape.ip.txt",
                 "homefolder":"/beegfs/group_bit/home/JBoucas", 
                 "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
-                "samplestable":os.path.join(paths["r2d2"]["code"], filename),
+                "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, filename),
                 "fastqc_raw_data" :  os.path.join(paths["r2d2"]["raw_data"], project_folder) ,
                 "kallisto_raw_data" : os.path.join(paths["r2d2"]["raw_data"], project_folder) ,
                 "featurecounts_raw_data" : os.path.join(paths["r2d2"]["raw_data"], project_folder) ,
@@ -310,7 +310,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 )
 def make_app_content(session_id):
     header_access, msg_access = check_access( 'rnaseq' )
-    header_access, msg_access = None, None # for local debugging 
+    # header_access, msg_access = None, None # for local debugging 
 
     input_df=pd.DataFrame( columns=["Sample","Group","Replicate","Read 1", "Read 2"] )
     example_input=pd.DataFrame( 
@@ -384,16 +384,28 @@ type in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI).
 Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combinations should be unique or files will be overwritten.
     '''
 
+    local_readme='''
+**Local runs**
+
+For running this pipeline on your local computer please follow the instructions on [https://github.com/mpg-age-bioinformatics/nextflow-rnaseq](https://github.com/mpg-age-bioinformatics/nextflow-rnaseq).
+
+For local runs, if multiple runs were performed and you need to concatenated files please do this ahead of generating the config file here.
+    '''
+
     readme_age=f'''
 {readme_age}
 
 {readme_common}
+
+{local_readme}
     '''
 
     readme_mps=f'''
 {readme_mps}
 
 {readme_common}
+
+{local_readme}
     '''
 
     readme_noaccess='''
@@ -402,18 +414,27 @@ Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combina
 Once you have been given access more information will be displayed on how to transfer your raw data.
     '''
 
+    readme_noaccess=local_readme
+
 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
 
     mps_domain="mpg.de"
-    #if user_domain[-len(mps_domain):] == mps_domain :
-    if user_domain =="age.mpg.de" :
-        readme=dcc.Markdown(readme_age, style={"width":"90%", "margin":"10px"} )
-        groups_=make_options(GROUPS)
-        groups_val=None
-        folder_row_style={"margin-top":10 }
-        folder=""
+    if user_domain[-len(mps_domain):] == mps_domain :
+        if user_domain =="age.mpg.de" :
+            readme=dcc.Markdown(readme_age, style={"width":"90%", "margin":"10px"} )
+            groups_=make_options(GROUPS)
+            groups_val=None
+            folder_row_style={"margin-top":10 }
+            folder=""
+        else :
+            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
+            groups_=make_options([user_domain])
+            groups_val=user_domain
+            folder_row_style={"margin-top":10, 'display': 'none' }
+            folder="FTP"
+
     elif not header_access :
         readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
         groups_=make_options([user_domain])
