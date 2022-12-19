@@ -252,7 +252,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "cytoscape_ip_mount":"",
                 "homefolder":"", 
                 "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
-                "samplestable":os.path.join(paths["raven"]["code"], filename),
+                "samplestable":os.path.join(paths["raven"]["code"], project_folder, filename),
                 "fastqc_raw_data" :  os.path.join(paths["raven"]["raw_data"], folder) ,
                 "kallisto_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
                 "featurecounts_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
