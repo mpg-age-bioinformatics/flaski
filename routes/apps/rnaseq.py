@@ -256,7 +256,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "fastqc_raw_data" :  os.path.join(paths["raven"]["raw_data"], folder) ,
                 "kallisto_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
                 "featurecounts_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
-                "genomes" : "/beegfs/common/genomes/nextflow_builds" ,
+                "genomes" : "/ptmp/jboucas/genomes/nextflow_builds" ,
                 "circRNA":"None",
             },
             "local":{
