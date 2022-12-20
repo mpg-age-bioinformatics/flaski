@@ -224,9 +224,9 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "run_data":"/beegfs/group_bit/data/projects/departments/"
             },
             "raven":{
-                "code":"/beegfs/group_bit/data/projects/departments/",
-                "raw_data":"/beegfs/group_bit/data/raw_data/departments/",
-                "run_data":"/beegfs/group_bit/data/projects/departments/"
+                "code":"/raven/u/jboucas/projects_code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/raven/ptmp/jboucas/projects/"
             },
             "local":{
                 "raw_data":"<path_to_raw_data>",
