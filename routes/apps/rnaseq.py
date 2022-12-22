@@ -381,6 +381,10 @@ the SRA run number instead of the file name. If you are analysing paired end dat
 exists please give in the same run number in `Read 2`. In the `Folder` and `md5sums` fields you will need to 
 type in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI). 
 
+If you choose to run this workflow locally on your laptop please be aware that the SRA section here described 
+does not apply to local runs. For local runs you will have to download the raw fastq.gz files yourself and 
+then fill up the submission form.
+
 **Samples**
 
 Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combinations should be unique or files will be overwritten.
