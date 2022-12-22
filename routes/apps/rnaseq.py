@@ -14,6 +14,8 @@ import io
 import json
 import base64
 import pandas as pd
+import zipfile
+
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
 from werkzeug.utils import secure_filename
@@ -253,9 +255,9 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "homefolder":"", 
                 "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
                 "samplestable":os.path.join(paths["raven"]["code"], project_folder, filename),
-                "fastqc_raw_data" :  os.path.join(paths["raven"]["raw_data"], folder) ,
-                "kallisto_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
-                "featurecounts_raw_data" : os.path.join(paths["raven"]["raw_data"], folder) ,
+                "fastqc_raw_data" :  os.path.join(paths["raven"]["raw_data"], "<ftp>") ,
+                "kallisto_raw_data" : os.path.join(paths["raven"]["raw_data"], "<ftp>") ,
+                "featurecounts_raw_data" : os.path.join(paths["raven"]["raw_data"], "<ftp>") ,
                 "genomes" : "/ptmp/jboucas/genomes/nextflow_builds" ,
                 "circRNA":"None",
             },
@@ -581,7 +583,7 @@ Once you have been given access more information will be displayed on how to tra
             is_open=False,
         ),
         dcc.Download( id="download-file" ),
-        dcc.Download( id="download-file-json" )
+        # dcc.Download( id="download-file-json" )
 
     ]
 
@@ -642,8 +644,7 @@ def read_file(contents,filename,last_modified):
     Output("modal_header", "children"),
     Output("modal_body", "children"),
     Output("download-file","data"),
-    Output("download-file-json","data"),
-    # Input('session-id', 'data'),
+    # Output("download-file-json","data"),
     Input('submit-button-state', 'n_clicks'),
     State('adding-rows-table', 'data'),
     State('email', 'value'),
@@ -734,12 +735,18 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
         json_config=json.dumps(json_config)
 
-        return header, msg, dcc.send_file( filename ), dict(content=json_config, filename=os.path.basename(json_filename))
+        def write_archive(bytes_io):
+            with zipfile.ZipFile(bytes_io, mode="w") as zf:
+                for f in [ filename, json_filename ]:
+                    zf.write(f,  os.path.basename(f) )
+
+        return header, msg, dcc.send_bytes(write_archive, os.path.basename(filename).replace("xlsx","zip") )
+
 
     else:
         json_config=json.dumps(json_config)
 
-        return header, msg, dash.no_update, dict(content=json_config, filename=os.path.basename(json_filename))
+        return header, msg, dict(content=json_config, filename=os.path.basename(json_filename)) 
 
 
 
