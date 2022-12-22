@@ -389,9 +389,9 @@ Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combina
     local_readme='''
 **Local runs**
 
-For running this pipeline on your local computer please follow the instructions on [https://github.com/mpg-age-bioinformatics/nextflow-rnaseq](https://github.com/mpg-age-bioinformatics/nextflow-rnaseq).
+For running this pipeline on your local computer you can use the config generated here and follow the instructions on [https://github.com/mpg-age-bioinformatics/nextflow-rnaseq](https://github.com/mpg-age-bioinformatics/nextflow-rnaseq).
 
-For local runs, if multiple runs were performed and you need to concatenated files please do this ahead of generating the config file here.
+For local usage, if multiple sequencing runs were performed and you need to concatenate files please do this ahead of generating the config file here.
     '''
 
     readme_age=f'''
