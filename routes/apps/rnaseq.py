@@ -662,6 +662,10 @@ def read_file(contents,filename,last_modified):
     prevent_initial_call=True )
 def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
     header, msg = check_access( 'rnaseq' )
+    if not msg:
+        authorized = True
+    else:
+        authorized= False
     # header, msg = None, None # for local debugging 
     # if msg :
     #     return header, msg, dash.no_update, dash.no_update
@@ -694,7 +698,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
     mps_domain="mpg.de"
-    if ( user_domain[-len(mps_domain):] == mps_domain ) or ( not msg) :
+    if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
         if user_domain !="age.mpg.de" :
             filename=os.path.join("/submissions_ftp/",filename)
