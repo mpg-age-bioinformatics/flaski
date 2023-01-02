@@ -175,6 +175,10 @@ def release_request(n_clicks, pathname):
 
     shutil.move(submission_file, dest)
 
+    xlsx_file=submission_file.replace(".json", ".xlsx")
+    if os.path.isfile(xlsx_file) :
+        shutil.move(xlsx_file, dest.replace(".json", ".xlsx"))
+
     submission_tag=os.path.basename(dest)
 
     send_email(f'[Flaski][Automation][{submission_type}] Files have been transfered.',
