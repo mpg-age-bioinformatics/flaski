@@ -698,9 +698,10 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
     mps_domain="mpg.de"
+
     if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
-        if user_domain !="age.mpg.de" :
+        if user_domain != "age.mpg.de" :
             filename=os.path.join("/submissions_ftp/",filename)
             json_filename=os.path.join("/submissions_ftp/",json_filename)
 
@@ -713,7 +714,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
                 json.dump(json_config,out)
 
             ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename)
-            
+
             metadata=pd.concat([metadata,ftp_user])
 
             EXCout=pd.ExcelWriter(filename)
@@ -722,6 +723,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
             EXCout.save()
 
             ftp_user=ftp_user["Value"].tolist()[0]
+            json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
             json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
 
             with open(json_filename, "w") as out:
