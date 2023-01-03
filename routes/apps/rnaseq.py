@@ -695,6 +695,8 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
         msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
     
 
+    json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
+
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
     mps_domain="mpg.de"
@@ -723,7 +725,6 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
             EXCout.save()
 
             ftp_user=ftp_user["Value"].tolist()[0]
-            json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
             json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
 
             with open(json_filename, "w") as out:
