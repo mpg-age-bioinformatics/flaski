@@ -215,7 +215,12 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             if group in GROUPS :
                 project_folder=group+"/"+GROUPS_INITALS[group]+"_at_"+secure_filename(project_title)
             else:
-                project_folder=group+"/at_"+secure_filename(project_title)
+                user_domain=[ s.replace(" ","") for s in email.split(",") if "mpg.de" in s ]
+                user_domain=user_domain[0].split("@")[-1]
+                mps_domain="mpg.de"
+                tag=user_domain.split(".mpg.de")[0]
+
+                project_folder=group+"/"+tag+"_at_"+secure_filename(project_title)
         else:
             project_folder="Bioinformatics/bit_ext_at_"+secure_filename(project_title)
 
