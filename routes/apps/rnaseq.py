@@ -673,6 +673,13 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     if not wget:
         wget="NONE"
 
+    user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+    mps_domain="mpg.de"
+
+    if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
+        group="Bioinformatics"
+
     subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
     filename=subdic["filename"]
     json_filename=subdic["json_filename"]
@@ -696,10 +703,6 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     
 
     json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
-
-    user_domain=current_user.email
-    user_domain=user_domain.split("@")[-1]
-    mps_domain="mpg.de"
 
     if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
