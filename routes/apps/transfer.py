@@ -15,6 +15,11 @@ import shutil
 
 dashapp = dash.Dash("transfer",url_base_pathname=f'{PAGE_PREFIX}/transfer/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
+if app.config['PAGE_PREFIX'] == "" :
+    home_page="/"
+else:
+    home_page=app.config['PAGE_PREFIX']
+
 dashapp.layout=dbc.Row( 
     [
         dbc.Col( 
@@ -103,7 +108,7 @@ def release_request(n_clicks, pathname):
                 dbc.ModalBody("Submission could not be found.", id="modal_body"),
                 dbc.ModalFooter(
                     dbc.Button(
-                        "Close", id="close", className="ms-auto", n_clicks=0, href=app.config['APP_URL']
+                        "Close", id="close", className="ms-auto", n_clicks=0, href=home_page
                     )
                 ),
             ],
@@ -146,7 +151,7 @@ def release_request(n_clicks, pathname):
                 dbc.ModalBody("ftp server could not be reached. Please try again later.", id="modal_body"),
                 dbc.ModalFooter(
                     dbc.Button(
-                        "Close", id="close", className="ms-auto", n_clicks=0, href=app.config['APP_URL']
+                        "Close", id="close", className="ms-auto", n_clicks=0, href=home_page
                     )
                 ),
             ],
@@ -161,7 +166,7 @@ def release_request(n_clicks, pathname):
             dbc.ModalBody("Your request has been released.", id="modal_body"),
             dbc.ModalFooter(
                 dbc.Button(
-                    "Close", id="close", className="ms-auto", n_clicks=0, href=app.config['APP_URL']
+                    "Close", id="close", className="ms-auto", n_clicks=0, href=home_page
                 )
             ),
         ],
