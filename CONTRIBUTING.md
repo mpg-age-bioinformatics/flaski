@@ -12,6 +12,7 @@ git clone git@github.com:mpg-age-bioinformatics/flaski.git
 
 Export secret variables:
 ```
+cd ~/flaski
 cat << EOF > .env
 MYSQL_PASSWORD=$(openssl rand -base64 20)
 MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
@@ -25,9 +26,10 @@ Create local folders:
 mkdir -p ~/flaski23/backup/stats ~/flaski23/backup/users_data2 ~/flaski23/backup/users_data3 ~/flaski23/backup/mariadb ~/flaski23/private ~/flaski23/mpcdf ~/flaski23/submissions
 ```
 
-To deploy flaski edit the docker-compose.yml accordingly and then:
+To deploy flaski edit the docker-compose.yml accordingly and then pull pyflaski and build:
 ```
 cd ~/flaski
+git submodule update --init --recursive
 docker-compose up -d --build
 ```
 
@@ -36,6 +38,13 @@ If running myapp on development mode you will have to start flask from inside th
 docker-compose exec server3 /bin/bash
 flask run --host 0.0.0.0 --port 8000
 ```
+Add the following line to your `/etc/hosts`
+```
+127.0.0.1       flaski.localhost
+```
+
+You can now access flaski over https://flaski.localhost/v3.
+
 Adding administrator user:
 ```
 docker-compose run --entrypoint="python3 /myapp/myapp.py admin --add myemail@gmail.com" init
