@@ -54,4 +54,6 @@ COPY ./email/validate_email.html /myapp/myapp/templates/email/validate_email.htm
 COPY ./email/validate_email.txt /myapp/myapp/templates/email/validate_email.txt
 COPY ./_models.py /myapp/myapp/_models.py
 
+RUN chown -R ${BUILD_NAME}:${BUILD_NAME} /${BUILD_NAME}
+
 USER myapp
