@@ -23,21 +23,21 @@ jobs:
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
         docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${APP_VERSION} --build-arg PYFLASKI_VERSION=${PYFLASKI_VERSION} --no-cache -t docker.io/mpgagebioinformatics/flaski:stable -t docker.io/mpgagebioinformatics/flaski:${APP_VERSION} -t docker.io/mpgagebioinformatics/flaski:latest --push .
     - name: Set Success env
-      run: echo "GITHUB_SHA_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      run: echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV && echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)"
     - name: Slack Success Notification
       run: | 
         generate_post_data()
         {
           cat << EOF
         {
-          "text": "flaski $GITHUB_SHA_SHORT build and push completed"
+          "deployment":"server","namespace":"flaski", "container" :"server","image":"mpgagebioinformatics/flaski", "tag":"$GITHUB_TAG" ,"SHA":"$GITHUB_SHA_SHORT"
         }
         EOF
         } 
-        curl -H "Content-Type: application/json" -X POST -d "$(generate_post_data)" ${{ secrets.SLACK_WEBHOOK }}
+        curl --insecure -H "Content-Type: application/json" -X POST -d "$(generate_post_data)" ${{ secrets.ROLLOUT_WEBHOOK }}
     - name: Set Failure env
       if: failure()
-      run: echo "GITHUB_SHA_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      run: echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV && echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)"
     - name: Slack Failure Notification
       if: failure()
       run: | 
@@ -45,7 +45,7 @@ jobs:
         {
           cat << EOF
         {
-          "text": "flaski $GITHUB_SHA_SHORT build and push FAILED"
+          "text": "flaski $GITHUB_TAG build and push FAILED"
         }
         EOF
         } 

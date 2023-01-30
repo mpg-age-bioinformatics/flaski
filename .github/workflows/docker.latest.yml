@@ -30,11 +30,11 @@ jobs:
         {
           cat << EOF
         {
-          "text": "flaski $GITHUB_SHA_SHORT build and push completed"
+          "deployment":"server","namespace":"flaski-dev", "container" :"server","image":"mpgagebioinformatics/flaski", "tag":"latest" ,"SHA":"$GITHUB_SHA_SHORT"
         }
         EOF
         } 
-        curl -H "Content-Type: application/json" -X POST -d "$(generate_post_data)" ${{ secrets.SLACK_WEBHOOK }}
+        curl --insecure -H "Content-Type: application/json" -X POST -d "$(generate_post_data)" ${{ secrets.ROLLOUT_WEBHOOK }}
     - name: Set Failure env
       if: failure()
       run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
