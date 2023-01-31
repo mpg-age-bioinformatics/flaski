@@ -609,8 +609,8 @@ def make_app_content(pathname):
         dbc.Row( 
             [
                 dbc.Col( html.Label('Skip MLE') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='skip_mle', options=TRUE_FALSE, value='none', style={ "width":"100%"}),md=3 ), 
-                dbc.Col( html.Label('[MLE] Skip MLE TRUE/FALSE'),md=3  ), 
+                dbc.Col( dcc.Dropdown( id='skip_mle', options=TRUE_FALSE, value='False', style={ "width":"100%"}),md=3 ), 
+                dbc.Col( html.Label('[MLE] Skip MLE when not needed / applicable'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
