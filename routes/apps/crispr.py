@@ -154,6 +154,7 @@ def generate_submission_file(samplenames, \
     gmt_file,\
     mageck_test_remove_zero,\
     mageck_test_remove_zero_threshold,\
+    skip_mle,\
     species,\
     assembly,\
     use_bowtie,\
@@ -181,6 +182,7 @@ def generate_submission_file(samplenames, \
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
+        skip_mle,\
         species,\
         assembly,\
         use_bowtie,\
@@ -213,6 +215,7 @@ def generate_submission_file(samplenames, \
                 "gmt_file",\
                 "mageck_test_remove_zero",\
                 "mageck_test_remove_zero_threshold",\
+                "skip_mle",\
                 "species",\
                 "assembly",\
                 "use_bowtie",\
@@ -240,6 +243,7 @@ def generate_submission_file(samplenames, \
                 gmt_file,\
                 mageck_test_remove_zero,\
                 mageck_test_remove_zero_threshold,\
+                skip_mle,\
                 species,\
                 assembly,\
                 use_bowtie,\
@@ -275,6 +279,7 @@ def generate_submission_file(samplenames, \
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
+        skip_mle,\
         species,\
         assembly,\
         use_bowtie,\
@@ -603,6 +608,14 @@ def make_app_content(pathname):
         ),
         dbc.Row( 
             [
+                dbc.Col( html.Label('Skip MLE') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='skip_mle', options=TRUE_FALSE, value='none', style={ "width":"100%"}),md=3 ), 
+                dbc.Col( html.Label('[MLE] Skip MLE TRUE/FALSE'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
                 dbc.Col( html.Label('Species') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='species', options=species, value=species_value, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('[vispr] Species'),md=3  ), 
@@ -813,6 +826,7 @@ fields = [
     "gmt_file",\
     "mageck_test_remove_zero",\
     "mageck_test_remove_zero_threshold",\
+    "skip_mle",\
     "species",\
     "assembly",\
     "use_bowtie",\
@@ -909,6 +923,7 @@ def update_output(n_clicks, \
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
+        skip_mle,\
         species,\
         assembly,\
         use_bowtie,\
@@ -943,6 +958,7 @@ def update_output(n_clicks, \
         gmt_file,\
         mageck_test_remove_zero,\
         mageck_test_remove_zero_threshold,\
+        skip_mle,\
         species,\
         assembly,\
         use_bowtie,\
