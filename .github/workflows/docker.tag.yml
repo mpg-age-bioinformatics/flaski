@@ -30,7 +30,7 @@ jobs:
         {
           cat << EOF
         {
-          "deployment":"server","namespace":"flaski", "container" :"server","image":"mpgagebioinformatics/flaski", "tag":"$GITHUB_TAG" ,"SHA":"$GITHUB_SHA_SHORT"
+          "deployment":"server","namespace":"flaski-prod", "container" :"server","image":"mpgagebioinformatics/flaski", "tag":"$GITHUB_TAG" ,"SHA":"$GITHUB_SHA_SHORT"
         }
         EOF
         } 
