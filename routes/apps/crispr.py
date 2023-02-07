@@ -254,7 +254,7 @@ def generate_submission_file(samplenames, \
                 mageckflute_organism,\
                 ONLY_COUNT
                 ]
-             }, index=list(range(25)))
+             }, index=list(range(26)))
 
         df_=df_.to_json()
      
