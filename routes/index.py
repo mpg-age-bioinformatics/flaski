@@ -82,7 +82,7 @@ def make_layout(pathname):
                     [
                         dcc.Link(
                             [
-                                html.Img( src='data:image/png;base64,{}'.format(encoded_image.decode() ) , height="300px", style={ "margin-bottom":5}),
+                                html.Img( alt=app.config["APP_TITLE"], lang="en", src='data:image/png;base64,{}'.format(encoded_image.decode() ) , height="300px", style={ "margin-bottom":5}),
                                 html.H1(app.config["APP_TITLE"], style={"textAlign":"center"}),
                             ],
                             href=target,
