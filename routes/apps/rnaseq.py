@@ -231,7 +231,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "run_data":"/beegfs/group_bit/data/projects/departments/"
             },
             "raven":{
-                "code":"/raven/u/jboucas/projects_code/",
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
                 "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
                 "run_data":"/raven/ptmp/jboucas/projects/"
             },
@@ -263,7 +263,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "fastqc_raw_data" :  os.path.join(paths["raven"]["raw_data"], "<ftp>") ,
                 "kallisto_raw_data" : os.path.join(paths["raven"]["raw_data"], "<ftp>") ,
                 "featurecounts_raw_data" : os.path.join(paths["raven"]["raw_data"], "<ftp>") ,
-                "genomes" : "/ptmp/jboucas/genomes/nextflow_builds" ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/rnaseq" ,
                 "circRNA":"None",
             },
             "local":{
