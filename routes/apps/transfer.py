@@ -16,9 +16,9 @@ import shutil
 dashapp = dash.Dash("transfer",url_base_pathname=f'{PAGE_PREFIX}/transfer/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], title=app.config["APP_TITLE"], assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 if app.config['PAGE_PREFIX'] == "" :
-    home_page="/"
+    home_page=app.config['APP_URL']
 else:
-    home_page=app.config['PAGE_PREFIX']
+    home_page=app.config['APP_URL']
 
 dashapp.layout=dbc.Row( 
     [
