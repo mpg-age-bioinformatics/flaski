@@ -172,6 +172,7 @@ def release_request(n_clicks, pathname):
         ],
         id="modal",
         is_open=True,
+        backdrop='static'
     )
 
     submission_type=filename.split(".")[-2]
