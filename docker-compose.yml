@@ -7,12 +7,11 @@ services:
   container_name: init
   image: mpgagebioinformatics/flaski:latest
   build:
-    context: ~/myapp
-    dockerfile: services/server/Dockerfile
+    context: ./
+    dockerfile: Dockerfile
     args:
-      BUILD_NAME: myapp
-      MYAPP_VERSION: dev
-      UPGRADE_REQS: "no"
+      APP_VERSION: dev
+      PYFLASKI_VERSION: dev
   entrypoint: /myapp/services/init/entrypoint.sh
   user: root
   volumes:
