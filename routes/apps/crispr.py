@@ -946,28 +946,28 @@ def update_output(n_clicks, \
     # print("\n")
     # print(samples)
 
+    if ONLY_COUNT == "False":
+        sample_names_tab=pd.json_normalize(samplenames)
+        all_samples=list(set(sample_names_tab["Name"].tolist()))
+        
+        samples_tab=pd.json_normalize(samples)
+        
+        ## checking list of control samples
+        cont_samples=[s.split(",") for s in samples_tab["List of control samples"].tolist()]
+        cont_samples=list(set( [item for sublist in cont_samples for item in sublist] ))
 
-    sample_names_tab=pd.json_normalize(samplenames)
-    all_samples=list(set(sample_names_tab["Name"].tolist()))
-    
-    samples_tab=pd.json_normalize(samples)
-    
-    ## checking list of control samples
-    cont_samples=[s.split(",") for s in samples_tab["List of control samples"].tolist()]
-    cont_samples=list(set( [item for sublist in cont_samples for item in sublist] ))
+        ## checking list of treat samples
+        treat_samples=[s.split(",") for s in samples_tab["List of treated samples"].tolist()]
+        treat_samples=list(set( [item for sublist in treat_samples for item in sublist]))
 
-    ## checking list of treat samples
-    treat_samples=[s.split(",") for s in samples_tab["List of treated samples"].tolist()]
-    treat_samples=list(set( [item for sublist in treat_samples for item in sublist]))
+        control_treat=cont_samples+treat_samples
+        control_treat=list(set(control_treat))
 
-    control_treat=cont_samples+treat_samples
-    control_treat=list(set(control_treat))
-
-    for sam in control_treat:
-        if sam not in all_samples:
-            header="Attention"
-            msg='''One or more samples in your list of control or treated samples does not match the sample names.'''
-            return header, msg, dash.no_update
+        for sam in control_treat:
+            if sam not in all_samples:
+                header="Attention"
+                msg='''One or more samples in your list of control or treated samples does not match the sample names.'''
+                return header, msg, dash.no_update
 
 
     subdic=generate_submission_file( samplenames, \
