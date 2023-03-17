@@ -433,11 +433,11 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     gene_sets.to_excel(EXCout,"GeneSets",index=None)
     EXCout.save()
 
-    if user_domain == "age.mpg.de" :
-        send_submission_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
-    else:
-        ftp_user=send_submission_ftp_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
-        metadata=pd.concat([metadata,ftp_user])
+    # if user_domain == "age.mpg.de" :
+    #     send_submission_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+    # else:
+    ftp_user=send_submission_ftp_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
+    metadata=pd.concat([metadata,ftp_user])
 
     EXCout=pd.ExcelWriter(subdic["filename"])
     samples.to_excel(EXCout,"samples",index=None)

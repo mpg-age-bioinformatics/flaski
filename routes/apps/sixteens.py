@@ -201,11 +201,11 @@ Once you have been given access more information will be displayed on how to tra
     mps_domain="mpg.de"
     #if user_domain[-len(mps_domain):] == mps_domain :
     if user_domain =="age.mpg.de" :
-        readme=dcc.Markdown(readme_age, style={"width":"90%", "margin":"10px"} )
+        readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
         groups_=make_options(GROUPS)
         groups_val=None
-        folder_row_style={"margin-top":10 }
-        folder=""
+        folder_row_style={"margin-top":10, 'display': 'none' }
+        folder="FTP"
     elif not header_access :
         readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
         groups_=make_options([user_domain])
