@@ -10,6 +10,18 @@ pass: {{ ftp_pass }}
 
 drop all your files on the main folder, do not create subdirectories. 
 
+Example with ncftp:
+```
+# navigate to your raw data folder
+cd ~/myrawdata
+# login with ncftp
+ncftp -u {{ ftp_user }} -p {{ ftp_pass }} {{ PUREFTPD_MYSQL_SERVER }}
+# upload your raw files
+mput *.fastq.gz
+# upload your md5sums file
+put md5sums.txt
+``` 
+
 Please realise that this FTP account will be inactivated in 2 weeks.
 
 Once you've transfered all your files click on the following link to start the analysis:
