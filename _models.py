@@ -26,6 +26,6 @@ class FTPSubmissions(db.Model):
             id = jwt.decode(token, app.config['SECRET_KEY'],
                             algorithms=['HS256'])['file']
         except:
-            return
+            return None
         # file_name=FTPSubmissions.query.get(id)
         return id

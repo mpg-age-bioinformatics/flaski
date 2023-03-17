@@ -519,16 +519,16 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
     if submission:
         return "Error"
     
+    PUREFTPD_AUTH_SALT=os.getenv('PUREFTPD_AUTH_SALT')
+    PUREFTPD_MYSQL_SERVER=os.getenv('PUREFTPD_MYSQL_SERVER')
+    PUREFTPD_MYSQL_PORT=os.getenv('PUREFTPD_MYSQL_PORT')
+    PUREFTPD_MYSQL_USER=os.getenv('PUREFTPD_MYSQL_USER')
+    PUREFTPD_MYSQL_PASS=os.getenv('PUREFTPD_MYSQL_PASS')
+    PUREFTPD_MYSQL_DB=os.getenv('PUREFTPD_MYSQL_DB')
+
+    today=str(date.today())
+    
     if ftp_user == "" :
-
-        today=str(date.today())
-
-        PUREFTPD_AUTH_SALT=os.getenv('PUREFTPD_AUTH_SALT')
-        PUREFTPD_MYSQL_SERVER=os.getenv('PUREFTPD_MYSQL_SERVER')
-        PUREFTPD_MYSQL_PORT=os.getenv('PUREFTPD_MYSQL_PORT')
-        PUREFTPD_MYSQL_USER=os.getenv('PUREFTPD_MYSQL_USER')
-        PUREFTPD_MYSQL_PASS=os.getenv('PUREFTPD_MYSQL_PASS')
-        PUREFTPD_MYSQL_DB=os.getenv('PUREFTPD_MYSQL_DB')
 
         ftp_user=user_generator()
         ftp_pass=password_generator()
