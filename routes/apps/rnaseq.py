@@ -81,17 +81,17 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp):
     @cache.memoize(60*60*2) # 2 hours 60*60*2
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget]}, index=list(range(8)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget", "ftp"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget, ftp]}, index=list(range(9)))
         df_deseq2=df[["Read 1","Group"]]
         df_deseq2.columns=["files","group"]
         df=df.to_json()
@@ -110,7 +110,8 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "project_title":project_title,
             "organism":organism,
             "ercc":ercc,
-            "wget":wget
+            "wget":wget,
+            "ftp":ftp
         }
 
         ercc_dic={
@@ -309,7 +310,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         json_config={filename:{"deseq2":df_deseq2, "samples":df, "RNAseq":df_ }, json_filename:nf }
         
         return {"filename": filename, "json_filename":json_filename, "json":json_config}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -520,7 +521,14 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
             ], 
-            style={"margin-top":10,"margin-bottom":10}),  
+            style={"margin-top":10,"margin-bottom":10}),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right"}), 
+                dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
+            ], 
+            style={ "margin-top":10, "margin-bottom":10 }),     
         dbc.Row( 
             [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right", 'display': 'none'}), 
@@ -609,6 +617,7 @@ Once you have been given access more information will be displayed on how to tra
     Output('opt-organism', 'value'),
     Output('opt-ercc', 'value'),
     Output('wget', 'value'), 
+    Output('ftp', 'value'), 
     Output('upload-data-text', 'children'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -638,7 +647,7 @@ def read_file(contents,filename,last_modified):
 
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "wget" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "wget", "ftp" ]
     fields_on_file=RNAseq["Field"].tolist()
     for f in fields_to_return:
         if f in  fields_on_file:
@@ -664,8 +673,9 @@ def read_file(contents,filename,last_modified):
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
     State('wget', 'value'),
+    State('ftp', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget):
+def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget, ftp):
     header, msg = check_access( 'rnaseq' )
     if not msg:
         authorized = True
@@ -685,7 +695,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
         group="Bioinformatics"
 
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp)
     filename=subdic["filename"]
     json_filename=subdic["json_filename"]
     json_config=subdic["json"]
@@ -723,7 +733,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
         with open(json_filename, "w") as out:
             json.dump(json_config,out)
 
-        ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename)
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
 
         metadata=pd.concat([metadata,ftp_user])
 

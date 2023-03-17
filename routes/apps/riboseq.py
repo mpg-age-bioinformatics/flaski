@@ -76,9 +76,9 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, matching,email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet,wget):
+def generate_submission_file(rows, matching,email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet,wget, ftp):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, matching, email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget):
+    def _generate_submission_file(rows, matching, email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
@@ -93,15 +93,15 @@ def generate_submission_file(rows, matching,email,group,folder,md5sums,project_t
                 mdf=pd.concat([mdf,df_])
         mdf.reset_index(inplace=True, drop=True)
 
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures","wget"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget]}, index=list(range(15)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures","wget", "ftp"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp]}, index=list(range(16)))
         df=df.to_json()
         df_=df_.to_json()
         mdf=mdf.to_json()
         filename=make_submission_file(".riboseq.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_, "matching":mdf}
-    return _generate_submission_file(rows,matching, email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget)
+    return _generate_submission_file(rows,matching, email,group,folder,md5sums,project_title,organism,ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -375,6 +375,13 @@ Once you have been given access more information will be displayed on how to tra
             style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
+                dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right"}), 
+                dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
+            ], 
+            style={ "margin-top":10, "margin-bottom":10 }),     
+        dbc.Row( 
+            [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='wget', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("`wget` command for direct download (optional)"),md=3  ), 
@@ -477,7 +484,8 @@ Once you have been given access more information will be displayed on how to tra
     Output('opt-strand', 'value'),
     Output('fragsize', 'value'),
     Output('opt-rfeet', 'value'),
-    Output('wget', 'value'), 
+    Output('wget', 'value'),
+    Output('ftp', 'value'), 
     Output('upload-data-text', 'children'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -509,7 +517,7 @@ def read_file(contents,filename,last_modified):
 
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures" ,"wget" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures" ,"wget", "ftp" ]
     # for f in fields_to_return:
     #     # print(f, RiboSeq[RiboSeq["Field"]==f]["Value"].tolist() )
     #     values_to_return.append(  RiboSeq[RiboSeq["Field"]==f]["Value"].tolist()[0]  )
@@ -554,8 +562,9 @@ def read_file(contents,filename,last_modified):
     State('fragsize', 'value'),
     State('opt-rfeet', 'value'),
     State('wget', 'value'),
+    State('ftp', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, project_title, organism, ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget):
+def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, project_title, organism, ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp):
     header, msg = check_access( 'riboseq' )
     # header, msg = None, None # for local debugging 
     if msg :
@@ -563,7 +572,7 @@ def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, pr
 
     if not wget:
         wget="NONE"
-    subdic=generate_submission_file(rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget)
+    subdic=generate_submission_file(rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     matching=pd.read_json(subdic["matching"])
@@ -592,7 +601,7 @@ def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, pr
     # if user_domain == "age.mpg.de" :
     #     send_submission_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     # else:
-    ftp_user=send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
+    ftp_user=send_submission_ftp_email(user=current_user, submission_type="riboseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"], ftp_user=ftp)
     metadata=pd.concat([metadata,ftp_user])
 
     EXCout=pd.ExcelWriter(subdic["filename"])

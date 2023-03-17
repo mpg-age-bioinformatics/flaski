@@ -514,44 +514,49 @@ def send_submission_email(user,submission_type,submission_tag, submission_file=N
                 open_type=open_type,\
                 attachment_type=attachment_type)
 
-def send_submission_ftp_email(user,submission_type,submission_tag, submission_file=None, attachment_path=None,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
+def send_submission_ftp_email(user,submission_type,submission_tag, submission_file=None, attachment_path=None,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ftp_user=""):
     submission=FTPSubmissions.query.filter_by(file_name=submission_file).first()
     if submission:
         return "Error"
+    
+    if ftp_user == "" :
 
-    today=str(date.today())
+        today=str(date.today())
 
-    PUREFTPD_AUTH_SALT=os.getenv('PUREFTPD_AUTH_SALT')
-    PUREFTPD_MYSQL_SERVER=os.getenv('PUREFTPD_MYSQL_SERVER')
-    PUREFTPD_MYSQL_PORT=os.getenv('PUREFTPD_MYSQL_PORT')
-    PUREFTPD_MYSQL_USER=os.getenv('PUREFTPD_MYSQL_USER')
-    PUREFTPD_MYSQL_PASS=os.getenv('PUREFTPD_MYSQL_PASS')
-    PUREFTPD_MYSQL_DB=os.getenv('PUREFTPD_MYSQL_DB')
+        PUREFTPD_AUTH_SALT=os.getenv('PUREFTPD_AUTH_SALT')
+        PUREFTPD_MYSQL_SERVER=os.getenv('PUREFTPD_MYSQL_SERVER')
+        PUREFTPD_MYSQL_PORT=os.getenv('PUREFTPD_MYSQL_PORT')
+        PUREFTPD_MYSQL_USER=os.getenv('PUREFTPD_MYSQL_USER')
+        PUREFTPD_MYSQL_PASS=os.getenv('PUREFTPD_MYSQL_PASS')
+        PUREFTPD_MYSQL_DB=os.getenv('PUREFTPD_MYSQL_DB')
 
-    ftp_user=user_generator()
-    ftp_pass=password_generator()
+        ftp_user=user_generator()
+        ftp_pass=password_generator()
 
-    AUTHD_PASSWORD=hashlib.pbkdf2_hmac('sha256',
-        ftp_pass.encode('utf-8'),
-        PUREFTPD_AUTH_SALT.encode('utf-8'), 
-        100000 ).hex()
+        AUTHD_PASSWORD=hashlib.pbkdf2_hmac('sha256',
+            ftp_pass.encode('utf-8'),
+            PUREFTPD_AUTH_SALT.encode('utf-8'), 
+            100000 ).hex()
 
-    # Connect to the database
-    connection = pymysql.connect(host=PUREFTPD_MYSQL_SERVER,
-                                port=int(PUREFTPD_MYSQL_PORT),
-                                user=PUREFTPD_MYSQL_USER,
-                                password=PUREFTPD_MYSQL_PASS,
-                                database=PUREFTPD_MYSQL_DB,
-                                ssl_ca='/etc/mysql/certs/ca-cert.pem',
-                                ssl_key='/etc/mysql/certs/client-key.pem',
-                                ssl_cert='/etc/mysql/certs/client-cert.pem',
-                                cursorclass=pymysql.cursors.DictCursor)
+        # Connect to the database
+        connection = pymysql.connect(host=PUREFTPD_MYSQL_SERVER,
+                                    port=int(PUREFTPD_MYSQL_PORT),
+                                    user=PUREFTPD_MYSQL_USER,
+                                    password=PUREFTPD_MYSQL_PASS,
+                                    database=PUREFTPD_MYSQL_DB,
+                                    ssl_ca='/etc/mysql/certs/ca-cert.pem',
+                                    ssl_key='/etc/mysql/certs/client-key.pem',
+                                    ssl_cert='/etc/mysql/certs/client-cert.pem',
+                                    cursorclass=pymysql.cursors.DictCursor)
 
-    with connection:
-        with connection.cursor() as cursor:
-            sql = "INSERT INTO `users` (`user`, `pass`,`uid`,`gid`,`dir`, `user_quota_size`, `user_quota_files`, `created` ) VALUES (%s, %s, %s, %s, %s, %s,%s, %s );"
-            response=cursor.execute(sql, (ftp_user, AUTHD_PASSWORD, '1000', '1003', f'/home/{ftp_user}','200', '80', today ))
-        connection.commit()
+        with connection:
+            with connection.cursor() as cursor:
+                sql = "INSERT INTO `users` (`user`, `pass`,`uid`,`gid`,`dir`, `user_quota_size`, `user_quota_files`, `created` ) VALUES (%s, %s, %s, %s, %s, %s,%s, %s );"
+                response=cursor.execute(sql, (ftp_user, AUTHD_PASSWORD, '1000', '1003', f'/home/{ftp_user}','200', '80', today ))
+            connection.commit()
+    else:
+        ftp_pass="* see previous email with credentials for this user *"
+
 
     ##### add ftp user name to excel file in a new sheet called ftp 
     # ftp_df=pd.DataFrame({ "user":ftp_user}, index=[0])
