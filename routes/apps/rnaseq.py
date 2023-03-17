@@ -434,11 +434,11 @@ Once you have been given access more information will be displayed on how to tra
     mps_domain="mpg.de"
     if user_domain[-len(mps_domain):] == mps_domain :
         if user_domain =="age.mpg.de" :
-            readme=dcc.Markdown(readme_age, style={"width":"90%", "margin":"10px"} )
+            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
             groups_=make_options(GROUPS)
             groups_val=None
-            folder_row_style={"margin-top":10 }
-            folder=""
+            folder_row_style={"margin-top":10, 'display': 'none' }
+            folder="FTP"
         else :
             readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
             groups_=make_options([user_domain])
@@ -711,46 +711,46 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
-        if user_domain != "age.mpg.de" :
-            filename=os.path.join("/submissions_ftp/",filename)
-            json_filename=os.path.join("/submissions_ftp/",json_filename)
+        # if user_domain != "age.mpg.de" :
+        filename=os.path.join("/submissions_ftp/",filename)
+        json_filename=os.path.join("/submissions_ftp/",json_filename)
 
-            EXCout=pd.ExcelWriter(filename)
-            samples.to_excel(EXCout,"samples",index=None)
-            metadata.to_excel(EXCout,"RNAseq",index=None)
-            EXCout.save()
+        EXCout=pd.ExcelWriter(filename)
+        samples.to_excel(EXCout,"samples",index=None)
+        metadata.to_excel(EXCout,"RNAseq",index=None)
+        EXCout.save()
 
-            with open(json_filename, "w") as out:
-                json.dump(json_config,out)
+        with open(json_filename, "w") as out:
+            json.dump(json_config,out)
 
-            ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename)
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename)
 
-            metadata=pd.concat([metadata,ftp_user])
+        metadata=pd.concat([metadata,ftp_user])
 
-            EXCout=pd.ExcelWriter(filename)
-            samples.to_excel(EXCout,"samples",index=None)
-            metadata.to_excel(EXCout,"RNAseq",index=None)
-            EXCout.save()
+        EXCout=pd.ExcelWriter(filename)
+        samples.to_excel(EXCout,"samples",index=None)
+        metadata.to_excel(EXCout,"RNAseq",index=None)
+        EXCout.save()
 
-            ftp_user=ftp_user["Value"].tolist()[0]
-            json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
+        ftp_user=ftp_user["Value"].tolist()[0]
+        json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
 
-            with open(json_filename, "w") as out:
-                json.dump(json_config, out)
+        with open(json_filename, "w") as out:
+            json.dump(json_config, out)
 
-        else:
-            filename=os.path.join("/submissions/",filename)
-            json_filename=os.path.join("/submissions/",json_filename)
+        # else:
+        #     filename=os.path.join("/submissions/",filename)
+        #     json_filename=os.path.join("/submissions/",json_filename)
 
-            EXCout=pd.ExcelWriter(filename)
-            samples.to_excel(EXCout,"samples",index=None)
-            metadata.to_excel(EXCout,"RNAseq",index=None)
-            EXCout.save()
+        #     EXCout=pd.ExcelWriter(filename)
+        #     samples.to_excel(EXCout,"samples",index=None)
+        #     metadata.to_excel(EXCout,"RNAseq",index=None)
+        #     EXCout.save()
 
-            with open(json_filename, "w") as out:
-                json.dump(json_config,out)
+        #     with open(json_filename, "w") as out:
+        #         json.dump(json_config,out)
 
-            send_submission_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename)
+        #     send_submission_email(user=current_user, submission_type="RNAseq", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename)
 
         json_config=json.dumps(json_config)
 
