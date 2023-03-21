@@ -1515,7 +1515,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
                 # style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
             )
 
-        return fig, warnmsg, None, None, download_buttons_style_show, None
+        return fig, toast, None, None, download_buttons_style_show, None
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
