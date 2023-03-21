@@ -234,7 +234,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "raven":{
                 "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
                 "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
-                "run_data":"/raven/ptmp/jboucas/projects/"
+                "run_data":"/raven/ptmp/flaski/projects/"
             },
             "local":{
                 "raw_data":"<path_to_raw_data>",
