@@ -85,8 +85,8 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","wget", "ftp"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter, wget, ftp]}, index=list(range(10)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","wget" ],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter, wget ]}, index=list(range(9)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".miRNAseq.xlsx")

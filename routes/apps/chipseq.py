@@ -96,7 +96,7 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC",
                                    "seq","Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "wget" ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc,\
-                                    seq, adapter,macs2,mito, wget, ftp]}, index=list(range(13)))
+                                    seq, adapter,macs2,mito, wget]}, index=list(range(12)))
         df=df.to_json()
         dfi=dfi.to_json()
         df_=df_.to_json()

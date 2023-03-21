@@ -86,8 +86,8 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", 
-                                   "Forward adapter", "Reverse adapter", "Rarefy", "Lanes separately", "wget", "ftp"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, fadapter,radapter,rarefy,lanes, wget, ftp]}, index=list(range(13)))
+                                   "Forward adapter", "Reverse adapter", "Rarefy", "Lanes separately", "wget" ],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, fadapter,radapter,rarefy,lanes, wget ]}, index=list(range(12)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".16S.xlsx")

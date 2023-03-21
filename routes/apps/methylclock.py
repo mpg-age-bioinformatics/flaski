@@ -95,8 +95,8 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
         print(df)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism","rrbs","wget", "ftp"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism,rrbs, wget, ftp]}, index=list(range(9)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism","rrbs","wget" ],\
+                          "Value":[email,group,folder,md5sums,project_title, organism,rrbs, wget ]}, index=list(range(8)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".methylclock.xlsx")

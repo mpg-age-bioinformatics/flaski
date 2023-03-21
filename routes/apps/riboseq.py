@@ -93,8 +93,8 @@ def generate_submission_file(rows, matching,email,group,folder,md5sums,project_t
                 mdf=pd.concat([mdf,df_])
         mdf.reset_index(inplace=True, drop=True)
 
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures","wget", "ftp"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp]}, index=list(range(16)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Adapter sequence","RiboSeq","RNASeq","study_design","Strand", "Fragment Size", "Plot Rfeet pictures","wget" ],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc,adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget ]}, index=list(range(15)))
         df=df.to_json()
         df_=df_.to_json()
         mdf=mdf.to_json()
