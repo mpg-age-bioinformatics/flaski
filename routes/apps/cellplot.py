@@ -1514,6 +1514,8 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
                 # top: 66 positions the toast below the navbar
                 # style={"position": "fixed", "z-index": 0, "top": 66, "right": 10, "width": 350,},
             )
+        else:
+            toast=None
 
         return fig, toast, None, None, download_buttons_style_show, None
 
