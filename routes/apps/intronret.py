@@ -471,7 +471,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     # if user_domain == "age.mpg.de" :
     #     send_submission_email(user=current_user, submission_type="intronRet", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
     # else:
-    ftp_user=send_submission_ftp_email(user=current_user, submission_type="intronRet", submission_tag=subdic["filename"], submission_file=None, attachment_path=None, ftp_user=ftp)
+    ftp_user=send_submission_ftp_email(user=current_user, submission_type="intronRet", submission_tag=subdic["filename"], submission_file=subdic["filename"], attachment_path=subdic["filename"], ftp_user=ftp)
     metadata=pd.concat([metadata,ftp_user])
 
     EXCout=pd.ExcelWriter(subdic["filename"])
