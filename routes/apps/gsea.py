@@ -7,7 +7,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
+from myapp.routes.apps._utils import check_access, parse_table, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
 import io
@@ -358,7 +358,7 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
     State('upload-expression', 'last_modified'),
     prevent_initial_call=True )
 def upload_expression(session_id, contents,filename, last_modified):
-    df=parse_table(contents,filename,last_modified,session_id,cache)
+    df=parse_table(contents,filename,last_modified,session_id,cache, "gsea")
     return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
 
 @dashapp.callback(
@@ -370,7 +370,7 @@ def upload_expression(session_id, contents,filename, last_modified):
     State('upload-genesset', 'last_modified'),
     prevent_initial_call=True )
 def upload_genesets(session_id, contents,filename, last_modified):
-    df=parse_table(contents,filename,last_modified,session_id,cache)
+    df=parse_table(contents,filename,last_modified,session_id,cache, "gsea")
     return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
     
 @dashapp.callback(
