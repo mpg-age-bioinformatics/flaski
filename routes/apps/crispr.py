@@ -235,6 +235,7 @@ def generate_submission_file(samplenames, \
                 folder,\
                 folder,\
                 md5sums,\
+                ftp,\
                 cnv_line,\
                 upstreamseq,\
                 sgRNA_size,\
@@ -528,20 +529,27 @@ def make_app_content(pathname):
         ),
         dbc.Row( 
             [
-                dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", type='text', style={ "width":"100%" } ) ,md=3 ),
-                dbc.Col( html.Label('Folder on smb://octopus.age.mpg.de/group_bit_automation/ containing your files. No subfolders.'),md=3  ), 
+                dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" ,'display': 'none'}), 
+                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value="ftp", type='text', style={ "width":"100%",'display': 'none' } ) ,md=3 ),
+                dbc.Col( html.Label('Folder on smb://octopus.age.mpg.de/group_bit_automation/ containing your files. No subfolders.'),md=3 ,  style={'display': 'none'} ), 
+            ], 
+            style={"margin-top":10 , 'display': 'none'}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('md5sums'), md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='md5sums', placeholder="md5sums.file.txt", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('File with md5sums of your fastq.gz files.'), md=3), 
             ], 
             style={"margin-top":10}
         ),
         dbc.Row( 
             [
-                dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='md5sums', placeholder="md5sums.file.txt", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('File with md5sums of your fastq.gz files.'),md=3  ), 
+                dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right"}), 
+                dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
             ], 
-            style={"margin-top":10}
-        ),
+            style={ "margin-top":10, "margin-bottom":10 }),   
         dbc.Row( 
             [
                 dbc.Col( html.Label('CNV line') ,md=3 , style={"textAlign":"right" }), 
@@ -818,6 +826,7 @@ fields = [
     "experiment_name",\
     "folder",\
     "md5sums",\
+    "ftp",\
     "cnv_line",\
     "upstreamseq",\
     "sgRNA_size",\
@@ -915,6 +924,7 @@ def update_output(n_clicks, \
         experiment_name,\
         folder,\
         md5sums,\
+        ftp,\
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
@@ -945,6 +955,14 @@ def update_output(n_clicks, \
     # print(samplenames)
     # print("\n")
     # print(samples)
+    header, msg = check_access( 'crispr' )
+    if not msg:
+        authorized = True
+    else:
+        authorized= False
+
+    if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
+        group="Bioinformatics"
 
     if ONLY_COUNT == "False":
         sample_names_tab=pd.json_normalize(samplenames)
@@ -1015,16 +1033,22 @@ def update_output(n_clicks, \
     
 
     user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+    mps_domain="mpg.de"
     # user_domain=user_domain.split("@")[-1]
     # mps_domain="mpg.de"
     # if user_domain[-len(mps_domain):] == mps_domain :
     # if user_domain !="age.mpg.de" :
         # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
     sampleNames=pd.read_json(subdic["sampleNames"])
     samples=pd.read_json(subdic["samples"])
     library=pd.read_json(subdic["library"])
     arguments=pd.read_json(subdic["crispr"])
+
+    ftp_user=send_submission_ftp_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=subdic["filename"], attachment_path=subdic["filename"], ftp_user=ftp)
+    arguments=pd.concat([arguments,ftp_user])
 
     EXCout=pd.ExcelWriter(subdic["filename"])
     sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
@@ -1036,7 +1060,7 @@ def update_output(n_clicks, \
 
 
     # if user_domain == "age.mpg.de" :
-    send_submission_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+    # send_submission_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     return header, msg, dcc.send_file( subdic["filename"] )
     # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
