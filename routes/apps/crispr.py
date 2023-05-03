@@ -960,6 +960,10 @@ def update_output(n_clicks, \
         authorized = True
     else:
         authorized= False
+    
+    user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+    mps_domain="mpg.de"
 
     if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
         group="Bioinformatics"
@@ -1032,9 +1036,7 @@ def update_output(n_clicks, \
         msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
     
 
-    user_domain=current_user.email
-    user_domain=user_domain.split("@")[-1]
-    mps_domain="mpg.de"
+
     # user_domain=user_domain.split("@")[-1]
     # mps_domain="mpg.de"
     # if user_domain[-len(mps_domain):] == mps_domain :
