@@ -235,7 +235,6 @@ def generate_submission_file(samplenames, \
                 folder,\
                 folder,\
                 md5sums,\
-                ftp,\
                 cnv_line,\
                 upstreamseq,\
                 sgRNA_size,\
