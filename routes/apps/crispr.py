@@ -529,7 +529,7 @@ def make_app_content(pathname):
         dbc.Row( 
             [
                 dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" ,'display': 'none'}), 
-                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value="ftp", type='text', style={ "width":"100%",'display': 'none' } ) ,md=3 ),
+                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value="FTP", type='text', style={ "width":"100%",'display': 'none' } ) ,md=3 ),
                 dbc.Col( html.Label('Folder on smb://octopus.age.mpg.de/group_bit_automation/ containing your files. No subfolders.'),md=3 ,  style={'display': 'none'} ), 
             ], 
             style={"margin-top":10 , 'display': 'none'}
