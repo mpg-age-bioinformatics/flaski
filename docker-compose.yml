@@ -149,7 +149,6 @@ services:
    - ./email/validate_email.txt:/myapp/myapp/templates/email/validate_email.txt
   environment:
    N_WORKERS: 4
-   ADMINS: flaski@age.mpg.de
    APP_NAME: myapp
    APP_TITLE: flaski(local)
    INSTANCE: local
