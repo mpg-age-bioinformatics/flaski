@@ -429,7 +429,24 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
             dbc.Collapse(
                 dbc.Card(
                     dbc.CardBody(
-                        dcc.Markdown(f'```{tb_str}```'),
+                        style={'overflow': 'auto', 'maxHeight': '250px'},
+                        children=[
+                            html.Div(
+                                style={'width': 'fit-content', 'maxWidth': '100%'},
+                                children=[
+                                    dcc.Markdown(f'```{tb_str}```', id="tb_str-content"),
+                                ]
+                            ),
+                            dcc.Clipboard(
+                                target_id="tb_str-content",
+                                    style={
+                                        "position": "absolute",
+                                        "bottom": 12,
+                                        "right": 12,
+                                        "fontSize": 25,
+                                    },
+                            ),
+                        ]
                     ),
                     color="light",
                 ),
