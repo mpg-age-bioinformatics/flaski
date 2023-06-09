@@ -30,6 +30,8 @@ Once you've transfered all your files click on the following link to start the a
 
 {{ token_link }}
 
+If you only have SRA data you do not need to download/upload it yourself, just go ahead and click the link above.
+
 Cheers!
 
 Flaski
