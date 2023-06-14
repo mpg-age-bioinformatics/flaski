@@ -1180,11 +1180,11 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                     className="g-1",
                                 ),
                                 ############################
-                                dbc.Row([
-                                    html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px","margin-bottom":"15px","margin":"auto","horizontal-align":"middle"})
-                                ],
-                                className="g-1",
-                                justify="start"),
+                                # dbc.Row([
+                                #     html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px", "horizontal-align":"middle"})
+                                # ],
+                                # className="g-1",
+                                # justify="center"),
                                 ############################################
                                 dbc.Row(
                                     [
@@ -1217,7 +1217,11 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                         dbc.Col(
                                             dcc.Input(id={'type':"edgecolor_write","index":str(card_id)}, value=gpa["edgecolor_write"], placeholder=".. or, write color name", type='text', style=card_input_style ),
                                             width=5
-                                        )
+                                        ),
+                                        # dbc.Col(
+                                        #     dcc.Dropdown( options=cols_, value=gpa["edgecolor_col"], id={'type':"edgecolor_col","index":str(card_id)}, multi=False, style=card_input_style_dynamic ),
+                                        #     width=5
+                                        # )
                                     ],
                                     className="g-1",
                                 ),
@@ -1254,7 +1258,6 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                     className="g-1",
                                 ),
                                 ############################################ 
-
                                 dbc.Row(
                                     [
                                         dbc.Col(
@@ -1278,10 +1281,6 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                             dbc.Label("Lower", style={'display':field_style_on_off}),
                                             width=4, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
                                         ),
-                                        # dbc.Col(
-                                        #     dbc.Label("Center", style={'display':field_style_on_off}),
-                                        #     width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
-                                        # ),
                                         dbc.Col(
                                             dbc.Label("Upper", style={'display':field_style_on_off}),
                                             width=4, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
@@ -1302,10 +1301,6 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                             dbc.Input(value=gpa["lower_size_value"], id={'type':"lower_size_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
                                             #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
                                         ),
-                                        # dbc.Col(
-                                        #     dbc.Input(value=pa["center_size_value"], id={'type':"center_size_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
-                                        #     #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
-                                        # ),
                                         dbc.Col(
                                             dbc.Input(value=pa["upper_size_value"], id={'type':"upper_size_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
                                             #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
@@ -1327,10 +1322,6 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                             dbc.Input(value=gpa["lower_size"], id={'type':"lower_size","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
                                             #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
                                         ),
-                                        # dbc.Col(
-                                        #     dbc.Input(value=gpa["center_size"], id={'type':"center_size","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
-                                        #     #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
-                                        # ),
                                         dbc.Col(
                                             dbc.Input(value=gpa["upper_size"], id={'type':"upper_size","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
                                             #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
@@ -1342,10 +1333,142 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
                                 ),
                                 ############################
                                 dbc.Row([
-                                    html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px","margin-bottom":"15px","margin":"auto","horizontal-align":"middle",'display':field_style_on_off})
+                                    html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px", "horizontal-align":"middle",'display':field_style_on_off})
                                 ],
                                 className="g-1",
-                                justify="start"),
+                                justify="center"),
+
+
+                                ############################################
+                                dbc.Row(
+                                    [
+                                        dbc.Label("Select a column and and color scale for dynamic edge colors", style={'display':field_style_on_off}),
+                               
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################
+
+                                dbc.Row(
+                                    [   dbc.Label("", width = 1,style={'display':field_style_on_off}),
+                                        dbc.Col(
+                                            dcc.Dropdown( options=cols_, value=gpa["edgecolor_col"], id={'type':"edgecolor_col","index":str(card_id)}, multi=False, clearable=True, style=card_input_style_dynamic ),
+                                            width=4
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("CMAP:", html_for="colorscale", style={"margin-top":"5px",'display':field_style_on_off}),
+                                            width=2,
+                                            style={"textAlign":"right"},
+                                        ),
+                                        dbc.Col(
+                                            dcc.Dropdown(options=make_options(pa["colorscale"]), value=gpa["ec_colorscale_value"], id={'type':"ec_colorscale_value","index":str(card_id)}, multi=False, clearable=False, style=card_input_style_dynamic ),
+                                            width=3,
+                                            style={"margin-top":"5px"}
+                                        ),
+                                        dbc.Col(
+                                            dcc.Checklist(
+                                                options=[
+                                                    {'label': 'reverse', 'value': 'ec_reverse_color_scale'},], value=gpa['ec_reverse_color_scale'], id={'type':"ec_reverse_color_scale","index":str(card_id)}, style={"margin-top":"7px",'display':field_style_on_off}, 
+                                            ),
+                                            width=2,
+                                        ),
+                                    ],
+                                    className="g-1",
+                                ),
+                                ############################################ 
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("..or, explicitly define your edge color map if necessary:",style={"margin-top":"5px",'display':field_style_on_off }),
+                                            #width=3,
+                                            #style={"textAlign":"right","padding-right":"2px"}
+                                        ),
+                                    ],
+                                    className="g-0",
+                                ),
+
+                                ############################################ 
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Lower", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Center", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Label("Upper", style={'display':field_style_on_off}),
+                                            width=3, #,style={"padding-left":"80px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    justify="center",
+                                ),
+
+                                ############################################
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("Value: ", style={'display':field_style_on_off}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["edgecolor_lower_value"], id={'type':"edgecolor_lower_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=pa["edgecolor_center_value"], id={'type':"edgecolor_center_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}), 
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=pa["edgecolor_upper_value"], id={'type':"edgecolor_upper_value","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off}),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top":"5px"},
+                                    align="center",
+                                ),
+
+                                ############################################
+
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Label("Color: ", style={'display':field_style_on_off}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["edgecolor_lower"], id={'type':"edgecolor_lower","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["edgecolor_center"], id={'type':"edgecolor_center","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                        dbc.Col(
+                                            dbc.Input(value=gpa["edgecolor_upper"], id={'type':"edgecolor_upper","index":str(card_id)}, placeholder="", type="text", style={'display':field_style_on_off} ),
+                                            #style={"width":"65px", "height":"22px", "padding-left":"4px" , "vertical-align": "middle"}),
+                                        ),
+                                    ],
+                                    className="g-1",
+                                    style={"margin-top":"5px"},
+                                    align="center",
+                                ),
+                                ############################
+
+                                dbc.Row([
+                                    html.Hr(style={'width' : "90%", "height" :'2px', "margin-top":"15px", "horizontal-align":"middle",'display':field_style_on_off})
+                                ],
+                                className="g-1",
+                                justify="center"),
                                 ############################################
                                 dbc.Row(
                                     [
@@ -1596,6 +1719,15 @@ states=[State('xvals', 'value'),
     State( { 'type': 'colorscale_value', 'index': ALL }, "value"),
     State( { 'type': 'edge_linewidth', 'index': ALL }, "value"),
     State( { 'type': 'edgecolor', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_col', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_lower', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_center', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_upper', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_lower_value', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_center_value', 'index': ALL }, "value"),
+    State( { 'type': 'edgecolor_upper_value', 'index': ALL }, "value"),
+    State( { 'type': 'ec_reverse_color_scale', 'index': ALL }, "value"),
+    State( { 'type': 'ec_colorscale_value', 'index': ALL }, "value"),
     State( { 'type': 'edgecolor_write', 'index': ALL }, "value") ]    
 
 @dashapp.callback( 
