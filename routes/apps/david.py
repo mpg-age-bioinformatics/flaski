@@ -63,7 +63,7 @@ def run_david_and_cache(pa,cache):
             df=df.astype(str)
             report_stats=report_stats.astype(str)
             revigo=revigo.astype(str)
-            david_results={ "df": df.to_json() , "stats": report_stats.to_json(), "revigo": revigo ,"msg": None }
+            david_results={ "df": df.to_json() , "stats": report_stats.to_json(), "revigo": revigo.to_json() ,"msg": None }
         else:
             david_results={ "df": None , "stats": None, "revigo": None , "msg": msg }
         return david_results
