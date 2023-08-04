@@ -57,14 +57,15 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
 def run_david_and_cache(pa,cache):
     @cache.memoize(timeout=3600)
     def _run_david_and_cache(pa,cache):
-        df, report_stats, msg =run_david(pa)
+        df, report_stats, revigo, msg =run_david(pa)
         if msg == None:
             # only handle df if there is no error message returned
             df=df.astype(str)
             report_stats=report_stats.astype(str)
-            david_results={ "df": df.to_json() , "stats": report_stats.to_json(), "msg": None }
+            revigo=revigo.astype(str)
+            david_results={ "df": df.to_json() , "stats": report_stats.to_json(), "revigo": revigo ,"msg": None }
         else:
-            david_results={ "df": None , "stats": None, "msg": msg }
+            david_results={ "df": None , "stats": None, "revigo": None , "msg": msg }
         return david_results
     return _run_david_and_cache(pa,cache)
 
@@ -1021,12 +1022,14 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         david_results=run_david_and_cache(pa, cache)
         df = pd.read_json(david_results["df"]) 
         report_stats = pd.read_json(david_results["stats"])
+        revigo = pd.read_json(david_results["revigo"])
 
         import io
         output = io.BytesIO()
         writer= pd.ExcelWriter(output)
         df.to_excel(writer, sheet_name = 'david results', index = False)
         report_stats.to_excel(writer, sheet_name = 'report stats', index = False)
+        revigo.to_excel(writer, sheet_name = 'revigo', index = False)
         writer.save()
         data=output.getvalue()
         return dash.no_update, None, None, None, dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, None, dcc.send_bytes(data, excel_filename), None
