@@ -1,7 +1,7 @@
 import os
 
 _PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea",'aadatalake', "methylclock", "crispr"]
-_PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"]
+_PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
     _DEV_ROUTES=[  ] 
@@ -59,6 +59,7 @@ other_nav_dropdowns =[
                 "t-SNE":"/tsne/",\
                 "Lifespan":"/lifespan/",\
                 "Datalake":"/aadatalake/",\
+                "cBioPortal":"/cbioportal/",\
                 "Version check":"/vcheck/",\
             }, \
 

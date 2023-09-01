@@ -1411,7 +1411,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
         writer= pd.ExcelWriter(output)
 
         if pa["groups_value"]:
-            df,fig,cph_coeff_,cph_stats=make_figure(df,pa)
+            df,fig,cph_coeff_,cph_stats,input_df=make_figure(df,pa)
 
             df.to_excel(writer, sheet_name = 'SurvivalAnalysis', index = False)
             cph_stats.to_excel(writer, sheet_name="CoxPH.Stats", index=False)
@@ -1507,7 +1507,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
 
         if pa["groups_value"]:
-            df,fig,cph_coeff_,cph_stats=make_figure(df,pa)
+            df,fig,cph_coeff_,cph_stats,input_df=make_figure(df,pa)
 
             fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
             fig=dcc.Graph(figure=fig,config=fig_config,  id="graph") 
