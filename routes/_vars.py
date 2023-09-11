@@ -1,10 +1,10 @@
 import os
 
 _PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea",'aadatalake', "methylclock", "crispr"]
-_PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "cbioportal"]
+_PUBLIC_VIEWS=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=[  ] 
+    _DEV_ROUTES=[ "cbioportal", "agebot" ] 
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 _META_TAGS=[{'name':'title', 'property':'og:title', 'content':'flaski' },\
@@ -59,7 +59,8 @@ other_nav_dropdowns =[
                 "t-SNE":"/tsne/",\
                 "Lifespan":"/lifespan/",\
                 "Datalake":"/aadatalake/",\
-                "cBioPortal":"/cbioportal/",\
+                # "cBioPortal":"/cbioportal/",\
+                # "AGE bot":"/agebot/",\
                 "Version check":"/vcheck/",\
             }, \
 

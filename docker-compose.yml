@@ -116,7 +116,7 @@ services:
    - ~/flaski23/submissions/:/submissions
    - data3:/flaski_data/users
   #  - ~/tmp_sessions:/flaski_data/users/1
-   - ~/flaski23/private/:/flaski_private:ro
+   - ~/flaski23/private/:/flaski_private:rw
    - ./static/dog-solid.png:/myapp/myapp/static/favicon.ico
    - ./static/dog-solid.png:/myapp/myapp/static/logo.png
    - ./pyflaski/pyflaski:/myapp/pyflaski

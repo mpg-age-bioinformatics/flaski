@@ -1,1 +1,6 @@
 humanize==3.13.1
+## agebot (testing)
+llama-index==0.8.23.post1 
+llama-cpp-python==0.1.78 
+sentence_transformers==2.2.2
+## 
