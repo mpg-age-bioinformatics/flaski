@@ -5,26 +5,30 @@ services:
  init:
   container_name: init
   image: mpgagebioinformatics/flaski:latest
-  build:
-    context: ~/myapp
-    dockerfile: services/server/Dockerfile
-    args:
-      BUILD_NAME: myapp
-      MYAPP_VERSION: dev
-      UPGRADE_REQS: "no"
+  # build:
+  #   context: ~/myapp
+  #   dockerfile: services/server/Dockerfile
+  #   args:
+  #     BUILD_NAME: myapp
+  #     MYAPP_VERSION: dev
+  #     UPGRADE_REQS: "no"
   entrypoint: /myapp/services/init/entrypoint.sh
   user: root
   volumes:
    - data3:/myapp_data/users
-   - ~/flaski_data/backup/stats:/backup/stats
-   - ~/flaski_data/backup/users_data:/backup/users_data
-   - ~/flaski_data/backup/mariadb:/backup/mariadb:ro
+   - private:/flaski_private
+   - mysql-certs:/etc/mysql/certs
+   - ~/backups:/backup
   environment:
    APP_NAME: myapp
    FLASK_ENV: init
-   RESTORE_DB: 1
-   RESTORE_USERS_DATA: 1
-   UPGRADE_DB: 1
+   APP_URL: https://flaski.age.mpg.de
+   ADMINS: flaski@age.mpg.de
+   RESTORE_DB: 0
+   RESTORE_USERS_DATA: 0
+   UPGRADE_DB: 0
+   RESTORE_CERTS: 0
+   RESTORE_DATALAKE: 0
    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
    SECRET_KEY: ${SECRET_KEY}
    REDIS_ADDRESS: redis:6379/0
@@ -42,31 +46,33 @@ services:
  server3:
   container_name: server3
   image: mpgagebioinformatics/flaski:stable
-  build:
-    context: ./
-    dockerfile: Dockerfile
-    args:
-      APP_VERSION: dev
-      PYFLASKI_VERSION: dev
+  # build:
+  #   context: ./
+  #   dockerfile: Dockerfile
+  #   args:
+  #     APP_VERSION: dev
+  #     PYFLASKI_VERSION: dev
   restart: always
   volumes:
    - data3:/flaski_data/users
+   - private:/flaski_private
+   - mysql-certs:/etc/mysql/certs
+   - ~/mpcdf:/mpcdf
   environment:
    N_WORKERS: 4
-   ADMINS: flaski@age.mpg.de
    APP_NAME: myapp
-   APP_TITLE: flaski(local)
-   INSTANCE: local
+   APP_TITLE: flaski
+  #  INSTANCE: local
    SECRET_KEY: ${SECRET_KEY}
-   APP_URL: https://flaski.localhost
+   APP_URL: https://flaski.age.mpg.de
    PAGE_PREFIX: ""
    FLASK_ENV: production
-  #  MAIL_PASSWORD: ${MAIL_PASSWORD}
-  #  MAIL_PORT: 587
-  #  MAIL_SERVER: mail.age.mpg.de
+   MAIL_PASSWORD: ${MAIL_PASSWORD}
+   MAIL_PORT: 587
+   MAIL_SERVER: mail.age.mpg.de
    MAIL_USERNAME: flaski@age.mpg.de
    ADMINS: flaski@age.mpg.de
-  #  MAIL_USE_TLS: '1'
+   MAIL_USE_TLS: '1'
    MYSQL_HOST: mariadb
    MYSQL_PORT: 3306
    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -81,14 +87,16 @@ services:
    PUREFTPD_MYSQL_PASS: ${PUREFTPD_MYSQL_PASS}
    PUREFTPD_MYSQL_DB: pureftpd
   labels:
+   - traefik.enable=true
    - traefik.http.services.server3.loadbalancer.server.port=8000
-   - traefik.http.middlewares.server3_https.redirectscheme.scheme=https
    - traefik.http.routers.server3.entrypoints=web
-   - traefik.http.routers.server3.rule=Host(`flaski.localhost`)
-   - traefik.http.routers.server3.middlewares=server3_https@docker
-   - traefik.http.routers.server3_https.rule=Host(`flaski.localhost`)
+   - traefik.http.routers.server3.rule=Host(`flaski.age.mpg.de`) 
+   - traefik.http.middlewares.server3.redirectscheme.scheme=https
+   - traefik.http.routers.server3.middlewares=server3@docker
+   - traefik.http.routers.server3_https.entrypoints=websecure   
+   - traefik.http.routers.server3_https.rule=Host(`flaski.age.mpg.de`)
    - traefik.http.routers.server3_https.tls=true
-   - traefik.http.routers.server3_https.entrypoints=websecure
+   - traefik.http.routers.server3_https.tls.certresolver=myresolver
   links:
    - mariadb
    - redis
@@ -100,23 +108,21 @@ services:
  backup:
   container_name: backup
   image: mpgagebioinformatics/myapp:latest
-  build:
-    context: ~/myapp
-    dockerfile: services/server/Dockerfile
-    args:
-      BUILD_NAME: myapp
-      MYAPP_VERSION: dev
-      UPGRADE_REQS: "no"
-  entrypoint: /flaski/services/backup/entrypoint.sh
+  # build:
+  #   context: ~/myapp
+  #   dockerfile: services/server/Dockerfile
+  #   args:
+  #     BUILD_NAME: myapp
+  #     MYAPP_VERSION: dev
+  #     UPGRADE_REQS: "no"
+  entrypoint: /myapp/services/backup/entrypoint.sh
   user: root
   depends_on:
    - mariadb
    - init
   volumes:
-   - ~/flaski_data/backup/stats:/backup/stats
-   - ~/flaski_data/backup/users_data:/backup/users_data
-   - ~/flaski_data/backup/mariadb:/backup/mariadb:ro
    - data3:/myapp_data/users:ro
+   - ~/backups:/backup
   environment:
    APP_NAME: flaski
    INSTANCE: backup
@@ -147,20 +153,39 @@ services:
   command: redis-server --requirepass ${REDIS_PASSWORD}
 
  reverse-proxy:
-  image: traefik:v2.6
-  command: 
-    - --api.insecure=true
+  image: "traefik:v2.9"
+  restart: always
+  container_name: "traefik"
+  command:
     - --providers.docker=true
-    - --entrypoints.websecure.address=:443
+    - --providers.docker.useBindPortIP=true
     - --entrypoints.web.address=:80
+    - --entrypoints.websecure.address=:443
+    - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+    - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    - --certificatesresolvers.myresolver.acme.httpchallenge=true
+    - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+    - --certificatesresolvers.myresolver.acme.tlschallenge=true
+    - --certificatesresolvers.myresolver.acme.email=jboucas@age.mpg.de
+    #- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+    #- --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme-dev-4.json
+    - --certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+    - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme-prod-3.json
+    - --log.level=DEBUG
   ports:
-    - "80:80"
-    - "443:443"
-    - "8080:8080"
+    - 80:80
+    - 443:443
   volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
+    - ~/letsencrypt:/letsencrypt
+    - /var/run/docker.sock:/var/run/docker.sock:ro
   labels:
-    - traefik.enable=false
+    - traefik.enable=true
+    # Global redir to https
+    - traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
+    - traefik.http.routers.http-catchall.entrypoints=web
+    - traefik.http.routers.http-catchall.middlewares=redirect-to-https
+    - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
   depends_on:
    - server3
 
@@ -169,5 +194,7 @@ volumes:
   external: false
  db:
   external: false
- oc:
+ private:
+  external: false
+ mysql-certs:
   external: false
