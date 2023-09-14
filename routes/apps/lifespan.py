@@ -862,9 +862,9 @@ def read_input_file(contents,filename,last_modified,session_id):
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        print(tb_str)
+        # print(tb_str)
         toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"lifespan")
-        print(toast)
+        # print(toast)
         return [ dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, toast, tb_str, dash.no_update, dash.no_update ] + pa_outputs
 
 
@@ -891,7 +891,7 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
         if ( filename.split(".")[-1] == "json") and ( not generate_markers_import ):
             app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "lifespan")
             pa=app_data['pa']
-            print(pa["groups_settings"])
+            # print(pa["groups_settings"])
             generate_markers_import=True
 
     #         df=pd.read_json(app_data["df"])
@@ -1391,7 +1391,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
 
     if button_id == "saveas-session-btn" :
         session["session_data"]=session_data
-        print(session_data)
+        # print(session_data)
         return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
           # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
 
@@ -1561,7 +1561,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
         toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"lifespan")
-        print(tb_str)
+        # print(tb_str)
         #print(toast)
         return dash.no_update, toast, session_data, tb_str, None, None  #download_buttons_style_hide, download_buttons_style_hide
 

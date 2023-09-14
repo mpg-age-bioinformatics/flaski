@@ -27,7 +27,7 @@ import shutil
 from time import sleep
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
-from ._cbioportal import read_results_files, nFormat, plot_gene, filter_data  # plot_height
+from ._cbioportal import read_results_files, nFormat, plot_gene, filter_data, read_meta_files, read_study_meta, convert_html_links_to_markdown
 
         
 PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
@@ -83,13 +83,6 @@ card_input_style={"width":"100%","height":"35px"}
 card_body_style={ "padding":"2px", "padding-top":"4px"}
 
 
-df=pd.read_csv("/flaski_private/cbioportal_data/all.datasets.csv", sep="\t")
-ds=list(set(df["dataset"].tolist()))
-gd={}
-for d in ds:
-    gd[d]=list(set(df.loc[df["dataset"] == d]["Hugo_Symbol"].tolist()))
-
-
 @dashapp.callback(
     Output('protected-content', 'children'),
     Input('session-id', 'data')
@@ -142,12 +135,14 @@ def make_layout(session_id):
                                     dcc.Input(id='higher_percentile', value="75", type='text',style={"width":"100%", "height":"34px"}),
                                     html.Label('Download file prefix',style={"margin-top":10}), 
                                     dcc.Input(id='download_name', value="cbio.portal", type='text',style={"width":"100%", "height":"34px"}),
-                                    html.Label('Abbreviations:',style={"margin-top":10}),
-                                    html.Label('N Low -> No. of samples in lower percentile',style={"margin-top":4}),
-                                    html.Label('N High -> No. of samples in upper percentile',style={"margin-top":2}),
-                                    html.Label('LLRT -> Log Likelihood Ratio Test',style={"margin-top":2}),
-                                    html.Label('PHT -> Proportional Hazard Test',style={"margin-top":2}), 
-
+                                    html.Hr(style={'width' : "100%", "margin-top":"15px", "margin-bottom": "0px"}),
+                                    html.Label('Abbreviations:',style={"margin-top":10, "width":"100%"}),
+                                    html.Label('N Low -> No. of samples in lower percentile',style={"margin-top":4, "font-size":14}),
+                                    html.Label('N High -> No. of samples in upper percentile',style={"margin-top":2, "font-size":14}),
+                                    html.Label('LLRT -> Log Likelihood Ratio Test',style={"margin-top":2, "font-size":14}),
+                                    html.Label('PHT -> Proportional Hazard Test',style={"margin-top":2, "font-size":14}),
+                                    html.Hr(style={'width' : "100%", "margin-top":"15px", "margin-bottom": "0px"}),
+                                    dcc.Markdown('''Reference: [cBioPortal](https://www.cbioportal.org/datasets)''', style={"width":"100%", "margin-top":"10px", "margin-bottom": "0px", "height":"20px"})
                                 ],
                                 body=True
                             ),
@@ -195,7 +190,7 @@ def make_layout(session_id):
 def percentiles_block(session_id, sig_only):
 
     disabled = 'disable' in sig_only
-    print("dis", disabled)
+    #print("dis", disabled)
     return disabled, disabled
 
 
@@ -204,9 +199,12 @@ def percentiles_block(session_id, sig_only):
     Input('session-id', 'data')
     )
 def update_datasets(session_id):
-    results_files=read_results_files(cache)
-    datasets_=list(set([s for s in results_files["dataset"] if s not in ['pcpg_tcga', 'meso_tcga']]))
-    datasets=make_options(datasets_)
+
+    meta=read_meta_files(cache)
+    meta=meta["short_name"].tolist()
+    # results_files=read_results_files(cache)
+    # datasets_=list(set([s for s in results_files["dataset"] if s not in ['pcpg_tcga', 'meso_tcga']]))
+    datasets=make_options(meta)
 
     return datasets
 
@@ -216,10 +214,15 @@ def update_datasets(session_id):
     Input('session-id', 'data'),
     Input('opt-datasets', 'value') )
 def update_genes(session_id, datasets):
-    #results_files=read_results_files(cache)
     sub=filter_data(datasets=datasets, cache=cache)
     
-    ##genes_=results_files.loc[results_files["dataset"].isin(datasets)]["Hugo_Symbol"].tolist()
+    if datasets:
+        meta_files=read_meta_files(cache)
+        ds_mapping=meta_files[["cancer_study_identifier", "short_name"]]
+        datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+   
+        sub=filter_data(datasets=datasets, cache=cache)
+    
     genes_=list(set( sub["Hugo_Symbol"].tolist() ))
     genes=make_options(genes_)
     return genes
@@ -242,7 +245,21 @@ def update_genes(session_id, datasets):
 )
 def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc, sig_only, download_name): #, geneids:
     
-    #selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
+    meta_files_or=read_meta_files(cache=cache)
+    meta_files=meta_files_or[["type_of_cancer", "cancer_study_identifier", "name", "citation" ]]
+    meta_files_=make_table(meta_files, "meta_files")
+    download_meta=html.Div( 
+        [
+            html.Button(id='btn-meta', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+            dcc.Download(id="download-meta")
+        ]
+    )
+
+    if datasets:
+        ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
+        datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+    
+    
     selected_results_files=filter_data(datasets=datasets, cache=cache)
     selected_results_files=selected_results_files.loc[ ~ selected_results_files["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
 
@@ -263,9 +280,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
     results_files=selected_results_files[list(cols.keys())]
     results_files=results_files.rename(columns=cols)
-    
-    ###genes_out=results_files.loc[results_files["dataset"].isin(datasets)]["Hugo_Symbol"].tolist()
-    
+     
     results_files=results_files.drop_duplicates()
     results_files_=make_table(results_files,"results_files")
     download_samples=html.Div( 
@@ -275,14 +290,13 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
         ]
     )
 
-    print(len(sig_only))
-    print(sig_only)
+    # print(len(sig_only))
+    # print(sig_only)
     
     #if len(sig_only) > 0 and sig_only[0] == True:
     if len(sig_only) > 0 and sig_only[0] == 'disable':
-        results_files_sig=results_files.loc[ (results_files["P.Value(LLRT)"].astype(float) < 0.05) & (results_files["P.Value(PHT)"].astype(float) >= 0.05)]
+        results_files_sig=results_files.loc[ (results_files["P.adj(LLRT)"].astype(float) < 0.05) & (results_files["P.Value(PHT)"].astype(float) >= 0.05)]
         results_files_sig_=make_table(results_files_sig, "results_sig")
-
         sig_bol=True
     else:
         sig_bol=False
@@ -291,7 +305,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     #if datasets and (len(sig_only) > 0 and sig_only[0]) == True:
     if datasets and (len(sig_only) > 0 and sig_only[0]) == 'disable':
         sub=results_files.loc[results_files["Dataset"].isin(datasets)]
-        sub_=sub.loc[ (sub["P.Value(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
+        sub_=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
         result_files_ds_sig_genes=make_table(sub_, "results_ds_sig")
         ds_sig_bol=True
     else:
@@ -299,7 +313,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
     if datasets and genenames and (len(sig_only) > 0 and sig_only[0]) == 'disable':
         sub=results_files.loc[(results_files["Dataset"].isin(datasets)) & (results_files["Hugo Symbol"].isin(genenames))]
-        sub_=sub.loc[ (sub["P.Value(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
+        sub_=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
         result_files_ds_genes_sig_genes=make_table(sub_, "results_ds_gene_sig")
         ds_gene_sig_bol=True
     else:
@@ -307,7 +321,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
     if genenames and (len(sig_only) > 0 and sig_only[0]) == 'disable':
         sub=results_files.loc[results_files["Hugo Symbol"].isin(genenames)]
-        sub_=sub.loc[ (sub["P.Value(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
+        sub_=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
         result_files_genes_sig_genes=make_table(sub_, "results_ds_sig")
         genes_sig_bol=True
     else:
@@ -315,19 +329,16 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
 
     if datasets:
-        print(datasets)
         results_files_ds=results_files.loc[results_files["Dataset"].isin(datasets)]
         results_files_ds_=make_table(results_files_ds, "results_ds_files")
-        
         ds_bol=True
     else:
         ds_bol=False
 
 
     if genenames:
-        print(genenames)
         results_files_gene=results_files.loc[results_files["Hugo Symbol"].isin(genenames)]
-        print(results_files_gene)
+        # print(results_files_gene)
         results_files_gene_=make_table(results_files_gene, "results_gene_files")
 
         gene_bol=True
@@ -336,47 +347,131 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
     
     if datasets and genenames:
-
         results_files_ds_gene=results_files[ results_files['Dataset'].isin( datasets ) & (results_files['Hugo Symbol'].isin( genenames )) ]
         results_files_ds_gene_=make_table(results_files_ds_gene, "results_ds_files")
-
         dg_bol=True
     else:
         dg_bol=False
 
 
     if (datasets and len(datasets) == 1) and (genenames and len(genenames) == 1):
-        print(genenames)
-        print(datasets)
-
         ds=datasets[0]
-        print(ds)
-
-        #output_df=results_files.loc[(results_files["Hugo_Symbol"] == gene) & (results_files["dataset"] == ds)]
-        #print(output_df)
-        #results_files_gene_=make_table(results_files_gene, "results_gene_files")
+        #print(ds)
 
         df, fig, cph_coeff, cph_stats,args, input_df=plot_gene(genenames, ds, lp=lower_pc, hp=higher_pc) #results_files
 
-        #print(cph_coeff.T)
-        tmp=cph_coeff.T
+        tmp=cph_coeff[[s for s in cph_coeff.columns.tolist() if "cmp" not in s]].T
         tmp=tmp.reset_index(drop=False)
         tmp.columns=["Statistic","Value"]
-        #print(tmp)
-        test=pd.concat([cph_stats,tmp])
-        print(test)
+        cph_stats_=cph_stats.loc[cph_stats["Statistic"].isin([s for s in cph_stats["Statistic"].tolist() if "log rank" not in s])]
+        test=pd.concat([cph_stats_,tmp])
+        test["Value"]=test["Value"].apply(lambda x : nFormat(x) if isinstance(x, (float, int)) else x)
+        
+        readme_cols='''
+        **baseline estimation**
+
+        Method used to estimate baseline hazard 
+
+        **partial log-likelihood**
+
+        Represents how well the model fits the observed survival data given the model's parameter estimates. 
+        A higher log partial likelihood value indicates a better fit to the data compared to a lower value.
+
+        **Concordance**
+
+        Concordance or the C-Index quantifies the ability of the model to correctly rank the survival times of pairs of subjects. 
+        It is a measure of the model's ability to stratify subjects into groups based on their risk.
+        
+        The C-Index ranges from 0.5 to 1.0
+
+        - 0.5 is the expected result from random predictions
+        - 1.0 is perfect concordance
+
+        **Partial AIC**
+
+        Represents the trade-off between model fit and model complexity. It quantifies how much better the model fits the data compared to its complexity.
+        A Lower Partial AIC indicates that a model strikes a good balance (compared to a higer value) between explaining the data and avoiding unnecessary complexity.
+
+        **log-likelihood ratio test**
+
+        Tests the goodness of fit of a model. Compares the existing model (with all covariates) to the trivial model of no covariates.
+
+        If the P.value < 0.05, the null hypothesis (complex model is not better than the trivial model) is rejected in favor of the 
+        alternative hypothesis (complex model is significantly better). 
+        This indicates that the additional covariates or constraints in the alternative model significantly improve the model fit.
+
+        **proportional-hazard-test**
+
+        Tests whether the assumption of constant hazard ratios over time from the Cox's proportional hazard model is met.
+        P.Value >= 0.05 suggests that the assumption is met.
 
 
-        #output_df=make_table(cph_stats, "gene_ds_specific_table")
+        **covariate**
+
+        Indicates the variables that were used as covariates in the Cox regression model.
+
+        **coef**
+
+        Represents the estimated coefficients (log hazard ratios) associated with each covariate. 
+        These coefficients quantify the change in the log hazard for a one-unit change in the corresponding covariate while holding other covariates constant.
+
+        **exp(coef)**
+
+        Exponentiated coefficients which correspond to the hazard ratios (HRs). 
+        The hazard ratio represents the ratio of the hazard rate for one group or level of a covariate to another group or level. 
+        It quantifies the relative change in hazard associated with a one-unit change in the covariate.
+
+        **se(coef)**
+
+        Standard error of the coefficient estimates. It measures the uncertainty or variability in the coefficient estimates.
+
+        **coef lower 95%**
+
+        Lower bound of the 95% confidence interval for the coefficient estimate. 
+        It indicates the range within which the true coefficient value is likely to fall with 95% confidence.
+
+        **coef upper 95%**
+
+        Upper bound of the 95% confidence interval for the coefficient estimate. 
+        Also indicates the range within which the true coefficient value is likely to fall with 95% confidence.
+
+
+        **exp(coef) lower 95%**
+
+        Lower bound of the 95% confidence interval for the hazard ratio (exp(coef)).
+
+        **exp(coef) upper 95%**
+
+        Upper bound of the 95% confidence interval for the hazard ratio (exp(coef)).
+
+        **z**
+
+        The z-statistic is a measure of how many standard errors the coefficient estimate is away from zero. 
+        It is calculated as the coefficient estimate divided by its standard error.
+
+        **p**
+
+        The P.value associated with the z-statistic. It tests the null hypothesis that the coefficient (or hazard ratio) is equal to zero (i.e., no effect). 
+        P.Value < 0.05 suggests that the covariate has a significant effect on survival.
+
+        **-log2(p)**
+
+        This is a transformation of the P.value. Taking the negative base-2 logarithm (-log2) helps emphasize the significance of small p-values. 
+        Larger values indicate stronger evidence against the null hypothesis.
+
+        **Study Metadata**
+
+        '''
+
+        meta_list=read_study_meta(dataset=ds)
+        meta_list_formatted=[convert_html_links_to_markdown(s) for s in meta_list]
+        meta_mds=[dcc.Markdown(text, style={"width":"90%", "margin":"10px"}) for text in meta_list_formatted]
+        
+        readme=dcc.Markdown(readme_cols, style={"width":"90%", "margin":"10px"} )
         output_df=make_table(test, "gene_ds_specific_table")
         surv_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".km" }}
         fig_plot=dcc.Graph(figure=fig, config=surv_config, style={"width":"100%","overflow-x":"auto"})
         
-        # download_samples=html.Div( 
-        # [   
-        #     html.Button(id='btn-samples', n_clicks=0, children='Download', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-        #     dcc.Download(id="download-samples")
-        # ])
         lifespan_app_tab2=html.Div( 
         [         
             html.Button(id='btn-lifespan-app', n_clicks=0, children='Lifespan', 
@@ -395,7 +490,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ######################################################################################################################
 
     if (ds_bol) & (gene_bol) & surv_fig_bol:
-        minwidth=["Survival Analysis","Lifespan curve"]
+        minwidth=["Survival Analysis","Lifespan curve", "Readme", "Studies"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
 
@@ -411,6 +506,9 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                 dcc.Tab( [ fig_plot_, lifespan_app_tab2] ,#, lifespan_app], 
                         label="Lifespan curve", id="tab-survPLOT", 
                         style={"margin-top":"0%"}),
+                dcc.Tab( [readme]+meta_mds, label="Readme", id="tab-readme") ,
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat") ,
+
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -419,12 +517,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################
 
     elif ds_gene_sig_bol:
-        print(ds_gene_sig_bol)
+        # print(ds_gene_sig_bol)
         minwidth=["Significant genes in the selected genes and datasets"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -436,6 +532,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Significant genes in the selected genes and datasets", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -444,12 +541,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################
         
     elif dg_bol:
-        print(dg_bol)
+        # print(dg_bol)
         minwidth=["Selected genes and datasets"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -461,6 +556,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Selected Genes and Datasets", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -468,12 +564,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################
 
     elif genes_sig_bol:
-        print(genes_sig_bol)
+        # print(genes_sig_bol)
         minwidth=["Significant genes from the selected genes"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -485,6 +579,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Significant genes from the selected genes", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_ , download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -494,12 +589,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################
         
     elif ds_sig_bol:
-        print(ds_sig_bol)
+        # print(ds_sig_bol)
         minwidth=["Significant genes in selected datasets"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -511,6 +604,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Significant genes in selected datasets", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -518,12 +612,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################  
 
     elif sig_bol:
-        print(sig_bol)
+        # print(sig_bol)
         minwidth=["Significant genes in all datasets"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -535,6 +627,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Significant genes in all datasets", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -542,12 +635,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################
 
     elif ds_bol :
-        print(ds_bol)
+        # print(ds_bol)
         minwidth=["Selected datasets"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -559,6 +650,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Selected datasets", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_,download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -566,12 +658,10 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ####################################################################
     
     elif gene_bol:
-        print(gene_bol)
+        # print(gene_bol)
         minwidth=["Selected genes"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -583,6 +673,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Selected genes", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat") ,
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
@@ -590,12 +681,9 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ###################################################################
 
     else:
-        # print("12 -- else")
         minwidth=["Genes and Datasets"]
         # minwidth=len(minwidth) * 150
         # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
 
         out=dcc.Tabs( 
             [ 
@@ -607,55 +695,13 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                     label="Genes and Datasets", id="tab-samples",
                     style={"margin-top":"0%"}
                 ),
+                dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat")
             ],  
             mobile_breakpoint=0,
             style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
         
     return out
 
-
-
-
-# @dashapp.callback(
-#     Output('download-sp', 'data'),
-#     Input('btn-download-sp',"n_clicks"),
-#     State('fig_plot', 'figure'),
-#     State("opt-datasets", "value"),
-#     #State("opt-groups", "value"),
-#     #State("opt-samples", "value"),
-#     State("download_name", "value"),
-#     prevent_initial_call=True,
-# )
-# def download_survPLOTr(n_clicks,figure,datasets,download_name): #groups, samples
-#     selected_results_files=filter_data(datasets=datasets, cache=cache)
-#     #selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-#     ## samples
-#     # results_files=selected_results_files[["Set","Group","Reps"]]
-#     # results_files.columns=["Set","Group","Sample"]
-#     # results_files=results_files.drop_duplicates()
-
-#     results_files=selected_results_files[["Hugo_Symbol","n_low","n_high","p(log_likelihood_ratio_test)","p(proportional_hazard_test)","padj(log_likelihood_ratio_test)" ,"dataset"]]
-#     results_files=results_files.drop_duplicates()
-
-#     selected_sets=list(set(results_files["dataset"]))
-
-#     minheight=plot_height(selected_sets)
-
-#     fileprefix=secure_filename(str(download_name))
-#     pdf_filename="%s.geneExp.bar.Plot.pdf" %fileprefix
-    
-#     if not pdf_filename:
-#         pdf_filename="geneExp.bar.Plot.pdf"
-#     pdf_filename=secure_filename(pdf_filename)
-#     if pdf_filename.split(".")[-1] != "pdf":
-#         pdf_filename=f'{pdf_filename}.pdf'
-
-#     def write_image(figure, graph=figure):
-#         fig=go.Figure(graph)
-#         fig.write_image(figure, format="pdf", height=minheight, width=minheight)
-        
-#     return dcc.send_bytes(write_image, pdf_filename)
-    
 
 @dashapp.callback(
     Output("redirect-lifespan", 'children'),
@@ -668,7 +714,11 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 )
 def cbioportal_to_lifespan(n_clicks,datasets, genenames, lp,hp ):
     if n_clicks:
-            
+        if datasets:
+            meta_files_or=read_meta_files(cache=cache)
+            ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
+            datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+
         df, fig, cph_coeff, cph_stats,args, df_input=plot_gene(gene_list=genenames, dataset=datasets[0], lp=lp, hp=hp)
 
         args['xvals'] =  "day"
@@ -699,50 +749,22 @@ def cbioportal_to_lifespan(n_clicks,datasets, genenames, lp,hp ):
         return dcc.Location(pathname=f"{PAGE_PREFIX}/lifespan/", id="index")
     
 
+@dashapp.callback(
+    Output("download-meta", "data"),
+    Input("btn-meta", "n_clicks"),
+    State('download_name', 'value'),
+    prevent_initial_call=True,
+)
+def download_meta(n_clicks,fileprefix):
+    
+    meta_files_or=read_meta_files(cache=cache)
+    meta_files=meta_files_or[["type_of_cancer", "cancer_study_identifier", "name", "citation" ]]
+    
+    results_files_to_save=meta_files
+    fileprefix=secure_filename(str(fileprefix))
+    filename="%s.studies.meta.data.xlsx" %fileprefix
 
-# @dashapp.callback(
-#     Output('pdf-filename-modal', 'is_open'),
-#     [ Input('download-pdf-btn',"n_clicks"),Input("pdf-filename-download", "n_clicks")],
-#     [ State("pdf-filename-modal", "is_open")], 
-#     prevent_initial_call=True
-# )
-# def download_pdf_filename(n1, n2, is_open):
-#     if n1 or n2:
-#         return not is_open
-#     return is_open
-
-# @dashapp.callback(
-#     Output('download-pdf', 'data'),
-#     Input('pdf-filename-download',"n_clicks"),
-#     State('graph', 'figure'),
-#     State("pdf-filename", "value"),
-#     prevent_initial_call=True
-# )
-# def download_pdf(n_clicks,graph, pdf_filename):
-#     if not pdf_filename:
-#         pdf_filename="cBioPortal_lifespan_plot.pdf"
-#     pdf_filename=secure_filename(pdf_filename)
-#     if pdf_filename.split(".")[-1] != "pdf":
-#         pdf_filename=f'{pdf_filename}.pdf'
-
-#     ### needs logging
-#     def write_image(figure, graph=graph):
-#         ## This section is for bypassing the mathjax bug on inscription on the final plot
-#         fig=px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])        
-#         fig.write_image(figure, format="pdf")
-#         time.sleep(2)
-#         ## 
-#         fig=go.Figure(graph)
-#         fig.write_image(figure, format="pdf")
-
-#     eventlog = UserLogging(email=current_user.email,action="download figure lifespan")
-#     db.session.add(eventlog)
-#     db.session.commit()
-
-#     return dcc.send_bytes(write_image, pdf_filename)
-
-
-
+    return dcc.send_data_frame(results_files_to_save.to_excel, filename, sheet_name="cbioportal.studies", index=False)
 
 @dashapp.callback(
     Output("download-samples", "data"),
@@ -756,11 +778,12 @@ def cbioportal_to_lifespan(n_clicks,datasets, genenames, lp,hp ):
     prevent_initial_call=True,
 )
 def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only, fileprefix):
-    #selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-    #results_files=selected_results_files[["Set","Group","Reps"]]
-    #results_files.columns=["Set","Group","Sample"]
-    #results_files=results_files.drop_duplicates()
 
+    meta_files_or=read_meta_files(cache=cache)
+    if datasets:
+        ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
+        datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+    
     selected_results_files=filter_data(datasets=datasets, genes=genenames, cache=cache)
     selected_results_files=selected_results_files.loc[ ~ selected_results_files["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
 
@@ -773,11 +796,6 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
           "dataset" : "Dataset"
         }
     
-
-    # selected_results_files["p(log_likelihood_ratio_test)"]=selected_results_files["p(log_likelihood_ratio_test)"].apply(lambda x : nFormat(x))
-    # selected_results_files["padj(log_likelihood_ratio_test)"]=selected_results_files["padj(log_likelihood_ratio_test)"].apply(lambda x : nFormat(x))
-    # selected_results_files["p(proportional_hazard_test)"]=selected_results_files["p(proportional_hazard_test)"].apply(lambda x : nFormat(x))
-
 
     results_files=selected_results_files[list(cols.keys())]
     results_files=results_files.rename(columns=cols)
@@ -795,7 +813,7 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
         tmp=tmp.reset_index(drop=False)
         tmp.columns=["Statistic","Value"]
         test=pd.concat([cph_stats,tmp])
-        print(test)
+        # print(test)
 
         ds=datasets[0]
         g=genenames[0]
@@ -805,7 +823,7 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
         filename="%s.%s.%s.xlsx" % (fileprefix , ds , g)
 
     if len(sig_only) > 0 and sig_only[0] == 'disable':
-        results_files_sig=results_files.loc[ (results_files["P.Value(LLRT)"].astype(float) < 0.05) & (results_files["P.Value(PHT)"].astype(float) >= 0.05)]
+        results_files_sig=results_files.loc[ (results_files["P.adj(LLRT)"].astype(float) < 0.05) & (results_files["P.Value(PHT)"].astype(float) >= 0.05)]
         
         results_files_to_save=results_files_sig
         fileprefix=secure_filename(str(fileprefix))
@@ -814,7 +832,7 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
 
     if datasets and (len(sig_only) > 0 and sig_only[0]) == 'disable':
         sub=results_files.loc[results_files["Dataset"].isin(datasets)]
-        sub_=sub.loc[ (sub["P.Value(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
+        sub_=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
         
         results_files_to_save=sub_
         fileprefix=secure_filename(str(fileprefix))
@@ -822,7 +840,7 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
 
     if datasets and genenames and (len(sig_only) > 0 and sig_only[0]) == 'disable':
         sub=results_files.loc[(results_files["Dataset"].isin(datasets)) & (results_files["Hugo Symbol"].isin(genenames))]
-        sub_=sub.loc[ (sub["P.Value(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
+        sub_=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
         
         results_files_to_save=sub_
         fileprefix=secure_filename(str(fileprefix))
@@ -830,7 +848,7 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
 
     if genenames and (len(sig_only) > 0 and sig_only[0]) == 'disable':
         sub=results_files.loc[results_files["Hugo Symbol"].isin(genenames)]
-        sub_=sub.loc[ (sub["P.Value(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
+        sub_=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05) ]
 
         results_files_to_save=sub_
         fileprefix=secure_filename(str(fileprefix))

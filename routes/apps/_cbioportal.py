@@ -59,15 +59,22 @@ def get_groups(genes, mrna, lowp, highp):
 
     mrna=mrna.transpose()
 
-    #genes=list(set(mrna.columns.tolist()))
-    print(len(genes))
-
     groups=pd.DataFrame( {"Hugo_Symbol":genes }, index=genes )
     groups["group"]=groups["Hugo_Symbol"].apply(lambda x: grouping(x,mrna, lowp, highp) )
 
     groups=groups.dropna()
     
     return groups
+
+
+def read_study_meta(path_to_files=path_to_files, dataset=None):
+    if dataset:
+        with open (path_to_files+dataset+"/meta_study.txt", "r") as md:
+            meta_data=md.read()
+            meta_data=meta_data.split("\n")
+            meta_data=[s for s in meta_data if s != ""]
+
+            return meta_data
     
 
 def plot_gene(gene_list, dataset, lp, hp):
@@ -146,12 +153,16 @@ def plot_gene(gene_list, dataset, lp, hp):
     clinical=clinical[["group","time", "dead" ]].dropna()
     clinical=clinical.reset_index(drop=True)
 
+    title=read_study_meta(dataset=dataset)
+    title=[s.split("short_name:")[1] for s in title if "short_name" in s][0]
+    # print(title)
+
     ### Sending data to the lifespan app
     pa=defaults_lifespan()
 
     pa['xvals'] =  "time"
     pa['yvals'] = "dead"
-    pa['title'] = dataset+" - "+gene
+    pa['title'] = title+" - "+gene
     pa['xlabel'] = "Months"
     pa['ylabel'] = "Survival"
     pa['groups_value'] = "group"
@@ -161,7 +172,7 @@ def plot_gene(gene_list, dataset, lp, hp):
     groups=pa["list_of_groups"]
 
     colors_dict=dict(zip(pa["list_of_groups"], COLORS[:len(groups)]))
-    print(colors_dict)
+    # print(colors_dict)
 
     groups_settings=[]
 
@@ -206,10 +217,12 @@ def read_results_files(cache,path_to_files=path_to_files):
         return df.to_json()
     return pd.read_json(_read_results_files())
 
-# def read_results_files(cache, path_to_files=path_to_files):
-#     df=read_results_files_all(cache, path_to_files)
-#     df=df.loc[ ~ df["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]  
-#     return df 
+def read_meta_files(cache,path_to_files=path_to_files):
+    @cache.memoize(60*60*2) # 2 hours
+    def _read_meta_files(path_to_files=path_to_files):
+        df=pd.read_csv(path_to_files+"all_meta_data.csv",sep="\t")
+        return df.to_json()
+    return pd.read_json(_read_meta_files())
 
 
 def nFormat(x):
@@ -240,7 +253,40 @@ def filter_data(datasets=None, genes=None, cache=None):
 
 
 
-
+def convert_html_links_to_markdown(html_text):
+    start_idx = 0
+    markdown_text = ""
+    
+    while True:
+        # Find the start and end positions of the <a> tag
+        start_tag_idx = html_text.lower().find("<a", start_idx)
+        
+        if start_tag_idx == -1:
+            # No more <a> tags found, append the remaining text and break
+            markdown_text += html_text[start_idx:]
+            break
+        
+        end_tag_idx = html_text.lower().find("</a>", start_tag_idx)
+        
+        if end_tag_idx == -1:
+            # If there's no matching </a> tag, append the remaining text and break
+            markdown_text += html_text[start_idx:]
+            break
+        
+        # Extract the link text and href attribute
+        link_start_idx = html_text.find(">", start_tag_idx) + 1
+        link_text = html_text[link_start_idx:end_tag_idx]
+        href_start_idx = html_text.lower().find('href="', start_tag_idx) + 6
+        href_end_idx = html_text.find('"', href_start_idx)
+        href = html_text[href_start_idx:href_end_idx]
+        
+        # Convert the link to Dash Markdown format and append it
+        markdown_text += f"{html_text[start_idx:start_tag_idx]}[{link_text}]({href})"
+        
+        # Update the start index for the next iteration
+        start_idx = end_tag_idx + 4
+    
+    return markdown_text
 
 
 # def make_annotated_col(x,annotate_genes):
