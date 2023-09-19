@@ -234,22 +234,22 @@ def nFormat(x):
         return str('{:.3f}'.format(float(x)))
 
 
-def filter_data(datasets=None, genes=None, cache=None):
-    results_files=read_results_files(cache)
-    # print(datasets)
-    # import sys
-    # sys.stdout.flush()
-    if datasets:
-        results_files=results_files[ results_files['dataset'].isin( datasets ) ]
+def filter_data(cache, datasets=None, genes=None):
+    @cache.memoize(60*60*2) # 2 hours
+    def _filter_data(cache, datasets=None, genes=None):
+        results_files=read_results_files(cache)
+   
+        if datasets:
+            results_files=results_files[ results_files['dataset'].isin( datasets ) ]
 
-    if genes:
-        results_files=results_files[ results_files['Hugo_Symbol'].isin( genes ) ]
+        if genes:
+            results_files=results_files[ results_files['Hugo_Symbol'].isin( genes ) ]
 
-    if datasets and genes:
-        results_files=results_files[ results_files['dataset'].isin( datasets ) & (results_files['Hugo_Symbol'].isin( genes )) ]
+        if datasets and genes:
+            results_files=results_files[ results_files['dataset'].isin( datasets ) & (results_files['Hugo_Symbol'].isin( genes )) ]
 
-
-    return results_files
+        return results_files
+    return _filter_data(cache, datasets, genes)
 
 
 

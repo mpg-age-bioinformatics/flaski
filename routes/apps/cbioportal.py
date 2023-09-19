@@ -264,8 +264,8 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     selected_results_files=selected_results_files.loc[ ~ selected_results_files["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
 
     cols={"Hugo_Symbol" : "Hugo Symbol",
-          "n_low" : "N Low",
-          "n_high" : "N High",
+          "n_low" : "N Low (25%)",
+          "n_high" : "N High (75%)",
           "p(log_likelihood_ratio_test)" : "P.Value(LLRT)",
           "padj(log_likelihood_ratio_test)" : "P.adj(LLRT)" ,
           "p(proportional_hazard_test)" : "P.Value(PHT)",
@@ -490,7 +490,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     ######################################################################################################################
 
     if (ds_bol) & (gene_bol) & surv_fig_bol:
-        minwidth=["Survival Analysis","Lifespan curve", "Readme", "Studies"]
+        minwidth=["Lifespan curve","Survival Analysis","Readme", "Studies"]
         minwidth=len(minwidth) * 150
         minwidth = str(minwidth) + "px"
 
@@ -500,11 +500,11 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
         out=dcc.Tabs(
             [ 
+                dcc.Tab( [ fig_plot_, lifespan_app_tab2],
+                        label="Lifespan curve", id="tab-survPLOT", 
+                        style={"margin-top":"0%"}),
                 dcc.Tab([ results_files_, download_samples], 
                         label="Survival Analysis", id="tab-samples",
-                        style={"margin-top":"0%"}),
-                dcc.Tab( [ fig_plot_, lifespan_app_tab2] ,#, lifespan_app], 
-                        label="Lifespan curve", id="tab-survPLOT", 
                         style={"margin-top":"0%"}),
                 dcc.Tab( [readme]+meta_mds, label="Readme", id="tab-readme") ,
                 dcc.Tab( [meta_files_, download_meta], label="Studies", id="tab-metadat") ,
@@ -788,8 +788,8 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
     selected_results_files=selected_results_files.loc[ ~ selected_results_files["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
 
     cols={"Hugo_Symbol" : "Hugo Symbol",
-          "n_low" : "N Low",
-          "n_high" : "N High",
+          "n_low" : "N Low (25%)",
+          "n_high" : "N High (75%)",
           "p(log_likelihood_ratio_test)" : "P.Value(LLRT)",
           "padj(log_likelihood_ratio_test)" : "P.adj(LLRT)" ,
           "p(proportional_hazard_test)" : "P.Value(PHT)",
