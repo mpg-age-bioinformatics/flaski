@@ -16,7 +16,7 @@ import os
 from functools import reduce
 
 
-path_to_files="/flaski_private/cbioportal_data/"
+path_to_files="/flaski_private/cbioportal/"
 
 def fix_id(x):
     try:

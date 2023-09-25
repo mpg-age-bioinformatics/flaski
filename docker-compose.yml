@@ -25,8 +25,9 @@ services:
   environment:
    APP_NAME: myapp
    FLASK_ENV: init
-   RESTORE_DB: 0
-   RESTORE_USERS_DATA: 0
+   ADMINS: flaski@age.mpg.de
+   RESTORE_DB: 1
+   RESTORE_USERS_DATA: 1
    UPGRADE_DB: 1
    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
    SECRET_KEY: ${SECRET_KEY}
@@ -40,7 +41,6 @@ services:
   #  MAIL_PORT: 587
   #  MAIL_USE_TLS: 1
   #  MAIL_PASSWORD: ${MAIL_PASSWORD}
-   ADMINS: flaski@age.mpg.de
   #  MAIL_SERVER: mail.age.mpg.de
    MAIL_USERNAME: flaski@age.mpg.de
   links:
