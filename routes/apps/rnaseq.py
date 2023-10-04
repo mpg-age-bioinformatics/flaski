@@ -323,8 +323,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "circRNA":"None",
             },
             "raven":{
-                "cytoscape_host":"/nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/cytoscape.ip.txt",
-                "cytoscape_ip_mount":"-B /nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/cytoscape.ip.txt_inuse:/cytoscape.ip.txt",
+                "cytoscape_ip_mount":"",
                 "homefolder":"", 
                 "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
                 "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.jboucas" ,"sample_sheet.xlsx"),
