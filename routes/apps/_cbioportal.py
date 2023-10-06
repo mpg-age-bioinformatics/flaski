@@ -209,18 +209,18 @@ def plot_gene(gene_list, dataset, lp, hp):
     return df, fig, cph_coeff, cph_stats,pa, input_df
 
 
-def read_results_files(cache,path_to_files=path_to_files):
+def read_results_files(cache, path_to_files=path_to_files):  #cache
     @cache.memoize(60*60*2) # 2 hours
     def _read_results_files(path_to_files=path_to_files):
-        df=pd.read_csv(path_to_files+"all.datasets.csv",sep="\t")
-        #df=df.loc[ ~ df["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
-        return df.to_json()
-    return pd.read_json(_read_results_files())
+        df=pd.read_csv(path_to_files+"all.datasets.formatted.csv",sep="\t", dtype=str)
+        return df.to_json(orient='records', default_handler=str )
+    return pd.read_json(_read_results_files(), dtype=str)
+
 
 def read_meta_files(cache,path_to_files=path_to_files):
     @cache.memoize(60*60*2) # 2 hours
     def _read_meta_files(path_to_files=path_to_files):
-        df=pd.read_csv(path_to_files+"all_meta_data.csv",sep="\t")
+        df=pd.read_csv(path_to_files+"all.metaData.formatted.csv",sep="\t")
         return df.to_json()
     return pd.read_json(_read_meta_files())
 
@@ -238,18 +238,18 @@ def filter_data(cache, datasets=None, genes=None):
     @cache.memoize(60*60*2) # 2 hours
     def _filter_data(cache, datasets=None, genes=None):
         results_files=read_results_files(cache)
-   
+
         if datasets:
-            results_files=results_files[ results_files['dataset'].isin( datasets ) ]
+            results_files=results_files[ results_files['Dataset'].isin( datasets ) ]
 
         if genes:
-            results_files=results_files[ results_files['Hugo_Symbol'].isin( genes ) ]
+            results_files=results_files[ results_files['Hugo Symbol'].isin( genes ) ]
 
         if datasets and genes:
-            results_files=results_files[ results_files['dataset'].isin( datasets ) & (results_files['Hugo_Symbol'].isin( genes )) ]
+            results_files=results_files[ results_files['Dataset'].isin( datasets ) & (results_files['Hugo Symbol'].isin( genes )) ]
 
         return results_files
-    return _filter_data(cache, datasets, genes)
+    return _filter_data(cache, datasets, genes) 
 
 
 

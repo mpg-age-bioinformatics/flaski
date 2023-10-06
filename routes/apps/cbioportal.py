@@ -105,7 +105,6 @@ def make_layout(session_id):
     db.session.add(eventlog)
     db.session.commit()
 
-
     def make_loading(children,i):
         return dcc.Loading(
             id=f"menu-load-{i}",
@@ -202,8 +201,7 @@ def update_datasets(session_id):
 
     meta=read_meta_files(cache)
     meta=meta["short_name"].tolist()
-    # results_files=read_results_files(cache)
-    # datasets_=list(set([s for s in results_files["dataset"] if s not in ['pcpg_tcga', 'meso_tcga']]))
+    
     datasets=make_options(meta)
 
     return datasets
@@ -212,8 +210,9 @@ def update_datasets(session_id):
 @dashapp.callback(
     Output(component_id='opt-genenames', component_property='options'),
     Input('session-id', 'data'),
-    Input('opt-datasets', 'value') )
-def update_genes(session_id, datasets):
+    Input('opt-datasets', 'value'),
+    Input('sig-only', 'value'), )
+def update_genes(session_id, datasets, sig_only):
     sub=filter_data(datasets=datasets, cache=cache)
     
     if datasets:
@@ -222,8 +221,11 @@ def update_genes(session_id, datasets):
         datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
    
         sub=filter_data(datasets=datasets, cache=cache)
+
+    if len(sig_only) > 0 and sig_only[0] == 'disable':
+        sub=sub.loc[ (sub["P.adj(LLRT)"].astype(float) < 0.05) & (sub["P.Value(PHT)"].astype(float) >= 0.05)]
     
-    genes_=list(set( sub["Hugo_Symbol"].tolist() ))
+    genes_=list(set( sub["Hugo Symbol"].tolist() ))
     genes=make_options(genes_)
     return genes
 
@@ -259,29 +261,9 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
         ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
         datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
     
-    
     selected_results_files=filter_data(datasets=datasets, cache=cache)
-    selected_results_files=selected_results_files.loc[ ~ selected_results_files["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
+    results_files=selected_results_files
 
-    cols={"Hugo_Symbol" : "Hugo Symbol",
-          "n_low" : "N Low (25%)",
-          "n_high" : "N High (75%)",
-          "p(log_likelihood_ratio_test)" : "P.Value(LLRT)",
-          "padj(log_likelihood_ratio_test)" : "P.adj(LLRT)" ,
-          "p(proportional_hazard_test)" : "P.Value(PHT)",
-          "dataset" : "Dataset"
-        }
-    
-
-    selected_results_files["p(log_likelihood_ratio_test)"]=selected_results_files["p(log_likelihood_ratio_test)"].apply(lambda x : nFormat(x))
-    selected_results_files["padj(log_likelihood_ratio_test)"]=selected_results_files["padj(log_likelihood_ratio_test)"].apply(lambda x : nFormat(x))
-    selected_results_files["p(proportional_hazard_test)"]=selected_results_files["p(proportional_hazard_test)"].apply(lambda x : nFormat(x))
-
-
-    results_files=selected_results_files[list(cols.keys())]
-    results_files=results_files.rename(columns=cols)
-     
-    results_files=results_files.drop_duplicates()
     results_files_=make_table(results_files,"results_files")
     download_samples=html.Div( 
         [
@@ -300,7 +282,6 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
         sig_bol=True
     else:
         sig_bol=False
-
 
     #if datasets and (len(sig_only) > 0 and sig_only[0]) == True:
     if datasets and (len(sig_only) > 0 and sig_only[0]) == 'disable':
@@ -785,21 +766,8 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
         datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
     
     selected_results_files=filter_data(datasets=datasets, genes=genenames, cache=cache)
-    selected_results_files=selected_results_files.loc[ ~ selected_results_files["dataset"].isin(['pcpg_tcga', 'meso_tcga']) ]
-
-    cols={"Hugo_Symbol" : "Hugo Symbol",
-          "n_low" : "N Low (25%)",
-          "n_high" : "N High (75%)",
-          "p(log_likelihood_ratio_test)" : "P.Value(LLRT)",
-          "padj(log_likelihood_ratio_test)" : "P.adj(LLRT)" ,
-          "p(proportional_hazard_test)" : "P.Value(PHT)",
-          "dataset" : "Dataset"
-        }
     
-
-    results_files=selected_results_files[list(cols.keys())]
-    results_files=results_files.rename(columns=cols)
-    results_files=results_files.drop_duplicates()
+    results_files=selected_results_files
 
     results_files_to_save=results_files
     fileprefix=secure_filename(str(fileprefix))
