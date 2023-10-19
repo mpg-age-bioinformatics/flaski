@@ -4,7 +4,7 @@ _PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intr
 _PUBLIC_VIEWS = ['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
-    _DEV_ROUTES=[  "agebot", "cbioportal" ]  #"cbioportal",
+    _DEV_ROUTES=[  "agebot" ]  #"cbioportal",
     _PRIVATE_ROUTES = _PRIVATE_ROUTES + _DEV_ROUTES
 
 _META_TAGS=[{'name':'title', 'property':'og:title', 'content':'flaski' },\
