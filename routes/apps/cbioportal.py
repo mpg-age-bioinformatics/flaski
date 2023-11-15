@@ -200,7 +200,7 @@ def percentiles_block(session_id, sig_only):
 def update_datasets(session_id):
 
     meta=read_meta_files(cache)
-    meta=meta["short_name"].tolist()
+    meta=meta["study label"].tolist()
     
     datasets=make_options(meta)
 
@@ -217,8 +217,8 @@ def update_genes(session_id, datasets, sig_only):
     
     if datasets:
         meta_files=read_meta_files(cache)
-        ds_mapping=meta_files[["cancer_study_identifier", "short_name"]]
-        datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+        ds_mapping=meta_files[["study identifier", "study label"]]
+        datasets=ds_mapping.loc[ ds_mapping["study label"].isin(datasets), "study identifier"].tolist()
    
         sub=filter_data(datasets=datasets, cache=cache)
 
@@ -248,7 +248,7 @@ def update_genes(session_id, datasets, sig_only):
 def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc, sig_only, download_name): #, geneids:
     
     meta_files_or=read_meta_files(cache=cache)
-    meta_files=meta_files_or[["type_of_cancer", "cancer_study_identifier", "name", "citation" ]]
+    meta_files=meta_files_or[["cancer type", "study identifier", "study label", "name", "citation" ]]
     meta_files_=make_table(meta_files, "meta_files")
     download_meta=html.Div( 
         [
@@ -258,8 +258,8 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
     )
 
     if datasets:
-        ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
-        datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+        ds_mapping=meta_files_or[["study identifier", "study label"]]
+        datasets=ds_mapping.loc[ ds_mapping["study label"].isin(datasets), "study identifier"].tolist()
     
     selected_results_files=filter_data(datasets=datasets, cache=cache)
     results_files=selected_results_files
@@ -340,6 +340,8 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
         #print(ds)
 
         df, fig, cph_coeff, cph_stats,args, input_df=plot_gene(genenames, ds, lp=lower_pc, hp=higher_pc) #results_files
+
+        #print(input_df)
 
         tmp=cph_coeff[[s for s in cph_coeff.columns.tolist() if "cmp" not in s]].T
         tmp=tmp.reset_index(drop=False)
@@ -460,9 +462,25 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
                 "margin-left":4,\
                 "margin-right":4,\
                 'background-color': "#5474d8", \
-                "color":"white"
-                })
-        ]) 
+                "color":"white",\
+                "display": 'inline-block'
+                }),
+
+            html.Button(id='btn-lsData', n_clicks=0, children='Input Data', 
+            style={"margin-top":4, 'background-color': "#5474d8", "color":"white", 'display': 'inline-block'}
+                ),
+            dcc.Download(id="download-lsData")
+
+        ])
+
+        # download_lsData=html.Div( 
+        # [
+        #     html.Button(id='btn-lsData', n_clicks=0, children='Download', 
+        #     style={"margin-top":4, 'background-color': "#5474d8", "color":"white", 'display': 'inline-block'}
+        #         ),
+        #     dcc.Download(id="download-lsData")
+        # ]
+    # )
         
         surv_fig_bol = True
     else:
@@ -481,7 +499,7 @@ def update_output(session_id, n_clicks, datasets, genenames, lower_pc, higher_pc
 
         out=dcc.Tabs(
             [ 
-                dcc.Tab( [ fig_plot_, lifespan_app_tab2],
+                dcc.Tab( [ fig_plot_, lifespan_app_tab2 ],
                         label="Lifespan curve", id="tab-survPLOT", 
                         style={"margin-top":"0%"}),
                 dcc.Tab([ results_files_, download_samples], 
@@ -697,8 +715,8 @@ def cbioportal_to_lifespan(n_clicks,datasets, genenames, lp,hp ):
     if n_clicks:
         if datasets:
             meta_files_or=read_meta_files(cache=cache)
-            ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
-            datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+            ds_mapping=meta_files_or[["study identifier", "study label"]]
+            datasets=ds_mapping.loc[ ds_mapping["study label"].isin(datasets), "study identifier"].tolist()
 
         df, fig, cph_coeff, cph_stats,args, df_input=plot_gene(gene_list=genenames, dataset=datasets[0], lp=lp, hp=hp)
 
@@ -739,13 +757,48 @@ def cbioportal_to_lifespan(n_clicks,datasets, genenames, lp,hp ):
 def download_meta(n_clicks,fileprefix):
     
     meta_files_or=read_meta_files(cache=cache)
-    meta_files=meta_files_or[["type_of_cancer", "cancer_study_identifier", "name", "citation" ]]
+    meta_files=meta_files_or[["cancer type", "study identifier", "study label", "name", "citation" ]]
     
     results_files_to_save=meta_files
     fileprefix=secure_filename(str(fileprefix))
     filename="%s.studies.meta.data.xlsx" %fileprefix
 
     return dcc.send_data_frame(results_files_to_save.to_excel, filename, sheet_name="cbioportal.studies", index=False)
+
+
+
+###########################################
+
+@dashapp.callback(
+    Output("download-lsData", "data"),
+    Input("btn-lsData", "n_clicks"),
+    State("opt-datasets", "value"),
+    State("opt-genenames", "value"),
+    State("lower_percentile", "value"),
+    State("higher_percentile", "value"),
+    State('download_name', 'value'),
+    prevent_initial_call=True,
+)
+def download_lsData(n_clicks, ds, genenames, lower_pc, higher_pc, fileprefix):
+
+    meta_files_or=read_meta_files(cache=cache)
+    if ds:
+        ds_mapping=meta_files_or[["study identifier", "study label"]]
+        ds=ds_mapping.loc[ ds_mapping["study label"].isin(ds), "study identifier"].tolist()
+
+    g=genenames[0]
+    d=ds[0]
+
+    df, fig, cph_coeff, cph_stats,args, input_df=plot_gene(genenames, d, lp=lower_pc, hp=higher_pc) #results_files
+    
+    results_files_to_save=input_df
+    fileprefix=secure_filename(str(fileprefix))
+    filename="%s.lifespan.data.%s.%s.xlsx" % (fileprefix, g, d)
+
+    return dcc.send_data_frame(results_files_to_save.to_excel, filename, sheet_name="cbioportal.lifespan.data", index=False)
+
+
+###########################################
 
 @dashapp.callback(
     Output("download-samples", "data"),
@@ -762,8 +815,8 @@ def download_samples(n_clicks,datasets,genenames, low_perc, high_perc, sig_only,
 
     meta_files_or=read_meta_files(cache=cache)
     if datasets:
-        ds_mapping=meta_files_or[["cancer_study_identifier", "short_name"]]
-        datasets=ds_mapping.loc[ ds_mapping["short_name"].isin(datasets), "cancer_study_identifier"].tolist()
+        ds_mapping=meta_files_or[["study identifier", "study label"]]
+        datasets=ds_mapping.loc[ ds_mapping["study label"].isin(datasets), "study identifier"].tolist()
     
     selected_results_files=filter_data(datasets=datasets, genes=genenames, cache=cache)
     

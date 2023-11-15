@@ -91,9 +91,11 @@ def plot_gene(gene_list, dataset, lp, hp):
     cols=mrna.columns.tolist()
 
     if ( "Hugo_Symbol" in cols ) and ( "Entrez_Gene_Id" in cols ) :
-        mrna["Entrez_Gene_Id"]=mrna["Entrez_Gene_Id"].apply(lambda x: fix_id(x) )
-        mrna.index=mrna["Hugo_Symbol"]+"_"+mrna["Entrez_Gene_Id"]
+        mrna.index=mrna["Hugo_Symbol"]
         mrna=mrna.drop(["Hugo_Symbol","Entrez_Gene_Id"], axis=1)
+        # mrna["Entrez_Gene_Id"]=mrna["Entrez_Gene_Id"].apply(lambda x: fix_id(x) )
+        # mrna.index=mrna["Hugo_Symbol"]+"_"+mrna["Entrez_Gene_Id"]
+        # mrna=mrna.drop(["Hugo_Symbol","Entrez_Gene_Id"], axis=1)
     elif ( "Hugo_Symbol" in cols ) :
         mrna.index=mrna["Hugo_Symbol"]
         mrna=mrna.drop(["Hugo_Symbol"], axis=1)
@@ -202,6 +204,7 @@ def plot_gene(gene_list, dataset, lp, hp):
         groups_settings.append(group_dic)
 
     pa["groups_settings"]=groups_settings
+    
 
     df, fig, cph_coeff, cph_stats, input_df=survival_ls(clinical,pa)
 
@@ -212,7 +215,7 @@ def plot_gene(gene_list, dataset, lp, hp):
 def read_results_files(cache, path_to_files=path_to_files):  #cache
     @cache.memoize(60*60*2) # 2 hours
     def _read_results_files(path_to_files=path_to_files):
-        df=pd.read_csv(path_to_files+"all.datasets.formatted.csv",sep="\t", dtype=str)
+        df=pd.read_csv(path_to_files+"all.datasets.gene.names.cleaned.csv",sep="\t", dtype=str)
         return df.to_json(orient='records', default_handler=str )
     return pd.read_json(_read_results_files(), dtype=str)
 
