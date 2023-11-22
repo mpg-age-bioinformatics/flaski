@@ -23,7 +23,8 @@ def read_results_files(cache,path_to_files=path_to_files):
     return pd.read_json(_read_results_files())
 
 def read_gene_expression(cache,path_to_files=path_to_files):
-    @cache.memoize(60*60*2)
+    # @cache.memoize(60*60*2)
+    # currently failing to read gene_expression with caching
     def _read_gene_expression(path_to_files=path_to_files):
         df=pd.read_csv(path_to_files+"gene_expression.tsv",sep="\t",index_col=[0])
         return df.to_json()
