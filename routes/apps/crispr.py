@@ -10,7 +10,7 @@ from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_nav
 import dash_bootstrap_components as dbc
 from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session
 from pyflaski.scatterplot import make_figure, figure_defaults
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
+from myapp.routes.apps._utils import check_access, make_options, GROUPS, GROUPS_INITALS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
 import io
@@ -26,6 +26,7 @@ from werkzeug.utils import secure_filename
 from myapp import db
 from myapp.models import UserLogging
 from time import sleep
+import zipfile
 
 PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
 PYFLASKI_VERSION=str(PYFLASKI_VERSION)
@@ -165,6 +166,15 @@ def generate_submission_file(samplenames, \
     BAGEL_ESSENTIAL,\
     BAGEL_NONESSENTIAL,\
     mageckflute_organism,\
+    magecku_fdr, \
+    magecku_threshold_control_groups,\
+    magecku_threshold_treatment_groups, \
+    use_neg_ctrl, \
+    using_master_library,\
+    acer_master_library,\
+    facs,\
+    ctrl_guides,\
+    mle_matrices,\
     ONLY_COUNT ):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(
@@ -193,6 +203,15 @@ def generate_submission_file(samplenames, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
+        magecku_fdr, \
+        magecku_threshold_control_groups,\
+        magecku_threshold_treatment_groups, \
+        use_neg_ctrl, \
+        using_master_library,\
+        acer_master_library,\
+        facs,\
+        ctrl_guides,\
+        mle_matrices,\
         ONLY_COUNT
         ):
         samplenames_df=make_df_from_rows(samplenames)
@@ -226,6 +245,15 @@ def generate_submission_file(samplenames, \
                 "BAGEL_ESSENTIAL",\
                 "BAGEL_NONESSENTIAL",\
                 "mageckflute_organism",\
+                "magecku_fdr", \
+                "magecku_threshold_control_groups",\
+                "magecku_threshold_treatment_groups", \
+                "use_neg_ctrl", \
+                "using_master_library",\
+                "acer_master_library",\
+                "facs",\
+                "ctrl_guides",\
+                "mle_matrices",\
                 "ONLY_COUNT"
                 ],\
             "Value":[
@@ -254,16 +282,173 @@ def generate_submission_file(samplenames, \
                 BAGEL_ESSENTIAL,\
                 BAGEL_NONESSENTIAL,\
                 mageckflute_organism,\
+                magecku_fdr, \
+                magecku_threshold_control_groups,\
+                magecku_threshold_treatment_groups, \
+                use_neg_ctrl, \
+                using_master_library,\
+                acer_master_library,\
+                facs,\
+                ctrl_guides,\
+                mle_matrices,\
                 ONLY_COUNT
                 ]
-             }, index=list(range(26)))
+             }, index=list(range(35)))
 
         df_=df_.to_json()
      
         filename=make_submission_file(".crispr.xlsx")
 
+        filename=os.path.basename(filename)
 
-        return {"filename": filename, "sampleNames":samplenames_df, "samples":samples_df, "library":library_df, "crispr":df_}
+        json_filename=filename.replace(".xlsx",".json")
+
+        paths={ "raven":{
+            "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+            "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+            "run_data":"/raven/ptmp/flaski/projects/"
+            },
+            "studio":{
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/nexus/posix0/MAGE-flaski/service/projects/data/"
+            },
+            "local":{
+                "code":"none",
+                "raw_data":"<path_to_raw_data>",
+                "run_data":"<path_to_run_data>",
+            }
+        }
+
+        if group != "External" :
+            if group in GROUPS :
+                project_folder=group+"/"+GROUPS_INITALS[group]+"_at_"+secure_filename(experiment_name)
+            else:
+                user_domain=[ s.replace(" ","") for s in email.split(",") if "mpg.de" in s ]
+                user_domain=user_domain[0].split("@")[-1]
+                mps_domain="mpg.de"
+                tag=user_domain.split(".mpg.de")[0]
+
+                project_folder=group+"/"+tag+"_at_"+secure_filename(experiment_name)
+        else:
+            project_folder="Bioinformatics/bit_ext_at_"+secure_filename(experiment_name)
+
+        nf={}
+
+        for location in list(paths.keys()) :
+            code=paths[location]["code"]
+            raw_data=paths[location]["raw_data"]
+            run_data=paths[location]["run_data"]
+            if gmt_file == "msigdb.v7.2.symbols.gmt" :
+                gmt_file = "/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+            else:
+                gmt_file = f"/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/{gmt_file}"
+
+
+            nf_={ 
+                "email":email,
+                "group":group,
+                "project_title":experiment_name,
+                "image_folder":"/nexus/posix0/MAGE-flaski/service/images/" ,
+                "project_folder" : os.path.join(run_data,project_folder),
+                "reference_file": os.path.join(code, filename),
+                "raw_fastq": os.path.join(raw_data, folder),
+                "renamed_fastq": os.path.join(run_data,"raw_renamed"),
+                "fastqc_raw_data" : os.path.join(run_data,"raw_renamed"),
+                "cutadapt_raw_data" : os.path.join(run_data,"raw_renamed"),
+                "sgRNA_size" : sgRNA_size,
+                "SSC_sgRNA_size" : SSC_sgRNA_size,
+                "upstreamseq" : upstreamseq,
+                "library" : os.path.join(run_data,"library.csv"),
+                "input_count" : os.path.join(run_data,"cutadapt_output"), 
+                "output_count" : "mageck_output/count",
+                "mageck_counts_type":"mageck",
+                "samples_tsv": os.path.join(run_data,"samples.tsv"),
+                "output_test":"mageck_output/test",
+                "mageck_test_remove_zero": mageck_test_remove_zero,
+                "mageck_test_remove_zero_threshold": mageck_test_remove_zero_threshold , 
+                "cnv_file": "/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/CCLE_copynumber_byGene_2013-12-03.txt",
+                "cnv_line": cnv_line,
+                "output_mle": "mageck_output/mle",
+                "efficiency_matrix": f"/SSC0.1/matrix/{efficiency_matrix}",
+                "mle_matrices": os.path.join(raw_data, folder),
+                "library_xlsx": os.path.join(run_data, "library.xlsx"),
+                "gmt_file":gmt_file,
+                "output_pathway":"mageck_output/pathway",
+                "output_plot":"mageck_output/plot",
+                "output_vispr":"mageck_output/vispr",
+                "vispr_fastqc": os.path.join(run_data, "fastqc_output"),
+                "vispr_species":species,
+                "vispr_assembly":assembly,
+                "output_flute":"mageck_output/flute",
+                "mageckflute_organism":mageckflute_organism,
+                "depmap":depmap,
+                "depmap_cell_line":depmap_cell_line,
+                "ouput_mageck_count" : os.path.join(run_data, "mageck_output/count"),
+                "output_magecku":"mageck_output/magecku",
+                "magecku_fdr":magecku_fdr,
+                "magecku_threshold_control_groups":magecku_threshold_control_groups,
+                "magecku_threshold_treatment_groups":magecku_threshold_treatment_groups,
+                "output_bagel": os.path.join(run_data, "bagel_output"),
+                "bagel_essential":BAGEL_ESSENTIAL,
+                "bagel_nonessential":BAGEL_NONESSENTIAL,
+                "output_drugz": os.path.join(run_data, "drugz_output"), 
+                "output_acer":os.path.join(run_data, "acer_output"), 
+                "use_neg_ctrl":use_neg_ctrl,
+                "using_master_library":using_master_library,
+                "acer_master_library":acer_master_library,
+                "md5sums":md5sums,\
+                "output_maude":os.path.join(run_data, "maude_output"),
+                "facs":facs,
+                "ctrl_guides":ctrl_guides,
+                "mle_matrices":mle_matrices,
+                "skip_mle":skip_mle
+            }
+
+            if not use_neg_ctrl :
+                del(nf_["use_neg_ctrl"])
+                del(nf_["using_master_library"])
+                del(nf_["acer_master_library"])
+                del(nf_["output_acer"])
+
+            if not facs :
+                del(nf_["output_maude"])
+                del(nf_["facs"])
+                del(nf_["ctrl_guides"])
+
+            if skip_mle == "True" :
+                del(nf_["output_mle"])
+            
+            if not gmt_file:
+                del(nf_["gmt_file"])
+            
+            if not mle_matrices:
+                del(nf_["mle_matrices"])
+            
+            if not efficiency_matrix:
+                del(nf_["efficiency_matrix"])
+            
+            if depmap == 'False':
+                del(nf_["depmap"])
+                del(nf_["depmap_cell_line"])
+
+            if not depmap_cell_line :
+                del(nf_["depmap_cell_line"])
+
+            if not magecku_fdr:
+                del(nf_["output_magecku"])
+                del(nf_["magecku_fdr"])
+                del(nf_["magecku_threshold_control_groups"])
+                del(nf_["magecku_threshold_treatment_groups"])
+
+            nf[location]=nf_
+        
+        nf=json.dumps(nf)
+
+        json_config={filename:{"sampleNames":samplenames_df, "samples":samples_df, "library":library_df, "crispr":df_ }, json_filename:nf }
+
+        return { "filename": filename, "json_filename":json_filename, "json":json_config }
+        # return {"filename": filename, "sampleNames":samplenames_df, "samples":samples_df, "library":library_df, "crispr":df_}
     return _generate_submission_file(
         samplenames, \
         samples, \
@@ -290,6 +475,15 @@ def generate_submission_file(samplenames, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism ,\
+        magecku_fdr, \
+        magecku_threshold_control_groups,\
+        magecku_threshold_treatment_groups, \
+        use_neg_ctrl, \
+        using_master_library,\
+        acer_master_library,\
+        facs,\
+        ctrl_guides,\
+        mle_matrices,\
         ONLY_COUNT
     )
 
@@ -556,7 +750,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('CNV line') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='cnv_line', options=CELL_LINES, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('[mageck test] The name of the cell line to be used for copy number variation  to normalize CNV-biased sgRNA scores prior to gene ranking.'),md=3  ), 
+                dbc.Col( html.Label('[mageck test] The name of the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -621,6 +815,15 @@ def make_app_content(pathname):
                 dbc.Col( html.Label('Skip MLE') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='skip_mle', options=TRUE_FALSE, value='False', style={ "width":"100%"}),md=3 ), 
                 dbc.Col( html.Label('[MLE] Skip MLE when not needed / applicable'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('MLE matrices') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='mle_matrices', placeholder="folder_name", type='text', style={ "width":"100%"} ) ,md=3 ), 
+                dbc.Col( html.Label('[MLE] If MLE matrices are provided please put them all in one folder together with your raw data'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -690,6 +893,70 @@ def make_app_content(pathname):
         ),
         dbc.Row( 
             [
+                dbc.Col( html.Label('MageckU FDR') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='magecku_fdr', value="0.05", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[magecku] Significance cutoff for magecku'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('MageckU Tresh. Ctrl') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='magecku_threshold_control_groups', value="5", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[magecku] Counts threshold for control groups - applied on counts table pre-mageck test.'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('MageckU Tresh. Treat.') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='magecku_threshold_treatment_groups', value="5", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[magecku] Counts threshold for treatment groups - applied on counts table pre-mageck test.'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),       
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Acer neg. ctrl.') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='use_neg_ctrl', options=make_options(["T","F"]), style={ "width":"100%"}),md=3  ),
+                dbc.Col( html.Label('[Acer] Use negative control.'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Acer master library') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='using_master_library', options=make_options(["T","F"]), style={ "width":"100%"}),md=3 ) ,
+                dbc.Col( html.Label('[Acer] User Acer master library.'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Acer master library') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input( id='acer_master_library', type='text', style={ "width":"100%"} ) ,md=3  ) ,
+                dbc.Col( html.Label('[Acer] Acer master library.'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Maude FACS input') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input( id='facs', placeholder="facs.file.tsv", type='text', style={ "width":"100%"} ) ,md=3  ) ,
+                dbc.Col( html.Label('[Maude] Tab separated values file with FACS results for Maude'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Maude Ctrl guides') ,md=3 , style={"textAlign":"right" }),
+                dbc.Col( dcc.Input( id='ctrl_guides', placeholder="ctrl.guides.tsv", type='text', style={ "width":"100%"} ) ,md=3  ) ,
+                dbc.Col( html.Label('[Maude] One column file with control sgRNAs ids'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
+        dbc.Row( 
+            [
                 dbc.Col( html.Label('Only count') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown(id='ONLY_COUNT', options=TRUE_FALSE, value="False", style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('[mageck] Stop workflow after mageck count'),md=3  ), 
@@ -697,6 +964,10 @@ def make_app_content(pathname):
             style={"margin-top":10}
         ),
     ]
+
+# Maude::
+#   "facs":"",
+#   "ctrl_guides":
 
     card=[
         dbc.Card( 
@@ -846,6 +1117,15 @@ fields = [
     "BAGEL_ESSENTIAL",\
     "BAGEL_NONESSENTIAL",\
     "mageckflute_organism",\
+    "magecku_fdr", \
+    "magecku_threshold_control_groups",\
+    "magecku_threshold_treatment_groups", \
+    "use_neg_ctrl", \
+    "using_master_library",\
+    "acer_master_library",\
+    "facs",\
+    "ctrl_guides",\
+    "mle_matrices",\
     "ONLY_COUNT"
 ]
 
@@ -944,6 +1224,15 @@ def update_output(n_clicks, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
+        magecku_fdr, \
+        magecku_threshold_control_groups,\
+        magecku_threshold_treatment_groups, \
+        use_neg_ctrl, \
+        using_master_library,\
+        acer_master_library,\
+        facs,\
+        ctrl_guides,\
+        mle_matrices,\
         ONLY_COUNT ):
     # header, msg = check_access( 'rnaseq' )
     # header, msg = None, None # for local debugging 
@@ -1019,6 +1308,15 @@ def update_output(n_clicks, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
+        magecku_fdr, \
+        magecku_threshold_control_groups,\
+        magecku_threshold_treatment_groups, \
+        use_neg_ctrl, \
+        using_master_library,\
+        acer_master_library,\
+        facs,\
+        ctrl_guides,\
+        mle_matrices,\
         ONLY_COUNT )
 
     # samples=pd.read_json(subdic["samples"])
@@ -1028,6 +1326,15 @@ def update_output(n_clicks, \
     # if validation:
     #     header="Attention"
     #     return header, validation
+
+    filename=subdic["filename"]
+    json_filename=subdic["json_filename"]
+    json_config=subdic["json"]
+
+    json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
+
+    # print(json_config[os.path.basename(json_filename)]["studio"])
+
 
     if os.path.isfile(subdic["filename"]):
         header="Attention"
@@ -1044,28 +1351,72 @@ def update_output(n_clicks, \
     # if user_domain[-len(mps_domain):] == mps_domain :
     # if user_domain !="age.mpg.de" :
         # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
-    subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
-    sampleNames=pd.read_json(subdic["sampleNames"])
-    samples=pd.read_json(subdic["samples"])
-    library=pd.read_json(subdic["library"])
-    arguments=pd.read_json(subdic["crispr"])
 
-    ftp_user=send_submission_ftp_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=subdic["filename"], attachment_path=subdic["filename"], ftp_user=ftp)
-    arguments=pd.concat([arguments,ftp_user])
+        filename=os.path.join("/submissions_ftp/",filename)
+        json_filename=os.path.join("/submissions_ftp/",json_filename)
+        filename_=os.path.basename(filename)
+        json_filename_=os.path.basename(json_filename)
+        
+        # subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
-    samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs",   "List of control genes" ]].to_excel(EXCout,"samples",index=None)
-    library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
-    arguments.to_excel(EXCout,"crispr",index=None)
-    EXCout.save()
+        sampleNames=pd.read_json(json_config[filename_]["sampleNames"])
+        samples=pd.read_json(json_config[filename_]["samples"])
+        library=pd.read_json(json_config[filename_]["library"])
+        arguments=pd.read_json(json_config[filename_]["crispr"])
 
+        def writeout(subdic=subdic, json_config=json_config, json_filename=json_filename, arguments=arguments,filename=filename ):
+            EXCout=pd.ExcelWriter(filename)
+            sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
+            samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes" ]].to_excel(EXCout,"samples",index=None)
+            library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
+            arguments.to_excel(EXCout,"crispr",index=None)
+            EXCout.save()
+        
+            with open(json_filename, "w") as out:
+                json.dump(json_config,out)
+
+        writeout()
+
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="crispr", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
+        arguments=pd.concat([arguments,ftp_user])
+        ftp_user=ftp_user["Value"].tolist()[0]
+        raw_folder=json_config[os.path.basename(json_filename)]["raven"]["raw_fastq"]
+        raw_folder=os.path.join( raw_folder, ftp_user  )
+        json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
+        json_config[os.path.basename(json_filename)]["studio"]["ftp"]=ftp_user
+
+        ## keep on from here
+        json_config[os.path.basename(json_filename)]["raven"]["raw_fastq"]=raw_folder
+        json_config[os.path.basename(json_filename)]["studio"]["raw_fastq"]=raw_folder
+        BAGEL_NONESSENTIAL_=json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]
+        if json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"] != "/bagel/NEGv1.txt" :
+            json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]=os.path.join(raw_folder,BAGEL_NONESSENTIAL_)
+        BAGEL_ESSENTIAL_=json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]
+        if json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"] != "/bagel/CEGv2.txt" :
+            json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL_)
+
+        writeout(json_config=json_config, arguments=arguments )
+
+        # json_config=json.dumps(json_config)
+
+        def write_archive(bytes_io):
+            with zipfile.ZipFile(bytes_io, mode="w") as zf:
+                for f in [ filename, json_filename ]:
+                    zf.write(f,  os.path.basename(f) )
+
+        return header, msg, dcc.send_bytes(write_archive, os.path.basename(filename).replace("xlsx","zip") )
+
+    else:
+        json_config=json.dumps(json_config)
+
+        return header, msg, dict(content=json_config, filename=os.path.basename(json_filename)) 
 
 
     # if user_domain == "age.mpg.de" :
     # send_submission_email(user=current_user, submission_type="crispr", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
-    return header, msg, dcc.send_file( subdic["filename"] )
+    # return header, msg, dcc.send_file( subdic["filename"] )
     # else:
         #     send_submission_ftp_email(user=current_user, submission_type="RNAseq", submission_file=os.path.basename(subdic["filename"]), attachment_path=subdic["filename"])
     # except:

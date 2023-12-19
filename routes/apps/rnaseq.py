@@ -302,6 +302,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
                 "run_data":"/raven/ptmp/flaski/projects/"
             },
+            "studio":{
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/nexus/posix0/MAGE-flaski/service/projects/data/"
+            },
             "local":{
                 "raw_data":"<path_to_raw_data>",
                 "run_data":"<path_to_run_data>",
@@ -330,6 +335,17 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
                 "kallisto_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
                 "featurecounts_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/rnaseq" ,
+                "circRNA":"None",
+            },
+            "studio":{
+                "cytoscape_ip_mount":"",
+                "homefolder":"", 
+                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
+                "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
+                "kallisto_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
+                "featurecounts_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
                 "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/rnaseq" ,
                 "circRNA":"None",
             },
