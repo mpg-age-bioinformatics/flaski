@@ -167,6 +167,7 @@ def generate_submission_file(samplenames, \
     BAGEL_ESSENTIAL,\
     BAGEL_NONESSENTIAL,\
     mageckflute_organism,\
+    nontargeting_tag,\
     magecku_fdr, \
     magecku_threshold_control_groups,\
     magecku_threshold_treatment_groups, \
@@ -205,6 +206,7 @@ def generate_submission_file(samplenames, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
+        nontargeting_tag,\
         magecku_fdr, \
         magecku_threshold_control_groups,\
         magecku_threshold_treatment_groups, \
@@ -248,6 +250,7 @@ def generate_submission_file(samplenames, \
                 "BAGEL_ESSENTIAL",\
                 "BAGEL_NONESSENTIAL",\
                 "mageckflute_organism",\
+                "nontargeting_tag",\
                 "magecku_fdr", \
                 "magecku_threshold_control_groups",\
                 "magecku_threshold_treatment_groups", \
@@ -286,6 +289,7 @@ def generate_submission_file(samplenames, \
                 BAGEL_ESSENTIAL,\
                 BAGEL_NONESSENTIAL,\
                 mageckflute_organism,\
+                nontargeting_tag,\
                 magecku_fdr, \
                 magecku_threshold_control_groups,\
                 magecku_threshold_treatment_groups, \
@@ -297,7 +301,7 @@ def generate_submission_file(samplenames, \
                 mle_matrices,\
                 ONLY_COUNT
                 ]
-             }, index=list(range(36)))
+             }, index=list(range(37)))
 
         df_=df_.to_json()
      
@@ -383,9 +387,10 @@ def generate_submission_file(samplenames, \
                 "mageckflute_organism":mageckflute_organism,
                 "depmap":depmap,
                 "depmap_cell_line":depmap_cell_line,
-                "ouput_mageck_count" : os.path.join(run_data, "mageck_output/count"),
+                "output_mageck_count" : os.path.join(run_data, "mageck_output/count"),
                 "output_magecku":"mageck_output/magecku",
                 "magecku_fdr":magecku_fdr,
+                "nontargeting_tag": nontargeting_tag ,
                 "magecku_threshold_control_groups":magecku_threshold_control_groups,
                 "magecku_threshold_treatment_groups":magecku_threshold_treatment_groups,
                 "output_bagel": os.path.join(run_data, "bagel_output"),
@@ -435,6 +440,7 @@ def generate_submission_file(samplenames, \
                 del(nf_["depmap_cell_line"])
 
             if not magecku_fdr:
+                del(nf_["nontargeting_tag"])
                 del(nf_["output_magecku"])
                 del(nf_["magecku_fdr"])
                 del(nf_["magecku_threshold_control_groups"])
@@ -478,6 +484,7 @@ def generate_submission_file(samplenames, \
         magecku_fdr, \
         magecku_threshold_control_groups,\
         magecku_threshold_treatment_groups, \
+        nontargeting_tag,\
         use_neg_ctrl, \
         using_master_library,\
         acer_master_library,\
@@ -911,7 +918,7 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('MageckU Tresh. Ctrl') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='magecku_threshold_control_groups', value="5", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('[magecku] Counts threshold for control groups - applied on counts table pre-mageck test.'),md=3  ), 
+                dbc.Col( html.Label('[magecku] Counts threshold for control groups - applied on counts table pre-mageck test'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
@@ -919,10 +926,18 @@ def make_app_content(pathname):
             [
                 dbc.Col( html.Label('MageckU Tresh. Treat.') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='magecku_threshold_treatment_groups', value="5", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('[magecku] Counts threshold for treatment groups - applied on counts table pre-mageck test.'),md=3  ), 
+                dbc.Col( html.Label('[magecku] Counts threshold for treatment groups - applied on counts table pre-mageck test'),md=3  ), 
             ], 
             style={"margin-top":10}
-        ),       
+        ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('MageckU nontargeting tag') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='nontargeting_tag', value="Non-Targeting Control", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[magecku] How the non targeting controls are labele'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Acer neg. ctrl.') ,md=3 , style={"textAlign":"right" }), 
@@ -1129,6 +1144,7 @@ fields = [
     "magecku_fdr", \
     "magecku_threshold_control_groups",\
     "magecku_threshold_treatment_groups", \
+    "nontargeting_tag",\
     "use_neg_ctrl", \
     "using_master_library",\
     "acer_master_library",\
@@ -1237,6 +1253,7 @@ def update_output(n_clicks, \
         magecku_fdr, \
         magecku_threshold_control_groups,\
         magecku_threshold_treatment_groups, \
+        nontargeting_tag,\
         use_neg_ctrl, \
         using_master_library,\
         acer_master_library,\
@@ -1322,6 +1339,7 @@ def update_output(n_clicks, \
         magecku_fdr, \
         magecku_threshold_control_groups,\
         magecku_threshold_treatment_groups, \
+        nontargeting_tag,\
         use_neg_ctrl, \
         using_master_library,\
         acer_master_library,\
