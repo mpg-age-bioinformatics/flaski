@@ -149,6 +149,7 @@ def generate_submission_file(samplenames, \
     experiment_name,\
     folder,\
     md5sums,\
+    cnv_file,\
     cnv_line,\
     upstreamseq,\
     sgRNA_size,\
@@ -186,6 +187,7 @@ def generate_submission_file(samplenames, \
         experiment_name,\
         folder,\
         md5sums,\
+        cnv_file,\
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
@@ -228,6 +230,7 @@ def generate_submission_file(samplenames, \
                 "folder",\
                 "Folder",\
                 "md5sums",\
+                "cnv_file",\
                 "cnv_line",\
                 "upstreamseq",\
                 "sgRNA_size",\
@@ -265,6 +268,7 @@ def generate_submission_file(samplenames, \
                 folder,\
                 folder,\
                 md5sums,\
+                cnv_file,\
                 cnv_line,\
                 upstreamseq,\
                 sgRNA_size,\
@@ -293,7 +297,7 @@ def generate_submission_file(samplenames, \
                 mle_matrices,\
                 ONLY_COUNT
                 ]
-             }, index=list(range(35)))
+             }, index=list(range(36)))
 
         df_=df_.to_json()
      
@@ -339,11 +343,6 @@ def generate_submission_file(samplenames, \
             code=paths[location]["code"]
             raw_data=paths[location]["raw_data"]
             run_data=paths[location]["run_data"]
-            if gmt_file == "msigdb.v7.2.symbols.gmt" :
-                gmt_file = "/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
-            else:
-                gmt_file = f"/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/{gmt_file}"
-
 
             nf_={ 
                 "email":email,
@@ -367,7 +366,7 @@ def generate_submission_file(samplenames, \
                 "output_test":"mageck_output/test",
                 "mageck_test_remove_zero": mageck_test_remove_zero,
                 "mageck_test_remove_zero_threshold": mageck_test_remove_zero_threshold , 
-                "cnv_file": "/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/CCLE_copynumber_byGene_2013-12-03.txt",
+                "cnv_file": cnv_file,
                 "cnv_line": cnv_line,
                 "output_mle": "mageck_output/mle",
                 "efficiency_matrix": f"/SSC0.1/matrix/{efficiency_matrix}",
@@ -458,6 +457,7 @@ def generate_submission_file(samplenames, \
         experiment_name,\
         folder,\
         md5sums,\
+        cnv_file,\
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
@@ -745,7 +745,15 @@ def make_app_content(pathname):
                 dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
             ], 
-            style={ "margin-top":10, "margin-bottom":10 }),   
+            style={ "margin-top":10, "margin-bottom":10 }),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('CNV file') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='cnv_file', value="CCLE_copynumber_byGene_2013-12-03.txt", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[mageck test] The name of file containing the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
         dbc.Row( 
             [
                 dbc.Col( html.Label('CNV line') ,md=3 , style={"textAlign":"right" }), 
@@ -1100,6 +1108,7 @@ fields = [
     "folder",\
     "md5sums",\
     "ftp",\
+    "cnv_file",\
     "cnv_line",\
     "upstreamseq",\
     "sgRNA_size",\
@@ -1207,6 +1216,7 @@ def update_output(n_clicks, \
         folder,\
         md5sums,\
         ftp,\
+        cnv_file,\
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
@@ -1291,6 +1301,7 @@ def update_output(n_clicks, \
         experiment_name,\
         folder,\
         md5sums,\
+        cnv_file,\
         cnv_line,\
         upstreamseq,\
         sgRNA_size,\
@@ -1387,16 +1398,33 @@ def update_output(n_clicks, \
         json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
         json_config[os.path.basename(json_filename)]["studio"]["ftp"]=ftp_user
 
+
         ## keep on from here
         json_config[os.path.basename(json_filename)]["raven"]["raw_fastq"]=raw_folder
         json_config[os.path.basename(json_filename)]["studio"]["raw_fastq"]=raw_folder
-        BAGEL_NONESSENTIAL_=json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]
-        if json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"] != "/bagel/NEGv1.txt" :
-            json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]=os.path.join(raw_folder,BAGEL_NONESSENTIAL_)
-        BAGEL_ESSENTIAL_=json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]
-        if json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"] != "/bagel/CEGv2.txt" :
-            json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL_)
 
+        if BAGEL_NONESSENTIAL != "/bagel/NEGv1.txt" :
+            json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]=os.path.join(raw_folder,BAGEL_NONESSENTIAL)
+            json_config[os.path.basename(json_filename)]["studio"]["bagel_nonessential"]=os.path.join(raw_folder,BAGEL_NONESSENTIAL)
+        
+        if BAGEL_ESSENTIAL != "/bagel/CEGv2.txt" :
+            json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL)
+            json_config[os.path.basename(json_filename)]["studio"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL)
+        
+        if gmt_file == "msigdb.v7.2.symbols.gmt" :
+            json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+            json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+        else:
+            json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
+            json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
+        
+        if cnv_file == "CCLE_copynumber_byGene_2013-12-03.txt" :
+            json_config[os.path.basename(json_filename)]["raven"]["cnv_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/CCLE_copynumber_byGene_2013-12-03.txt"
+            json_config[os.path.basename(json_filename)]["studio"]["cnv_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/CCLE_copynumber_byGene_2013-12-03.txt"
+        else:
+            json_config[os.path.basename(json_filename)]["raven"]["cnv_file"]=os.path.join(raw_folder,cnv_file)
+            json_config[os.path.basename(json_filename)]["studio"]["cnv_file"]=os.path.join(raw_folder,cnv_file)
+        
         writeout(json_config=json_config, arguments=arguments )
 
         # json_config=json.dumps(json_config)
