@@ -302,7 +302,7 @@ def generate_submission_file(samplenames, \
                 ONLY_COUNT
                 ]
              }, index=list(range(37)))
-
+        
         df_=df_.to_json()
      
         filename=make_submission_file(".crispr.xlsx")
@@ -436,8 +436,8 @@ def generate_submission_file(samplenames, \
                 del(nf_["depmap"])
                 del(nf_["depmap_cell_line"])
 
-            if not depmap_cell_line :
-                del(nf_["depmap_cell_line"])
+            # if not depmap_cell_line :
+            #     del(nf_["depmap_cell_line"])
 
             if not magecku_fdr:
                 del(nf_["nontargeting_tag"])
