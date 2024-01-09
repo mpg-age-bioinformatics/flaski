@@ -179,11 +179,10 @@ def generate_submission_file(samplenames, \
     mle_matrices,\
     ONLY_COUNT ):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(
-        samplenames, \
-        samples, \
-        library, \
-        email, \
+    def _generate_submission_file(samplenames,\
+        samples,\
+        library,\
+        email,\
         group,\
         experiment_name,\
         folder,\
@@ -207,17 +206,16 @@ def generate_submission_file(samplenames, \
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
         nontargeting_tag,\
-        magecku_fdr, \
+        magecku_fdr,\
         magecku_threshold_control_groups,\
-        magecku_threshold_treatment_groups, \
-        use_neg_ctrl, \
+        magecku_threshold_treatment_groups,\
+        use_neg_ctrl,\
         using_master_library,\
         acer_master_library,\
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT
-        ):
+        ONLY_COUNT):
         samplenames_df=make_df_from_rows(samplenames)
         samples_df=make_df_from_rows(samples)
         library_df=make_df_from_rows(library)
@@ -354,19 +352,22 @@ def generate_submission_file(samplenames, \
                 "project_title":experiment_name,
                 "image_folder":"/nexus/posix0/MAGE-flaski/service/images/" ,
                 "project_folder" : os.path.join(run_data,project_folder),
-                "reference_file": os.path.join(code, filename),
-                "raw_fastq": os.path.join(raw_data, folder),
-                "renamed_fastq": os.path.join(run_data,"raw_renamed"),
-                "fastqc_raw_data" : os.path.join(run_data,"raw_renamed"),
-                "cutadapt_raw_data" : os.path.join(run_data,"raw_renamed"),
+                "reference_file": os.path.join(code,project_folder, "scripts.flaski", filename),
+                "raw_fastq": os.path.join(raw_data),
+                "renamed_fastq": os.path.join(run_data,project_folder,"raw_renamed"),
+                "fastqc_raw_data" : os.path.join(run_data,project_folder,"raw_renamed"),
+                "cutadapt_raw_data" : os.path.join(run_data,project_folder,"raw_renamed"),
+                "renamed" : os.path.join(run_data,project_folder,"raw_renamed"),
+                "clean_reads" : os.path.join(run_data,project_folder,"cutadapt_output"),
+                "fastqc_clean" : "fastqc_clean_output",
                 "sgRNA_size" : sgRNA_size,
                 "SSC_sgRNA_size" : SSC_sgRNA_size,
                 "upstreamseq" : upstreamseq,
-                "library" : os.path.join(run_data,"library.csv"),
-                "input_count" : os.path.join(run_data,"cutadapt_output"), 
+                "library" : os.path.join(run_data,project_folder,"library.csv"),
+                "input_count" : os.path.join(run_data,project_folder,"cutadapt_output"), 
                 "output_count" : "mageck_output/count",
                 "mageck_counts_type":"mageck",
-                "samples_tsv": os.path.join(run_data,"samples.tsv"),
+                "samples_tsv": os.path.join(run_data,project_folder,"samples.tsv"),
                 "output_test":"mageck_output/test",
                 "mageck_test_remove_zero": mageck_test_remove_zero,
                 "mageck_test_remove_zero_threshold": mageck_test_remove_zero_threshold , 
@@ -374,42 +375,42 @@ def generate_submission_file(samplenames, \
                 "cnv_line": cnv_line,
                 "output_mle": "mageck_output/mle",
                 "efficiency_matrix": f"/SSC0.1/matrix/{efficiency_matrix}",
-                "mle_matrices": os.path.join(raw_data, folder),
-                "library_xlsx": os.path.join(run_data, "library.xlsx"),
+                "mle_matrices": os.path.join(raw_data),
+                "library_xlsx": os.path.join(run_data, project_folder,"library.xlsx"),
                 "gmt_file":gmt_file,
                 "output_pathway":"mageck_output/pathway",
                 "output_plot":"mageck_output/plot",
                 "output_vispr":"mageck_output/vispr",
-                "vispr_fastqc": os.path.join(run_data, "fastqc_output"),
+                "vispr_fastqc": os.path.join(run_data,project_folder,"fastqc_output"),
                 "vispr_species":species,
                 "vispr_assembly":assembly,
                 "output_flute":"mageck_output/flute",
                 "mageckflute_organism":mageckflute_organism,
                 "depmap":depmap,
                 "depmap_cell_line":depmap_cell_line,
-                "output_mageck_count" : os.path.join(run_data, "mageck_output/count"),
+                "output_mageck_count" : os.path.join(run_data,project_folder,"mageck_output/count"),
                 "output_magecku":"mageck_output/magecku",
                 "magecku_fdr":magecku_fdr,
                 "nontargeting_tag": nontargeting_tag ,
                 "magecku_threshold_control_groups":magecku_threshold_control_groups,
                 "magecku_threshold_treatment_groups":magecku_threshold_treatment_groups,
-                "output_bagel": os.path.join(run_data, "bagel_output"),
+                "output_bagel": os.path.join(run_data,project_folder,"bagel_output"),
                 "bagel_essential":BAGEL_ESSENTIAL,
                 "bagel_nonessential":BAGEL_NONESSENTIAL,
-                "output_drugz": os.path.join(run_data, "drugz_output"), 
-                "output_acer":os.path.join(run_data, "acer_output"), 
+                "output_drugz": os.path.join(run_data,project_folder,"drugz_output"), 
+                "output_acer":os.path.join(run_data,project_folder,"acer_output"), 
                 "use_neg_ctrl":use_neg_ctrl,
                 "using_master_library":using_master_library,
                 "acer_master_library":acer_master_library,
                 "md5sums":md5sums,\
-                "output_maude":os.path.join(run_data, "maude_output"),
+                "output_maude":os.path.join(run_data,project_folder,"maude_output"),
                 "facs":facs,
                 "ctrl_guides":ctrl_guides,
                 "mle_matrices":mle_matrices,
                 "skip_mle":skip_mle
             }
 
-            if not use_neg_ctrl :
+            if use_neg_ctrl == "F" :
                 del(nf_["use_neg_ctrl"])
                 del(nf_["using_master_library"])
                 del(nf_["acer_master_library"])
@@ -481,10 +482,10 @@ def generate_submission_file(samplenames, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism ,\
+        nontargeting_tag ,\
         magecku_fdr, \
         magecku_threshold_control_groups,\
         magecku_threshold_treatment_groups, \
-        nontargeting_tag,\
         use_neg_ctrl, \
         using_master_library,\
         acer_master_library,\
@@ -1141,10 +1142,10 @@ fields = [
     "BAGEL_ESSENTIAL",\
     "BAGEL_NONESSENTIAL",\
     "mageckflute_organism",\
+    "nontargeting_tag",\
     "magecku_fdr", \
     "magecku_threshold_control_groups",\
     "magecku_threshold_treatment_groups", \
-    "nontargeting_tag",\
     "use_neg_ctrl", \
     "using_master_library",\
     "acer_master_library",\
@@ -1250,10 +1251,10 @@ def update_output(n_clicks, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
+        nontargeting_tag,\
         magecku_fdr, \
         magecku_threshold_control_groups,\
         magecku_threshold_treatment_groups, \
-        nontargeting_tag,\
         use_neg_ctrl, \
         using_master_library,\
         acer_master_library,\
@@ -1309,11 +1310,10 @@ def update_output(n_clicks, \
                 msg='''One or more samples in your list of control or treated samples does not match the sample names.'''
                 return header, msg, dash.no_update
 
-
-    subdic=generate_submission_file( samplenames, \
-        samples, \
-        library, \
-        email, \
+    subdic=generate_submission_file( samplenames,\
+        samples,\
+        library,\
+        email,\
         group,\
         experiment_name,\
         folder,\
@@ -1336,18 +1336,18 @@ def update_output(n_clicks, \
         BAGEL_ESSENTIAL,\
         BAGEL_NONESSENTIAL,\
         mageckflute_organism,\
-        magecku_fdr, \
-        magecku_threshold_control_groups,\
-        magecku_threshold_treatment_groups, \
         nontargeting_tag,\
-        use_neg_ctrl, \
+        magecku_fdr,\
+        magecku_threshold_control_groups,\
+        magecku_threshold_treatment_groups,\
+        use_neg_ctrl,\
         using_master_library,\
         acer_master_library,\
         facs,\
         ctrl_guides,\
         mle_matrices,\
         ONLY_COUNT )
-
+    
     # samples=pd.read_json(subdic["samples"])
     # metadata=pd.read_json(subdic["metadata"])
 
@@ -1394,6 +1394,7 @@ def update_output(n_clicks, \
         samples=pd.read_json(json_config[filename_]["samples"])
         library=pd.read_json(json_config[filename_]["library"])
         arguments=pd.read_json(json_config[filename_]["crispr"])
+        print(arguments)
 
         def writeout(subdic=subdic, json_config=json_config, json_filename=json_filename, arguments=arguments,filename=filename ):
             EXCout=pd.ExcelWriter(filename)
@@ -1408,6 +1409,9 @@ def update_output(n_clicks, \
 
         writeout()
 
+        print(ftp)
+        print(current_user)
+        print(json_filename)
         ftp_user=send_submission_ftp_email(user=current_user, submission_type="crispr", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
         arguments=pd.concat([arguments,ftp_user])
         ftp_user=ftp_user["Value"].tolist()[0]
@@ -1420,6 +1424,11 @@ def update_output(n_clicks, \
         ## keep on from here
         json_config[os.path.basename(json_filename)]["raven"]["raw_fastq"]=raw_folder
         json_config[os.path.basename(json_filename)]["studio"]["raw_fastq"]=raw_folder
+        
+        if mle_matrices:
+            json_config[os.path.basename(json_filename)]["raven"]["mle_matrices"]=os.path.join(raw_folder,mle_matrices)
+            json_config[os.path.basename(json_filename)]["studio"]["mle_matrices"]=os.path.join(raw_folder,mle_matrices)
+
 
         if BAGEL_NONESSENTIAL != "/bagel/NEGv1.txt" :
             json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]=os.path.join(raw_folder,BAGEL_NONESSENTIAL)
