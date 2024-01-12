@@ -411,10 +411,10 @@ def generate_submission_file(samplenames, \
                 del(nf_["use_neg_ctrl"])
                 del(nf_["using_master_library"])
                 del(nf_["acer_master_library"])
-                del(nf_["output_acer"])
+                # del(nf_["output_acer"])
 
             if not facs :
-                del(nf_["output_maude"])
+                # del(nf_["output_maude"])
                 del(nf_["facs"])
                 del(nf_["ctrl_guides"])
 
@@ -1391,12 +1391,11 @@ def update_output(n_clicks, \
         samples=pd.read_json(json_config[filename_]["samples"])
         library=pd.read_json(json_config[filename_]["library"])
         arguments=pd.read_json(json_config[filename_]["crispr"])
-        print(arguments)
 
         def writeout(subdic=subdic, json_config=json_config, json_filename=json_filename, arguments=arguments,filename=filename ):
             EXCout=pd.ExcelWriter(filename)
             sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
-            samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes" ]].to_excel(EXCout,"samples",index=None)
+            samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes", "CNV line" ]].to_excel(EXCout,"samples",index=None)
             library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
             arguments.to_excel(EXCout,"crispr",index=None)
             EXCout.save()
@@ -1406,9 +1405,6 @@ def update_output(n_clicks, \
 
         writeout()
 
-        print(ftp)
-        print(current_user)
-        print(json_filename)
         ftp_user=send_submission_ftp_email(user=current_user, submission_type="crispr", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
         arguments=pd.concat([arguments,ftp_user])
         ftp_user=ftp_user["Value"].tolist()[0]
