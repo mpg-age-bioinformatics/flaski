@@ -407,16 +407,24 @@ def generate_submission_file(samplenames, \
                 "skip_mle":skip_mle
             }
 
-            if use_neg_ctrl == "F" :
+            # if use_neg_ctrl == "F" :
+            if not use_neg_ctrl:
                 del(nf_["use_neg_ctrl"])
                 del(nf_["using_master_library"])
                 del(nf_["acer_master_library"])
                 # del(nf_["output_acer"])
 
-            if not facs :
-                # del(nf_["output_maude"])
-                del(nf_["facs"])
-                del(nf_["ctrl_guides"])
+            if not nontargeting_tag:
+                del(nf_["magecku_fdr"])
+                del(nf_["nontargeting_tag"])
+                del(nf_["magecku_threshold_control_groups"])
+                del(nf_["magecku_threshold_treatment_groups"])
+                del(nf_["output_magecku"])
+
+            # if not facs :
+            #     # del(nf_["output_maude"])
+            #     del(nf_["facs"])
+            #     del(nf_["ctrl_guides"])
 
             if skip_mle == "True" :
                 del(nf_["output_mle"])
@@ -931,8 +939,8 @@ def make_app_content(pathname):
         dbc.Row( 
             [
                 dbc.Col( html.Label('MageckU nontargeting tag') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='nontargeting_tag', value="Non-Targeting Control", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label('[magecku] How the non targeting controls are labele'),md=3  ), 
+                dbc.Col( dcc.Input(id='nontargeting_tag', placeholder="Non-Targeting Control", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( html.Label('[magecku] How the non targeting controls are labelled'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
