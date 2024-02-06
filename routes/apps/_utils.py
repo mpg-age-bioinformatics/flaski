@@ -547,7 +547,7 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
 
     today=str(date.today())
     
-    if ftp_user == "" :
+    if ( ftp_user == "" ) or ( not ftp_user) :
 
         ftp_user=user_generator()
         ftp_pass=password_generator()

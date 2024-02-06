@@ -1411,15 +1411,12 @@ def update_output(n_clicks, \
         ftp_user=send_submission_ftp_email(user=current_user, submission_type="crispr", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
         arguments=pd.concat([arguments,ftp_user])
         ftp_user=ftp_user["Value"].tolist()[0]
-        raw_folder=json_config[os.path.basename(json_filename)]["raven"]["raw_fastq"]
+        raw_folder=json_config[json_filename_]["raven"]["raw_fastq"]
         raw_folder=os.path.join( raw_folder, ftp_user  )
-        json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
-        json_config[os.path.basename(json_filename)]["studio"]["ftp"]=ftp_user
-
-
-        ## keep on from here
-        json_config[os.path.basename(json_filename)]["raven"]["raw_fastq"]=raw_folder
-        json_config[os.path.basename(json_filename)]["studio"]["raw_fastq"]=raw_folder
+        json_config[json_filename_]["raven"]["ftp"]=ftp_user
+        json_config[json_filename_]["studio"]["ftp"]=ftp_user
+        json_config[json_filename_]["raven"]["raw_fastq"]=raw_folder
+        json_config[json_filename_]["studio"]["raw_fastq"]=raw_folder
 
         if BAGEL_NONESSENTIAL != "/bagel/NEGv1.txt" :
             json_config[os.path.basename(json_filename)]["raven"]["bagel_nonessential"]=os.path.join(raw_folder,BAGEL_NONESSENTIAL)
