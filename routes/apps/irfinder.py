@@ -420,8 +420,6 @@ def read_file(contents,filename,last_modified):
         else:
             values_to_return.append( dash.no_update )
 
-    print(values_to_return)
-
     return [ input_df ] +  values_to_return + [ filename ]
 
 # main submission call
