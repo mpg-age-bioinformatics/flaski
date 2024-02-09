@@ -76,23 +76,23 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, intron_len, wget, ftp):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,intron_len, wget, ftp):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "wget" ],\
-                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, wget ]}, index=list(range(8)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC", "Small introns detection", "wget" ],\
+                          "Value":[email,group,folder,md5sums,project_title, organism, ercc, intron_len, wget ]}, index=list(range(9)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".IRfinder.xlsx")
 
         return {"filename": filename, "samples":df, "metadata":df_}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,intron_len, wget, ftp)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -281,11 +281,18 @@ Once you have been given access more information will be displayed on how to tra
             style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
+                dbc.Col( html.Label('Small introns detection') ,md=3 , style={"textAlign":"right" }),
+                dbc.Col( dcc.Dropdown( id='opt-intron-len', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Whether to detect introns <50bp'),md=3  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}),
+        dbc.Row( 
+            [
                 dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right"}), 
                 dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
-                dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
+                dbc.Col( html.Label("If data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
             ], 
-            style={ "margin-top":10, "margin-bottom":10 }),      
+            style={ "margin-top":10, "margin-bottom":10 }),   
         dbc.Row( 
             [
                 dbc.Col( html.Label('wget') ,md=3 , style={"textAlign":"right" }), 
@@ -371,6 +378,7 @@ Once you have been given access more information will be displayed on how to tra
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
     Output('opt-ercc', 'value'),
+    Output('opt-intron-len', 'value'),
     Output('wget', 'value'),
     Output('ftp', 'value'), 
     Output('upload-data-text', 'children'),
@@ -401,7 +409,7 @@ def read_file(contents,filename,last_modified):
     input_df.style_table["height"]="62vh"
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "wget", "ftp" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "Small introns detection", "wget", "ftp" ]
     # for f in fields_to_return:
     #     values_to_return.append(  IRfinder[IRfinder["Field"]==f]["Value"].tolist()[0]  )
 
@@ -411,6 +419,8 @@ def read_file(contents,filename,last_modified):
             values_to_return.append(  IRfinder[IRfinder["Field"]==f]["Value"].tolist()[0]  )
         else:
             values_to_return.append( dash.no_update )
+
+    print(values_to_return)
 
     return [ input_df ] +  values_to_return + [ filename ]
 
@@ -429,10 +439,11 @@ def read_file(contents,filename,last_modified):
     State('project_title', 'value'),
     State('opt-organism', 'value'),
     State('opt-ercc', 'value'),
+    State('opt-intron-len', 'value'),
     State('wget', 'value'),
     State('ftp', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, wget, ftp):
+def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, intron_len, wget, ftp):
     header, msg = check_access( 'irfinder' )
     # header, msg = None, None # for local debugging 
     if msg :
@@ -440,7 +451,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     if not wget:
         wget="NONE"
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc, wget, ftp)
+    subdic=generate_submission_file(rows,email,group,folder,md5sums,project_title,organism,ercc,intron_len,wget,ftp)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
 
