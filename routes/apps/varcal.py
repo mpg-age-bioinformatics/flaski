@@ -79,17 +79,17 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism, model,targeted,wget, ftp):
+def generate_submission_file(rows, email,group,folder,md5sums,project_title,organism, model,targeted, ercc, wget, ftp):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,model,targeted,wget,ftp):
+    def _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,model,targeted,ercc,wget,ftp):
         df=pd.DataFrame()
         for row in rows:
             if row['Read 1'] != "" :
                 df_=pd.DataFrame(row,index=[0])
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
-        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "model","targeted Exomes","wget"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism,model,targeted, wget]}, index=list(range(9)))
+        df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "model","targeted Exomes","ERCC","wget"],\
+                          "Value":[email,group,folder,md5sums,project_title, organism,model,targeted,ercc, wget]}, index=list(range(10)))
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".variantCalling.xlsx")
@@ -106,10 +106,16 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "organism":organism,
             "model":model,
             "targeted":targeted,
+            "ercc":ercc,
             "wget":wget,
             "ftp":ftp
         }
 
+        ercc_dic={
+            "ercc_label" : "ercc92" ,
+            "url_ercc_gtf" : "https://datashare.mpcdf.mpg.de/s/MOxbNrXeBNcg9wt/download" ,
+            "url_ercc_fa" : "https://datashare.mpcdf.mpg.de/s/H9PQu3vDRi9saqV/download"
+        }
 
         species={
             "celegans":{
@@ -383,6 +389,16 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             for s in ["r2d2","raven","studio","local"] :
                 nf[s][k]=meta[k]
 
+        if ercc != "NO" :
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","local"] :
+                    nf[s][k]=ercc_dic[k]
+        else:
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","local"] :
+                    nf[s][k]=""
+
+
         species_release=species[organism]["current_release"]
         species_release=species[organism][species_release]
         for k in list(species_release.keys()):
@@ -403,7 +419,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         json_config={filename:{"samples":df, "variantCalling":df_ }, json_filename:nf }
 
         return {"filename": filename,"json_filename":json_filename, "json":json_config}
-    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,model,targeted,wget, ftp)
+    return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,model,targeted,ercc, wget, ftp)
 
 
 @dashapp.callback(
@@ -451,7 +467,7 @@ def make_app_content(session_id):
     # generate dropdown options
     organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
     organisms_=make_options(organisms)
-    # ercc_=make_options(["YES","NO"])
+    ercc_=make_options(["YES","NO"])
     model_=make_options(["WES","WGS"])
 
     readme_age='''
@@ -608,13 +624,13 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
             ], 
             style={"margin-top":10}),
-        # dbc.Row( 
-        #     [
-        #         dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
-        #         dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
-        #         dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
-        #     ], 
-        #     style={"margin-top":10,"margin-bottom":10}),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
                 dbc.Col( html.Label('model') ,md=3 , style={"textAlign":"right" }), 
@@ -720,7 +736,7 @@ Once you have been given access more information will be displayed on how to tra
     Output('md5sums', 'value'),
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
-    # Output('opt-ercc', 'value'),
+    Output('opt-ercc', 'value'),
     Output('opt-model', 'value'),
     Output('targeted', 'value'),
     Output('wget', 'value'),
@@ -753,7 +769,7 @@ def read_file(contents,filename,last_modified):
     input_df.style_table["height"]="62vh"
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "model", "targeted Exomes", "wget", "ftp"  ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "model", "targeted Exomes", "ERCC", "wget", "ftp"  ]
     for f in fields_to_return:
         values_to_return.append(  variantCalling[variantCalling["Field"]==f]["Value"].tolist()[0]  )
 
@@ -773,13 +789,13 @@ def read_file(contents,filename,last_modified):
     State('md5sums', 'value'),
     State('project_title', 'value'),
     State('opt-organism', 'value'),
-    # State('opt-ercc', 'value'),
+    State('opt-ercc', 'value'),
     State('opt-model', 'value'),
     State('targeted', 'value'),
     State('wget', 'value'),
     State('ftp', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, model,targeted,wget, ftp):
+def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, model,targeted,ercc, wget, ftp):
     header, msg = check_access( 'varcal' )
     if not msg:
         authorized = True
@@ -800,7 +816,7 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
         group="Bioinformatics"
 
 
-    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,model,targeted, wget, ftp)
+    subdic=generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,model,targeted, ercc, wget, ftp)
     filename=subdic["filename"]
     json_filename=subdic["json_filename"]
     json_config=subdic["json"]
