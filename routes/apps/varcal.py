@@ -89,7 +89,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 df=pd.concat([df,df_])
         df.reset_index(inplace=True, drop=True)
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "model","targeted Exomes","ERCC","wget"],\
-                          "Value":[email,group,folder,md5sums,project_title, organism,model,targeted,ercc, wget]}, index=list(range(10)))
+                          "Value":[email,group,folder,md5sums,project_title, organism,model,targeted,ercc, wget]}, index=list(range(10))) 
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".variantCalling.xlsx")
@@ -626,16 +626,16 @@ Once you have been given access more information will be displayed on how to tra
             style={"margin-top":10}),
         dbc.Row( 
             [
-                dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
+                dbc.Col( html.Label('model') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-model', options=model_, style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('WES: whole exome seq; WGS: whole genome seq'),md=6  ), 
             ], 
             style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
             [
-                dbc.Col( html.Label('model') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Dropdown( id='opt-model', options=model_, style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('WES: whole exome seq; WGS: whole genome seq'),md=6  ), 
+                dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_,value="NO", style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
             ], 
             style={"margin-top":10,"margin-bottom":10}),
         dbc.Row( 
@@ -736,9 +736,9 @@ Once you have been given access more information will be displayed on how to tra
     Output('md5sums', 'value'),
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
-    Output('opt-ercc', 'value'),
     Output('opt-model', 'value'),
     Output('targeted', 'value'),
+    Output('opt-ercc', 'value'),
     Output('wget', 'value'),
     Output('ftp', 'value'), 
     Output('upload-data-text', 'children'),
@@ -789,9 +789,9 @@ def read_file(contents,filename,last_modified):
     State('md5sums', 'value'),
     State('project_title', 'value'),
     State('opt-organism', 'value'),
-    State('opt-ercc', 'value'),
     State('opt-model', 'value'),
     State('targeted', 'value'),
+    State('opt-ercc', 'value'),
     State('wget', 'value'),
     State('ftp', 'value'),
     prevent_initial_call=True )
