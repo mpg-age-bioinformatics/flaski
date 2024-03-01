@@ -7,12 +7,15 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
+from myapp.routes.apps._utils import check_access, make_options, GROUPS, GROUPS_INITALS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
 import io
+import json
 import base64
 import pandas as pd
+import zipfile
+
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
 from werkzeug.utils import secure_filename
@@ -90,8 +93,299 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
         df=df.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".IRfinder.xlsx")
+        filename=os.path.basename(filename)
+        json_filename=filename.replace(".xlsx",".json")
 
-        return {"filename": filename, "samples":df, "metadata":df_}
+        meta={
+            "email":email,
+            "group":group,
+            "folder":folder,
+            "md5sums":md5sums,
+            "project_title":project_title,
+            "organism":organism,
+            "ercc":ercc,
+            "small_introns_detection":intron_len,
+            "wget":wget,
+            "ftp":ftp
+        }
+
+        ercc_dic={
+            "ercc_label" : "ercc92" ,
+            "url_ercc_gtf" : "https://datashare.mpcdf.mpg.de/s/MOxbNrXeBNcg9wt/download" ,
+            "url_ercc_fa" : "https://datashare.mpcdf.mpg.de/s/H9PQu3vDRi9saqV/download"
+        }
+
+        species={
+            "celegans":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/caenorhabditis_elegans/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"celegans_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "110":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/caenorhabditis_elegans/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"celegans_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "mmusculus":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/mus_musculus/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"mmusculus_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "110":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"mmusculus_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "hsapiens":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"hsapiens_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "110":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"hsapiens_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "dmelanogaster":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/drosophila_melanogaster/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"dmelanogaster_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "110":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/drosophila_melanogaster/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"dmelanogaster_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },
+            },
+            "nfurzeri":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/nothobranchius_furzeri/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"nfurzeri_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "110":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/nothobranchius_furzeri/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"nfurzeri_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+            "scerevisiae":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "biomart_host":"http://dec2021.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"scerevisiae_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "110":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"scerevisiae_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
+        }
+
+        if group != "External" :
+            if group in GROUPS :
+                project_folder=group+"/"+GROUPS_INITALS[group]+"_at_"+secure_filename(project_title)
+            else:
+                user_domain=[ s.replace(" ","") for s in email.split(",") if "mpg.de" in s ]
+                user_domain=user_domain[0].split("@")[-1]
+                mps_domain="mpg.de"
+                tag=user_domain.split(".mpg.de")[0]
+
+                project_folder=group+"/"+tag+"_at_"+secure_filename(project_title)
+        else:
+            project_folder="Bioinformatics/bit_ext_at_"+secure_filename(project_title)
+
+
+        paths={
+            "r2d2":{
+                "code":"/beegfs/group_bit/data/projects/departments/",
+                "raw_data":"/beegfs/group_bit/data/raw_data/departments/",
+                "run_data":"/beegfs/group_bit/data/projects/departments/"
+            },
+            "raven":{
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/raven/ptmp/flaski/projects/"
+            },
+            "studio":{
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/nexus/posix0/MAGE-flaski/service/projects/data/"
+            },
+            "local":{
+                "raw_data":"<path_to_raw_data>",
+                "run_data":"<path_to_run_data>",
+            }
+        }
+
+        nf={
+            "r2d2":{
+                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" ,"sample_sheet.xlsx"),
+                "fastqc_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
+                "IRquant_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data"),
+                "kallisto_raw_data" : "" ,
+                "genomes" : "/beegfs/common/genomes/nextflow_builds" ,
+                "read1_sufix" : ".READ_1.fastq.gz",
+                "fastqc_output" : "fastqc_output",
+                "mapping_output" : "",
+                "featurecounts" : ""
+
+            },
+            "raven":{
+                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
+                "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
+                "IRquant_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data"),
+                "kallisto_raw_data" : "" ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/IRfinder/" ,
+                "read1_sufix" : ".READ_1.fastq.gz",
+                "fastqc_output" : "fastqc_output",
+                "mapping_output" : "",
+                "featurecounts" : ""
+            },
+            "studio":{
+                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
+                "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
+                "IRquant_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data"),
+                "kallisto_raw_data" : "" ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/IRfinder/" ,
+                "read1_sufix" : ".READ_1.fastq.gz",
+                "fastqc_output" : "fastqc_output",
+                "mapping_output" : "",
+                "featurecounts" : ""
+            },
+            "local":{
+                "project_folder" : "<path_to_run_data>" ,
+                "samplestable": f"<path_to_run_data>/{filename}",
+                "fastqc_raw_data" :  "<path_to_raw_data>" ,
+                "kallisto_raw_data" : "" ,
+                "genomes" : "<path_to_run_data>" ,
+                "read1_sufix" : ".READ_1.fastq.gz",
+                "fastqc_output" : "fastqc_output",
+                "mapping_output" : "",
+                "featurecounts" : ""
+            }
+        }
+
+        for k in list(meta.keys()):
+            for s in ["r2d2","raven","studio","local"] :
+                nf[s][k]=meta[k]
+        
+        if ercc != "NO" :
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","studio","local"] :
+                    nf[s][k]=ercc_dic[k]
+        else:
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","studio","local"] :
+                    nf[s][k]=""
+
+
+        species_release=species[organism]["current_release"]
+        species_release=species[organism][species_release]
+        for k in list(species_release.keys()):
+            for s in ["r2d2","raven","studio","local"] :
+                nf[s][k]=species_release[k]
+
+        if organism in ["scerevisiae","nfurzeri"] :
+            del nf["r2d2"]["DAVIDUSER"]
+            del nf["r2d2"]["cytoscape_host"]
+            nf["r2d2"]["cytoscape_ip_mount"]=""
+        
+
+        nf=json.dumps(nf)
+
+        json_config={filename:{"samples":df, "IRfinder":df_ }, json_filename:nf }
+
+        return {"filename": filename,"json_filename":json_filename, "json":json_config}
     return _generate_submission_file(rows, email,group,folder,md5sums,project_title,organism,ercc,intron_len, wget, ftp)
 
 @dashapp.callback(
@@ -174,16 +468,28 @@ type in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI).
 Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combinations should be unique or files will be overwritten.
     '''
 
+    local_readme='''
+**Local runs**
+
+For running this pipeline on your local computer you can use the config generated here and follow the instructions on [https://github.com/mpg-age-bioinformatics/nextflow-IRFinder](https://github.com/mpg-age-bioinformatics/nextflow-IRFinder).
+
+For local usage, if multiple sequencing runs were performed and you need to concatenate files please do this ahead of generating the config file here.
+    '''
+
     readme_age=f'''
 {readme_age}
 
 {readme_common}
+
+{local_readme}
     '''
 
     readme_mps=f'''
 {readme_mps}
 
 {readme_common}
+
+{local_readme}
     '''
 
     readme_noaccess='''
@@ -192,18 +498,25 @@ Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combina
 Once you have been given access more information will be displayed on how to transfer your raw data.
     '''
 
+    readme_noaccess=local_readme
 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
 
     mps_domain="mpg.de"
-    #if user_domain[-len(mps_domain):] == mps_domain :
-    if user_domain =="age.mpg.de" :
-        readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
-        groups_=make_options(GROUPS)
-        groups_val=None
-        folder_row_style={"margin-top":10, 'display': 'none' }
-        folder="FTP"
+    if user_domain[-len(mps_domain):] == mps_domain :
+        if user_domain =="age.mpg.de" :
+            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
+            groups_=make_options(GROUPS)
+            groups_val=None
+            folder_row_style={"margin-top":10, 'display': 'none' }
+            folder="FTP"
+        elif not header_access :
+            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
+            groups_=make_options([user_domain])
+            groups_val=user_domain
+            folder_row_style={"margin-top":10, 'display': 'none' }
+            folder="FTP"
     elif not header_access :
         readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
         groups_=make_options([user_domain])
@@ -413,12 +726,12 @@ def read_file(contents,filename,last_modified):
     # for f in fields_to_return:
     #     values_to_return.append(  IRfinder[IRfinder["Field"]==f]["Value"].tolist()[0]  )
 
-    fields_on_file=IRfinder["Field"].tolist()
+    #fields_on_file=IRfinder["Field"].tolist()
     for f in fields_to_return:
-        if f in  fields_on_file:
-            values_to_return.append(  IRfinder[IRfinder["Field"]==f]["Value"].tolist()[0]  )
-        else:
-            values_to_return.append( dash.no_update )
+        #if f in  fields_on_file:
+        values_to_return.append(  IRfinder[IRfinder["Field"]==f]["Value"].tolist()[0]  )
+        # else:
+        #     values_to_return.append( dash.no_update )
 
     return [ input_df ] +  values_to_return + [ filename ]
 
@@ -444,14 +757,30 @@ def read_file(contents,filename,last_modified):
 def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, organism, ercc, intron_len, wget, ftp):
     header, msg = check_access( 'irfinder' )
     # header, msg = None, None # for local debugging 
-    if msg :
-        return header, msg, dash.no_update
-
+    if not msg :
+        authorized = True
+    else:
+        authorized = False
+        
     if not wget:
         wget="NONE"
+
+    user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+    mps_domain="mpg.de"
+
+    if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
+        group="Bioinformatics"
+
     subdic=generate_submission_file(rows,email,group,folder,md5sums,project_title,organism,ercc,intron_len,wget,ftp)
-    samples=pd.read_json(subdic["samples"])
-    metadata=pd.read_json(subdic["metadata"])
+    filename=subdic["filename"]
+    json_filename=subdic["json_filename"]
+    json_config=subdic["json"]
+
+    samples=pd.read_json(json_config[filename]["samples"])
+    metadata=pd.read_json(json_config[filename]["IRfinder"])
+
+    print(metadata)
 
     validation=validate_metadata(metadata)
     if validation:
@@ -466,31 +795,54 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
         header="Success!"
         msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
     
+    json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
 
-    user_domain=current_user.email
-    user_domain=user_domain.split("@")[-1]
-    mps_domain="mpg.de"
-    # if user_domain[-len(mps_domain):] == mps_domain :
-    # if user_domain !="age.mpg.de" :
-    subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"IRfinder",index=None)
-    EXCout.save()
+    if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
-    # if user_domain == "age.mpg.de" :
-    #     send_submission_email(user=current_user, submission_type="IRfinder", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
-    # else:
-    ftp_user=send_submission_ftp_email(user=current_user, submission_type="IRfinder", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"], ftp_user=ftp)
-    metadata=pd.concat([metadata,ftp_user])
+        # if user_domain != "age.mpg.de" :
+        filename=os.path.join("/submissions_ftp/",filename)
+        json_filename=os.path.join("/submissions_ftp/",json_filename)
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"IRfinder",index=None)
-    EXCout.save()
+        EXCout=pd.ExcelWriter(filename)
+        samples.to_excel(EXCout,"samples",index=None)
+        metadata.to_excel(EXCout,"IRfinder",index=None)
+        EXCout.save()
 
-    return header, msg, dcc.send_file( subdic["filename"] )
+        with open(json_filename, "w") as out:
+            json.dump(json_config,out)
+
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="IRfinder", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
+        metadata=pd.concat([metadata,ftp_user])
+
+        print(metadata)
+
+        EXCout=pd.ExcelWriter(filename)
+        samples.to_excel(EXCout,"samples",index=None)
+        metadata.to_excel(EXCout,"IRfinder",index=None)  
+        EXCout.save()
+
+        ftp_user=ftp_user["Value"].tolist()[0]
+        json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
+
+        with open(json_filename, "w") as out:
+            json.dump(json_config, out)
+
+        json_config=json.dumps(json_config)
+
+        def write_archive(bytes_io):
+            with zipfile.ZipFile(bytes_io, mode="w") as zf:
+                for f in [ filename, json_filename ]:
+                    zf.write(f,  os.path.basename(f) )
+
+        return header, msg, dcc.send_bytes(write_archive, os.path.basename(filename).replace("xlsx","zip") )
+    
+    else:
+        json_config=json.dumps(json_config)
+
+        return header, msg, dict(content=json_config, filename=os.path.basename(json_filename)) 
+
+
 
 # add rows buttom 
 @dashapp.callback(
