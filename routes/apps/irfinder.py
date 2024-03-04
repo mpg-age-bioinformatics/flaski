@@ -306,7 +306,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
         nf={
             "r2d2":{
-                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder, "/") ,
+                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
                 "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" ,"sample_sheet.xlsx"),
                 "fastqc_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data/") ,
                 "IRquant_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data/"),
@@ -320,7 +320,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
             },
             "raven":{
-                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder, "/") ,
+                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
                 "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
                 "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data/") ,
                 "IRquant_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data/"),
@@ -333,7 +333,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "featurecounts" : ""
             },
             "studio":{
-                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder, "/") ,
+                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
                 "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
                 "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data/") ,
                 "IRquant_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data/"),
