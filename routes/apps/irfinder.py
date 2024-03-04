@@ -306,12 +306,13 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
         nf={
             "r2d2":{
-                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
+                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder, "/") ,
                 "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" ,"sample_sheet.xlsx"),
-                "fastqc_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
-                "IRquant_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data"),
+                "fastqc_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data/") ,
+                "IRquant_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data/"),
+                "scripts" : os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas/"),
                 "kallisto_raw_data" : "" ,
-                "genomes" : "/beegfs/common/genomes/nextflow_builds" ,
+                "genomes" : "/beegfs/common/genomes/nextflow_builds/" ,
                 "read1_sufix" : ".READ_1.fastq.gz",
                 "fastqc_output" : "fastqc_output",
                 "mapping_output" : "",
@@ -319,10 +320,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
             },
             "raven":{
-                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
+                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder, "/") ,
                 "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
-                "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
-                "IRquant_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data"),
+                "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data/") ,
+                "IRquant_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data/"),
+                "scripts" : os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski/"),
                 "kallisto_raw_data" : "" ,
                 "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/IRfinder/" ,
                 "read1_sufix" : ".READ_1.fastq.gz",
@@ -331,10 +333,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "featurecounts" : ""
             },
             "studio":{
-                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
+                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder, "/") ,
                 "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
-                "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
-                "IRquant_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data"),
+                "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data/") ,
+                "IRquant_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data/"),
+                "scripts" : os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski/"),
                 "kallisto_raw_data" : "" ,
                 "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/IRfinder/" ,
                 "read1_sufix" : ".READ_1.fastq.gz",
@@ -780,8 +783,6 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
     samples=pd.read_json(json_config[filename]["samples"])
     metadata=pd.read_json(json_config[filename]["IRfinder"])
 
-    print(metadata)
-
     validation=validate_metadata(metadata)
     if validation:
         header="Attention"
@@ -814,8 +815,6 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
         ftp_user=send_submission_ftp_email(user=current_user, submission_type="IRfinder", submission_tag=json_filename, submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
         metadata=pd.concat([metadata,ftp_user])
-
-        print(metadata)
 
         EXCout=pd.ExcelWriter(filename)
         samples.to_excel(EXCout,"samples",index=None)
