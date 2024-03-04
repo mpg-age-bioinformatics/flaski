@@ -340,7 +340,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "featurecounts_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
                 "bwa_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
                 "exomebed" : os.path.join(paths["r2d2"]["run_data"], project_folder, targeted),
-                "genomes" : "/beegfs/common/genomes/nextflow_builds" ,
+                "genomes" : "/beegfs/common/genomes/nextflow_builds/" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
             },
@@ -353,7 +353,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "featurecounts_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
                 "bwa_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data"),
                 "exomebed" : os.path.join(paths["raven"]["run_data"], project_folder, targeted),
-                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/variantcalling" ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/variantcalling/" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
             },
@@ -366,7 +366,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "featurecounts_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
                 "bwa_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
                 "exomebed" : os.path.join(paths["studio"]["run_data"], project_folder, targeted),
-                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/variantcalling" ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/variantcalling/" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
             },
