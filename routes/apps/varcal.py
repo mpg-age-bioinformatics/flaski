@@ -334,12 +334,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "r2d2":{
                 "series" : "at_"+secure_filename(project_title),
                 "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
-                "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" ,"sample_sheet.xlsx"),
+                "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" , filename),
                 "kallisto_raw_data" : "" ,
                 "fastqc_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
                 "featurecounts_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
                 "bwa_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
-                "exomebed" : os.path.join(paths["r2d2"]["run_data"], project_folder, targeted),
                 "genomes" : "/beegfs/common/genomes/nextflow_builds/" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
@@ -347,12 +346,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "raven":{
                 "series" : "at_"+secure_filename(project_title),
                 "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
-                "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
+                "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" , filename),
                 "kallisto_raw_data" : "" ,
                 "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
                 "featurecounts_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
                 "bwa_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data"),
-                "exomebed" : os.path.join(paths["raven"]["run_data"], project_folder, targeted),
                 "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/variantcalling/" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
@@ -360,12 +358,11 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
             "studio":{
                 "series" : "at_"+secure_filename(project_title),
                 "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
-                "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" ,"sample_sheet.xlsx"),
+                "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" , filename),
                 "kallisto_raw_data" : "" ,
                 "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
                 "featurecounts_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
                 "bwa_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
-                "exomebed" : os.path.join(paths["studio"]["run_data"], project_folder, targeted),
                 "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/variantcalling/" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
@@ -378,12 +375,20 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 "fastqc_raw_data" :  "<path_to_raw_data>" ,
                 "featurecounts_raw_data" : "<path_to_raw_data>" ,
                 "bwa_raw_data" : "<path_to_raw_data>" ,
-                "exomebed" : "<path_to_raw_data>" ,
                 "genomes" : "<path_to_run_data>" ,
                 "mapping_output" : "bwa_output" ,
                 "bam" : "None"
             }
         }
+
+        
+        if targeted == "":
+            for profile in ["r2d2", "raven", "studio", "local"]:
+                nf[profile]["exomebed"]="none"    
+        elif targeted != "":
+            nf["local"]["exomebed"]=f"<path_to_run_data>/{targeted}"
+            for profile in ["r2d2", "raven", "studio"]:
+                nf[profile]["exomebed"]=os.path.join(paths[profile]["run_data"], project_folder, targeted)
 
         for k in list(meta.keys()):
             for s in ["r2d2","raven","studio","local"] :
@@ -415,6 +420,8 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 nf[location]["gtf"] = os.path.join(gtf_path, org_name, rel, org_name+"."+rel+".gtf")
 
         nf=json.dumps(nf)
+
+        print(nf)
 
         json_config={filename:{"samples":df, "variantCalling":df_ }, json_filename:nf }
 
