@@ -341,7 +341,11 @@ def generate_submission_file(samplenames, \
 
         nf={}
 
-        for location in list(paths.keys()) :
+        for location in  [ s for s in list(paths.keys()) if s != "local"] + ["local"] :
+
+            if location == "local":
+                project_folder=""
+
             code=paths[location]["code"]
             raw_data=paths[location]["raw_data"]
             run_data=paths[location]["run_data"]
