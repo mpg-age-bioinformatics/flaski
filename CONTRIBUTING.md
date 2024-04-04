@@ -14,10 +14,10 @@ Export secret variables:
 ```
 cd ~/flaski
 cat << EOF > .env
-MYSQL_PASSWORD=$(openssl rand -base64 20)
-MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
-REDIS_PASSWORD=$(openssl rand -base64 20)
-SECRET_KEY=$(openssl rand -base64 20)
+MYSQL_PASSWORD=$(openssl rand -base64 20 | tr -d '/')
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20 | tr -d '/')
+REDIS_PASSWORD=$(openssl rand -base64 20 | tr -d '/')
+SECRET_KEY=$(openssl rand -base64 20 | tr -d '/')
 EOF
 ```
 
