@@ -714,6 +714,106 @@ def make_app_content(pathname):
 
     EFM=make_options(EFM)
 
+    readme='''
+***tools and options***
+
+## cutadapt
+- Upstream sequence, "upstreamseq": \[cutadapt\] Upstream sequence for trimming.
+
+- sgRNA size, "sgRNA_size": \[cutadapt\] sgRNA size used for trimming. \[bowtie2\] Generate full mapping stats.
+
+## bowtie
+- Bowtie, "use_bowtie": \[bowtie2\] Use Bowtie to map reads. Default is False. * Not implemented in nextflow pipe yet.
+
+## mageck count
+- Only count, "ONLY_COUNT": \[mageck\] Stop workflow after mageck count. * Not implemented in nextflow pipe yet.
+
+## mageck test
+Original MAGeCK, or ‘MAGeCK-RRA’, tests two samples and ranks sgRNAs and genes.
+
+- Mageck test remove zero, "mageck_test_remove_zero": \[mageck test\] Whether to remove zero-count sgRNAs in control and/or treatment experiments. Default: none (do not remove those zero-count sgRNAs).
+
+- Zero threshold, "mageck_test_remove_zero_threshold": \[mageck test\] Zero value.
+
+- CNV file, "cnv_file": \[mageck test\] The name of file containing the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
+
+- CNV line, "cnv_line": \[mageck test\] The name of the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
+
+## mageck pathway
+GSEA analysis.
+
+- GMT file, "gmt_file": \[mageck pathway\] GMT file used for GSEA.
+
+## SSC
+For calculating sgrna efficiency, the output file could be an optional input parameter for mageck mle.
+
+- Efficiency matrix, "efficiency_matrix": \[SSC\] Weight matrix provided in the SSC source for calculating sgRNA efficiencies. If not given SSC will be skipped.
+
+- SSC sgRNA size, "SSC_sgRNA_size": \[SSC\] sgRNA size used for calculating sgRNA efficiencies.
+
+## mageck mle
+MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essential genes under multiple conditions (a metrice needed).
+
+- Skip MLE, "skip_mle": \[MLE\] Skip MLE when not needed / applicable.
+
+- MLE matrices, "mle_matrices": \[MLE\] If MLE matrices are provided please put them all in one folder together with your raw data. If not provided, mle will run two-sample-comparison like mageck test.
+
+## vispr
+Generating a yaml file for web-based visualization.
+
+- Species, "vispr_species": \[vispr\] Species
+
+- Assembly, "vispr_assembly": \[vispr\] Organism assembly
+
+## FluteMLE
+Generating downstream plots for mageck test and mageck mle.
+
+- Mageckflute organism, "mageckflute_organism": \[FluteMLE\] Mageckflute reference organism
+
+- Depmap, "depmap": \[FluteMLE\] Use Depmap as reference. A character vector, specifying the names of control samples. If there is no controls in your CRISPR screen, you can specify "Depmap" as ctrlname.
+
+- Depmap cell line, "depmap_cell_line": \[FluteMLE\] A character vector, specifying the cell lines in Depmap to be considered. If none is given than the most close one will be identified automaticaly from the depmap collection. Only used when depmap is True.
+
+## magecku
+[MAGeCK-iNC](https://kampmannlab.ucsf.edu/mageck-inc), MAGeCK-including Negative Controls.
+
+- MageckU nontargeting tag, "nontargeting_tag": \[magecku\] How the non targeting controls are labelled. If empty, magecku will not run.
+
+- MageckU FDR, "magecku_fdr":  \[magecku\] Significance cutoff for magecku. If empty, magecku will not run.
+
+- MageckU Tresh. Ctrl, "magecku_threshold_control_groups": \[magecku\] Counts threshold for control groups - applied on counts table pre-mageck test.
+
+- MageckU Tresh. Treat., "magecku_threshold_treatment_groups": \[magecku\] Counts threshold for treatment groups - applied on counts table pre-mageck test.
+
+## BAGEL
+Bayesian Analysis of Gene EssentiaLity.
+
+- Bagel essential, "bagel_essential": \[bagel\] Bagel essential genes list.
+
+- Bagel essential, "bagel_nonessential": \[bagel\] Bagel non essential genes list.
+
+## ACER
+Similar to bagel, but does maximum likelihood tests on raw counts instead of takeing log-fold change of read abundances as input data.
+
+- Acer neg. ctrl., "use_neg_ctrl": \[Acer\] Use negative control. If empty, acer will not run.
+
+- Acer master library, "using_master_library": \[Acer\] User Acer master library. If True, then acer_master_library needs to be provided. Acer will do a test taken master libary counts into account. eg. (T12 drug vs T12 DMSO taken T0 into account)
+
+- Acer master library, "acer_master_library": \[Acer\] Acer master library.
+
+## MAUDE
+For sorting-based expression screen.
+
+- Maude FACS input, "facs": \[Maude\] Tab separated values file with FACS results for Maude
+
+- Maude Ctrl guides, "ctrl_guides": \[Maude\] One column file with control sgRNAs ids
+
+## drugZ
+Designed for chemogenetic interactions.
+    '''
+    readme=dcc.Markdown(readme, style={"width":"90%", "margin":"10px"} )
+
+
 
     arguments=[
         dbc.Row( 
@@ -1030,6 +1130,7 @@ def make_app_content(pathname):
                 ),
                 dcc.Tabs(
                     [
+                        dcc.Tab( readme, label="Readme", id="tab-readme") ,
                         dcc.Tab( 
                             [ 
                                 html.Div(
