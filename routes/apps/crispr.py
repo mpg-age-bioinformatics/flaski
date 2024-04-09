@@ -715,9 +715,9 @@ def make_app_content(pathname):
     EFM=make_options(EFM)
 
     readme='''
-***tools and options***
-
 ## cutadapt
+Trim the 5' end adapter and shorten the reads to the sgRNA size.
+
 - Upstream sequence, "upstreamseq": \[cutadapt\] Upstream sequence for trimming.
 
 - sgRNA size, "sgRNA_size": \[cutadapt\] sgRNA size used for trimming. \[bowtie2\] Generate full mapping stats.
@@ -726,10 +726,12 @@ def make_app_content(pathname):
 - Bowtie, "use_bowtie": \[bowtie2\] Use Bowtie to map reads. Default is False. * Not implemented in nextflow pipe yet.
 
 ## mageck count
+Get the count matrice of sgRNA reads. The matrice is used for mageck test, mle and also the other tools e.g Acer, Bagel... 
+
 - Only count, "ONLY_COUNT": \[mageck\] Stop workflow after mageck count. * Not implemented in nextflow pipe yet.
 
 ## mageck test
-Original MAGeCK, or ‘MAGeCK-RRA’, tests two samples and ranks sgRNAs and genes.
+Or MAGeCK-RRA, a modified robust ranking aggregation (RRA) algorithm to identify positively or negatively selected genes.
 
 - Mageck test remove zero, "mageck_test_remove_zero": \[mageck test\] Whether to remove zero-count sgRNAs in control and/or treatment experiments. Default: none (do not remove those zero-count sgRNAs).
 
@@ -740,19 +742,19 @@ Original MAGeCK, or ‘MAGeCK-RRA’, tests two samples and ranks sgRNAs and gen
 - CNV line, "cnv_line": \[mageck test\] The name of the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
 
 ## mageck pathway
-GSEA analysis.
+GSEA analysis for testing enriched pathway.
 
 - GMT file, "gmt_file": \[mageck pathway\] GMT file used for GSEA.
 
 ## SSC
-For calculating sgrna efficiency, the output file could be an optional input parameter for mageck mle.
+For calculating sgrna efficiency. The output file could be an optional input parameter for mageck mle.
 
 - Efficiency matrix, "efficiency_matrix": \[SSC\] Weight matrix provided in the SSC source for calculating sgRNA efficiencies. If not given SSC will be skipped.
 
 - SSC sgRNA size, "SSC_sgRNA_size": \[SSC\] sgRNA size used for calculating sgRNA efficiencies.
 
 ## mageck mle
-MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essential genes under multiple conditions (a metrice needed).
+MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essential genes. It can do pairwise test as RRA and can also test multiple conditions (a metrice is then required).
 
 - Skip MLE, "skip_mle": \[MLE\] Skip MLE when not needed / applicable.
 
@@ -793,6 +795,8 @@ Bayesian Analysis of Gene EssentiaLity.
 - Bagel essential, "bagel_nonessential": \[bagel\] Bagel non essential genes list.
 
 ## ACER
+[Paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02491-z), [github repo](https://github.com/CshlSiepelLab/ACE)
+
 Similar to bagel, but does maximum likelihood tests on raw counts instead of takeing log-fold change of read abundances as input data.
 
 - Acer neg. ctrl., "use_neg_ctrl": \[Acer\] Use negative control. If empty, acer will not run.
@@ -802,14 +806,16 @@ Similar to bagel, but does maximum likelihood tests on raw counts instead of tak
 - Acer master library, "acer_master_library": \[Acer\] Acer master library.
 
 ## MAUDE
-For sorting-based expression screen.
+[Paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02046-8), [github repo](https://github.com/de-Boer-Lab/MAUDE)
 
-- Maude FACS input, "facs": \[Maude\] Tab separated values file with FACS results for Maude
+For sorting-based expression screen. For example, a pooled CRISPRi screen with expression readout by FACS sorting into discrete bins and sequencing the abundances of the guides in each bin.
+
+- Maude FACS input, "facs": \[Maude\] Tab separated values file with FACS results for Maude ([example](https://github.com/de-Boer-Lab/MAUDE/blob/master/inst/extdata/CD69_bin_percentiles.txt)).
 
 - Maude Ctrl guides, "ctrl_guides": \[Maude\] One column file with control sgRNAs ids
 
 ## drugZ
-Designed for chemogenetic interactions.
+Designed for chemogenetic interactions. This differs from CRISPR knockout screen: cells are split into drug-treated and untreated control samples, grown for several doublings; and the relative abundance of CRISPR gRNA sequences in the treated and untreated population is compared (instead of comparing to starting gRNA abundance).
     '''
     readme=dcc.Markdown(readme, style={"width":"90%", "margin":"10px"} )
 
