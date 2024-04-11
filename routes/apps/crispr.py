@@ -754,7 +754,7 @@ For calculating sgrna efficiency. The output file could be an optional input par
 - SSC sgRNA size, "SSC_sgRNA_size": \[SSC\] sgRNA size used for calculating sgRNA efficiencies.
 
 ## mageck mle
-MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essential genes. It can do pairwise test as RRA and can also test multiple conditions (a metrice is then required).
+MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essential genes. It can do pairwise test as RRA and can also test multiple conditions (a matrice is then required).
 
 - Skip MLE, "skip_mle": \[MLE\] Skip MLE when not needed / applicable.
 
