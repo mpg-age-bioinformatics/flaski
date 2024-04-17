@@ -7,12 +7,14 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import check_access, make_options, GROUPS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
+from myapp.routes.apps._utils import check_access, make_options, GROUPS,GROUPS_INITALS, make_table, make_submission_file, validate_metadata, send_submission_email, send_submission_ftp_email
 import os
 import uuid
 import io
+import json
 import base64
 import pandas as pd
+import zipfile
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
 from werkzeug.utils import secure_filename
@@ -77,7 +79,7 @@ def make_layout(pathname):
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito, wget, ftp):
-    @cache.memoize(60*60*2) # 2 hours
+    @cache.memoize(60*60*2) # 2 hours 
     def _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito, wget, ftp):
         df=pd.DataFrame()
         for row in rows_atac:
@@ -97,12 +99,379 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                                    "seq","Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "wget" ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc,\
                                     seq, adapter,macs2,mito, wget]}, index=list(range(12)))
+        
+        # if input sheet is empty, the `input` variable in json is `yes` otherwise `no`
+        if len(dfi) == 0:
+            macs_input='no'
+        else:
+            macs_input='yes'
+        
         df=df.to_json()
         dfi=dfi.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".ATACseq.xlsx")
+        filename=os.path.basename(filename)
+        json_filename=filename.replace(".xlsx",".json")
 
-        return {"filename": filename, "samples":df, "input":dfi , "metadata":df_}
+
+        meta={
+            "email":email,
+            "group":group,
+            "folder":folder,
+            "md5sums":md5sums,
+            "project_title":project_title,
+            "organism":organism,
+            "ercc":ercc,
+            "seq":seq,
+            "adapter":adapter,
+            "peak_type":macs2,
+            "mito":mito,            
+            "wget":wget,
+            "ftp":ftp
+        }
+
+        ercc_dic={
+            "ercc_label" : "ercc92" ,
+            "url_ercc_gtf" : "https://datashare.mpcdf.mpg.de/s/MOxbNrXeBNcg9wt/download" ,
+            "url_ercc_fa" : "https://datashare.mpcdf.mpg.de/s/H9PQu3vDRi9saqV/download"
+        }
+
+        species={
+            "celegans":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/caenorhabditis_elegans/dna/" ,
+                    "BSgenome":"BSgenome.Celegans.UCSC.ce11",
+                    "TxDb":"TxDb.Celegans.UCSC.ce11.ensGene",
+                    "annoDb":"org.Ce.eg.db",
+                    "atac_genome":"Celegans",
+                    "peakAnno_organism":"celegans",
+                    "chrom":"1:6",
+                    "GeTAG":"100286401"  
+                },\
+                "110":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    # "UCSC_genome" : "ce11",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/caenorhabditis_elegans/dna/" ,
+                    "BSgenome":"BSgenome.Celegans.UCSC.ce11",
+                    "TxDb":"TxDb.Celegans.UCSC.ce11.ensGene",
+                    "annoDb":"org.Ce.eg.db",
+                    "atac_genome":"Celegans",
+                    "peakAnno_organism":"celegans",
+                    "chrom":"1:6",
+                    "GeTAG":"100286401"  
+                }
+            },
+            "mmusculus":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/mus_musculus/dna/" ,
+                    "BSgenome":"BSgenome.Mmusculus.UCSC.mm39",
+                    "TxDb":"TxDb.Mmusculus.UCSC.mm39.knownGene",
+                    "annoDb":"org.Mm.eg.db",
+                    "atac_genome":"Mmusculus",
+                    "peakAnno_organism":"mouse",
+                    "chrom":"1:21",
+                    "GeTAG":"2666151232" 
+                },\
+                "110":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    # "UCSC_genome" : "mm39",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/" ,
+                    "BSgenome":"BSgenome.Mmusculus.UCSC.mm39",
+                    "TxDb":"TxDb.Mmusculus.UCSC.mm39.knownGene",
+                    "annoDb":"org.Mm.eg.db",
+                    "atac_genome":"Mmusculus",
+                    "peakAnno_organism":"mouse",
+                    "chrom":"1:21",
+                    "GeTAG":"2666151232" 
+                }
+            },
+            "hsapiens":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    #"genome" : "hg38",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/homo_sapiens/dna/" ,
+                    "BSgenome":"BSgenome.Hsapiens.UCSC.hg38",
+                    "TxDb":"TxDb.Hsapiens.UCSC.hg38.knownGene",
+                    "annoDb":"org.Hs.eg.db",
+                    "atac_genome":"Hsapiens",
+                    "peakAnno_organism":"human",
+                    "chrom":"1:24",
+                    "GeTAG":"3103007597"   
+                },\
+                "110":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    #"genome" : "hg38",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/" ,
+                    "BSgenome":"BSgenome.Hsapiens.UCSC.hg38",
+                    "TxDb":"TxDb.Hsapiens.UCSC.hg38.knownGene",
+                    "annoDb":"org.Hs.eg.db",
+                    "atac_genome":"Hsapiens",
+                    "peakAnno_organism":"human",
+                    "chrom":"1:24",
+                    "GeTAG":"3103007597"                   
+                }
+            },
+            "dmelanogaster":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/drosophila_melanogaster/dna/" ,
+                    "BSgenome":"BSgenome.Dmelanogaster.UCSC.dm6",
+                    "TxDb":"TxDb.Dmelanogaster.UCSC.dm6.ensGene",
+                    "annoDb":"org.Dm.eg.db",
+                    "atac_genome":"Dmelanogaster",
+                    "peakAnno_organism":"fly",
+                    "chrom":"1:7",
+                    "GeTAG":"142573024"
+                },\
+                "110":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/drosophila_melanogaster/dna/" ,
+                    "BSgenome":"BSgenome.Dmelanogaster.UCSC.dm6",
+                    "TxDb":"TxDb.Dmelanogaster.UCSC.dm6.ensGene",
+                    "annoDb":"org.Dm.eg.db",
+                    "atac_genome":"Dmelanogaster",
+                    "peakAnno_organism":"fly",
+                    "chrom":"1:7",
+                    "GeTAG":"142573024"
+                },
+            },
+            "nfurzeri":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/nothobranchius_furzeri/dna/" ,
+                    "BSgenome":"",
+                    "TxDb":"",
+                    "annoDb":"",
+                    "atac_genome":"Nfurzeri",
+                    "peakAnno_organism":"",
+                    "chrom":"1:22",
+                    "GeTAG":"856808511"
+                },\
+                "110":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    #"genome" : "",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/nothobranchius_furzeri/dna/" ,
+                    "BSgenome":"",
+                    "TxDb":"",
+                    "annoDb":"",
+                    "atac_genome":"Nfurzeri",
+                    "peakAnno_organism":"",
+                    "chrom":"1:22",
+                    "GeTAG":"856808511"
+                }
+            },
+            "scerevisiae":{
+                "current_release":"110",
+                "105":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "genome_assembly_vep" : "R64-1-1",
+                    "release" : "105",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-105/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-105/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "BSgenome":"BSgenome.Scerevisiae.UCSC.sacCer3",
+                    "TxDb":"TxDb.Scerevisiae.UCSC.sacCer3.sgdGene",
+                    "annoDb":"org.Sc.sgd.db",
+                    "atac_genome":"Scerevisiae",
+                    "peakAnno_organism":"yeast",
+                    "chrom":"1:16",
+                    "GeTAG":"12157105"
+                },\
+                "110":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "BSgenome":"BSgenome.Scerevisiae.UCSC.sacCer3",
+                    "TxDb":"TxDb.Scerevisiae.UCSC.sacCer3.sgdGene",
+                    "annoDb":"org.Sc.sgd.db",
+                    "atac_genome":"Scerevisiae",
+                    "peakAnno_organism":"yeast",
+                    "chrom":"1:16",
+                    "GeTAG":"12157105"
+                }
+            },
+        }
+
+        if group != "External" :
+            if group in GROUPS :
+                project_folder=group+"/"+GROUPS_INITALS[group]+"_at_"+secure_filename(project_title)
+            else:
+                user_domain=[ s.replace(" ","") for s in email.split(",") if "mpg.de" in s ]
+                user_domain=user_domain[0].split("@")[-1]
+                mps_domain="mpg.de"
+                tag=user_domain.split(".mpg.de")[0]
+
+                project_folder=group+"/"+tag+"_at_"+secure_filename(project_title)
+        else:
+            project_folder="Bioinformatics/bit_ext_at_"+secure_filename(project_title)
+
+        paths={
+            "r2d2":{
+                "code":"/beegfs/group_bit/data/projects/departments/",
+                "raw_data":"/beegfs/group_bit/data/raw_data/departments/",
+                "run_data":"/beegfs/group_bit/data/projects/departments/"
+            },
+            "raven":{
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/raven/ptmp/flaski/projects/"
+            },
+            "studio":{
+                "code":"/nexus/posix0/MAGE-flaski/service/projects/code/",
+                "raw_data":"/nexus/posix0/MAGE-flaski/ftp_data/",
+                "run_data":"/nexus/posix0/MAGE-flaski/service/projects/data/"
+            },
+            "local":{
+                "raw_data":"<path_to_raw_data>",
+                "run_data":"<path_to_run_data>",
+            }
+        }
+
+        nf={
+            "r2d2":{
+                "project_folder" : os.path.join(paths["r2d2"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" , filename),
+                "fastqc_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
+                "kallisto_raw_data" : os.path.join(paths["r2d2"]["run_data"], project_folder, "raw_data") ,
+                "genomes" : "/beegfs/common/genomes/nextflow_builds/" ,
+                "bowtie_raw_data" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "trimmed_raw") ,
+                "bdg_folder" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "macs2_output") ,
+                "diffbind_out" :  os.path.join(paths["r2d2"]["run_data"], project_folder, "diffbind3_output") ,
+                "samples_csv" : os.path.join(paths["r2d2"]["code"], project_folder, "scripts.JBoucas" , "diffbind_sample_sheet.csv")
+            },
+            "raven":{
+                "project_folder" : os.path.join(paths["raven"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" , filename),
+                "kallisto_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
+                "fastqc_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
+                # "featurecounts_raw_data" : os.path.join(paths["raven"]["run_data"], project_folder, "raw_data") ,
+                # "bwa_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "raw_data"),
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/atacseq/" ,
+                "bowtie_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "trimmed_raw") ,
+                "bdg_folder" :  os.path.join(paths["raven"]["run_data"], project_folder, "macs2_output") ,
+                "diffbind_out" :  os.path.join(paths["raven"]["run_data"], project_folder, "diffbind3_output") ,
+                "samples_csv" : os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" , "diffbind_sample_sheet.csv")
+            },
+            "studio":{
+                "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
+                "samplestable":os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" , filename),
+                "fastqc_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
+                "kallisto_raw_data" : os.path.join(paths["studio"]["run_data"], project_folder, "raw_data") ,
+                "genomes" : "/nexus/posix0/MAGE-flaski/service/genomes/atacseq/" ,
+                "bowtie_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "trimmed_raw") ,
+                "bdg_folder" :  os.path.join(paths["studio"]["run_data"], project_folder, "macs2_output") ,
+                "diffbind_out" :  os.path.join(paths["studio"]["run_data"], project_folder, "diffbind3_output") ,
+                "samples_csv" : os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" , "diffbind_sample_sheet.csv")
+            },
+            "local":{
+                "project_folder" : "<path_to_run_data>" ,
+                "samplestable": f"<path_to_run_data>/{filename}",
+                "fastqc_raw_data" :  "<path_to_raw_data>" ,
+                "kallisto_raw_data" : "<path_to_raw_data>",
+                "genomes" : "<path_to_run_data>" ,
+                "bowtie_raw_data" :  "<path_to_run_data>" ,
+                "bdg_folder" :  "<path_to_run_data>" ,
+                "diffbind_out" :  "<path_to_run_data>" ,
+                "samples_csv" : "<path_to_run_data/diffbind_sample_sheet.csv>"
+            }
+        }
+
+        species_release=species[organism]["current_release"]
+        species_release=species[organism][species_release]
+        for k in list(species_release.keys()):
+            for s in ["r2d2","raven","studio","local"] :
+                nf[s][k]=species_release[k]
+
+        for k in list(meta.keys()):
+            for s in ["r2d2","raven","studio","local"] :
+                nf[s][k]=meta[k]
+                
+
+        if ercc != "NO" :
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","studio","local"] :
+                    nf[s][k]=ercc_dic[k]
+        else:
+            for k in list(ercc_dic.keys()):
+                for s in ["r2d2","raven","studio","local"] :
+                    nf[s][k]=""
+    
+
+        for profile in ["r2d2", "raven", "studio", "local"]:
+            nf[profile]["adapter_seq"]=adapter    
+            nf[profile]["remove_mito"]=mito  
+            nf[profile]["seq"]=seq
+            nf[profile]["mapping_output"]="bowtie2_output"   
+            nf[profile]["featurecounts"]=""   
+            nf[profile]["sizes"]=nf[profile]["genomes"]+ '/'+nf[profile]["organism"]+ '/'+nf[profile]["release"]+'/'+nf[profile]["organism"]+'.'+nf[profile]["release"]+'.'+'genome'   
+            nf[profile]["input"]=macs_input  
+
+        for profile in ["r2d2", "raven", "studio", "local"]:
+            if nf[profile]["seq"] == 'single': 
+                del(nf[profile]["BSgenome"])
+                del(nf[profile]["atac_genome"])
+                del(nf[profile]["chrom"])
+
+        nf=json.dumps(nf)
+
+        print(nf)
+
+        json_config={filename:{"samples":df,  "input":dfi, "ATACseq":df_ }, json_filename:nf }
+       
+        # return {"filename": filename, "samples":df, "input":dfi , "metadata":df_}
+        return {"filename": filename,"json_filename":json_filename, "json":json_config}
+
     return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget,ftp)
 
 
@@ -204,16 +573,28 @@ type in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI).
 Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combinations should be unique or files will be overwritten.
     '''
 
+    local_readme='''
+**Local runs**
+
+For running this pipeline on your local computer you can use the config generated here and follow the instructions on [https://github.com/mpg-age-bioinformatics/nextflow-rnaseq](https://github.com/mpg-age-bioinformatics/nextflow-rnaseq).
+
+For local usage, if multiple sequencing runs were performed and you need to concatenate files please do this ahead of generating the config file here.
+    '''
+
     readme_age=f'''
 {readme_age}
 
 {readme_common}
+
+{local_readme} 
     '''
 
     readme_mps=f'''
 {readme_mps}
 
 {readme_common}
+
+{local_readme}
     '''
 
     readme_noaccess='''
@@ -222,18 +603,25 @@ Samples will be renamed to `Group_Replicate.fastq.gz` Group -- Replicate combina
 Once you have been given access more information will be displayed on how to transfer your raw data.
     '''
 
+    readme_noaccess=local_readme
 
     user_domain=current_user.email
     user_domain=user_domain.split("@")[-1]
 
     mps_domain="mpg.de"
-    #if user_domain[-len(mps_domain):] == mps_domain :
-    if user_domain =="age.mpg.de" :
-        readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
-        groups_=make_options(GROUPS)
-        groups_val=None
-        folder_row_style={"margin-top":10, 'display': 'none' }
-        folder="FTP"
+    if user_domain[-len(mps_domain):] == mps_domain :
+        if user_domain =="age.mpg.de" :
+            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
+            groups_=make_options(GROUPS)
+            groups_val=None
+            folder_row_style={"margin-top":10, 'display': 'none' }
+            folder="FTP"
+        elif not header_access :
+            readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
+            groups_=make_options([user_domain])
+            groups_val=user_domain
+            folder_row_style={"margin-top":10, 'display': 'none' }
+            folder="FTP"        
     elif not header_access :
         readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
         groups_=make_options([user_domain])
@@ -534,16 +922,36 @@ def read_file(contents,filename,last_modified):
     prevent_initial_call=True )
 def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget, ftp ):
     header, msg = check_access( 'atacseq' )
+    if not msg:
+        authorized = True
+    else:
+        authorized= False
     # header, msg = None, None # for local debugging 
-    if msg :
-        return header, msg, dash.no_update
+    # if msg :
+    #     return header, msg, dash.no_update
 
     if not wget:
         wget="NONE"
+    # subdic=generate_submission_file(rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq,adapter,macs2,mito,wget, ftp)
+    # samples=pd.read_json(subdic["samples"])
+    # metadata=pd.read_json(subdic["metadata"])
+    #?? inputdf=pd.read_json(subdic["input"])
+    user_domain=current_user.email
+    user_domain=user_domain.split("@")[-1]
+    mps_domain="mpg.de"
+
+    if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
+        group="Bioinformatics"
+
+
     subdic=generate_submission_file(rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq,adapter,macs2,mito,wget, ftp)
-    samples=pd.read_json(subdic["samples"])
-    metadata=pd.read_json(subdic["metadata"])
-    inputdf=pd.read_json(subdic["input"])
+    filename=subdic["filename"]
+    json_filename=subdic["json_filename"]
+    json_config=subdic["json"]
+
+    samples=pd.read_json(json_config[filename]["samples"])
+    metadata=pd.read_json(json_config[filename]["ATACseq"])
+    inputdf=pd.read_json(json_config[filename]["input"])
 
     validation=validate_metadata(metadata)
     if validation:
@@ -558,27 +966,54 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
         header="Success!"
         msg='''Please allow a summary file of your submission to download and check your email for confirmation.'''
     
+    json_config[os.path.basename(json_filename)]=json.loads(json_config[os.path.basename(json_filename)])
 
-    user_domain=current_user.email
-    user_domain=user_domain.split("@")[-1]
-    mps_domain="mpg.de"
-    # if user_domain[-len(mps_domain):] == mps_domain :
-    # if user_domain !="age.mpg.de" :
-    subdic["filename"]=subdic["filename"].replace("/submissions/", "/submissions_ftp/")
+    if ( user_domain[-len(mps_domain):] == mps_domain ) or ( authorized ) :
 
-    # if user_domain == "age.mpg.de" :
-    #     send_submission_email(user=current_user, submission_type="ATACseq",  submission_tag=subdic["filename"],submission_file=None, attachment_path=None)
-    # else:
-    ftp_user=send_submission_ftp_email(user=current_user, submission_type="ATACseq", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"], ftp_user=ftp)
-    metadata=pd.concat([metadata,ftp_user])
+        # if user_domain != "age.mpg.de" :
+        filename=os.path.join("/submissions_ftp/",filename)
+        json_filename=os.path.join("/submissions_ftp/",json_filename)
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"ATACseq",index=None)
-    inputdf.to_excel(EXCout,"input",index=None)
-    EXCout.save()
+        EXCout=pd.ExcelWriter(filename)
+        samples.to_excel(EXCout,"samples",index=None)
+        inputdf.to_excel(EXCout,"input",index=None)
+        metadata.to_excel(EXCout,"ATACseq",index=None)
+        EXCout.save()
 
-    return header, msg, dcc.send_file( subdic["filename"] )
+        with open(json_filename, "w") as out:
+            json.dump(json_config,out)
+
+        ftp_user=send_submission_ftp_email(user=current_user, submission_type="ATACseq", submission_tag=json_filename,submission_file=json_filename, attachment_path=json_filename, ftp_user=ftp)
+
+        metadata=pd.concat([metadata,ftp_user])
+
+        EXCout=pd.ExcelWriter(filename)
+        samples.to_excel(EXCout,"samples",index=None)        
+        inputdf.to_excel(EXCout,"input",index=None)
+        metadata.to_excel(EXCout,"ATACseq",index=None)
+        EXCout.save()
+
+        ftp_user=ftp_user["Value"].tolist()[0]
+        json_config[os.path.basename(json_filename)]["raven"]["ftp"]=ftp_user
+
+        with open(json_filename, "w") as out:
+            json.dump(json_config, out)
+
+        
+        json_config=json.dumps(json_config)
+
+        def write_archive(bytes_io):
+            with zipfile.ZipFile(bytes_io, mode="w") as zf:
+                for f in [ filename, json_filename ]:
+                    zf.write(f,  os.path.basename(f) )
+
+        return header, msg, dcc.send_bytes(write_archive, os.path.basename(filename).replace("xlsx","zip") )
+
+
+    else:
+        json_config=json.dumps(json_config)
+
+        return header, msg, dict(content=json_config, filename=os.path.basename(json_filename)) 
 
 # add rows buttom 
 @dashapp.callback(
