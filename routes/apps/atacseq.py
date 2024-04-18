@@ -403,7 +403,7 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                 "bowtie_raw_data" :  os.path.join(paths["raven"]["run_data"], project_folder, "trimmed_raw") ,
                 "bdg_folder" :  os.path.join(paths["raven"]["run_data"], project_folder, "macs2_output") ,
                 "diffbind_out" :  os.path.join(paths["raven"]["run_data"], project_folder, "diffbind3_output") ,
-                "samples_csv" : os.path.join(paths["raven"]["code"], project_folder, "scripts.flaski" , "diffbind_sample_sheet.csv")
+                "samples_csv" : os.path.join(paths["raven"]["run_data"], project_folder, "diffbind_sample_sheet.csv")
             },
             "studio":{
                 "project_folder" : os.path.join(paths["studio"]["run_data"], project_folder) ,
@@ -416,7 +416,7 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                 "bowtie_raw_data" :  os.path.join(paths["studio"]["run_data"], project_folder, "trimmed_raw") ,
                 "bdg_folder" :  os.path.join(paths["studio"]["run_data"], project_folder, "macs2_output") ,
                 "diffbind_out" :  os.path.join(paths["studio"]["run_data"], project_folder, "diffbind3_output") ,
-                "samples_csv" : os.path.join(paths["studio"]["code"], project_folder, "scripts.flaski" , "diffbind_sample_sheet.csv")
+                "samples_csv" : os.path.join(paths["studio"]["run_data"], project_folder, "diffbind_sample_sheet.csv")
             },
             "local":{
                 "project_folder" : "<path_to_run_data>" ,
