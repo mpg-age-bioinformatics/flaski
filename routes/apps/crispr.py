@@ -714,6 +714,112 @@ def make_app_content(pathname):
 
     EFM=make_options(EFM)
 
+    readme='''
+## cutadapt
+Trim the 5' end adapter and shorten the reads to the sgRNA size.
+
+- Upstream sequence, "upstreamseq": \[cutadapt\] Upstream sequence for trimming.
+
+- sgRNA size, "sgRNA_size": \[cutadapt\] sgRNA size used for trimming. \[bowtie2\] Generate full mapping stats.
+
+## bowtie
+- Bowtie, "use_bowtie": \[bowtie2\] Use Bowtie to map reads. Default is False. * Not implemented in nextflow pipe yet.
+
+## mageck count
+Get the count matrice of sgRNA reads. The matrice is used for mageck test, mle and also the other tools e.g Acer, Bagel... 
+
+- Only count, "ONLY_COUNT": \[mageck\] Stop workflow after mageck count. * Not implemented in nextflow pipe yet.
+
+## mageck test
+Or MAGeCK-RRA, a modified robust ranking aggregation (RRA) algorithm to identify positively or negatively selected genes.
+
+- Mageck test remove zero, "mageck_test_remove_zero": \[mageck test\] Whether to remove zero-count sgRNAs in control and/or treatment experiments. Default: none (do not remove those zero-count sgRNAs).
+
+- Zero threshold, "mageck_test_remove_zero_threshold": \[mageck test\] Zero value.
+
+- CNV file, "cnv_file": \[mageck test\] The name of file containing the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
+
+- CNV line, "cnv_line": \[mageck test\] The name of the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
+
+## mageck pathway
+GSEA analysis for testing enriched pathway.
+
+- GMT file, "gmt_file": \[mageck pathway\] GMT file used for GSEA.
+
+## SSC
+For calculating sgrna efficiency. The output file could be an optional input parameter for mageck mle.
+
+- Efficiency matrix, "efficiency_matrix": \[SSC\] Weight matrix provided in the SSC source for calculating sgRNA efficiencies. If not given SSC will be skipped.
+
+- SSC sgRNA size, "SSC_sgRNA_size": \[SSC\] sgRNA size used for calculating sgRNA efficiencies.
+
+## mageck mle
+MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essential genes. It can do pairwise test as RRA and can also test multiple conditions (a matrice is then required).
+
+- Skip MLE, "skip_mle": \[MLE\] Skip MLE when not needed / applicable.
+
+- MLE matrices, "mle_matrices": \[MLE\] If MLE matrices are provided please put them all in one folder together with your raw data. If not provided, mle will run two-sample-comparison like mageck test.
+
+## vispr
+Generating a yaml file for web-based visualization.
+
+- Species, "vispr_species": \[vispr\] Species
+
+- Assembly, "vispr_assembly": \[vispr\] Organism assembly
+
+## FluteMLE
+Generating downstream plots for mageck test and mageck mle.
+
+- Mageckflute organism, "mageckflute_organism": \[FluteMLE\] Mageckflute reference organism
+
+- Depmap, "depmap": \[FluteMLE\] Use Depmap as reference. A character vector, specifying the names of control samples. If there is no controls in your CRISPR screen, you can specify "Depmap" as ctrlname.
+
+- Depmap cell line, "depmap_cell_line": \[FluteMLE\] A character vector, specifying the cell lines in Depmap to be considered. If none is given than the most close one will be identified automaticaly from the depmap collection. Only used when depmap is True.
+
+## magecku
+[MAGeCK-iNC](https://kampmannlab.ucsf.edu/mageck-inc), MAGeCK-including Negative Controls.
+
+- MageckU nontargeting tag, "nontargeting_tag": \[magecku\] How the non targeting controls are labelled. If empty, magecku will not run.
+
+- MageckU FDR, "magecku_fdr":  \[magecku\] Significance cutoff for magecku. If empty, magecku will not run.
+
+- MageckU Tresh. Ctrl, "magecku_threshold_control_groups": \[magecku\] Counts threshold for control groups - applied on counts table pre-mageck test.
+
+- MageckU Tresh. Treat., "magecku_threshold_treatment_groups": \[magecku\] Counts threshold for treatment groups - applied on counts table pre-mageck test.
+
+## BAGEL
+Bayesian Analysis of Gene EssentiaLity.
+
+- Bagel essential, "bagel_essential": \[bagel\] Bagel essential genes list.
+
+- Bagel essential, "bagel_nonessential": \[bagel\] Bagel non essential genes list.
+
+## ACER
+[Paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02491-z), [github repo](https://github.com/CshlSiepelLab/ACE)
+
+Similar to bagel, but does maximum likelihood tests on raw counts instead of takeing log-fold change of read abundances as input data.
+
+- Acer neg. ctrl., "use_neg_ctrl": \[Acer\] Use negative control. If empty, acer will not run.
+
+- Acer master library, "using_master_library": \[Acer\] User Acer master library. If True, then acer_master_library needs to be provided. Acer will do a test taken master libary counts into account. eg. (T12 drug vs T12 DMSO taken T0 into account)
+
+- Acer master library, "acer_master_library": \[Acer\] Acer master library.
+
+## MAUDE
+[Paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02046-8), [github repo](https://github.com/de-Boer-Lab/MAUDE)
+
+For sorting-based expression screen. For example, a pooled CRISPRi screen with expression readout by FACS sorting into discrete bins and sequencing the abundances of the guides in each bin.
+
+- Maude FACS input, "facs": \[Maude\] Tab separated values file with FACS results for Maude ([example](https://github.com/de-Boer-Lab/MAUDE/blob/master/inst/extdata/CD69_bin_percentiles.txt)).
+
+- Maude Ctrl guides, "ctrl_guides": \[Maude\] One column file with control sgRNAs ids
+
+## drugZ
+Designed for chemogenetic interactions. This differs from CRISPR knockout screen: cells are split into drug-treated and untreated control samples, grown for several doublings; and the relative abundance of CRISPR gRNA sequences in the treated and untreated population is compared (instead of comparing to starting gRNA abundance).
+    '''
+    readme=dcc.Markdown(readme, style={"width":"90%", "margin":"10px"} )
+
+
 
     arguments=[
         dbc.Row( 
@@ -1030,6 +1136,7 @@ def make_app_content(pathname):
                 ),
                 dcc.Tabs(
                     [
+                        dcc.Tab( readme, label="Readme", id="tab-readme") ,
                         dcc.Tab( 
                             [ 
                                 html.Div(

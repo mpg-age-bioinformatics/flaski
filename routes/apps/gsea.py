@@ -78,9 +78,9 @@ def make_layout(pathname):
 
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, expression,genessets, email,group,project_title,organism,ref):
+def generate_submission_file(rows, expression,genessets, email,group,folder,project_title,organism,ref):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows, expression,genessets, email,group,project_title,organism,ref):
+    def _generate_submission_file(rows, expression,genessets, email,group,folder,project_title,organism,ref):
         df=pd.DataFrame()
         for row in rows:
             if row['Sample'] != "" :
@@ -104,10 +104,10 @@ def generate_submission_file(rows, expression,genessets, email,group,project_tit
         target=df[df["Group"]!=ref]["Group"].tolist()[0]
         target_len=len(df[df["Group"]==target])
         
-        df_=pd.DataFrame({"Field":["email","Group","Project title", "Organism",\
+        df_=pd.DataFrame({"Field":["email","Group","Folder","Project title", "Organism",\
                           "Reference", "Reference_len", "Target", "Target_len"],\
-                          "Value":[email,group,project_title, organism,ref,\
-                              reference_len, target,target_len ]}, index=list(range(8)))
+                          "Value":[email,group,folder,project_title, organism,ref,\
+                              reference_len, target,target_len ]}, index=list(range(9)))
         df=df.to_json()
         edf=edf.to_json()
         gdf=gdf.to_json()
@@ -115,7 +115,7 @@ def generate_submission_file(rows, expression,genessets, email,group,project_tit
         filename=make_submission_file(".GSEA.xlsx")
 
         return {"filename": filename, "samples":df, "expression":edf ,"metadata":df_, "gene_sets":gdf}
-    return _generate_submission_file(rows,expression, genessets, email,group,project_title,organism,ref)
+    return _generate_submission_file(rows,expression, genessets, email,group,folder,project_title,organism,ref)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -238,6 +238,8 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
         groups_=make_options(["External"])
         groups_val="External"
 
+    folder="GSEA"
+
     # arguments 
     arguments=[ dbc.Row( [
                 dbc.Col( html.Label('email') ,md=3 , style={"textAlign":"right" }), 
@@ -249,6 +251,11 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
                 dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, value=groups_val, style={ "width":"100%","height":"35px"}),md=3 ),
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
                 ], style={"margin-top":5, "margin-bottom":5}),
+            dbc.Row( [
+                dbc.Col( html.Label('Folder') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='folder', placeholder="my_proj_folder", value=folder, type='text', style={ "width":"100%" } ) ,md=3 ),
+                dbc.Col( html.Label('Folder containing your files'),md=3  ), 
+            ], style={"margin-top":10, 'display': 'none' }),
             dbc.Row( [
                 dbc.Col( html.Label('Project title') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%","height":"35px"} ) ,md=3 ),
@@ -384,23 +391,24 @@ def upload_genesets(session_id, contents,filename, last_modified):
     State('genes_sets-table', 'data'),
     State('email', 'value'),
     State('opt-group', 'value'),
+    State('folder', 'value'),
     State('project_title', 'value'),
     State('opt-organism', 'value'),
     State('reference_group', 'value'),
     prevent_initial_call=True )
-def update_output(session_id, n_clicks, rows, expression, genessets, email,group,project_title,organism,ref):
+def update_output(session_id, n_clicks, rows, expression, genessets, email,group,folder, project_title,organism,ref):
     # apps=read_private_apps(current_user.email,app)
     # apps=[ s["link"] for s in apps ]
     # if not validate_user_access(current_user,CURRENTAPP):
     #         return dcc.Location(pathname="/index", id="index"), None, None
     # if CURRENTAPP not in apps:
     #     return dbc.Alert('''You do not have access to this App.''',color="danger")
-    header, msg = check_access( 'rnaseq' )
+    header, msg = check_access( 'gsea' )
     # header, msg = None, None # for local debugging 
     if msg :
         return header, msg, dash.no_update
 
-    subdic=generate_submission_file(rows, expression, genessets,  email,group,project_title,organism,ref)
+    subdic=generate_submission_file(rows, expression, genessets,  email,group,folder, project_title,organism,ref)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     expression=pd.read_json(subdic["expression"])
