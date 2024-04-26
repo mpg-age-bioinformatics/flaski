@@ -698,15 +698,15 @@ def make_app_content(pathname):
     groups_=make_options(GROUPS)
     groups_val="CRISPR_Screening"
 
-    species=make_options(["homo_sapiens"])
+    species=make_options(["homo_sapiens","mus_musculus"])
     species_value="homo_sapiens"
 
-    assembly=make_options(["hg19"])
+    assembly=make_options(["hg19","mm10"])
     assembly_value="hg19"
 
     TRUE_FALSE=make_options(["True","False"])
 
-    mageckflute_organism=make_options(["hsa"])
+    mageckflute_organism=make_options(["hsa","mmu"])
 
     mageck_test_remove_zero_=make_options([ "none","control","treatment","both","any" ]) # {none,control,treatment,both,any}
 
@@ -739,7 +739,7 @@ Or MAGeCK-RRA, a modified robust ranking aggregation (RRA) algorithm to identify
 
 - CNV file, "cnv_file": \[mageck test\] The name of file containing the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
 
-- CNV line, "cnv_line": \[mageck test\] The name of the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking.
+- CNV line, "cnv_line": \[mageck test\] The name of the cell line to be used for copy number variation to normalize CNV-biased sgRNA scores prior to gene ranking. Note that the pipeline first takes the `CNV line` in `Samples` tab for each test. And if the `CNV line` in `Samples` tab  is empty, it will take this for all tests. If both empty, then the option will be ignored.
 
 ## mageck pathway
 GSEA analysis for testing enriched pathway.
@@ -750,6 +750,11 @@ GSEA analysis for testing enriched pathway.
 For calculating sgrna efficiency. The output file could be an optional input parameter for mageck mle.
 
 - Efficiency matrix, "efficiency_matrix": \[SSC\] Weight matrix provided in the SSC source for calculating sgRNA efficiencies. If not given SSC will be skipped.
+    - human_mouse_CRISPR_KO_30bp.matrix: matrix for CRISPR/Cas9 knockout, spacer length <=20 (optimized for 19 and 20). This matrix is used for scanning sequences that contain 20bp upstream of the PAM, and 10bp downstream of the PAM (including PAM).
+    - human_CRISPRi_19bp.matrix: matrix for CRISPRi/a, spacer length =19. This matrix is used for scanning sequences of 19-bp spacer upstream of the PAM.
+    - human_CRISPRi_20bp.matrix: matrix for CRISPRi/a, spacer length =20. This matrix is used for scanning sequences of 20-bp spacer upstream of the PAM.
+    - human_CRISPRi_21bp.matrix: matrix for CRISPRi/a, spacer length =21. This matrix is used for scanning sequences of 21-bp spacer upstream of the PAM.
+
 
 - SSC sgRNA size, "SSC_sgRNA_size": \[SSC\] sgRNA size used for calculating sgRNA efficiencies.
 
@@ -779,7 +784,7 @@ Generating downstream plots for mageck test and mageck mle.
 ## magecku
 [MAGeCK-iNC](https://kampmannlab.ucsf.edu/mageck-inc), MAGeCK-including Negative Controls.
 
-- MageckU nontargeting tag, "nontargeting_tag": \[magecku\] How the non targeting controls are labelled. If empty, magecku will not run.
+- MageckU nontargeting tag, "nontargeting_tag": \[magecku\] How the non targeting controls are labelled in the `Annoatation` column in the `Library` tab. If empty, magecku will not run.
 
 - MageckU FDR, "magecku_fdr":  \[magecku\] Significance cutoff for magecku. If empty, magecku will not run.
 
@@ -788,18 +793,20 @@ Generating downstream plots for mageck test and mageck mle.
 - MageckU Tresh. Treat., "magecku_threshold_treatment_groups": \[magecku\] Counts threshold for treatment groups - applied on counts table pre-mageck test.
 
 ## BAGEL
+[github repo](https://github.com/hart-lab/bagel)
+
 Bayesian Analysis of Gene EssentiaLity.
 
-- Bagel essential, "bagel_essential": \[bagel\] Bagel essential genes list.
+- Bagel essential, "bagel_essential": \[bagel\] Bagel [essential genes list](https://github.com/hart-lab/bagel/blob/master/CEGv2.txt). 
 
-- Bagel essential, "bagel_nonessential": \[bagel\] Bagel non essential genes list.
+- Bagel essential, "bagel_nonessential": \[bagel\] Bagel [non essential genes list](https://github.com/hart-lab/bagel/blob/master/NEGv1.txt).
 
 ## ACER
 [Paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02491-z), [github repo](https://github.com/CshlSiepelLab/ACE)
 
 Similar to bagel, but does maximum likelihood tests on raw counts instead of takeing log-fold change of read abundances as input data.
 
-- Acer neg. ctrl., "use_neg_ctrl": \[Acer\] Use negative control. If empty, acer will not run.
+- Acer neg. ctrl., "use_neg_ctrl": \[Acer\] Use negative control. If empty, acer will not run. For specifying control genes, the current pipeline take the list in the `List of control gens` column in `Samples` tab and it shall be comma delimited.
 
 - Acer master library, "using_master_library": \[Acer\] User Acer master library. If True, then acer_master_library needs to be provided. Acer will do a test taken master libary counts into account. eg. (T12 drug vs T12 DMSO taken T0 into account)
 
