@@ -777,7 +777,7 @@ Generating downstream plots for mageck test and mageck mle.
 
 - Mageckflute organism, "mageckflute_organism": \[FluteMLE\] Mageckflute reference organism
 
-- Depmap, "depmap": \[FluteMLE\] Use Depmap as reference. A character vector, specifying the names of control samples. If there is no controls in your CRISPR screen, you can specify "Depmap" as ctrlname.
+- Depmap, "depmap": \[FluteMLE\] In the current pipeline, FluteMLE will not run if Depmap=False. If Depmap=True, FLuteMLE will run on the output from MAGeCK MLE pairwise test using Depmap as reference. For MAGeCK MLE with a design matrice (multiple conditions), it is possible to specify a control in your CRISPR screen with FLuteMLE ([example](https://www.bioconductor.org/packages/release/bioc/vignettes/MAGeCKFlute/inst/doc/MAGeCKFlute.html#normalization-of-beta-scores)), but this is not implemented yet.
 
 - Depmap cell line, "depmap_cell_line": \[FluteMLE\] A character vector, specifying the cell lines in Depmap to be considered. If none is given than the most close one will be identified automaticaly from the depmap collection. Only used when depmap is True.
 
