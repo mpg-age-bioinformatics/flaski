@@ -773,7 +773,9 @@ Generating a yaml file for web-based visualization.
 - Assembly, "vispr_assembly": \[vispr\] Organism assembly
 
 ## FluteMLE
-Generating downstream plots for mageck test and mageck mle.
+Generating downstream plots for mageck test and mageck mle. FluteMLE works either using a pair-wise comparison as control or using Depmap as control.
+In the the case of a pairwise comparison as control it requires therefore a complex MLE matrix with more than 2 samples.
+For the case of Depmap usage, if the organism used is `mmu` it will try to convert the gene symbols from `mmu` into `hsa`.
 
 - Mageckflute organism, "mageckflute_organism": \[FluteMLE\] Mageckflute reference organism
 
