@@ -52,7 +52,9 @@ GROUPS=["Adam_Antebi",\
 "Proteomics",\
 "Ron_Jachimowicz",\
 "Sara_Wickstroem",\
+"Stephanie_Panier",\
 "Thomas_Langer",\
+"Zachary_Frentz",\
 "External"]
 
 GROUPS_INITALS={"Adam_Antebi":"AA",\
@@ -75,7 +77,9 @@ GROUPS_INITALS={"Adam_Antebi":"AA",\
 "Proteomics":"Prt",\
 "Ron_Jachimowicz":"RJ",\
 "Sara_Wickstroem":"SW",\
+"Stephanie_Panier":"SP",\
 "Thomas_Langer":"TL",\
+"Zachary_Frentz":"ZF",\
 "External":"ext"}
 
 
