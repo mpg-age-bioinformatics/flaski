@@ -250,6 +250,20 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "daviddatabase":"ENSEMBL_GENE_ID"
                 }
             },
+            "drerio":{
+                "current_release":"110",
+                "110":{
+                    "organism" : "danio_rerio" ,
+                    "species":"danio rerio",
+                    "spec":"drerio",
+                    "release" : "110",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/danio_rerio/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/danio_rerio/dna/" ,
+                    "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"drerio_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
+            },
             "scerevisiae":{
                 "current_release":"110",
                 "105":{
@@ -434,7 +448,7 @@ def make_app_content(session_id):
     )
 
     # generate dropdown options
-    organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
+    organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "drerio", "c_albicans_sc5314"]
     organisms_=make_options(organisms)
     ercc_=make_options(["YES","NO"])
 
