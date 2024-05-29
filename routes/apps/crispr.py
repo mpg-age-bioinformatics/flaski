@@ -177,7 +177,8 @@ def generate_submission_file(samplenames, \
     facs,\
     ctrl_guides,\
     mle_matrices,\
-    ONLY_COUNT ):
+    ONLY_COUNT, \
+    cleanR_control_reps ):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(samplenames,\
         samples,\
@@ -215,7 +216,8 @@ def generate_submission_file(samplenames, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT):
+        ONLY_COUNT, \
+        cleanR_control_reps):
         samplenames_df=make_df_from_rows(samplenames)
         samples_df=make_df_from_rows(samples)
         library_df=make_df_from_rows(library)
@@ -258,7 +260,8 @@ def generate_submission_file(samplenames, \
                 "facs",\
                 "ctrl_guides",\
                 "mle_matrices",\
-                "ONLY_COUNT"
+                "ONLY_COUNT",\
+                "cleanR_control_reps"
                 ],\
             "Value":[
                 email, \
@@ -297,9 +300,10 @@ def generate_submission_file(samplenames, \
                 facs,\
                 ctrl_guides,\
                 mle_matrices,\
-                ONLY_COUNT
+                ONLY_COUNT,\
+                cleanR_control_reps
                 ]
-             }, index=list(range(37)))
+             }, index=list(range(38)))
         
         df_=df_.to_json()
      
@@ -408,7 +412,11 @@ def generate_submission_file(samplenames, \
                 "facs":facs,
                 "ctrl_guides":ctrl_guides,
                 "mle_matrices":mle_matrices,
-                "skip_mle":skip_mle
+                "skip_mle":skip_mle,
+                "cleanR_input_mageck": os.path.join(run_data,project_folder,"mageck_output/count/counts.count.txt"),
+                "cleanR_output" : os.path.join(run_data,project_folder,"cleanR_output"),
+                "cleanR_lib_file" : os.path.join(run_data, project_folder,"library_cleanR.tsv"),
+                "cleanR_control_reps" : int(cleanR_control_reps)
             }
 
             # if use_neg_ctrl == "F" :
@@ -501,7 +509,8 @@ def generate_submission_file(samplenames, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT
+        ONLY_COUNT,\
+        cleanR_control_reps
     )
 
 @dashapp.callback( 
@@ -693,7 +702,7 @@ def make_app_content(pathname):
     samples=make_ed_table('adding-rows-samples', columns=["Label","Pairness (paired or unpaired)",\
         "List of control samples","List of treated samples",\
         "List of control sgRNAs", "List of control genes", "CNV line"] )
-    librarydf=make_ed_table(  'adding-rows-library', columns=["gene_ID","UID","seq","Annotation"])
+    librarydf=make_ed_table(  'adding-rows-library', columns=["gene_ID","UID","seq","Annotation","EXON","CHRM","STRAND","STARTpos","ENDpos"])
 
     groups_=make_options(GROUPS)
     groups_val="CRISPR_Screening"
@@ -1111,6 +1120,14 @@ Designed for chemogenetic interactions. This differs from CRISPR knockout screen
             ], 
             style={"margin-top":10}
         ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Ctrl replicates') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='cleanR_control_reps', value="1", type='text', style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[cleanR] No. of reference replicates'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
     ]
 
 # Maude::
@@ -1277,7 +1294,8 @@ fields = [
     "facs",\
     "ctrl_guides",\
     "mle_matrices",\
-    "ONLY_COUNT"
+    "ONLY_COUNT",\
+    "cleanR_control_reps"
 ]
 
 outputs = [ Output(o, 'value') for o in fields ]
@@ -1386,7 +1404,8 @@ def update_output(n_clicks, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT ):
+        ONLY_COUNT,\
+        cleanR_control_reps ):
     # header, msg = check_access( 'rnaseq' )
     # header, msg = None, None # for local debugging 
     # if msg :
@@ -1471,7 +1490,8 @@ def update_output(n_clicks, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT )
+        ONLY_COUNT,\
+        cleanR_control_reps )
     
     # samples=pd.read_json(subdic["samples"])
     # metadata=pd.read_json(subdic["metadata"])
@@ -1524,7 +1544,16 @@ def update_output(n_clicks, \
             EXCout=pd.ExcelWriter(filename)
             sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
             samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes", "CNV line" ]].to_excel(EXCout,"samples",index=None)
-            library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
+            
+            ## Checking if library positional info was provided
+            optional_columns = ["EXON", "CHRM", "STRAND", "STARTpos", "ENDpos"]
+            # Base columns that are always needed
+            base_columns = ["gene_ID", "UID", "seq", "Annotation"]
+            # Check if the optional columns are in the DataFrame
+            columns_to_include = base_columns + [col for col in optional_columns if col in library.columns]
+            library[columns_to_include].to_excel(EXCout, "library", index=None)
+            #library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
+            
             arguments.to_excel(EXCout,"crispr",index=None)
             EXCout.save()
         
@@ -1555,12 +1584,13 @@ def update_output(n_clicks, \
             json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL)
             json_config[os.path.basename(json_filename)]["studio"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL)
         
-        if gmt_file == "msigdb.v7.2.symbols.gmt" :
-            json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
-            json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
-        else:
-            json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
-            json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
+        if gmt_file:
+            if gmt_file == "msigdb.v7.2.symbols.gmt" :
+                json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+                json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+            else:
+                json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
+                json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
         
         if cnv_file == "CCLE_copynumber_byGene_2013-12-03.txt" :
             json_config[os.path.basename(json_filename)]["raven"]["cnv_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/CCLE_copynumber_byGene_2013-12-03.txt"
