@@ -764,6 +764,15 @@ MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essenti
 - Skip MLE, "skip_mle": \[MLE\] Skip MLE when not needed / applicable.
 
 - MLE matrices, "mle_matrices": \[MLE\] If MLE matrices are provided please put them all in one folder together with your raw data. If not provided, mle will run two-sample-comparison like mageck test.
+   
+    - design matrix
+
+        - links of the confusing wikis of design matrix: [simple matrix](https://sourceforge.net/p/mageck/wiki/demo/#step-2-prepare-the-design-matrix-file), [advanced](https://sourceforge.net/p/mageck/wiki/advanced_tutorial/#tutorial-4-make-full-use-of-mageck-mle-for-more-complicated-experimental-design-eg-paired-samples-time-series), [paper supplement, page 8 bottom](https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-015-0843-6/MediaObjects/13059_2015_843_MOESM1_ESM.pdf) 
+        - the explanation of [simple matrix](https://sourceforge.net/p/mageck/wiki/demo/#step-2-prepare-the-design-matrix-file) is apparently wrong as discussed [here](https://groups.google.com/g/mageck/c/83V91NQl_04/m/pXGhkNCuBAAJ)
+        - other discussion in the forum (to make it more confusing) [link1](https://groups.google.com/g/mageck/c/Sfdba-4_494/m/coW-o8mtCAAJ), [link2](https://groups.google.com/g/mageck/c/dMbJx4qStlw/m/xs1KonW3AQAJ), [link3](https://groups.google.com/g/mageck/c/mQBDf3UBCqc/m/JOXZKmN-BQAJ)
+
+    - p-value
+        - discussion about permutation test versus wald test ([link1](https://groups.google.com/g/mageck/c/S3ucRXD8Q-s/m/Ukvy-r3nAgAJ), [link2](https://groups.google.com/g/mageck/c/ZPQcRfnw868/m/jn0zJpg1CAAJ)).
 
 ## vispr
 Generating a yaml file for web-based visualization.
@@ -772,7 +781,10 @@ Generating a yaml file for web-based visualization.
 
 - Assembly, "vispr_assembly": \[vispr\] Organism assembly
 
-## FluteMLE
+## FluteMLE 
+
+*! R script breaks, needs debugging*
+
 Generating downstream plots for mageck test and mageck mle. FluteMLE works either using a pair-wise comparison as control or using Depmap as control.
 In the the case of a pairwise comparison as control it requires therefore a complex MLE matrix with more than 2 samples.
 For the case of Depmap usage, if the organism used is `mmu` it will try to convert the gene symbols from `mmu` into `hsa`.
