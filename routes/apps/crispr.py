@@ -222,6 +222,8 @@ def generate_submission_file(samplenames, \
         samples_df=make_df_from_rows(samples)
         library_df=make_df_from_rows(library)
 
+        cleanR_control_reps=int(cleanR_control_reps) if cleanR_control_reps is not None else None
+
         df_=pd.DataFrame({
             "Field":[
                 "email", \
@@ -416,7 +418,7 @@ def generate_submission_file(samplenames, \
                 "cleanR_input_mageck": os.path.join(run_data,project_folder,"mageck_output/count/counts.count.txt"),
                 "cleanR_output" : os.path.join(run_data,project_folder,"cleanR_output"),
                 "cleanR_lib_file" : os.path.join(run_data, project_folder,"library_cleanR.tsv"),
-                "cleanR_control_reps" : int(cleanR_control_reps)
+                "cleanR_control_reps" : cleanR_control_reps
             }
 
             # if use_neg_ctrl == "F" :
@@ -463,6 +465,14 @@ def generate_submission_file(samplenames, \
                 del(nf_["magecku_fdr"])
                 del(nf_["magecku_threshold_control_groups"])
                 del(nf_["magecku_threshold_treatment_groups"])
+
+            if not cleanR_control_reps:
+                del(nf_["cleanR_output"])
+                del(nf_["cleanR_lib_file"])
+                del(nf_["cleanR_input_mageck"])
+                del(nf_["cleanR_control_reps"])
+
+                
 
             nf[location]=nf_
         
@@ -1135,8 +1145,8 @@ Designed for chemogenetic interactions. This differs from CRISPR knockout screen
         dbc.Row( 
             [
                 dbc.Col( html.Label('Ctrl replicates') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='cleanR_control_reps', value="1", type='text', style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('[cleanR] No. of reference replicates'),md=3  ), 
+                dbc.Col( dcc.Input(id='cleanR_control_reps', placeholder="1", type='text', style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[cleanR] No. of reference replicates for pairwise comparisons'),md=3  ), 
             ], 
             style={"margin-top":10}
         ),
