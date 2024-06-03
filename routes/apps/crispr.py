@@ -428,7 +428,7 @@ def generate_submission_file(samplenames, \
                 del(nf_["acer_master_library"])
                 # del(nf_["output_acer"])
 
-            if not nontargeting_tag:
+            if not nontargeting_tag or not magecku_fdr:
                 del(nf_["magecku_fdr"])
                 del(nf_["nontargeting_tag"])
                 del(nf_["magecku_threshold_control_groups"])
@@ -459,12 +459,12 @@ def generate_submission_file(samplenames, \
             # if not depmap_cell_line :
             #     del(nf_["depmap_cell_line"])
 
-            if not magecku_fdr:
-                del(nf_["nontargeting_tag"])
-                del(nf_["output_magecku"])
-                del(nf_["magecku_fdr"])
-                del(nf_["magecku_threshold_control_groups"])
-                del(nf_["magecku_threshold_treatment_groups"])
+            # if not magecku_fdr:
+            #     del(nf_["nontargeting_tag"])
+            #     del(nf_["output_magecku"])
+            #     del(nf_["magecku_fdr"])
+            #     del(nf_["magecku_threshold_control_groups"])
+            #     del(nf_["magecku_threshold_treatment_groups"])
 
             if not cleanR_control_reps:
                 del(nf_["cleanR_output"])
