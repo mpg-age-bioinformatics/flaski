@@ -734,6 +734,7 @@ def make_app_content(pathname):
     EFM=make_options(EFM)
 
     readme='''
+In order to remove an argument from the excel submission file, please remove it only from the *value* column instead of removing the whole row from the excel file.
 ## cutadapt
 Trim the 5' end adapter and shorten the reads to the sgRNA size.
 
