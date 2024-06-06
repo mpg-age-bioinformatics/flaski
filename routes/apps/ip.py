@@ -68,7 +68,7 @@ def make_layout(pathname):
     l="--".join(l)
     r=request.access_route
     r="--".join(r)
-    return ["r::", r, "//", "l::", l, "//", "X-Real-IP", request.headers['X-Real-IP'], "//","ip::", ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'] ]
+    return ["r::", r, "//", "l::", l, "//", "X-Real-IP", request.headers['X-Real-IP'], "//","ip::", ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'], '\n', 'x_real_ip::', request.headers.get('X-Real-IP'), '\n', 'remote_addr::', request.remote_addr ]
     # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
     #     return [ 'REMOTE_ADDR','\n', request.environ['REMOTE_ADDR'] ]
     # else:
