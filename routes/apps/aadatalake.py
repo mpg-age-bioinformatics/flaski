@@ -101,10 +101,10 @@ def make_layout(session_id):
             allowed_domains=appdb.users_domains
             if current_user.domain not in allowed_domains:
                 return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        allowed_ips=app.config['WHITELISTED_IPS'].split(',') if app.config['WHITELISTED_IPS'] else []
-        user_ip=request.headers.get('X-Real-IP')
-        if allowed_ips and not any(fnmatch.fnmatch(user_ip, allowed_ip) for allowed_ip in allowed_ips):
-            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        # allowed_ips=app.config['WHITELISTED_IPS'].split(',') if app.config['WHITELISTED_IPS'] else []
+        # user_ip=request.headers.get('X-Real-IP')
+        # if allowed_ips and not any(fnmatch.fnmatch(user_ip, allowed_ip) for allowed_ip in allowed_ips):
+        #     return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
 
     ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit aadatalake")
