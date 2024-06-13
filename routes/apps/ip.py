@@ -18,6 +18,9 @@ from myapp.models import UserLogging, PrivateRoutes
 from werkzeug.utils import secure_filename
 from flask import jsonify, request
 import requests
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
 # @app.route('/v3/ip', methods=['GET'])
 # def get_tasks():
