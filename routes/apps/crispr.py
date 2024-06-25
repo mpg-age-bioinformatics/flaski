@@ -790,6 +790,14 @@ MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essenti
         - links of the confusing wikis of design matrix: [simple matrix](https://sourceforge.net/p/mageck/wiki/demo/#step-2-prepare-the-design-matrix-file), [advanced](https://sourceforge.net/p/mageck/wiki/advanced_tutorial/#tutorial-4-make-full-use-of-mageck-mle-for-more-complicated-experimental-design-eg-paired-samples-time-series), [paper supplement, page 8 bottom](https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-015-0843-6/MediaObjects/13059_2015_843_MOESM1_ESM.pdf) 
         - the explanation of [simple matrix](https://sourceforge.net/p/mageck/wiki/demo/#step-2-prepare-the-design-matrix-file) is apparently wrong as discussed [here](https://groups.google.com/g/mageck/c/83V91NQl_04/m/pXGhkNCuBAAJ)
         - other discussion in the forum (to make it more confusing) [link1](https://groups.google.com/g/mageck/c/Sfdba-4_494/m/coW-o8mtCAAJ), [link2](https://groups.google.com/g/mageck/c/dMbJx4qStlw/m/xs1KonW3AQAJ), [link3](https://groups.google.com/g/mageck/c/mQBDf3UBCqc/m/JOXZKmN-BQAJ)
+        - An example of the matrix is like this (we thought it is good to leave the T0 samples out):
+| Samples         | baseline | JEKO | MAVER | Ibru |
+|-----------------|----------|------|-------|------|
+| Plasmid         | 1        | 0    | 0     | 0    |
+| JEKO_T12_DMSO   | 1        | 1    | 0     | 0    |
+| MAVER_T12_DMSO  | 1        | 0    | 1     | 0    |
+| JEKO_T12_Ibru   | 1        | 1    | 0     | 1    |
+| MAVER_T12_Ibru  | 1        | 0    | 1     | 1    |
 
     - p-value
         - discussion about permutation test versus wald test ([link1](https://groups.google.com/g/mageck/c/S3ucRXD8Q-s/m/Ukvy-r3nAgAJ), [link2](https://groups.google.com/g/mageck/c/ZPQcRfnw868/m/jn0zJpg1CAAJ)).
