@@ -62,6 +62,7 @@ other_nav_dropdowns =[
                 "cBioPortal":"/cbioportal/",\
                 # "AGE bot":"/agebot/",\
                 "Version check":"/vcheck/",\
+                "Neanderthal age":"/neanderthalage/",\
             }, \
 
     }, \
