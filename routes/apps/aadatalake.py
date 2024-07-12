@@ -138,7 +138,7 @@ def make_layout(session_id):
                                     html.Label('Groups',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-groups', multi=True), 2 ),
                                     html.Label('Samples',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-samples', multi=True), 3 ),
                                     html.Label('Gene names',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-genenames', multi=True), 4 ),
-                                    html.Label('gene_ids',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-geneids', multi=True), 5 ),
+                                    html.Label('Gene IDs',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-geneids', multi=True), 5 ),
                                     html.Label('Download file prefix',style={"margin-top":10}), 
                                     dcc.Input(id='download_name', value="data.lake", type='text',style={"width":"100%", "height":"34px"})
                                 ],

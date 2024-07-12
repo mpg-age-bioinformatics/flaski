@@ -136,7 +136,7 @@ def read_dge(dataset, groups, cache,path_to_files=path_to_files):
         cols=selected_dge.columns.tolist()
         for c in cols[2:]:
             selected_dge[c]=selected_dge[c].apply(lambda x: nFormat(x) )
-        cols=[ s.replace("_", " ") for s in cols ]
+        # cols=[ s.replace("_", " ") for s in cols ]
         selected_dge.columns=cols
         samples_names=cols[2:-5]
         samples_names.sort()
@@ -200,7 +200,6 @@ def make_volcano_plot(df,dataset, annotate):
     pa["labels_col_value"]="gene_name"
     pa["fixed_labels"]=annotate
     pa["labels_alpha"]=1
-    
     fig=make_scatter(df_,pa)
 
     return fig, pa, df_
