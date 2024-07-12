@@ -177,7 +177,8 @@ def generate_submission_file(samplenames, \
     facs,\
     ctrl_guides,\
     mle_matrices,\
-    ONLY_COUNT ):
+    ONLY_COUNT, \
+    cleanR_control_reps ):
     @cache.memoize(60*60*2) # 2 hours
     def _generate_submission_file(samplenames,\
         samples,\
@@ -215,10 +216,13 @@ def generate_submission_file(samplenames, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT):
+        ONLY_COUNT, \
+        cleanR_control_reps):
         samplenames_df=make_df_from_rows(samplenames)
         samples_df=make_df_from_rows(samples)
         library_df=make_df_from_rows(library)
+
+        cleanR_control_reps=int(cleanR_control_reps) if cleanR_control_reps is not None else None
 
         df_=pd.DataFrame({
             "Field":[
@@ -258,7 +262,8 @@ def generate_submission_file(samplenames, \
                 "facs",\
                 "ctrl_guides",\
                 "mle_matrices",\
-                "ONLY_COUNT"
+                "ONLY_COUNT",\
+                "cleanR_control_reps"
                 ],\
             "Value":[
                 email, \
@@ -297,9 +302,10 @@ def generate_submission_file(samplenames, \
                 facs,\
                 ctrl_guides,\
                 mle_matrices,\
-                ONLY_COUNT
+                ONLY_COUNT,\
+                cleanR_control_reps
                 ]
-             }, index=list(range(37)))
+             }, index=list(range(38)))
         
         df_=df_.to_json()
      
@@ -408,7 +414,11 @@ def generate_submission_file(samplenames, \
                 "facs":facs,
                 "ctrl_guides":ctrl_guides,
                 "mle_matrices":mle_matrices,
-                "skip_mle":skip_mle
+                "skip_mle":skip_mle,
+                "cleanR_input_mageck": os.path.join(run_data,project_folder,"mageck_output/count/counts.count.txt"),
+                "cleanR_output" : os.path.join(run_data,project_folder,"cleanR_output"),
+                "cleanR_lib_file" : os.path.join(run_data, project_folder,"library_cleanR.tsv"),
+                "cleanR_control_reps" : cleanR_control_reps
             }
 
             # if use_neg_ctrl == "F" :
@@ -418,7 +428,7 @@ def generate_submission_file(samplenames, \
                 del(nf_["acer_master_library"])
                 # del(nf_["output_acer"])
 
-            if not nontargeting_tag:
+            if not nontargeting_tag or not magecku_fdr:
                 del(nf_["magecku_fdr"])
                 del(nf_["nontargeting_tag"])
                 del(nf_["magecku_threshold_control_groups"])
@@ -449,12 +459,20 @@ def generate_submission_file(samplenames, \
             # if not depmap_cell_line :
             #     del(nf_["depmap_cell_line"])
 
-            if not magecku_fdr:
-                del(nf_["nontargeting_tag"])
-                del(nf_["output_magecku"])
-                del(nf_["magecku_fdr"])
-                del(nf_["magecku_threshold_control_groups"])
-                del(nf_["magecku_threshold_treatment_groups"])
+            # if not magecku_fdr:
+            #     del(nf_["nontargeting_tag"])
+            #     del(nf_["output_magecku"])
+            #     del(nf_["magecku_fdr"])
+            #     del(nf_["magecku_threshold_control_groups"])
+            #     del(nf_["magecku_threshold_treatment_groups"])
+
+            if not cleanR_control_reps:
+                del(nf_["cleanR_output"])
+                del(nf_["cleanR_lib_file"])
+                del(nf_["cleanR_input_mageck"])
+                del(nf_["cleanR_control_reps"])
+
+                
 
             nf[location]=nf_
         
@@ -501,7 +519,8 @@ def generate_submission_file(samplenames, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT
+        ONLY_COUNT,\
+        cleanR_control_reps
     )
 
 @dashapp.callback( 
@@ -693,7 +712,7 @@ def make_app_content(pathname):
     samples=make_ed_table('adding-rows-samples', columns=["Label","Pairness (paired or unpaired)",\
         "List of control samples","List of treated samples",\
         "List of control sgRNAs", "List of control genes", "CNV line"] )
-    librarydf=make_ed_table(  'adding-rows-library', columns=["gene_ID","UID","seq","Annotation"])
+    librarydf=make_ed_table(  'adding-rows-library', columns=["gene_ID","UID","seq","Annotation","EXON","CHRM","STRAND","STARTpos","ENDpos"])
 
     groups_=make_options(GROUPS)
     groups_val="CRISPR_Screening"
@@ -715,6 +734,7 @@ def make_app_content(pathname):
     EFM=make_options(EFM)
 
     readme='''
+In order to remove an argument from the excel submission file, please remove it only from the *value* column instead of removing the whole row from the excel file.
 ## cutadapt
 Trim the 5' end adapter and shorten the reads to the sgRNA size.
 
@@ -764,6 +784,23 @@ MLE extends MAGeCK-RRA by a maximum likelihood estimation method to call essenti
 - Skip MLE, "skip_mle": \[MLE\] Skip MLE when not needed / applicable.
 
 - MLE matrices, "mle_matrices": \[MLE\] If MLE matrices are provided please put them all in one folder together with your raw data. If not provided, mle will run two-sample-comparison like mageck test.
+   
+    - design matrix
+
+        - links of the confusing wikis of design matrix: [simple matrix](https://sourceforge.net/p/mageck/wiki/demo/#step-2-prepare-the-design-matrix-file), [advanced](https://sourceforge.net/p/mageck/wiki/advanced_tutorial/#tutorial-4-make-full-use-of-mageck-mle-for-more-complicated-experimental-design-eg-paired-samples-time-series), [paper supplement, page 8 bottom](https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-015-0843-6/MediaObjects/13059_2015_843_MOESM1_ESM.pdf) 
+        - the explanation of [simple matrix](https://sourceforge.net/p/mageck/wiki/demo/#step-2-prepare-the-design-matrix-file) is apparently wrong as discussed [here](https://groups.google.com/g/mageck/c/83V91NQl_04/m/pXGhkNCuBAAJ)
+        - other discussion in the forum (to make it more confusing) [link1](https://groups.google.com/g/mageck/c/Sfdba-4_494/m/coW-o8mtCAAJ), [link2](https://groups.google.com/g/mageck/c/dMbJx4qStlw/m/xs1KonW3AQAJ), [link3](https://groups.google.com/g/mageck/c/mQBDf3UBCqc/m/JOXZKmN-BQAJ)
+        - An example of the matrix is like this (we thought it is good to leave the T0 samples out):
+| Samples         | baseline | JEKO | MAVER | Ibru |
+|-----------------|----------|------|-------|------|
+| Plasmid         | 1        | 0    | 0     | 0    |
+| JEKO_T12_DMSO   | 1        | 1    | 0     | 0    |
+| MAVER_T12_DMSO  | 1        | 0    | 1     | 0    |
+| JEKO_T12_Ibru   | 1        | 1    | 0     | 1    |
+| MAVER_T12_Ibru  | 1        | 0    | 1     | 1    |
+
+    - p-value
+        - discussion about permutation test versus wald test ([link1](https://groups.google.com/g/mageck/c/S3ucRXD8Q-s/m/Ukvy-r3nAgAJ), [link2](https://groups.google.com/g/mageck/c/ZPQcRfnw868/m/jn0zJpg1CAAJ)).
 
 ## vispr
 Generating a yaml file for web-based visualization.
@@ -772,7 +809,10 @@ Generating a yaml file for web-based visualization.
 
 - Assembly, "vispr_assembly": \[vispr\] Organism assembly
 
-## FluteMLE
+## FluteMLE 
+
+*! R script breaks, needs debugging*
+
 Generating downstream plots for mageck test and mageck mle. FluteMLE works either using a pair-wise comparison as control or using Depmap as control.
 In the the case of a pairwise comparison as control it requires therefore a complex MLE matrix with more than 2 samples.
 For the case of Depmap usage, if the organism used is `mmu` it will try to convert the gene symbols from `mmu` into `hsa`.
@@ -1111,6 +1151,14 @@ Designed for chemogenetic interactions. This differs from CRISPR knockout screen
             ], 
             style={"margin-top":10}
         ),
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('Ctrl replicates') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='cleanR_control_reps', placeholder="1", type='text', style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('[cleanR] No. of reference replicates for pairwise comparisons'),md=3  ), 
+            ], 
+            style={"margin-top":10}
+        ),
     ]
 
 # Maude::
@@ -1277,7 +1325,8 @@ fields = [
     "facs",\
     "ctrl_guides",\
     "mle_matrices",\
-    "ONLY_COUNT"
+    "ONLY_COUNT",\
+    "cleanR_control_reps"
 ]
 
 outputs = [ Output(o, 'value') for o in fields ]
@@ -1386,7 +1435,8 @@ def update_output(n_clicks, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT ):
+        ONLY_COUNT,\
+        cleanR_control_reps ):
     # header, msg = check_access( 'rnaseq' )
     # header, msg = None, None # for local debugging 
     # if msg :
@@ -1471,7 +1521,8 @@ def update_output(n_clicks, \
         facs,\
         ctrl_guides,\
         mle_matrices,\
-        ONLY_COUNT )
+        ONLY_COUNT,\
+        cleanR_control_reps )
     
     # samples=pd.read_json(subdic["samples"])
     # metadata=pd.read_json(subdic["metadata"])
@@ -1524,7 +1575,16 @@ def update_output(n_clicks, \
             EXCout=pd.ExcelWriter(filename)
             sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
             samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes", "CNV line" ]].to_excel(EXCout,"samples",index=None)
-            library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
+            
+            ## Checking if library positional info was provided
+            optional_columns = ["EXON", "CHRM", "STRAND", "STARTpos", "ENDpos"]
+            # Base columns that are always needed
+            base_columns = ["gene_ID", "UID", "seq", "Annotation"]
+            # Check if the optional columns are in the DataFrame
+            columns_to_include = base_columns + [col for col in optional_columns if col in library.columns]
+            library[columns_to_include].to_excel(EXCout, "library", index=None)
+            #library[["gene_ID","UID","seq","Annotation"]].to_excel(EXCout,"library",index=None)
+            
             arguments.to_excel(EXCout,"crispr",index=None)
             EXCout.save()
         
@@ -1555,12 +1615,13 @@ def update_output(n_clicks, \
             json_config[os.path.basename(json_filename)]["raven"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL)
             json_config[os.path.basename(json_filename)]["studio"]["bagel_essential"]=os.path.join(raw_folder,BAGEL_ESSENTIAL)
         
-        if gmt_file == "msigdb.v7.2.symbols.gmt" :
-            json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
-            json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
-        else:
-            json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
-            json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
+        if gmt_file:
+            if gmt_file == "msigdb.v7.2.symbols.gmt" :
+                json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+                json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/msigdb.v7.2.symbols.gmt"
+            else:
+                json_config[os.path.basename(json_filename)]["raven"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
+                json_config[os.path.basename(json_filename)]["studio"]["gmt_file"]=os.path.join(raw_folder,gmt_file)
         
         if cnv_file == "CCLE_copynumber_byGene_2013-12-03.txt" :
             json_config[os.path.basename(json_filename)]["raven"]["cnv_file"]="/nexus/posix0/MAGE-flaski/service/projects/data/CRISPR_Screening/CS_main_pipe/CCLE_copynumber_byGene_2013-12-03.txt"

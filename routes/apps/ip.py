@@ -17,6 +17,7 @@ from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
 from werkzeug.utils import secure_filename
 from flask import jsonify, request
+import requests
 
 # @app.route('/v3/ip', methods=['GET'])
 # def get_tasks():
@@ -62,13 +63,16 @@ dashapp.layout=html.Div(
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    ip_site1 = requests.get('https://checkip.amazonaws.com').text.strip()
+    ip_site2 = requests.get('https://ifconfig.me').text.strip()
+    ip_site3 = requests.get('https://ident.me').text.strip()
     headers_list = request.headers.getlist("HTTP_X_FORWARDED_FOR")
     ip = headers_list[0] if headers_list else request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     l=request.headers.getlist("X-Forwarded-For")
     l="--".join(l)
     r=request.access_route
     r="--".join(r)
-    return ["r::", r, "//", "l::", l, "//", "X-Real-IP", request.headers['X-Real-IP'], "//","ip::", ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'] ]
+    return ["r::", r, "//", "l::", l, "//", "X-Real-IP", request.headers['X-Real-IP'], "//","ip::", ip, "//" ,'REMOTE_ADDR', '\n', request.environ['REMOTE_ADDR'],'\n', 'HTTP_X_FORWARDED_FOR', '\n', request.environ['HTTP_X_FORWARDED_FOR'], '\n', 'x_real_ip::', request.headers.get('X-Real-IP'), '\n', 'remote_addr::', request.remote_addr, '\n', 'ip1::', ip_site1, '\n', 'ip2::', ip_site2, '\n', 'ip3::', ip_site3 ]
     # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
     #     return [ 'REMOTE_ADDR','\n', request.environ['REMOTE_ADDR'] ]
     # else:
