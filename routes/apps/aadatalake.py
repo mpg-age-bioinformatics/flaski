@@ -222,7 +222,18 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
     ## barPlot
     selected_sets=list(set(results_files["Set"]))
-    if (genenames and len(genenames) == 1) or (geneids and len(geneids) == 1):
+
+    if genenames :
+        lgenenames=len(genenames)
+    else:
+        lgenenames=0
+
+    if geneids :
+        lgeneids=len(geneids)
+    else:
+        lgeneids=0   
+
+    if (genenames and lgenenames == 1) or (geneids and lgeneids == 1):
         # print("2 -- bar plot")
 
         gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
@@ -339,8 +350,18 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                         "color":"white"})
                 ])
 
+                if genenames :
+                    lgenenames=len(genenames)
+                else:
+                    lgenenames=0
+
+                if geneids :
+                    lgeneids=len(geneids)
+                else:
+                    lgeneids=0            
+
                 if genenames or geneids:
-                    if len(genenames) == 1 or len(geneids) == 1:
+                    if lgenenames == 1 or lgeneids == 1:
                         bar_df=dge.copy()
                         
                         cols_exclude=["gene_id", "gene_name","base Mean","log2 FC","lfc SE","p value","padj"]
