@@ -197,7 +197,7 @@ def make_volcano_plot(df,dataset, annotate):
     pa["xlabel"]=fc
     pa["ylabel"]="-log10(p adj.)"
     pa["marker_alpha"]="0.5"
-    pa["labels_col_value"]="gene name"
+    pa["labels_col_value"]="gene_name"
     pa["fixed_labels"]=annotate
     pa["labels_alpha"]=1
     
@@ -233,7 +233,7 @@ def make_ma_plot(df,dataset, annotate):
     pa["xlabel"]="log10(base mean)"
     pa["ylabel"]=fc #"-log10(p adj.)"
     pa["marker_alpha"]="0.5"
-    pa["labels_col_value"]="gene name"
+    pa["labels_col_value"]="gene_name"
     pa["fixed_labels"]=annotate
     pa["labels_alpha"]=1
 

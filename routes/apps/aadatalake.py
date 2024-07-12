@@ -11,6 +11,7 @@ from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_nav
 import dash_bootstrap_components as dbc
 from myapp.routes.apps._utils import parse_import_json, parse_table, make_options, make_except_toast, ask_for_help, save_session, load_session, make_table, encode_session_app
 import os
+import sys
 import uuid
 # import traceback
 import json
@@ -132,7 +133,7 @@ def make_layout(session_id):
                                     html.Label('Groups',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-groups', multi=True), 2 ),
                                     html.Label('Samples',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-samples', multi=True), 3 ),
                                     html.Label('Gene names',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-genenames', multi=True), 4 ),
-                                    html.Label('Gene IDs',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-geneids', multi=True), 5 ),
+                                    html.Label('gene_ids',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-geneids', multi=True), 5 ),
                                     html.Label('Download file prefix',style={"margin-top":10}), 
                                     dcc.Input(id='download_name', value="data.lake", type='text',style={"width":"100%", "height":"34px"})
                                 ],
@@ -185,7 +186,7 @@ def make_layout(session_id):
 )
 def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
-    
+
     ## samples
     results_files=selected_results_files[["Set","Group","Reps"]]
     results_files.columns=["Set","Group","Sample"]
@@ -246,8 +247,13 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
     selected_sets=list(set(selected_results_files["Set"]))
     if len(selected_sets) == 1 : 
         # print("3 -- PCA")
+        # sys.stdout.flush()
         pca_data=filter_gene_expression(ids2labels,None,None,cache)
+        # print("3.1 -- PCA")
+        # sys.stdout.flush()
         pca_plot, pca_pa, pca_df=make_pca_plot(pca_data,selected_sets[0])
+        # print("3.2 -- PCA")
+        # sys.stdout.flush()
         pca_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".pca" }}
         pca_plot=dcc.Graph(figure=pca_plot, config=pca_config, style={"width":"100%","overflow-x":"auto"})
         
@@ -275,10 +281,12 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
             if len(dge_groups) == 2:
                 dge=read_dge(selected_sets[0], dge_groups, cache)
                 dge_plots=dge.copy()
+                # print(dge.columns.tolist(), dge.head())
+                # sys.stdout.flush()
                 if genenames:
-                    dge=dge[dge["gene name"].isin(genenames)]                    
+                    dge=dge[dge["gene_name"].isin(genenames)]                    
                 if geneids:
-                    dge=dge[dge["gene id"].isin(geneids)]
+                    dge=dge[dge["gene_id"].isin(geneids)]
 
                 dge_=make_table(dge,"dge")
                 download_dge=html.Div( 
@@ -290,10 +298,10 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
 
                 annotate_genes=[]
                 if genenames:
-                    genenames_=dge[dge["gene name"].isin(genenames)]["gene name"].tolist()
+                    genenames_=dge[dge["gene_name"].isin(genenames)]["gene_name"].tolist()
                     annotate_genes=annotate_genes+genenames_
                 if geneids:
-                    genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
+                    genenames_=dge[dge["gene_id"].isin(geneids)]["gene_name"].tolist()
                     annotate_genes=annotate_genes+genenames_                
 
                 volcano_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".volcano" }}
@@ -330,7 +338,7 @@ def update_output(session_id, n_clicks, datasets, groups, samples, genenames, ge
                     if len(genenames) == 1 or len(geneids) == 1:
                         bar_df=dge.copy()
                         
-                        cols_exclude=["gene id", "gene name","base Mean","log2 FC","lfc SE","p value","padj"]
+                        cols_exclude=["gene_id", "gene_name","base Mean","log2 FC","lfc SE","p value","padj"]
 
                         if genenames:
                             label=genenames[0]
@@ -656,7 +664,7 @@ def download_selected_volcano(n_clicks,selectedData,datasets,groups,download_nam
     dge_datasets=list(set(selected_results_files["Set"]))
     dge_groups=list(set(selected_results_files["Group"]))
     dge=read_dge(dge_datasets[0], dge_groups, cache)
-    dge=dge[dge["gene name"].isin(selected_genes)]                    
+    dge=dge[dge["gene_name"].isin(selected_genes)]                    
     fileprefix=secure_filename(str(download_name))
     filename="%s.dge.volcano_selected.xlsx" %fileprefix
     return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge.volcano", index=False)
@@ -678,10 +686,10 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         dge=read_dge(dge_datasets[0], dge_groups, cache)
         annotate_genes=[]
         if genenames:
-            genenames_=dge[dge["gene name"].isin(genenames)]["gene name"].tolist()
+            genenames_=dge[dge["gene_name"].isin(genenames)]["gene_name"].tolist()
             annotate_genes=annotate_genes+genenames_
         if geneids:
-            genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
+            genenames_=dge[dge["gene_id"].isin(geneids)]["gene_name"].tolist()
             annotate_genes=annotate_genes+genenames_     
         volcano_plot, volcano_pa, volcano_df=make_volcano_plot(dge, dge_datasets[0], annotate_genes)
 
@@ -689,7 +697,7 @@ def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         volcano_pa["ycols"]=volcano_df.columns.tolist()
         volcano_pa["groups"]=["None"]+volcano_df.columns.tolist()
         
-        volcano_df["datalake_search"]=volcano_df["gene name"].apply(lambda x: make_annotated_col(x, annotate_genes) )
+        volcano_df["datalake_search"]=volcano_df["gene_name"].apply(lambda x: make_annotated_col(x, annotate_genes) )
         volcano_pa["labels_col"]=volcano_df.columns.tolist()
         volcano_df=volcano_df.drop(["___label___"],axis=1)
 
@@ -768,7 +776,7 @@ def download_selected_ma(n_clicks,selectedData,datasets,groups,download_name):
     dge_datasets=list(set(selected_results_files["Set"]))
     dge_groups=list(set(selected_results_files["Group"]))
     dge=read_dge(dge_datasets[0], dge_groups, cache)
-    dge=dge[dge["gene name"].isin(selected_genes)]                    
+    dge=dge[dge["gene_name"].isin(selected_genes)]                    
     fileprefix=secure_filename(str(download_name))
     filename="%s.dge.ma_selected.xlsx" %fileprefix
     return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge.ma", index=False)
@@ -790,10 +798,10 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         dge=read_dge(dge_datasets[0], dge_groups, cache)
         annotate_genes=[]
         if genenames:
-            genenames_=dge[dge["gene name"].isin(genenames)]["gene name"].tolist()
+            genenames_=dge[dge["gene_name"].isin(genenames)]["gene_name"].tolist()
             annotate_genes=annotate_genes+genenames_
         if geneids:
-            genenames_=dge[dge["gene id"].isin(geneids)]["gene name"].tolist()
+            genenames_=dge[dge["gene_id"].isin(geneids)]["gene_name"].tolist()
             annotate_genes=annotate_genes+genenames_     
         ma_plot, ma_pa, ma_df=make_ma_plot(dge, dge_datasets[0],annotate_genes )
 
@@ -801,7 +809,7 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
         ma_pa["ycols"]=ma_df.columns.tolist()
         ma_pa["groups"]=ma_df.columns.tolist()
 
-        ma_df["datalake_search"]=ma_df["gene name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
+        ma_df["datalake_search"]=ma_df["gene_name"].apply(lambda x:  make_annotated_col(x, annotate_genes) )
         ma_df=ma_df.drop(["___label___"],axis=1)
         ma_pa["labels_col"]=ma_df.columns.tolist()
 
@@ -930,9 +938,9 @@ def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, filepre
             if len(dge_groups) == 2:
                 dge=read_dge(dge_datasets[0], dge_groups, cache)
                 if genenames:
-                    dge=dge[dge["gene name"].isin(genenames)]                    
+                    dge=dge[dge["gene_name"].isin(genenames)]                    
                 if geneids:
-                    dge=dge[dge["gene id"].isin(geneids)]
+                    dge=dge[dge["gene_id"].isin(geneids)]
     fileprefix=secure_filename(str(fileprefix))
     filename="%s.dge.xlsx" %fileprefix
     return dcc.send_data_frame(dge.to_excel, filename, sheet_name="dge", index=False)
