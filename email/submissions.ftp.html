@@ -10,12 +10,12 @@
 <br>
 <p>drop all your files on the main folder, do not create subdirectories. </p>
 <br>
-<p>Example with ncftp:</p>
+<p>Example with lftp:</p>
 <p>```</p>
 <p># navigate to your raw data folder</p>
 <p>cd ~/myrawdata</p>
-<p># login with ncftp</p>
-<p>ncftp -u {{ ftp_user }} -p {{ ftp_pass }} {{ PUREFTPD_MYSQL_SERVER }}</p>
+<p># login with lftp</p>
+<p>lftp -u {{ ftp_user }},{{ ftp_pass }} -e "set ftp:ssl-allow true; set ssl:verify-certificate no; set ftp:ssl-force true; set ftp:ssl-protect-data true" {{ PUREFTPD_MYSQL_SERVER }}</p>
 <p># upload your raw files</p>
 <p>mput *.fastq.gz</p>
 <p># upload your md5sums file</p>
