@@ -100,7 +100,7 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
         df=df.to_json()
         dfi=dfi.to_json()
         df_=df_.to_json()
-        filename=make_submission_file(".ATACseq.xlsx")
+        filename=make_submission_file(".CHIPseq.xlsx")
 
         return {"filename": filename, "samples":df, "input":dfi , "metadata":df_}
     return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget,ftp)
