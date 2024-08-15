@@ -178,6 +178,7 @@ def make_layout(session_id):
 
 ## all callback elements with `State` will be updated only once submit is pressed
 ## all callback elements wiht `Input` will be updated everytime the value gets changed 
+
 @dashapp.callback(
     Output('my-output','children'),
     Input('session-id', 'data'),

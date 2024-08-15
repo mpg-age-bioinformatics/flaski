@@ -350,12 +350,12 @@ def make_bar_plot(df, cols_to_exclude,sets, label):
     height_=plot_height(sets)
     
     def format_df(x1,x2):
-        v=x1.split(x2)[1].rsplit(" ",1)[0]
+        v=x1.split(x2)[1].split(".Rep")[0]
         return v
 
     if len(sets_) == 1 :
         bar_df["Dataset"]=sets_[0]
-        bar_df["Group"]=[s.rsplit(" ",1)[0] for s in bar_df["variable"].tolist()]
+        bar_df["Group"]=[s.split(".Rep")[0] for s in bar_df["variable"].tolist()]
         bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':['mean','std']})
 
         bar_df["Sample"]=bar_df["Dataset"]+"__"+bar_df["Group"]
@@ -386,7 +386,7 @@ def make_bar_plot(df, cols_to_exclude,sets, label):
         # for data in fig.data:
         #     data["width"] = 0.5
     else:
-        bar_df['Dataset'] = bar_df['variable'].apply(lambda x: [s for s in sets_ if s in x][0])        
+        bar_df['Dataset'] = bar_df['variable'].apply(lambda x: [s for s in sets_ if s in x][0])       
         bar_df['Group'] = bar_df.apply(lambda x: format_df(x.variable, x.Dataset), axis=1)
         bar_df=bar_df.groupby(["Dataset","Group"], as_index=False).agg({'value':['mean','std']})
     
@@ -405,12 +405,4 @@ def make_bar_plot(df, cols_to_exclude,sets, label):
     # import sys
     # sys.stdout.flush()
 
-
-
-
-
-
-
-
-        
 
