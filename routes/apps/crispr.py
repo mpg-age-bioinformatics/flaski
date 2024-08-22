@@ -711,7 +711,7 @@ def make_app_content(pathname):
     samplenames=make_ed_table('adding-rows-samplenames', columns=["Files","Name"] )
     samples=make_ed_table('adding-rows-samples', columns=["Label","Pairness (paired or unpaired)",\
         "List of control samples","List of treated samples",\
-        "List of control sgRNAs", "List of control genes", "CNV line"] )
+        "List of control sgRNAs", "List of control genes", "CNV line", "depmap line"] )
     librarydf=make_ed_table(  'adding-rows-library', columns=["gene_ID","UID","seq","Annotation","EXON","CHRM","STRAND","STARTpos","ENDpos"])
 
     groups_=make_options(GROUPS)
@@ -1574,7 +1574,7 @@ def update_output(n_clicks, \
         def writeout(subdic=subdic, json_config=json_config, json_filename=json_filename, arguments=arguments,filename=filename ):
             EXCout=pd.ExcelWriter(filename)
             sampleNames[["Files","Name"]].to_excel(EXCout,"sampleNames",index=None)
-            samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes", "CNV line" ]].to_excel(EXCout,"samples",index=None)
+            samples[["Label","Pairness (paired or unpaired)", "List of control samples","List of treated samples","List of control sgRNAs", "List of control genes", "CNV line","depmap line" ]].to_excel(EXCout,"samples",index=None)
             
             ## Checking if library positional info was provided
             optional_columns = ["EXON", "CHRM", "STRAND", "STARTpos", "ENDpos"]
