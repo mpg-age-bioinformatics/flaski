@@ -811,8 +811,6 @@ Generating a yaml file for web-based visualization.
 
 ## FluteMLE 
 
-*! R script breaks, needs debugging*
-
 Generating downstream plots for mageck test and mageck mle. FluteMLE works either using a pair-wise comparison as control or using Depmap as control.
 In the the case of a pairwise comparison as control it requires therefore a complex MLE matrix with more than 2 samples.
 For the case of Depmap usage, if the organism used is `mmu` it will try to convert the gene symbols from `mmu` into `hsa`.
@@ -821,7 +819,7 @@ For the case of Depmap usage, if the organism used is `mmu` it will try to conve
 
 - Depmap, "depmap": \[FluteMLE\] In the current pipeline, FluteMLE will not run if Depmap=False. If Depmap=True, FLuteMLE will run on the output from MAGeCK MLE pairwise test using Depmap as reference. For MAGeCK MLE with a design matrice (multiple conditions), it is possible to specify a control in your CRISPR screen with FLuteMLE ([example](https://www.bioconductor.org/packages/release/bioc/vignettes/MAGeCKFlute/inst/doc/MAGeCKFlute.html#normalization-of-beta-scores)), but this is not implemented yet.
 
-- Depmap cell line, "depmap_cell_line": \[FluteMLE\] A character vector, specifying the cell lines in Depmap to be considered. If none is given than the most close one will be identified automaticaly from the depmap collection. Only used when depmap is True.
+- Depmap cell line, "depmap_cell_line": \[FluteMLE\] A character vector, specifying the cell lines in Depmap to be considered. Only used when depmap is True. Note that the pipeline first takes the `depmap cell line` in `Samples` tab for each test. And if the `depmap cell line` in `Samples` tab  is empty, it will take this for all tests. If both empty, our original script tries get the most close one will be identified automaticaly from the depmap collection, however, as ResembleDepmap function is breaking, and `depmap cell line` will set as 'NA'. 
 
 ## magecku
 [MAGeCK-iNC](https://kampmannlab.ucsf.edu/mageck-inc), MAGeCK-including Negative Controls.
