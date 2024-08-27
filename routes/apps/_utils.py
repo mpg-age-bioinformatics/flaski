@@ -39,6 +39,8 @@ GROUPS=["Adam_Antebi",\
 "Constantinos_Demetriades",\
 "CRISPR_Screening",\
 "Dario_Valenzano",\
+"Hans_Sprenger",\
+"Hannah_Scheiblich",\
 "Ivan_Matic",\
 "James_Stewart",\
 "Lena_Pernas",\
@@ -64,6 +66,8 @@ GROUPS_INITALS={"Adam_Antebi":"AA",\
 "Constantinos_Demetriades":"CD",\
 "CRISPR_Screening":"CS",\
 "Dario_Valenzano":"DV",\
+"Hans_Sprenger":"HS",\
+"Hannah_Scheiblich":"HSc",\
 "Ivan_Matic":"IM",\
 "James_Stewart":"JS",\
 "Lena_Pernas":"LPe",\
