@@ -151,7 +151,7 @@ def make_app_content(session_id):
         }
     )
     matching_df=pd.DataFrame(columns=["SampleID","RiboSeq","RNASeq","Group"])
-    example_matching=pd.DataFrame( { "SampleID":[ "WT_1","WT_2","WT_3", "MUT_1","MUT_2","MUT_3"],\
+    example_matching=pd.DataFrame( { "SampleID":[ "WT_Rep1","WT_Rep2","WT_Rep3", "MUT_Rep1","MUT_Rep2","MUT_Rep3"],\
                                      "RiboSeq" :["R1","R2","R3","R4","R5","R6"],\
                                      "RNASeq":["T1","T2","T3","T1","T2","T3"],\
                                      "Group": ["WT","WT","WT","MUT","MUT","MUT"] 
@@ -573,11 +573,19 @@ def update_output(n_clicks, rows, matching_tb, email, group, folder, md5sums, pr
     if not wget:
         wget="NONE"
     subdic=generate_submission_file(rows, matching_tb, email,group,folder,md5sums,project_title,organism,ercc, adapter,ribopair,rnapair,studydesign,strand,fragsize,rfeet, wget, ftp)
+    
     samples=pd.read_json(subdic["samples"])
-    metadata=pd.read_json(subdic["metadata"])
-    matching=pd.read_json(subdic["matching"])
+    for col in samples.columns.tolist():
+        samples[col]=samples[col].astype(str).apply(lambda x: secure_filename(x) ) 
 
+    matching=pd.read_json(subdic["matching"])
+    for col in matching.columns.tolist():
+        matching[col]=matching[col].apply(lambda x : secure_filename(x))
+        matching[col]=[s.replace("-","_") for s in matching[col]]
+    
+    metadata=pd.read_json(subdic["metadata"])
     validation=validate_metadata(metadata)
+    
     if validation:
         header="Attention"
         return header, validation, dash.no_update
