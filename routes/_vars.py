@@ -37,6 +37,8 @@ user_navbar_links={
     "Logout":"/logout/"
 }
 
+# "KEGG":"/kegg/",\
+
 other_nav_dropdowns =[ 
     { \
         "Apps": \
@@ -53,7 +55,6 @@ other_nav_dropdowns =[
                 "GSEA plot":"/gseaplot/",\
                 "DAVID":"/david/",\
                 "Cell plot":"/cellplot/",\
-                "KEGG":"/kegg/",\
                 "PCA":"/pca/",\
                 "MDS":"/mds/",\
                 "t-SNE":"/tsne/",\
