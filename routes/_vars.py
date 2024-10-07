@@ -61,6 +61,7 @@ other_nav_dropdowns =[
                 "Lifespan":"/lifespan/",\
                 "Datalake":"/aadatalake/",\
                 "cBioPortal":"/cbioportal/",\
+                "GTEx":"/gtex/",\
                 # "AGE bot":"/agebot/",\
                 "Version check":"/vcheck/",\
                 "Neanderthal age":"/neanderthalage/",\
