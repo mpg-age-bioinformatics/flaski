@@ -57,6 +57,10 @@ def gene_report(cache,gender,tissue,geneid,path_to_files=path_to_files):
         ## Normcounts approach
         genes=pd.read_csv(norm_counts_file, sep="\t", usecols=[0])
         gene_index=genes.index.tolist()
+        if geneid not in gene_index:
+            df=pd.DataFrame()
+            return df.to_json()
+        
         gene_index=gene_index.index(geneid)
 
         fileheader_size=0
@@ -194,12 +198,14 @@ def get_tables(cache,genders,tissues,groups,genenames,geneids):
 
         geneid=genes["gene_id"].tolist()[0]
         df=gene_report(cache, genders,tissues,geneid)
-        df=df[["SAMPID","AGE","0","DTHHRDY", "SEX", "SMTS","SMTSD"]]
-        df=df[2:]
-        df["0"]=df["0"].astype(float)
-        df=df.rename(columns={"0":"Normalized counts"})
-        df=df.sort_values(by=["AGE","SMTSD"],ascending=True)
+        if len(df) > 0:
 
+            df=df[["SAMPID","AGE","0","DTHHRDY", "SEX", "SMTS","SMTSD"]]
+            df=df[2:]
+            df["0"]=df["0"].astype(float)
+            df=df.rename(columns={"0":"Normalized counts"})
+            df=df.sort_values(by=["AGE","SMTSD"],ascending=True)
+        
         pa=figure_defaults()
 
         gene_name=genes["gene_name"].tolist()[0]

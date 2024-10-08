@@ -225,43 +225,56 @@ def update_output(session_id, n_clicks, genders, tissues, groups, genenames, gen
     data, sigdf, df, pa, session_data = get_tables(cache,genders,tissues,groups,genenames,geneids)
 
     if pa:
+        
+        if len(df) > 0 :
 
-        fig=make_figure(df,pa)
-        fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
-        fig=dcc.Graph(figure=fig,config=fig_config,  id="graph")
+            fig=make_figure(df,pa)
+            fig_config={ 'modeBarButtonsToRemove':["toImage"], 'displaylogo': False}
+            fig=dcc.Graph(figure=fig,config=fig_config,  id="graph")
 
-        download_bar=html.Div( 
-            [   
-                dbc.Button(id='btn-download-values',className="me-1", n_clicks=0, children='Download values', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
-                dcc.Download(id="download-values")
-            ],
-            style={'display': 'inline-block'}
-        ) 
+            download_bar=html.Div( 
+                [   
+                    dbc.Button(id='btn-download-values',className="me-1", n_clicks=0, children='Download values', style={"margin-top":4, 'background-color': "#5474d8", "color":"white"}),
+                    dcc.Download(id="download-values")
+                ],
+                style={'display': 'inline-block'}
+            ) 
 
-        send_to_violinplot=html.Div( 
-            [
-                dbc.Button(id='btn-violin-app', n_clicks=0, children='Violin plot', className="me-1",
-                style={"margin-top":4, \
-                    "margin-left":4,\
-                    "margin-right":4,\
-                    'background-color': "#5474d8", \
-                    "color":"white",\
-                    })
-            ],
-            style={'display': 'inline-block'}
-        )
+            send_to_violinplot=html.Div( 
+                [
+                    dbc.Button(id='btn-violin-app', n_clicks=0, children='Violin plot', className="me-1",
+                    style={"margin-top":4, \
+                        "margin-left":4,\
+                        "margin-right":4,\
+                        'background-color': "#5474d8", \
+                        "color":"white",\
+                        })
+                ],
+                style={'display': 'inline-block'}
+            )
 
-        message=dcc.Markdown(
-            """
-                **Normalized counts**: DESeq2’s median of ratios. Counts divided by sample-specific size factors determined by median ratio \
-                of gene counts relative to geometric mean per gene. Ideal for gene count comparisons between samples and for DE analysis; \
-                NOT for within sample comparisons. Ref.: https://hbctraining.github.io/DGE_workshop_salmon/lessons/02_DGE_count_normalization.html\n\n\
-                **Specific tissue information** can be found on the original data. Please consider downloading the values and/or investigating \
-                the SMTSD column once on the violin plot to understand the distribution of the different tissues.
-            """ 
-        )
+            message=dcc.Markdown(
+                """
+                    **Normalized counts**: DESeq2’s median of ratios. Counts divided by sample-specific size factors determined by median ratio \
+                    of gene counts relative to geometric mean per gene. Ideal for gene count comparisons between samples and for DE analysis; \
+                    NOT for within sample comparisons. Ref.: https://hbctraining.github.io/DGE_workshop_salmon/lessons/02_DGE_count_normalization.html\n\n\
+                    **Specific tissue information** can be found on the original data. Please consider downloading the values and/or investigating \
+                    the SMTSD column once on the violin plot to understand the distribution of the different tissues.
+                """ 
+            )
 
-        swarmplot=[fig, message, html.Div( [download_bar, send_to_violinplot]) ]
+            swarmplot=[fig, message, html.Div( [download_bar, send_to_violinplot]) ]
+        
+        else:
+            
+            message=dcc.Markdown(
+                """
+                    Not enough counts could be found for this gene when subsetting for this gender and tissue.
+                """ 
+            )
+
+            swarmplot=[ message ]
+            
 
 
     minwidth=["Data","Significant"]
