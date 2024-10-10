@@ -59,17 +59,17 @@ card_body_style={ "padding":"2px", "padding-top":"4px"}
     Input('session-id', 'data')
     )
 def make_layout(session_id):
-    if "gtex_" in PRIVATE_ROUTES :
-        appdb=PrivateRoutes.query.filter_by(route="gtex_").first()
-        if not appdb:
-            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        allowed_users=appdb.users
-        if not allowed_users:
-            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        if current_user.id not in allowed_users :
-            allowed_domains=appdb.users_domains
-            if current_user.domain not in allowed_domains:
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+    # if "gtex_" in PRIVATE_ROUTES :
+    #     appdb=PrivateRoutes.query.filter_by(route="gtex_").first()
+    #     if not appdb:
+    #         return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+    #     allowed_users=appdb.users
+    #     if not allowed_users:
+    #         return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+    #     if current_user.id not in allowed_users :
+    #         allowed_domains=appdb.users_domains
+    #         if current_user.domain not in allowed_domains:
+    #             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
         # allowed_ips=app.config['WHITELISTED_IPS'].split(',') if app.config['WHITELISTED_IPS'] else []
         # user_ip=request.headers.get('X-Real-IP')
         # if allowed_ips and not any(fnmatch.fnmatch(user_ip, allowed_ip) for allowed_ip in allowed_ips):
@@ -162,7 +162,8 @@ def make_layout(session_id):
 def update_menus(session_id):
     menus=read_menus(cache)
     genders=make_options( menus["genders"] )
-    tissues=make_options( menus["tissues"] )
+    tissues=[ s.replace("_._", " - ") for s in menus["tissues"] ]
+    tissues=make_options( tissues  )
     groups=make_options( menus["groups"] )
 
     genes=read_genes(cache)
@@ -185,6 +186,8 @@ def update_menus(session_id):
     State('download_name','value'),
 )
 def update_output(session_id, n_clicks, genders, tissues, groups, genenames, geneids, download_name):
+    if tissues:
+        tissues=[ s.replace(" - ", "_._" ) for s in tissues ]
 
     swarmplot=[
         html.Div(
@@ -258,11 +261,12 @@ def update_output(session_id, n_clicks, genders, tissues, groups, genenames, gen
                 """
                     **Normalized counts**: DESeq2’s median of ratios. Counts divided by sample-specific size factors determined by median ratio \
                     of gene counts relative to geometric mean per gene. Ideal for gene count comparisons between samples and for DE analysis; \
-                    NOT for within sample comparisons. Ref.: https://hbctraining.github.io/DGE_workshop_salmon/lessons/02_DGE_count_normalization.html\n\n\
-                    **Specific tissue information** can be found on the original data. Please consider downloading the values and/or investigating \
-                    the SMTSD column once on the violin plot to understand the distribution of the different tissues.
+                    NOT for within sample comparisons. Ref.: https://hbctraining.github.io/DGE_workshop_salmon/lessons/02_DGE_count_normalization.html.  
                 """ 
             )
+
+            # **Specific tissue information** can be found on the original data. Please consider downloading the values and/or investigating \
+            # the SMTSD column once on the violin plot to understand the distribution of the different tissues.
 
             swarmplot=[fig, message, html.Div( [download_bar, send_to_violinplot]) ]
         
@@ -332,6 +336,8 @@ def update_output(session_id, n_clicks, genders, tissues, groups, genenames, gen
     prevent_initial_call=True,
 )
 def download_values(n_clicks,genders, tissues, groups, genenames, geneids, download_name):
+    if tissues:
+        tissues=[ s.replace(" - ", "_._" ) for s in tissues ]
 
     data, sigdf, df, pa, session_data =get_tables(cache,genders,tissues,groups,genenames,geneids)
 
@@ -350,6 +356,8 @@ def download_values(n_clicks,genders, tissues, groups, genenames, geneids, downl
 )
 def to_violin_app(n_clicks, genders, tissues, groups, genenames, geneids):
     if n_clicks:
+        if tissues:
+            tissues=[ s.replace(" - ", "_._" ) for s in tissues ]
 
         data, sigdf, df, pa, session_data =get_tables(cache,genders,tissues,groups,genenames,geneids)
 

@@ -11,6 +11,7 @@ PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 
 path_to_files="/flaski_private/gtex/"
 
+
 def read_menus(cache,path_to_files=path_to_files):
     @cache.memoize(60*60*2) # 2 hours
     def _read_menus(path_to_files=path_to_files):
@@ -46,16 +47,17 @@ def gene_report(cache,gender,tissue,geneid,path_to_files=path_to_files):
         elif gender[0] == "female":
             g=2
 
-        samples=metadata[ (metadata["SMTS"].isin(tissue) ) & (metadata["SEX"]==g) ]
+        samples=metadata[ (metadata["SMTSD_"].isin(tissue) ) & (metadata["SEX"]==g) ]
         samples_list=samples["SAMPID"].tolist()
         samples_dic=dict(zip(samples_list, samples["friendly_name"].tolist() ) )
 
-        tissue_=tissue[0]
+        tissue_=tissue[0].replace("_._","_-_")
         gender_=gender[0]
         norm_counts_file=f"{path_to_files}{gender_}_{tissue_}.tissue.counts.tsv.deseq2.normcounts.tsv"
 
         ## Normcounts approach
         genes=pd.read_csv(norm_counts_file, sep="\t", usecols=[0])
+
         gene_index=genes.index.tolist()
         if geneid not in gene_index:
             df=pd.DataFrame()
@@ -85,7 +87,10 @@ def gene_report(cache,gender,tissue,geneid,path_to_files=path_to_files):
         df=pd.merge(df, samples, left_on=["index"], right_on=["SAMPID"], how="left")
 
 
-        ## TPM approach
+
+        # print(df.head())
+        # sys.stdout.flush()
+        ## TPM approach big tissue approach
 
         # genes=read_genes(cache)
         # gene_index=genes[genes["gene_id"]==geneid].index.tolist()[0]
@@ -210,7 +215,7 @@ def get_tables(cache,genders,tissues,groups,genenames,geneids):
 
         gene_name=genes["gene_name"].tolist()[0]
         gender=genders[0]
-        tissue=tissues[0]
+        tissue=tissues[0].replace("_._"," - ")
 
         pa["style"]="Violinplot and Swarmplot"
         pa['title']=f'{gene_name}, {tissue}, {gender}'
