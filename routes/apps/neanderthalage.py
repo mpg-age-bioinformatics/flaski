@@ -164,23 +164,27 @@ def make_layout(session_id):
                                 style={'width':'100%','margin-top':'2px','margin-bottom':'2px'}#,'max-width':'375px','min-width':'375px'}
                             ), # Includes a submit button.
                         ],
-                        sm=12,md=6,lg=4,xl=3,
+                        xs=12,sm=12,md=6,lg=4,xl=3,
                         align='top',
-                        style={'padding':'0px','height': '100%','overflow': 'scroll','margin-bottom':'50px'} 
+                        style={'padding':'0px','margin-bottom':'50px'} 
                     ),               
-                    dbc.Col( 
-                        dcc.Loading(
-                            id='loading-output-2',
-                            type='default',
-                            children=[ html.Div(id='my-output')],
-                            style={'margin-top':'50%','height': '100%'} 
-                        ), # Output Column: Displays loading spinner and output content.
-                        style={'height': '100%','width': '100%','overflow': 'scroll','margin-bottom':'50px'})
+                    dbc.Col(
+                        [ 
+                            dcc.Loading(
+                                id='loading-output-2',
+                                type='default',
+                                children=[ html.Div(id='my-output')],
+                                style={'margin-top':'50%'} 
+                            ), # Output Column: Displays loading spinner and output content.
+                        ],
+                        xs=12,sm=12,md=6,lg=8,xl=9,
+                        style={'margin-bottom':'50px'}
+                    ),
                 ],
                 align='start',
                 justify='left',
                 className='g-0',
-                style={'height':'100%','width':'100%','overflow':'scroll'}
+                style={'width':'100%'}
             ),
             navbar_A,
         ],
