@@ -622,9 +622,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_drugTab_table ], label='Drugs targeted selected ageing genes', id='entry-gene-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
 
     elif gene_altai_bol:
         minwidth=['Selected gene\'s mutation age distribution']
@@ -634,9 +632,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_altai_drugTab_table ], label='Drugs targeted selected altai mutated ageing genes', id='entry-gene-altai-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_altai_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-altai-mutTab', style={'margin-top':'0%'}),                    dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
             
     elif gene_altai_drug_bol: 
         minwidth=['Selected gene\'s mutation age distribution']
@@ -647,9 +643,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_altai_drugname_drugTab_table ], label='Selected drugs targeted altai mutated ageing genes', id='entry-gene-altai-drugname-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_altai_drugname_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-altai-drugname_mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
         
     elif gene_altai_drug_natural_bol:
         minwidth=['Selected gene\'s mutation age distribution']
@@ -661,9 +655,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_altai_drugname_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-altai-drugname-natural-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
 
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
 
     elif gene_altai_natural_bol:
         minwidth=['Selected gene\'s mutation age distribution']
@@ -673,9 +665,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_altai_natural_drugTab_table ], label='Selected natural drug targeted altai mutated ageing genes', id='entry-gene-altai-natural-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_altai_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-altai-natural-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
 
     elif gene_altai_drugtarget_bol:
         minwidth=['Selected gene\'s mutation age distribution']
@@ -685,9 +675,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_altai_drugtarget_drugTab_table ], label='Selected natural drug targeted altai mutated ageing genes', id='entry-gene-altai-drugtarget-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_altai_drugtarget_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-altai-drugtarget-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
     elif gene_drug_bol:
         print('gene entered: ', genenames, 'drug entered: ', drugnames)
         minwidth=['Selected gene\'s mutation age distribution']
@@ -698,9 +686,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_drugname_drugTab_table ], label='Selected drugs targeted selected genes', id='entry-gene-drugname-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_drugname_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-drugname-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
     
         
     elif gene_drug_natural_bol:
@@ -713,9 +699,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_drugname_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-drugname-natural-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
 
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
 
            
     elif gene_natural_bol:
@@ -727,9 +711,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_natural_drugTab_table ], label='Selected natural drugs targeted selected genes', id='entry-gene-natural-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-natural-mutTab', style={'margin-top':'0%'}),
                     dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
     elif gene_drugtarget_bol:
         minwidth=['Selected gene\'s mutation age distribution']
 
@@ -739,9 +721,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                     dcc.Tab([ df_gene_drugtarget_drugTab_table ], label='Selected drugs targeted selected genes', id='entry-gene-drugtarget-drugTab', style={'margin-top':'0%'}),
                     dcc.Tab([ df_gene_drugtarget_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-gene-drugtarget-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-                ],  
-                mobile_breakpoint=0,
-                style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+                ])
     
     elif altai_bol:
         print('altai_only enabled')
@@ -753,10 +733,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_altai_drugTab_table ], label='Drugs targeted altai mutated ageing genes', id='entry-altai-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_altai_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-altai-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} 
-            )
+            ])
         
     elif altai_drug_bol:
         print('altai_only enabled', 'drug entered: ', drugnames)
@@ -783,10 +760,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_altai_drugname_natural_drugTab_table ], label='Selected natural drugs', id='entry-altai-drugname-natural-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_altai_drugname_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-altai-drugname-natural-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} 
-            )
+            ])
         
     elif altai_natural_bol:
         print('altai_only enabled', 'natural_only enabled')
@@ -798,10 +772,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_altai_natural_drugTab_table ], label='Altai mutated genes -> natural drug', id='entry-altai-natural-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_altai_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-altai-natural-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} 
-            )
+            ])
 
     elif drug_natural_bol:
         print('drug entered: ', drugnames, ' natural_only enabled') 
@@ -812,9 +783,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_drug_natural_drugTab_table ], label='Selected natural drug targets', id='entry-drug-natural-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_drug_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-drug-natural-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+            ])
     elif drug_bol:
         minwidth=['Selected gene\'s mutation age distribution']
         out=dcc.Tabs( 
@@ -823,9 +792,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_drug_drugTab_table ], label='Selected drugs', id='entry-drug-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_drug_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-drug-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+            ])
    
 
         
@@ -837,9 +804,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_natural_drugTba_table ], label='Natural drug targets', id='entry-natural-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_natural_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-natural-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+            ])
         
 
     elif altai_drugtarget_bol:
@@ -850,9 +815,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ df_altai_drugtarget_drugTab_table ], label='Targetable altai mutated ageing gene targets', id='entry-altai-drugtarget-drugTab', style={'margin-top':'0%'}),
                 dcc.Tab([ df_altai_drugtarget_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-altai-drugtarget-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+            ])
        
     elif drugtarget_bol:
         minwidth=['Selected gene\'s mutation age distribution']
@@ -862,9 +825,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ drugdf_table ], label='All drug targets', id='all-drugs', style={'margin-top':'0%'}),
                 dcc.Tab([ df_drugtarget_mutTab_table ], label='Selected gene\'s mutation age distribution', id='entry-drugtarget-mutTab', style={'margin-top':'0%'}),
                 dcc.Tab([ readme ], label='README', id='readme-content', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+            ])
        
 
 
@@ -879,9 +840,7 @@ Filters can be combined to select genes and drugs, showcasing gene-drug interact
                 dcc.Tab([ ageingdf_table ], label='All ageing genes', id='all-agegenes', style={'margin-top':'0%'}),
                 dcc.Tab([ drugdf_table ], label='Drug targets', id='all-drugs', style={'margin-top':'0%'}),
                 dcc.Tab([ agedistdf_table ], label='Gene mutation age distribution', id='all-agedist-mutTab', style={'margin-top':'0%'})
-            ],  
-            mobile_breakpoint=0,
-            style={'height':'50px','margin-top':'0px','margin-botom':'0px', 'width':'100%','overflow-x':'auto', 'minWidth':minwidth} )
+            ])
         
     return out
 
