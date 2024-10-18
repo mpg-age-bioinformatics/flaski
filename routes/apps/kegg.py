@@ -1,7 +1,7 @@
 from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
 from flask_login import current_user
 from flask_caching import Cache
-from flask import session
+from flask import session, send_from_directory, abort, send_file
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
@@ -27,8 +27,12 @@ import time
 import plotly.express as px
 # from plotly.io import write_image
 import plotly.graph_objects as go
-from ._kegg import compound_options,pathway_options
+from ._kegg import compound_options, pathway_options, organism_options, network_pdf
 from dash import dash_table
+
+import io
+from Bio.KEGG.KGML.KGML_parser import read
+from Bio.Graphics.KGML_vis import KGMLCanvas
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -54,6 +58,23 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         ],
         'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
+    
+# Route to serve any file from /tmp directory
+@dashapp.server.route(f"{PAGE_PREFIX}/kegg/tmp/<path:filename>")
+def serve_file_from_tmp(filename):
+    tmp_dir = "/tmp"
+
+    if not filename.startswith("kegg-") or not filename.endswith(".pdf"):
+        return abort(403, description="Forbidden: Only PDF files with kegg initials are allowed")
+    
+    file_path = os.path.abspath(os.path.join(tmp_dir, filename))
+
+    # Check if the file exists and is within the /tmp directory
+    if os.path.exists(file_path):
+        return send_file(file_path, mimetype='application/pdf')
+    else:
+        return abort(404, description="File not found")
+    
 
 dashapp.layout=html.Div( 
     [ 
@@ -66,11 +87,6 @@ dashapp.layout=html.Div(
 card_label_style={"margin-top":"5px"}
 card_input_style={"width":"100%","height":"35px"}
 card_body_style={ "padding":"2px", "padding-top":"4px"}
-
-
-
-
-
 
 @dashapp.callback(
     Output('protected-content', 'children'),
@@ -90,8 +106,6 @@ def make_layout(session_id):
             type="default",
             children=children,
         )
-
-
 
     # HTML content from here
     protected_content=html.Div(
@@ -130,7 +144,13 @@ def make_layout(session_id):
                     ),               
                     dbc.Col(
                         [
-                          dcc.Markdown("Based on GTEx Analysis Release V8 - https://gtexportal.org", style={"margin-top":"15px"}),
+                          dcc.Loading(
+                              id="loading-output-1",
+                              type="default",
+                              children=[ html.Div(id="my-output")],
+                              style={"margin-top":"50%"} 
+                          ),  
+                          dcc.Markdown("Based on KEGG (Kyoto Encyclopedia of Genes and Genomes) - https://www.genome.jp/kegg/", style={"margin-top":"15px", "margin-left":"15px"}),
                         ],
                         xs=12,sm=12,md=6,lg=8,xl=9,
                         style={"margin-bottom":"50px"}
@@ -147,18 +167,13 @@ def make_layout(session_id):
     )
     return protected_content
 
-
+# Callback to load compound list on session load
 @dashapp.callback(
     Output(component_id='opt-compound', component_property='options'),
-    #Output(component_id='opt-pathway', component_property='options'),
-    #Output(component_id='opt-organism', component_property='options'),
     Input('session-id', 'data')
     )
 def update_menus(session_id):
-    compound=compound_options(cache)
-
-    return compound
-
+    return compound_options(cache)
 
 # Callback to update opt-pathway based on selected compounds
 @dashapp.callback(
@@ -173,3 +188,46 @@ def update_pathways(selected_compounds):
     if pw_options is None:
         return [], "No Pathway Found for Selected Compound" 
     return pw_options, "Select Pathway"
+
+# Callback to update opt-organism based on selected pathway
+@dashapp.callback(
+    Output('opt-organism', 'options'),
+    Output('opt-organism', 'placeholder'),
+    Input('opt-pathway', 'value')
+)
+def update_organisms(selected_pathway):
+    if selected_pathway is None:
+        return [], "No Pathway Selected"    
+    org_options=organism_options(cache, selected_pathway)
+    if org_options is None:
+        return [], "No Organism Found for Selected Pathway" 
+    return org_options, "Select Organism"
+
+
+# Callback on submit
+@dashapp.callback(
+    Output('my-output','children'),
+    Input('session-id', 'data'),
+    Input('submit-button-state', 'n_clicks'),
+    State("opt-compound", "value"),
+    State("opt-pathway", "value"),
+    State("opt-organism", "value"),
+    State('download_name','value'),
+)
+def update_output(session_id, n_clicks, compound, pathway, organism, download_name):
+    if not n_clicks:
+        return html.Div([])
+    
+    if not compound or pathway is None or organism is None:
+        return html.Div([dcc.Markdown("*** Please select at least a compound, pathway and organism!", style={"margin-top":"15px","margin-left":"15px"})])
+    
+    pdf_path=network_pdf(compound,pathway,organism)
+    if pdf_path is None:
+        return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
+
+    output= html.Div([
+        html.Iframe(src=f"{PAGE_PREFIX}/kegg{pdf_path}", style={"width": "100%", "height": "700px"}),
+    ])
+
+    return output
+
