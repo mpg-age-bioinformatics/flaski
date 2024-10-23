@@ -122,8 +122,8 @@ def make_layout(session_id):
                             dbc.Card(
                                 [
                                     html.H5("Filters", style={"margin-top":10}), 
-                                    html.Label('Compound'), make_loading( dcc.Dropdown( id='opt-compound', multi=True, style={'white-space': 'nowrap','text-overflow': 'ellipsis'}), 1),
-                                    html.Label('Pathway',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-pathway'), 2 ),
+                                    html.Label('Compound'), make_loading( dcc.Dropdown( id='opt-compound', multi=True, optionHeight=120), 1),
+                                    html.Label('Pathway',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-pathway', optionHeight=90), 2 ),
                                     html.Label('Organism',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-organism', placeholder="No Pathway Selected"), 3 ),
                                     html.Label('Download file prefix',style={"margin-top":10}), 
                                     dcc.Input(id='download_name', value="kegg", type='text',style={"width":"100%", "height":"34px"})
@@ -226,8 +226,45 @@ def update_output(session_id, n_clicks, compound, pathway, organism, download_na
         return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
 
     output= html.Div([
-        html.Iframe(src=f"{PAGE_PREFIX}/kegg{pdf_path}", style={"width": "100%", "height": "700px"}),
+        html.Iframe(src=f"{PAGE_PREFIX}/kegg{pdf_path}", style={"width": "100%", "height": "600px"}),
+        
+        dcc.Store(id='stored-pdf-path', data=pdf_path),
+
+        html.Div([
+            dbc.Button(
+                html.Span([ 
+                    html.I(className="fas fas fa-file-pdf"),
+                    " PDF" ]),
+                    id='download-pdf-btn',
+                    style={"max-width":"150px","width":"100%"},
+                    color="secondary"
+                ),
+            dcc.Download(id="download-pdf")
+            ],
+            id="download-pdf-div",
+            style={"max-width":"150px","width":"100%","margin":"4px"}),
     ])
 
     return output
 
+
+
+@dashapp.callback(
+    Output("download-pdf", "data"),
+    Input("download-pdf-btn", "n_clicks"),
+    State("stored-pdf-path", "data"),
+    State('download_name','value'),
+    prevent_initial_call=True
+)
+def download_pdf(n_clicks, pdf_path, pdf_download_name):
+    try:    
+        file_path = os.path.abspath(pdf_path)
+        if not file_path.startswith("/tmp/kegg-"):
+            return abort(403, description="Forbidden: Invalid file path.")
+        if not os.path.exists(file_path) or not file_path.endswith(".pdf"):
+            return abort(404, description="File not found or unsupported file type.")
+        pdf_download_name = f"{pdf_download_name}.pdf" if pdf_download_name else "kegg.pdf"
+        sanitized_filename = os.path.basename(pdf_download_name)
+        return dcc.send_file(pdf_path, filename=sanitized_filename)
+    except Exception as e:
+        return abort(500, description=f"An error occurred: {str(e)}")
