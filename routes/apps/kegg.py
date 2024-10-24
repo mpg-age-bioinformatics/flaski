@@ -27,7 +27,7 @@ import time
 import plotly.express as px
 # from plotly.io import write_image
 import plotly.graph_objects as go
-from ._kegg import compound_options, pathway_options, organism_options, network_pdf
+from ._kegg import compound_options, pathway_options, organism_options, additional_compound_options, network_pdf
 from dash import dash_table
 
 import io
@@ -124,7 +124,8 @@ def make_layout(session_id):
                                     html.H5("Filters", style={"margin-top":10}), 
                                     html.Label('Compound'), make_loading( dcc.Dropdown( id='opt-compound', multi=True, optionHeight=120), 1),
                                     html.Label('Pathway',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-pathway', optionHeight=90), 2 ),
-                                    html.Label('Organism',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-organism', placeholder="No Pathway Selected"), 3 ),
+                                    html.Label('Organism',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-organism'), 3 ),
+                                    html.Label('Highlight Additional Compound',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-additional', multi=True, optionHeight=120), 4 ),
                                     html.Label('Download file prefix',style={"margin-top":10}), 
                                     dcc.Input(id='download_name', value="kegg", type='text',style={"width":"100%", "height":"34px"})
                                 ],
@@ -203,6 +204,18 @@ def update_organisms(selected_pathway):
         return [], "No Organism Found for Selected Pathway" 
     return org_options, "Select Organism"
 
+# Callback to update opt-additional based on selected pathway and organism
+@dashapp.callback(
+    Output('opt-additional', 'options'),
+    Output('opt-additional', 'placeholder'),
+    Input('opt-pathway', 'value'),
+    Input('opt-organism', 'value')
+)
+def update_additional(selected_pathway, selected_organism):
+    if selected_pathway is None or selected_organism is None:
+        return [], "No Available Compound"
+    return additional_compound_options(cache, selected_pathway, selected_organism), "Select Additional Compound"
+
 
 # Callback on submit
 @dashapp.callback(
@@ -212,16 +225,17 @@ def update_organisms(selected_pathway):
     State("opt-compound", "value"),
     State("opt-pathway", "value"),
     State("opt-organism", "value"),
+    State("opt-additional", "value"),
     State('download_name','value'),
 )
-def update_output(session_id, n_clicks, compound, pathway, organism, download_name):
+def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound, download_name):
     if not n_clicks:
         return html.Div([])
     
     if not compound or pathway is None or organism is None:
         return html.Div([dcc.Markdown("*** Please select at least a compound, pathway and organism!", style={"margin-top":"15px","margin-left":"15px"})])
     
-    pdf_path=network_pdf(compound,pathway,organism)
+    pdf_path=network_pdf(compound, pathway, organism, additional_compound)
     if pdf_path is None:
         return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
 

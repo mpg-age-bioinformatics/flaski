@@ -14,7 +14,6 @@ from Bio.KEGG.REST import *
 from Bio.KEGG.KGML import KGML_parser
 from Bio.Graphics.KGML_vis import KGMLCanvas
 from Bio.Graphics.ColorSpiral import ColorSpiral
-#from IPython.display import Image, HTML
 import tempfile
 
 
@@ -62,10 +61,23 @@ def organism_options(cache, pathway_id):
 
     return [{'label': org, 'value': org} for org in org_value.split(',')]
 
+def additional_compound_options(cache, pathway_id, organism_id):
+    compound_pathway_data=read_compound_pathway(cache)
+    try:
+        pathname = pathway_id.replace("map", organism_id)    
+        pathway=KGML_parser.read(kegg_get(pathname, "kgml"))
+        compound_list=[]
+        for compound in pathway.compounds :
+            c=compound.name.split(":")[-1]
+            compound_list.append(c)
 
+        # return [{'label': id, 'value': id} for id in compound_list] if compound_list else []
+        return [{'label': f"{id}: {compound_pathway_data.loc[compound_pathway_data['compound_id'] == id, 'compound_name'].values[0]}" 
+            if not compound_pathway_data.loc[compound_pathway_data['compound_id'] == id, 'compound_name'].empty else id, 'value': id} for id in compound_list] if compound_list else []
+    except:
+        return []
 
-
-def network_pdf(selected_compound, pathway_id, organism_id):
+def network_pdf(selected_compound, pathway_id, organism_id, additional_compound):
     # Clean up previous kegg files, clean all if total pdfs more than 50, else clean 30 mins or older files
     kegg_files = glob.glob("/tmp/kegg-*.pdf")
     if len(kegg_files) > 20:
@@ -80,6 +92,8 @@ def network_pdf(selected_compound, pathway_id, organism_id):
 
         for compound in pathway.compounds :
             c=compound.name.split(":")[-1]
+            if c in additional_compound:
+                compound.graphics[0].bgcolor="#FFFF00"
             if c in selected_compound:
                 compound.graphics[0].bgcolor="#FF0000"
         
