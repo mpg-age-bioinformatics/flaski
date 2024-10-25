@@ -1,20 +1,17 @@
 from myapp import app
-import pandas as pd
 from myapp.routes.apps._utils import make_table
-import json
 from io import StringIO
 from datetime import datetime
+import pandas as pd
+import json
 import os
 import glob
 import time
-
+import tempfile
 import Bio
-from Bio import SeqIO
 from Bio.KEGG.REST import *
 from Bio.KEGG.KGML import KGML_parser
 from Bio.Graphics.KGML_vis import KGMLCanvas
-from Bio.Graphics.ColorSpiral import ColorSpiral
-import tempfile
 
 
 PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
@@ -77,7 +74,8 @@ def additional_compound_options(cache, pathway_id, organism_id):
     except:
         return []
 
-def network_pdf(selected_compound, pathway_id, organism_id, additional_compound):
+def kegg_operations(cache, selected_compound, pathway_id, organism_id, additional_compound):
+    compound_pathway_data=read_compound_pathway(cache)
     # Clean up previous kegg files, clean all if total pdfs more than 50, else clean 30 mins or older files
     kegg_files = glob.glob("/tmp/kegg-*.pdf")
     if len(kegg_files) > 20:
@@ -85,25 +83,52 @@ def network_pdf(selected_compound, pathway_id, organism_id, additional_compound)
     else:
         [os.remove(file) for file in kegg_files if os.path.exists(file) and (time.time() - os.path.getmtime(file)) > 1800]
 
+    overview=None
+    compound_list=[]
+    compound_dfl=[]
+    gene_list=[]
+    
     try:
         pathname = pathway_id.replace("map", organism_id)    
         pathway=KGML_parser.read(kegg_get(pathname, "kgml"))
         canvas = KGMLCanvas(pathway, import_imagemap=True)
 
+        overview=str(pathway)
+
         for compound in pathway.compounds :
             c=compound.name.split(":")[-1]
-            if c in additional_compound:
-                compound.graphics[0].bgcolor="#FFFF00"
+            compound_list.append(c)
+            if additional_compound:
+                if c in additional_compound:
+                    compound.graphics[0].bgcolor="#00FFFF"
             if c in selected_compound:
                 compound.graphics[0].bgcolor="#FF0000"
         
-        temp_pdf = tempfile.NamedTemporaryFile(delete=False, prefix="kegg-", suffix=".pdf", dir="/tmp").name
+        temp_pdf=tempfile.NamedTemporaryFile(delete=False, prefix="kegg-", suffix=".pdf", dir="/tmp").name
         canvas.draw(temp_pdf)
-        return temp_pdf
+
+        for compound_id in compound_list:
+            if not compound_pathway_data.loc[compound_pathway_data['compound_id']==compound_id, 'compound_name'].empty:
+                compound_name=compound_pathway_data.loc[compound_pathway_data['compound_id']==compound_id, 'compound_name'].values[0]
+            else:
+                compound_name="NA"
+            compound_dfl.append({'compound_id': compound_id, 'compound_name': compound_name})
+
+        compound_df=pd.DataFrame(compound_dfl)
+        compound_table=make_table(compound_df,"compound_df")
+
+        try:
+            for gene in pathway.genes:
+                if gene.name:
+                    gene_list.append(gene.name)
+        except:
+            pass
+        gene_df=pd.DataFrame(gene_list, columns=['gene_list'])
+        gene_table=make_table(gene_df,"gene_df")
+
+        return temp_pdf, overview, compound_table, gene_table
     except Exception as e:
-        return None
-
-
+        return None, None, None, None
 
 
 ####### Generate/organize kegg data for faster use #######

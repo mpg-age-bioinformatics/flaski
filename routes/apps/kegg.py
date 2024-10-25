@@ -1,38 +1,18 @@
 from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
+from myapp import db
+from myapp.models import UserLogging, PrivateRoutes
 from flask_login import current_user
 from flask_caching import Cache
-from flask import session, send_from_directory, abort, send_file
+from flask import abort, send_file
 import dash
+import os
+import uuid
+import pandas as pd
 from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import make_options, encode_session_app
-from myapp.routes.apps._utils import parse_import_json, make_except_toast, ask_for_help, save_session, make_min_width
-import os
-import uuid
-from werkzeug.utils import secure_filename
-from time import sleep
-from myapp import db
-from myapp.models import UserLogging, PrivateRoutes
-from pyflaski.violinplot import make_figure
-
-#from flaski.routines import check_session_app
-from dash.exceptions import PreventUpdate
-from pyflaski.kegg import make_figure, figure_defaults
-import traceback
-import json
-import pandas as pd
-import time
-import plotly.express as px
-# from plotly.io import write_image
-import plotly.graph_objects as go
-from ._kegg import compound_options, pathway_options, organism_options, additional_compound_options, network_pdf
-from dash import dash_table
-
-import io
-from Bio.KEGG.KGML.KGML_parser import read
-from Bio.Graphics.KGML_vis import KGMLCanvas
+from ._kegg import compound_options, pathway_options, organism_options, additional_compound_options, kegg_operations
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -226,20 +206,19 @@ def update_additional(selected_pathway, selected_organism):
     State("opt-pathway", "value"),
     State("opt-organism", "value"),
     State("opt-additional", "value"),
-    State('download_name','value'),
 )
-def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound, download_name):
+def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound):
     if not n_clicks:
         return html.Div([])
     
     if not compound or pathway is None or organism is None:
         return html.Div([dcc.Markdown("*** Please select at least a compound, pathway and organism!", style={"margin-top":"15px","margin-left":"15px"})])
     
-    pdf_path=network_pdf(compound, pathway, organism, additional_compound)
+    pdf_path, overview, compound_table, gene_table=kegg_operations(cache, compound, pathway, organism, additional_compound)
     if pdf_path is None:
         return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
 
-    output= html.Div([
+    net_pdf_tab=html.Div([
         html.Iframe(src=f"{PAGE_PREFIX}/kegg{pdf_path}", style={"width": "100%", "height": "600px"}),
         
         dcc.Store(id='stored-pdf-path', data=pdf_path),
@@ -257,12 +236,61 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
             ],
             id="download-pdf-div",
             style={"max-width":"150px","width":"100%","margin":"4px"}),
+
+        html.Div([dcc.Markdown("*\* Primaray and additional compounds are highlighted with red and aqua respectively*", style={"margin-top":"10px","margin-left":"15px"})])
     ])
+
+    overview_tab=html.Pre(overview, style={'padding-left': '20px', 'padding-top': '20px'}) 
+
+    output=dcc.Tabs( 
+        [ 
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-1",
+                    type="default",
+                    children=[ net_pdf_tab ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Network PDF", id="tab-net-pdf",
+                style={"margin-top":"0%"}
+            ),
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-2",
+                    type="default",
+                    children=[ overview_tab ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Overview", id="tab-overview",
+                style={"margin-top":"0%"}
+            ),
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-3",
+                    type="default",
+                    children=[ compound_table ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Compound", id="tab-compound",
+                style={"margin-top":"0%"}
+            ),
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-4",
+                    type="default",
+                    children=[ gene_table ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Gene", id="tab-gene",
+                style={"margin-top":"0%"}
+            )
+        ]
+    )
 
     return output
 
 
-
+# Callback on network pdf download
 @dashapp.callback(
     Output("download-pdf", "data"),
     Input("download-pdf-btn", "n_clicks"),
