@@ -2,12 +2,9 @@ from myapp import app
 from myapp.routes.apps._utils import make_table
 from io import StringIO
 from datetime import datetime
+from io import BytesIO
 import pandas as pd
-import json
 import os
-import glob
-import time
-import tempfile
 import Bio
 from Bio.KEGG.REST import *
 from Bio.KEGG.KGML import KGML_parser
@@ -76,13 +73,6 @@ def additional_compound_options(cache, pathway_id, organism_id):
 
 def kegg_operations(cache, selected_compound, pathway_id, organism_id, additional_compound):
     compound_pathway_data=read_compound_pathway(cache)
-    # Clean up previous kegg files, clean all if total pdfs more than 50, else clean 30 mins or older files
-    kegg_files = glob.glob("/tmp/kegg-*.pdf")
-    if len(kegg_files) > 20:
-        [os.remove(file) for file in kegg_files if os.path.exists(file) or True]
-    else:
-        [os.remove(file) for file in kegg_files if os.path.exists(file) and (time.time() - os.path.getmtime(file)) > 1800]
-
     overview=None
     compound_list=[]
     compound_dfl=[]
@@ -91,6 +81,7 @@ def kegg_operations(cache, selected_compound, pathway_id, organism_id, additiona
     try:
         pathname = pathway_id.replace("map", organism_id)    
         pathway=KGML_parser.read(kegg_get(pathname, "kgml"))
+        buffer = BytesIO()
         canvas = KGMLCanvas(pathway, import_imagemap=True)
 
         overview=str(pathway)
@@ -104,8 +95,8 @@ def kegg_operations(cache, selected_compound, pathway_id, organism_id, additiona
             if c in selected_compound:
                 compound.graphics[0].bgcolor="#FF0000"
         
-        temp_pdf=tempfile.NamedTemporaryFile(delete=False, prefix="kegg-", suffix=".pdf", dir="/tmp").name
-        canvas.draw(temp_pdf)
+        canvas.draw(buffer)
+        buffer.seek(0)
 
         for compound_id in compound_list:
             if not compound_pathway_data.loc[compound_pathway_data['compound_id']==compound_id, 'compound_name'].empty:
@@ -126,7 +117,7 @@ def kegg_operations(cache, selected_compound, pathway_id, organism_id, additiona
         gene_df=pd.DataFrame(gene_list, columns=['gene_list'])
         gene_table=make_table(gene_df,"gene_df")
 
-        return temp_pdf, overview, compound_table, gene_table
+        return buffer, overview, compound_table, gene_table
     except Exception as e:
         return None, None, None, None
 

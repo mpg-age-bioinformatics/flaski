@@ -7,6 +7,8 @@ from flask import abort, send_file
 import dash
 import os
 import uuid
+import base64
+from io import BytesIO
 import pandas as pd
 from dash import dcc, html
 from dash.dependencies import Input, Output, State, MATCH, ALL
@@ -38,23 +40,6 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         ],
         'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
-    
-# Route to serve any file from /tmp directory
-@dashapp.server.route(f"{PAGE_PREFIX}/kegg/tmp/<path:filename>")
-def serve_file_from_tmp(filename):
-    tmp_dir = "/tmp"
-
-    if not filename.startswith("kegg-") or not filename.endswith(".pdf"):
-        return abort(403, description="Forbidden: Only PDF files with kegg initials are allowed")
-    
-    file_path = os.path.abspath(os.path.join(tmp_dir, filename))
-
-    # Check if the file exists and is within the /tmp directory
-    if os.path.exists(file_path):
-        return send_file(file_path, mimetype='application/pdf')
-    else:
-        return abort(404, description="File not found")
-    
 
 dashapp.layout=html.Div( 
     [ 
@@ -206,36 +191,40 @@ def update_additional(selected_pathway, selected_organism):
     State("opt-pathway", "value"),
     State("opt-organism", "value"),
     State("opt-additional", "value"),
+    State('download_name','value'),
 )
-def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound):
+def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound, download_name):
     if not n_clicks:
         return html.Div([])
     
     if not compound or pathway is None or organism is None:
         return html.Div([dcc.Markdown("*** Please select at least a compound, pathway and organism!", style={"margin-top":"15px","margin-left":"15px"})])
     
-    pdf_path, overview, compound_table, gene_table=kegg_operations(cache, compound, pathway, organism, additional_compound)
-    if pdf_path is None:
+    pdf_buffer, overview, compound_table, gene_table=kegg_operations(cache, compound, pathway, organism, additional_compound)
+    if pdf_buffer is None:
         return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
+    
+    pdf_buffer_data=pdf_buffer.getvalue()
+    pdf_base64 = base64.b64encode(pdf_buffer_data).decode("utf-8")
+    pdf_data_url = f"data:application/pdf;base64,{pdf_base64}"
+    pdf_download_name = f"{download_name}.pdf" if download_name else "kegg.pdf"
 
     net_pdf_tab=html.Div([
-        html.Iframe(src=f"{PAGE_PREFIX}/kegg{pdf_path}", style={"width": "100%", "height": "600px"}),
-        
-        dcc.Store(id='stored-pdf-path', data=pdf_path),
+        html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "600px"}),
 
         html.Div([
-            dbc.Button(
-                html.Span([ 
-                    html.I(className="fas fas fa-file-pdf"),
-                    " PDF" ]),
-                    id='download-pdf-btn',
-                    style={"max-width":"150px","width":"100%"},
-                    color="secondary"
-                ),
-            dcc.Download(id="download-pdf")
-            ],
-            id="download-pdf-div",
-            style={"max-width":"150px","width":"100%","margin":"4px"}),
+            html.A(
+                html.Span([
+                    html.I(className="fas fa-file-pdf"),
+                    " PDF"
+                ]),
+                id='download-pdf-link',
+                href=pdf_data_url,
+                download=pdf_download_name,
+                className="btn btn-secondary",
+                style={"max-width": "150px", "width": "100%", "display": "inline-block", "text-align": "center", "color": "white", "border-radius": "8px"}
+            ),
+        ], id="download-pdf-div", style={"max-width": "150px", "width": "100%", "margin": "4px"}),
 
         html.Div([dcc.Markdown("*\* Primaray and additional compounds are highlighted with red and aqua respectively*", style={"margin-top":"10px","margin-left":"15px"})])
     ])
@@ -289,24 +278,3 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
 
     return output
 
-
-# Callback on network pdf download
-@dashapp.callback(
-    Output("download-pdf", "data"),
-    Input("download-pdf-btn", "n_clicks"),
-    State("stored-pdf-path", "data"),
-    State('download_name','value'),
-    prevent_initial_call=True
-)
-def download_pdf(n_clicks, pdf_path, pdf_download_name):
-    try:    
-        file_path = os.path.abspath(pdf_path)
-        if not file_path.startswith("/tmp/kegg-"):
-            return abort(403, description="Forbidden: Invalid file path.")
-        if not os.path.exists(file_path) or not file_path.endswith(".pdf"):
-            return abort(404, description="File not found or unsupported file type.")
-        pdf_download_name = f"{pdf_download_name}.pdf" if pdf_download_name else "kegg.pdf"
-        sanitized_filename = os.path.basename(pdf_download_name)
-        return dcc.send_file(pdf_path, filename=sanitized_filename)
-    except Exception as e:
-        return abort(500, description=f"An error occurred: {str(e)}")
