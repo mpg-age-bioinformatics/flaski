@@ -4,3 +4,5 @@ humanize==3.13.1
 # llama-cpp-python==0.1.78 
 # sentence_transformers==2.2.2
 ## 
+biopython==1.84
+reportlab==4.2.5
