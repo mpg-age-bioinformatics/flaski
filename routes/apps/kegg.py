@@ -39,8 +39,16 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         'CACHE_REDIS_SENTINELS': [ 
             [ os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port') ]
         ],
-        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER'),
+        'CACHE_REDIS_PASSWORD': os.environ.get('REDIS_PASSWORD')
     })
+
+# Allow iframe embedding only from the same origin
+@dashapp.server.after_request
+def apply_security_headers(response):
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Content-Security-Policy"] = "frame-ancestors 'self';"
+    return response
 
 # Serve the cached PDF from the server based on session ID and time
 @dashapp.server.route(f"{PAGE_PREFIX}/kegg/serve-cached-pdf/<session_pdf>")
