@@ -8,6 +8,7 @@ import dash
 import os
 import uuid
 import base64
+import time
 from io import BytesIO
 import pandas as pd
 from dash import dcc, html
@@ -40,6 +41,19 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         ],
         'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
+
+# Serve the cached PDF from the server based on session ID and time
+@dashapp.server.route(f"{PAGE_PREFIX}/kegg/serve-cached-pdf/<session_pdf>")
+def serve_cached_pdf(session_pdf):
+    cached_pdf_base64 = cache.get(session_pdf)
+    if not cached_pdf_base64:
+        return "PDF not found or cache timed out, please re-submit!", 404
+
+    # Decode and convert to BytesIO
+    pdf_data = base64.b64decode(cached_pdf_base64)
+    pdf_buffer = BytesIO(pdf_data)
+    pdf_buffer.seek(0)
+    return send_file(pdf_buffer, mimetype="application/pdf")
 
 dashapp.layout=html.Div( 
     [ 
@@ -200,7 +214,7 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
     if not compound or pathway is None or organism is None:
         return html.Div([dcc.Markdown("*** Please select at least a compound, pathway and organism!", style={"margin-top":"15px","margin-left":"15px"})])
     
-    pdf_buffer, overview, compound_table, gene_table=kegg_operations(cache, compound, pathway, organism, additional_compound)
+    pdf_buffer, overview, compound_table=kegg_operations(cache, compound, pathway, organism, additional_compound)
     if pdf_buffer is None:
         return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
     
@@ -208,9 +222,12 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
     pdf_base64 = base64.b64encode(pdf_buffer_data).decode("utf-8")
     pdf_data_url = f"data:application/pdf;base64,{pdf_base64}"
     pdf_download_name = f"{download_name}.pdf" if download_name else "kegg.pdf"
+    timestamp_second = int(time.time())
+    cache.set(f"pdf-{session_id}-{timestamp_second}", pdf_base64, timeout=600)
 
     net_pdf_tab=html.Div([
-        html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "600px"}),
+        # html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "600px"}),
+        html.Iframe(src=f"{PAGE_PREFIX}/kegg/serve-cached-pdf/pdf-{session_id}-{timestamp_second}", style={"width": "100%", "height": "600px"}),
 
         html.Div([
             html.A(
@@ -261,16 +278,6 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
                     style={"margin-top":"50%","height": "100%"} 
                 ), 
                 label="Compound", id="tab-compound",
-                style={"margin-top":"0%"}
-            ),
-            dcc.Tab(
-                dcc.Loading(
-                    id="loading-output-4",
-                    type="default",
-                    children=[ gene_table ],
-                    style={"margin-top":"50%","height": "100%"} 
-                ), 
-                label="Gene", id="tab-gene",
                 style={"margin-top":"0%"}
             )
         ]

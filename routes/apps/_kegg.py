@@ -76,7 +76,6 @@ def kegg_operations(cache, selected_compound, pathway_id, organism_id, additiona
     overview=None
     compound_list=[]
     compound_dfl=[]
-    gene_list=[]
     
     try:
         pathname = pathway_id.replace("map", organism_id)    
@@ -84,7 +83,7 @@ def kegg_operations(cache, selected_compound, pathway_id, organism_id, additiona
         buffer = BytesIO()
         canvas = KGMLCanvas(pathway, import_imagemap=True)
 
-        overview=str(pathway)
+        overview=(str(pathway)).split("Entry types:")[0].strip()
 
         for compound in pathway.compounds :
             c=compound.name.split(":")[-1]
@@ -108,16 +107,7 @@ def kegg_operations(cache, selected_compound, pathway_id, organism_id, additiona
         compound_df=pd.DataFrame(compound_dfl)
         compound_table=make_table(compound_df,"compound_df")
 
-        try:
-            for gene in pathway.genes:
-                if gene.name:
-                    gene_list.append(gene.name)
-        except:
-            pass
-        gene_df=pd.DataFrame(gene_list, columns=['gene_list'])
-        gene_table=make_table(gene_df,"gene_df")
-
-        return buffer, overview, compound_table, gene_table
+        return buffer, overview, compound_table
     except Exception as e:
         return None, None, None, None
 
