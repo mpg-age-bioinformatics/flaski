@@ -44,24 +44,24 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
     })
 
 # Allow iframe embedding only from the same origin
-# @dashapp.server.after_request
-# def apply_security_headers(response):
-#     response.headers["X-Frame-Options"] = "SAMEORIGIN"
-#     response.headers["Content-Security-Policy"] = "frame-ancestors 'self';"
-#     return response
+@dashapp.server.after_request
+def apply_security_headers(response):
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Content-Security-Policy"] = "frame-ancestors 'self';"
+    return response
 
 # Serve the cached PDF from the server based on session ID and time
-@dashapp.server.route(f"{PAGE_PREFIX}/kegg/serve-cached-pdf/<session_pdf>")
-def serve_cached_pdf(session_pdf):
-    cached_pdf_base64 = cache.get(session_pdf)
-    if not cached_pdf_base64:
-        return "PDF not found or cache timed out, please re-submit!", 404
+# @dashapp.server.route(f"{PAGE_PREFIX}/kegg/serve-cached-pdf/<session_pdf>")
+# def serve_cached_pdf(session_pdf):
+#     cached_pdf_base64 = cache.get(session_pdf)
+#     if not cached_pdf_base64:
+#         return "PDF not found or cache timed out, please re-submit!", 404
 
-    # Decode and convert to BytesIO
-    pdf_data = base64.b64decode(cached_pdf_base64)
-    pdf_buffer = BytesIO(pdf_data)
-    pdf_buffer.seek(0)
-    return send_file(pdf_buffer, mimetype="application/pdf")
+#     # Decode and convert to BytesIO
+#     pdf_data = base64.b64decode(cached_pdf_base64)
+#     pdf_buffer = BytesIO(pdf_data)
+#     pdf_buffer.seek(0)
+#     return send_file(pdf_buffer, mimetype="application/pdf")
 
 dashapp.layout=html.Div( 
     [ 
@@ -230,12 +230,12 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
     pdf_base64 = base64.b64encode(pdf_buffer_data).decode("utf-8")
     pdf_data_url = f"data:application/pdf;base64,{pdf_base64}"
     pdf_download_name = f"{download_name}.pdf" if download_name else "kegg.pdf"
-    timestamp_second = int(time.time())
-    cache.set(f"pdf-{session_id}-{timestamp_second}", pdf_base64, timeout=600)
+    # timestamp_second = int(time.time())
+    # cache.set(f"pdf-{session_id}-{timestamp_second}", pdf_base64, timeout=600)
 
     net_pdf_tab=html.Div([
-        # html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "600px"}),
-        html.Iframe(src=f"{PAGE_PREFIX}/kegg/serve-cached-pdf/pdf-{session_id}-{timestamp_second}", style={"width": "100%", "height": "600px"}),
+        html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "600px"}),
+        # html.Iframe(src=f"{PAGE_PREFIX}/kegg/serve-cached-pdf/pdf-{session_id}-{timestamp_second}", style={"width": "100%", "height": "600px"}),
 
         html.Div([
             html.A(
@@ -251,7 +251,9 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
             ),
         ], id="download-pdf-div", style={"max-width": "150px", "width": "100%", "margin": "4px"}),
 
-        html.Div([dcc.Markdown("*\* Primaray and additional compounds are highlighted with red and aqua respectively*", style={"margin-top":"10px","margin-left":"15px"})])
+        html.Div([dcc.Markdown("*\* Primaray and additional compounds are highlighted with red and aqua respectively*", style={"margin-top":"10px","margin-left":"15px"})]),
+
+        html.Div([dcc.Markdown("*\* If fails to display the PDF (due to browser buffer limit), please try a differnt browser (e.g. Firefox, Safari) or download directly with PDF button*", style={"margin-top":"10px","margin-left":"15px"})]),
     ])
 
     overview_tab=html.Pre(overview, style={'padding-left': '20px', 'padding-top': '20px'}) 
