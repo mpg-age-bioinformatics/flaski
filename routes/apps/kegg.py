@@ -3,16 +3,13 @@ from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
 from flask_login import current_user
 from flask_caching import Cache
-from flask import abort, send_file
 import dash
 import os
 import uuid
 import base64
-import time
-from io import BytesIO
-import pandas as pd
-from dash import dcc, html
-from dash.dependencies import Input, Output, State, MATCH, ALL
+import re
+from dash import dcc, html, callback_context, no_update
+from dash.dependencies import Input, Output, State
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
 import dash_bootstrap_components as dbc
 from ._kegg import compound_options, pathway_options, organism_options, additional_compound_options, kegg_operations
@@ -44,11 +41,11 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
     })
 
 # Allow iframe embedding only from the same origin
-@dashapp.server.after_request
-def apply_security_headers(response):
-    response.headers["X-Frame-Options"] = "SAMEORIGIN"
-    response.headers["Content-Security-Policy"] = "frame-ancestors 'self';"
-    return response
+# @dashapp.server.after_request
+# def apply_security_headers(response):
+#     response.headers["X-Frame-Options"] = "SAMEORIGIN"
+#     response.headers["Content-Security-Policy"] = "frame-ancestors 'self';"
+#     return response
 
 # Serve the cached PDF from the server based on session ID and time
 # @dashapp.server.route(f"{PAGE_PREFIX}/kegg/serve-cached-pdf/<session_pdf>")
@@ -110,8 +107,9 @@ def make_layout(session_id):
                                 [
                                     html.H5("Filters", style={"margin-top":10}), 
                                     html.Label('Compound'), make_loading( dcc.Dropdown( id='opt-compound', multi=True, optionHeight=120), 1),
+                                    html.Label('(OR) List of Compound IDs',style={"margin-top":10}),  dcc.Textarea(id='list-compound', placeholder='C00001\nC00002\nC00003', style={'width': '100%', 'height': '100px', 'padding': '10px', 'font-size': '16px'}),
                                     html.Label('Pathway',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-pathway', optionHeight=90), 2 ),
-                                    html.Label('Organism',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-organism'), 3 ),
+                                    html.Label('Organism',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-organism', optionHeight=60), 3 ),
                                     html.Label('Highlight Additional Compound',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-additional', multi=True, optionHeight=120), 4 ),
                                     html.Label('Download file prefix',style={"margin-top":10}), 
                                     dcc.Input(id='download_name', value="kegg", type='text',style={"width":"100%", "height":"34px"})
@@ -139,6 +137,7 @@ def make_layout(session_id):
                               style={"margin-top":"50%"} 
                           ),  
                           dcc.Markdown("Based on KEGG (Kyoto Encyclopedia of Genes and Genomes) - https://www.genome.jp/kegg/", style={"margin-top":"15px", "margin-left":"15px"}),
+                          dcc.Store(id='stored-compounds'),
                         ],
                         xs=12,sm=12,md=6,lg=8,xl=9,
                         style={"margin-bottom":"50px"}
@@ -167,15 +166,31 @@ def update_menus(session_id):
 @dashapp.callback(
     Output('opt-pathway', 'options'),
     Output('opt-pathway', 'placeholder'),
-    Input('opt-compound', 'value')
+    Output('stored-compounds', 'data'),
+    Input('opt-compound', 'value'),
+    Input('list-compound', 'value')
 )
-def update_pathways(selected_compounds):
-    if selected_compounds is None or len(selected_compounds) == 0:
-        return [], "No Compound Selected"    
-    pw_options=pathway_options(cache, selected_compounds)
-    if pw_options is None:
-        return [], "No Pathway Found for Selected Compound" 
-    return pw_options, "Select Pathway"
+def update_pathways(selected_compounds, listed_compounds):
+    triggered_input = callback_context.triggered[0]['prop_id'].split('.')[0]
+
+    if triggered_input == 'opt-compound' and selected_compounds:
+        if selected_compounds is None or len(selected_compounds) == 0:
+            return [], "Invalid Compound Input", []
+        pw_options=pathway_options(cache, selected_compounds)
+        if pw_options is None:
+            return [], "No Pathway Found for Selected Compound", [] 
+        return pw_options, "Select Pathway", selected_compounds     
+    elif triggered_input == 'list-compound' and listed_compounds:
+        if listed_compounds is None or len(listed_compounds) < 6:
+            return [], "Invalid Compound Input", []
+        lines = listed_compounds.splitlines()
+        processed_compounds = [ re.sub(r'\W+', '', line) for line in lines if len(re.sub(r'\W+', '', line)) == 6 ]
+        pw_options=pathway_options(cache, processed_compounds)
+        if pw_options is None:
+            return [], "No Pathway Found for Selected Compound", []
+        return pw_options, "Select Pathway", processed_compounds
+    else:
+       return [], "No Compound Selected", []
 
 # Callback to update opt-organism based on selected pathway
 @dashapp.callback(
@@ -209,13 +224,17 @@ def update_additional(selected_pathway, selected_organism):
     Output('my-output','children'),
     Input('session-id', 'data'),
     Input('submit-button-state', 'n_clicks'),
-    State("opt-compound", "value"),
+    Input("stored-compounds", "data"),
     State("opt-pathway", "value"),
     State("opt-organism", "value"),
     State("opt-additional", "value"),
     State('download_name','value'),
 )
 def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound, download_name):
+    triggered_input = callback_context.triggered[0]['prop_id'].split('.')[0]
+    if triggered_input != 'submit-button-state':
+        return no_update
+    
     if not n_clicks:
         return html.Div([])
     
@@ -234,7 +253,7 @@ def update_output(session_id, n_clicks, compound, pathway, organism, additional_
     # cache.set(f"pdf-{session_id}-{timestamp_second}", pdf_base64, timeout=600)
 
     net_pdf_tab=html.Div([
-        html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "600px"}),
+        html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "550px"}),
         # html.Iframe(src=f"{PAGE_PREFIX}/kegg/serve-cached-pdf/pdf-{session_id}-{timestamp_second}", style={"width": "100%", "height": "600px"}),
 
         html.Div([

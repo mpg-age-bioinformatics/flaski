@@ -1,7 +1,6 @@
 from myapp import app
 from myapp.routes.apps._utils import make_table
 from io import StringIO
-from datetime import datetime
 from io import BytesIO
 import pandas as pd
 import os
@@ -30,6 +29,13 @@ def read_pathway_organism(cache, path_to_files=path_to_files):
         return df.to_json()
     return pd.read_json(StringIO(_read_pathway_organism()))
 
+def read_organisms(cache, path_to_files=path_to_files):
+    @cache.memoize(60*60*2) 
+    def _read_organisms(path_to_files=path_to_files):
+        df=pd.read_csv(f"{path_to_files}/organisms.tsv", sep="\t", names=['organism_id', 'organism_name'])
+        return df.to_json()
+    return pd.read_json(StringIO(_read_organisms()))
+
 def compound_options(cache):
     compound_pathway_data=read_compound_pathway(cache)
     return [{'label': f"{cid}: {cname}", 'value': cid} for cid, cname in zip(compound_pathway_data['compound_id'], compound_pathway_data['compound_name'])]
@@ -42,18 +48,25 @@ def pathway_options(cache, compound_list):
     pathways_values = cp_row['pathways'].tolist()
     if not pathways_values or pathways_values==[None]:
         return None
-    pathways_list = list(set([path.strip() for sublist in pathways_values for path in sublist.split(',')]))
+    # pathways_list = list(set([path.strip() for sublist in pathways_values for path in sublist.split(',')]))
+    pathways_list = list(set(
+        [path.strip() for sublist in pathways_values if sublist is not None for path in sublist.split(',')]
+    ))
+
     pw_rows = pathway_organism_data[pathway_organism_data['pathway_id'].isin(pathways_list)]
     
     return [{'label': f"{pid}: {pname}", 'value': pid} for pid, pname in zip(pw_rows['pathway_id'], pw_rows['pathway_name'])]
 
 def organism_options(cache, pathway_id):
     pod=read_pathway_organism(cache)
+    org_df=read_organisms(cache)
     org_value=pod.loc[pod['pathway_id'] == pathway_id, 'organisms'].values[0] if not pod.loc[pod['pathway_id'] == pathway_id, 'organisms'].empty else None
     if org_value is None:
         return None
 
-    return [{'label': org, 'value': org} for org in org_value.split(',')]
+    # return [{'label': org, 'value': org} for org in org_value.split(',')]
+    return [{'label': f"{org}: {org_df.loc[org_df['organism_id'] == org, 'organism_name'].values[0]}" if not org_df.loc[org_df['organism_id'] == org, 'organism_name'].empty else org, 'value': org} for org in org_value.split(',')]
+
 
 def additional_compound_options(cache, pathway_id, organism_id):
     compound_pathway_data=read_compound_pathway(cache)
