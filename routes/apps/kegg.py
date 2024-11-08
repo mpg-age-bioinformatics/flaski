@@ -36,8 +36,7 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         'CACHE_REDIS_SENTINELS': [ 
             [ os.environ.get('CACHE_REDIS_SENTINELS_address'), int(os.environ.get('CACHE_REDIS_SENTINELS_port')) ]
         ],
-        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER'),
-        'CACHE_REDIS_PASSWORD': os.environ.get('REDIS_PASSWORD')
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
 
 # Allow iframe embedding only from the same origin
