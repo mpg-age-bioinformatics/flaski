@@ -412,7 +412,7 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
         emsg_html=tb_str.split("\n")
         send_email(
             '[Flaski] exception: %s ' %eapp,
-            sender=app.config['MAIL_USERNAME'],
+            sender=app.config['MAIL_USERNAME_ADDRESS'],
             recipients=app.config['ADMINS'],
             text_body=render_template(
                 'email/app_exception.txt',
@@ -518,7 +518,7 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
         session_file_name="no session data for this Exception"
 
     send_email('[Flaski] help needed: %s ' %current_app,
-        sender=app.config['MAIL_USERNAME'],
+        sender=app.config['MAIL_USERNAME_ADDRESS'],
         recipients=app.config['ADMINS'],
         text_body=render_template('email/app_help.txt',
                                     user=user, eapp=current_app, emsg=tb_str, etime=str(datetime.now()), session_file=session_file_name),
@@ -529,7 +529,7 @@ def ask_for_help(tb_str, user, current_app, session_data=None ):
 def send_submission_email(user,submission_type,submission_tag, submission_file=None, attachment_path=None,open_type="rb",attachment_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):
     with app.app_context():
         send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
-                sender=app.config['MAIL_USERNAME'],
+                sender=app.config['MAIL_USERNAME_ADDRESS'],
                 recipients=[user.email, 'automation@age.mpg.de' ], 
                 text_body=render_template('email/submissions.age.txt',
                                             user=user, submission_type=submission_type, submission_tag=submission_tag),
@@ -608,7 +608,7 @@ def send_submission_ftp_email(user,submission_type,submission_tag, submission_fi
 
     with app.app_context():
         send_email('[Flaski][Automation][{submission_type}] Files have been submited for analysis.'.format(submission_type=submission_type),
-                sender=app.config['MAIL_USERNAME'],
+                sender=app.config['MAIL_USERNAME_ADDRESS'],
                 recipients=[user.email, 'automation@age.mpg.de' ], 
                 text_body=render_template('email/submissions.ftp.txt',
                                             user=user, 

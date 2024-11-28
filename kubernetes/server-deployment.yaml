@@ -71,8 +71,10 @@ spec:
         - name: MAIL_PORT
           value: "587"
         - name: MAIL_SERVER
-          value: mail.age.mpg.de
+          value: mail.ox.gwdg.de
         - name: MAIL_USERNAME
+          value: flaski@age.mpg.de
+        - name: MAIL_USERNAME_ADDRESS
           value: flaski@age.mpg.de
         - name: MAIL_USE_TLS
           value: "1"
