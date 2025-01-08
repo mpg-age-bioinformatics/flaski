@@ -1,84 +1,20 @@
-from myapp import app, PAGE_PREFIX
+from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
+from myapp import db
+from myapp.models import UserLogging, PrivateRoutes
 from flask_login import current_user
 from flask_caching import Cache
-from myapp.models import UserLogging
-#from flaski.routines import check_session_app
-from flask import session
 import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output, State, MATCH, ALL
-from dash.exceptions import PreventUpdate
-from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
-import dash_bootstrap_components as dbc
-from myapp.routes.apps._utils import parse_import_json, make_options, make_except_toast, ask_for_help, save_session, make_min_width
-from pyflaski.kegg import make_figure, figure_defaults
 import os
 import uuid
-import traceback
-import json
-import pandas as pd
-import time
-import plotly.express as px
-# from plotly.io import write_image
-import plotly.graph_objects as go
-from werkzeug.utils import secure_filename
-from time import sleep
-from dash import dash_table
-from myapp import db
-from myapp.models import UserLogging
+import base64
+import re
+from dash import dcc, html, callback_context, no_update
+from dash.dependencies import Input, Output, State
+from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
+import dash_bootstrap_components as dbc
+from ._kegg import compound_options, pathway_options, organism_options, additional_compound_options, kegg_operations
 
 
-
-def make_table_kegg(df,id,page_size=50,fixed_columns=False):
-
-    def create_conditional_style(df):
-        style=[]
-        for col in df.columns:
-            pixel=make_min_width(col, factor=7)
-            style.append({'if': {'column_id': col}, 'minWidth': pixel})
-
-        return style
-    
-    width_style=create_conditional_style(df)
-        # in reference pathway, use ref_link
-        # in species pathway, use species_link
-    def create_links(df):
-        links_reference=[]
-        links_species = []
-        for i, row in df.iterrows():
-            links_reference.append('[{}]({})'.format(row["Reference pathway"], row["ref_link"]))
-            links_species.append('[{}]({})'.format(row["Species pathway"], row["species_link"]))
-        df["Reference pathway"] = links_reference
-        df["Species pathway"] = links_species
-        df.drop(columns = ['ref_link', 'species_link'], inplace = True)
-        return(df)
-
-    df_with_links = create_links(df)
-
-    report_table=dash_table.DataTable(
-        id=id,
-        columns=[{"name": i, "id": i, 'type':"text", "presentation":"markdown"} for i in df_with_links.columns],
-        data=df_with_links.to_dict('records'),
-        fixed_rows={ 'headers': True, 'data': 0 },
-        fixed_columns=fixed_columns, 
-        style_cell={
-            'whiteSpace': 'normal'
-        },
-        css=[{"selector": "p", "rule": "margin: 0"}],
-        virtualization=False,
-        style_table={"height": "75vh", "maxHeight": "75vh",'width':"100%",'overflowY': 'auto', 'overflowX': 'auto','border': '1px solid rgb(223,223,223)'},
-        style_header={'backgroundColor': '#5474d8','color': 'white','fontWeight': 'bold', 'textAlign': 'left'},
-        style_data_conditional=[
-        { 'if': {'row_index': 'odd'}, 'backgroundColor': 'rgb(242,242,242)'}
-        ]+width_style,
-        page_size=page_size
-        # page_action='none'
-        )
-
-    return report_table
-
-PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
-PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
 dashapp = dash.Dash("kegg",url_base_pathname=f'{PAGE_PREFIX}/kegg/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title="KEGG", assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
@@ -98,636 +34,282 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
     cache = Cache(dashapp.server, config={
         'CACHE_TYPE': 'RedisSentinelCache',
         'CACHE_REDIS_SENTINELS': [ 
-            [ os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port') ]
+            [ os.environ.get('CACHE_REDIS_SENTINELS_address'), int(os.environ.get('CACHE_REDIS_SENTINELS_port')) ]
         ],
         'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
 
-def run_kegg_and_cache(pa, cache):
-    @cache.memoize(timeout=3600)
-    def _run_kegg_and_cache(pa, cache):
-        projected, msg = make_figure(pa)
-        kegg_results={ "projected": projected.to_json() }
-        return kegg_results
-    return _run_kegg_and_cache(pa, cache)
+# Allow iframe embedding only from the same origin
+# @dashapp.server.after_request
+# def apply_security_headers(response):
+#     response.headers["X-Frame-Options"] = "SAMEORIGIN"
+#     response.headers["Content-Security-Policy"] = "frame-ancestors 'self';"
+#     return response
 
+# Serve the cached PDF from the server based on session ID and time
+# @dashapp.server.route(f"{PAGE_PREFIX}/kegg/serve-cached-pdf/<session_pdf>")
+# def serve_cached_pdf(session_pdf):
+#     cached_pdf_base64 = cache.get(session_pdf)
+#     if not cached_pdf_base64:
+#         return "PDF not found or cache timed out, please re-submit!", 404
+
+#     # Decode and convert to BytesIO
+#     pdf_data = base64.b64decode(cached_pdf_base64)
+#     pdf_buffer = BytesIO(pdf_data)
+#     pdf_buffer.seek(0)
+#     return send_file(pdf_buffer, mimetype="application/pdf")
 
 dashapp.layout=html.Div( 
     [ 
         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
-        dcc.Location( id='url', refresh=True ),
+        dcc.Location( id='url', refresh=False ),
         html.Div( id="protected-content" ),
     ] 
 )
 
-card_label_style={"margin-right":"2px"}
-card_label_style_={"margin-left":"5px","margin-right":"2px"}
-
-card_input_style={"height":"35px","width":"100%"}
-# card_input_style_={"height":"35px","width":"100%","margin-right":"10px"}
-card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
-# card_body_style={ "padding":"2px", "padding-top":"4px","padding-left":"18px"}
-
+card_label_style={"margin-top":"5px"}
+card_input_style={"width":"100%","height":"35px"}
+card_body_style={ "padding":"2px", "padding-top":"4px"}
 
 @dashapp.callback(
     Output('protected-content', 'children'),
-    Input('url', 'pathname'))
-def make_layout(pathname):
+    Input('session-id', 'data')
+    )
+def make_layout(session_id):
+
+    ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit kegg")
     db.session.add(eventlog)
     db.session.commit()
+
+    # For better loading
+    def make_loading(children,i):
+        return dcc.Loading(
+            id=f"menu-load-{i}",
+            type="default",
+            children=children,
+        )
+
+    # HTML content from here
     protected_content=html.Div(
         [
             make_navbar_logged("KEGG",current_user),
-            html.Div(id="app-content"),
+            html.Div(id="app_access"),
+            # html.Div(id="redirect-app"),
+            dcc.Store(data=str(uuid.uuid4()), id='session-id'),
+
+            dbc.Row(
+                [
+                    dbc.Col( 
+                        [
+                            dbc.Card(
+                                [
+                                    html.H5("Filters", style={"margin-top":10}), 
+                                    html.Label('Compound'), make_loading( dcc.Dropdown( id='opt-compound', multi=True, optionHeight=120), 1),
+                                    html.Label('(OR) List of Compound IDs',style={"margin-top":10}),  dcc.Textarea(id='list-compound', placeholder='C00001\nC00002\nC00003', style={'width': '100%', 'height': '100px', 'padding': '10px', 'font-size': '16px'}),
+                                    html.Label('Pathway',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-pathway', optionHeight=90), 2 ),
+                                    html.Label('Organism',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-organism', optionHeight=60), 3 ),
+                                    html.Label('Highlight Additional Compound',style={"margin-top":10}),  make_loading( dcc.Dropdown( id='opt-additional', multi=True, optionHeight=120), 4 ),
+                                    html.Label('Download file prefix',style={"margin-top":10}), 
+                                    dcc.Input(id='download_name', value="kegg", type='text',style={"width":"100%", "height":"34px"})
+                                ],
+                                body=True
+                            ),
+                            dbc.Button(
+                                'Submit',
+                                id='submit-button-state', 
+                                color="secondary",
+                                n_clicks=0, 
+                                style={"width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
+                            )
+                        ],
+                        xs=12,sm=12,md=6,lg=4,xl=3,
+                        align="top",
+                        style={"padding":"0px","margin-bottom":"50px"} 
+                    ),               
+                    dbc.Col(
+                        [
+                          dcc.Loading(
+                              id="loading-output-1",
+                              type="default",
+                              children=[ html.Div(id="my-output")],
+                              style={"margin-top":"50%"} 
+                          ),  
+                          dcc.Markdown("Based on KEGG (Kyoto Encyclopedia of Genes and Genomes) - https://www.genome.jp/kegg/", style={"margin-top":"15px", "margin-left":"15px"}),
+                          dcc.Store(id='stored-compounds'),
+                        ],
+                        xs=12,sm=12,md=6,lg=8,xl=9,
+                        style={"margin-bottom":"50px"}
+                    )
+                ],
+                align="start",
+                justify="left",
+                className="g-0",
+                style={"width":"100%"}
+            ),
             navbar_A,
         ],
         style={"height":"100vh","verticalAlign":"center"}
     )
     return protected_content
 
-@dashapp.callback( 
-    Output('app-content', 'children'),
-    Input('url', 'pathname'))
-def make_app_content(pathname):
-    pa=figure_defaults()
-    side_bar=[
-        dbc.Card( 
-            [   
-                html.Div(
-                    dcc.Upload(
-                        id='upload-data',
-                        children=html.Div(
-                            [ 'Drag and Drop or ',html.A('Select File',id='upload-data-text') ],
-                            style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-                        ),
-                        style={
-                            'width': '100%',
-                            'borderWidth': '1px',
-                            'borderStyle': 'dashed',
-                            'borderRadius': '5px',
-                            "margin-bottom": "10px",
-                            "display":"none"
-                        },
-                        multiple=False,
-                    ),
-                ),
-                ############################
-                dbc.Row(
-                        dbc.Label("Target Metabolites"), #"height":"35px",
-                ),
-                ############################
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Textarea(id='ids', placeholder=pa["ids"], style={"height":"100px","width":"100%"}),
-                        ),
-                    ],
-                    align="start",
-                    justify="betweem",
-                    className="g-0",
-                ),
-                ############################
-                dbc.Row(
-                    [
-                        dbc.Label("Species",width = 4),
-                        dbc.Col(                        
-                            dcc.Dropdown( options=make_options(pa["species_options"]), value=pa["species"],  id='species', multi=False, clearable = False),
-                            width=8
-                        ),
-                    ],
-                    className="g-1",
-                ),
-            ],
-            body=True,
-            style={"min-width":"372px","width":"100%","margin-bottom":"2px","margin-top":"2px","padding":"0px"}#,'display': 'block'}#,"max-width":"375px","min-width":"375px"}"display":"inline-block"
-        ),
-        dbc.Row(
-            [
-                dbc.Col( 
-                    [
-                        dbc.Button(
-                            html.Span(
-                                [ 
-                                    html.I(className="fas fa-file-export"),
-                                    " Export" 
-                                ]
-                            ),
-                            color="secondary",
-                            id='export-session-btn', 
-                            style={"width":"100%"}
-                        ),
-                        dcc.Download(id="export-session")
-                    ],
-                    id="export-session-div",
-                    width=4,
-                    style={"padding-right":"2px"}
+# Callback to load compound list on session load
+@dashapp.callback(
+    Output(component_id='opt-compound', component_property='options'),
+    Input('session-id', 'data')
+    )
+def update_menus(session_id):
+    return compound_options(cache)
 
-                ),
-                dbc.Col(
-                    [
-                        dbc.Button(
-                            html.Span(
-                                [ 
-                                    html.I(className="far fa-lg fa-save"), #, style={"size":"12px"}
-                                    " Save" 
-                                ]
-                            ),
-                            id='save-session-btn', 
-                            color="secondary",
-                            style={"width":"100%"}
-                        ),
-                        dcc.Download(id="save-session")
-                    ],
-                    id="save-session-div",
-                    width=4,
-                    style={"padding-left":"2px", "padding-right":"2px"}
-                ),
+# Callback to update opt-pathway based on selected compounds
+@dashapp.callback(
+    Output('opt-pathway', 'options'),
+    Output('opt-pathway', 'placeholder'),
+    Output('stored-compounds', 'data'),
+    Input('opt-compound', 'value'),
+    Input('list-compound', 'value')
+)
+def update_pathways(selected_compounds, listed_compounds):
+    triggered_input = callback_context.triggered[0]['prop_id'].split('.')[0]
 
-                dbc.Col( 
-                    [
-                        dbc.Button(
-                            html.Span(
-                                [ 
-                                    html.I(className="fas fa-lg fa-save"),
-                                    " Save as.." 
-                                ]
-                            ),
-                            id='saveas-session-btn', 
-                            color="secondary",
-                            style={"width":"100%"}
-                        ),
-                        dcc.Download(id="saveas-session")
-                    ],
-                    id="saveas-session-div",
-                    width=4,
-                    style={"padding-left":"2px"}
+    if triggered_input == 'opt-compound' and selected_compounds:
+        if selected_compounds is None or len(selected_compounds) == 0:
+            return [], "Invalid Compound Input", []
+        pw_options=pathway_options(cache, selected_compounds)
+        if pw_options is None:
+            return [], "No Pathway Found for Selected Compound", [] 
+        return pw_options, "Select Pathway", selected_compounds     
+    elif triggered_input == 'list-compound' and listed_compounds:
+        if listed_compounds is None or len(listed_compounds) < 6:
+            return [], "Invalid Compound Input", []
+        lines = listed_compounds.splitlines()
+        processed_compounds = [ re.sub(r'\W+', '', line) for line in lines if len(re.sub(r'\W+', '', line)) == 6 ]
+        pw_options=pathway_options(cache, processed_compounds)
+        if pw_options is None:
+            return [], "No Pathway Found for Selected Compound", []
+        return pw_options, "Select Pathway", processed_compounds
+    else:
+       return [], "No Compound Selected", []
 
-                ),
-            ],
-            style={ "min-width":"372px","width":"100%"}, #, "display": "none"},
-            className="g-0",    
-            # style={ "margin-left":"0px" , "margin-right":"0px"}
-        ),
-        dbc.Button(
-                    'Submit',
-                    id='submit-button-state', 
-                    color="secondary",
-                    n_clicks=0, 
-                    style={"min-width":"372px","width":"100%","margin-top":"2px","margin-bottom":"2px"}#,"max-width":"375px","min-width":"375px"}
-                )
-    ]
+# Callback to update opt-organism based on selected pathway
+@dashapp.callback(
+    Output('opt-organism', 'options'),
+    Output('opt-organism', 'placeholder'),
+    Input('opt-pathway', 'value')
+)
+def update_organisms(selected_pathway):
+    if selected_pathway is None:
+        return [], "No Pathway Selected"    
+    org_options=organism_options(cache, selected_pathway)
+    if org_options is None:
+        return [], "No Organism Found for Selected Pathway" 
+    return org_options, "Select Organism"
 
-    app_content=html.Div(
-        [
-            dcc.Store( id='session-data' ),
-            # dcc.Store( id='json-import' ),
-            dbc.Row( 
-                [
-                    dbc.Col(
-                        side_bar,
-                        sm=12,md=6,lg=5,xl=4,
-                        align="top",
-                        style={"padding":"0px","overflow":"scroll"},
-                    ),
-                    dbc.Col(
-                        [
-                            dcc.Loading(
-                                id="loading-fig-output",
-                                type="default",
-                                children=[
-                                    html.Div(id="fig-output", style={"margin-left": "4px"}),
-                                    html.Div( 
-                                        [
-                                            dbc.Button(
-                                                html.Span(
-                                                    [ 
-                                                        html.I(className="far fa-lg fa-save"),
-                                                        " Results (xlsx)" 
-                                                    ]
-                                                ),
-                                                id='save-excel-btn', 
-                                                style={"max-width":"150px","width":"100%"},
-                                                color="secondary"
-                                            ),
-                                            dcc.Download(id='save-excel')
-                                        ],
-                                        id="save-excel-div",
-                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
-                                    ),                                    
-                                    html.Div( 
-                                        [
-                                            dbc.Button(
-                                                html.Span(
-                                                    [ 
-                                                        html.I(className="far fa-lg fa-save"),
-                                                        " Results (tsv)" 
-                                                    ]
-                                                ),
-                                                id='save-tsv-btn', 
-                                                style={"max-width":"150px","width":"100%"},
-                                                color="secondary"
-                                            ),
-                                            dcc.Download(id='save-tsv')
-                                        ],
-                                        id="save-tsv-div",
-                                        style={"max-width":"150px","width":"100%","margin":"4px", 'display':'none'} # 'none' / 'inline-block'
-                                    ),
-                                ],
-                                style={"height":"100%"}
-                            ),
-                            html.Div(
-                                [
-                                    html.Div( id="toast-read_input_file"  ),
-                                    dcc.Store( id={ "type":"traceback", "index":"read_input_file" }), 
-                                    html.Div( id="toast-make_fig_output" ),
-                                    dcc.Store( id={ "type":"traceback", "index":"make_fig_output" }), 
-                                    html.Div(id="toast-email"),  
-                                ],
-                                style={"position": "fixed", "top": 66, "right": 10, "width": 350}
-                            ),
-                        ],
-                        id="col-fig-output",
-                        sm=12,md=6,lg=7,xl=8,
-                        align="top",
-                        style={"height":"100%"}
-                    ),
+# Callback to update opt-additional based on selected pathway and organism
+@dashapp.callback(
+    Output('opt-additional', 'options'),
+    Output('opt-additional', 'placeholder'),
+    Input('opt-pathway', 'value'),
+    Input('opt-organism', 'value')
+)
+def update_additional(selected_pathway, selected_organism):
+    if selected_pathway is None or selected_organism is None:
+        return [], "No Available Compound"
+    return additional_compound_options(cache, selected_pathway, selected_organism), "Select Additional Compound"
 
-                    dbc.Modal(
-                        [
-                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
-                            dbc.ModalBody(
-                                [
-                                    dcc.Input(id='excel-filename', value="kegg.xlsx", type='text', style={"width":"100%"})
-                                ]
-                            ),
-                            dbc.ModalFooter(
-                                dbc.Button(
-                                    "Download", id="excel-filename-download", className="ms-auto", n_clicks=0
-                                )
-                            ),
-                        ],
-                        id="excel-filename-modal",
-                        is_open=False,
-                    ),
-                    dbc.Modal(
-                        [
-                            dbc.ModalHeader("File name"), # dbc.ModalTitle(
-                            dbc.ModalBody(
-                                [
-                                    dcc.Input(id='tsv-filename', value="kegg.tsv", type='text', style={"width":"100%"})
-                                ]
-                            ),
-                            dbc.ModalFooter(
-                                dbc.Button(
-                                    "Download", id="tsv-filename-download", className="ms-auto", n_clicks=0
-                                )
-                            ),
-                        ],
-                        id="tsv-filename-modal",
-                        is_open=False,
-                    ),
 
-                    dbc.Modal(
-                        [
-                            dbc.ModalHeader("File name"), 
-                            dbc.ModalBody(
-                                [
-                                    dcc.Input(id='export-filename', value="kegg.json", type='text', style={"width":"100%"})
-                                ]
-                            ),
-                            dbc.ModalFooter(
-                                dbc.Button(
-                                    "Download", id="export-filename-download", className="ms-auto", n_clicks=0
-                                )
-                            ),
-                        ],
-                        id="export-filename-modal",
-                        is_open=False,
-                    )
-                ],
-            align="start",
-            justify="left",
-            className="g-0",
-            style={"height":"86vh","width":"100%","overflow":"scroll"}
+# Callback on submit
+@dashapp.callback(
+    Output('my-output','children'),
+    Input('session-id', 'data'),
+    Input('submit-button-state', 'n_clicks'),
+    Input("stored-compounds", "data"),
+    State("opt-pathway", "value"),
+    State("opt-organism", "value"),
+    State("opt-additional", "value"),
+    State('download_name','value'),
+)
+def update_output(session_id, n_clicks, compound, pathway, organism, additional_compound, download_name):
+    triggered_input = callback_context.triggered[0]['prop_id'].split('.')[0]
+    if triggered_input != 'submit-button-state':
+        return no_update
+    
+    if not n_clicks:
+        return html.Div([])
+    
+    if not compound or pathway is None or organism is None:
+        return html.Div([dcc.Markdown("*** Please select at least a compound, pathway and organism!", style={"margin-top":"15px","margin-left":"15px"})])
+    
+    pdf_buffer, overview, compound_table=kegg_operations(cache, compound, pathway, organism, additional_compound)
+    if pdf_buffer is None:
+        return html.Div([dcc.Markdown("*** Failed to generate network pdf!", style={"margin-top":"15px","margin-left":"15px"})])
+    
+    pdf_buffer_data=pdf_buffer.getvalue()
+    pdf_base64 = base64.b64encode(pdf_buffer_data).decode("utf-8")
+    pdf_data_url = f"data:application/pdf;base64,{pdf_base64}"
+    pdf_download_name = f"{download_name}.pdf" if download_name else "kegg.pdf"
+    # timestamp_second = int(time.time())
+    # cache.set(f"pdf-{session_id}-{timestamp_second}", pdf_base64, timeout=600)
+
+    net_pdf_tab=html.Div([
+        html.Iframe(src=pdf_data_url, style={"width": "100%", "height": "550px"}),
+        # html.Iframe(src=f"{PAGE_PREFIX}/kegg/serve-cached-pdf/pdf-{session_id}-{timestamp_second}", style={"width": "100%", "height": "600px"}),
+
+        html.Div([
+            html.A(
+                html.Span([
+                    html.I(className="fas fa-file-pdf"),
+                    " PDF"
+                ]),
+                id='download-pdf-link',
+                href=pdf_data_url,
+                download=pdf_download_name,
+                className="btn btn-secondary",
+                style={"max-width": "150px", "width": "100%", "display": "inline-block", "text-align": "center", "color": "white", "border-radius": "8px"}
             ),
+        ], id="download-pdf-div", style={"max-width": "150px", "width": "100%", "margin": "4px"}),
+
+        html.Div([dcc.Markdown("*\* Primaray and additional compounds are highlighted with red and aqua respectively*", style={"margin-top":"10px","margin-left":"15px"})]),
+
+        html.Div([dcc.Markdown("*\* If fails to display the PDF (due to browser buffer limit), please try a differnt browser (e.g. Firefox, Safari) or download directly with PDF button*", style={"margin-top":"10px","margin-left":"15px"})]),
+    ])
+
+    overview_tab=html.Pre(overview, style={'padding-left': '20px', 'padding-top': '20px'}) 
+
+    output=dcc.Tabs( 
+        [ 
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-1",
+                    type="default",
+                    children=[ net_pdf_tab ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Network PDF", id="tab-net-pdf",
+                style={"margin-top":"0%"}
+            ),
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-2",
+                    type="default",
+                    children=[ overview_tab ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Overview", id="tab-overview",
+                style={"margin-top":"0%"}
+            ),
+            dcc.Tab(
+                dcc.Loading(
+                    id="loading-output-3",
+                    type="default",
+                    children=[ compound_table ],
+                    style={"margin-top":"50%","height": "100%"} 
+                ), 
+                label="Compound", id="tab-compound",
+                style={"margin-top":"0%"}
+            )
         ]
     )
-    return app_content
 
-# example reading session from server storage
-@dashapp.callback( 
-    Output('upload-data', 'contents'),
-    Output('upload-data', 'filename'),
-    Output('upload-data', 'last_modified'),
-    Input('session-id', 'data'))
-def read_session_redis(session_id):
-    if "session_data" in list( session.keys() )  :
-        imp=session["session_data"]
-        del(session["session_data"])
-        sleep(3)
-        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
-    else:
-        return dash.no_update, dash.no_update, dash.no_update
-   
-read_input_updates=["ids",
-    "species"
-]
+    return output
 
-read_input_updates_outputs=[ Output(s, 'value') for s in read_input_updates ]
-
-@dashapp.callback( 
-   [
-    Output('toast-read_input_file','children'), 
-    Output({ "type":"traceback", "index":"read_input_file" },'data'), ] + read_input_updates_outputs ,
-    #Input('json-import', 'data'),
-    Input('upload-data', 'contents') ,
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('session-id', 'data'),
-    prevent_initial_call=True)
-#def read_input_file(json_import):
-def read_input_file(contents, filename, last_modified, session_id):
-    if not filename:
-        raise dash.exceptions.PreventUpdate
-
-    pa_outputs=[ dash.no_update for k in  read_input_updates ]
-
-    try:
-
-        if filename and filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "kegg")
-            pa = app_data["pa"]
-            pa_outputs=[pa[k] for k in  read_input_updates ]
-
-        # upload_text=html.Div(
-        #     [ html.A(filename, id='upload-data-text') ],
-        #     style={ 'textAlign': 'center', "margin-top": 4, "margin-bottom": 4}
-        # )     
-        return [ None, None] + pa_outputs
-
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"kegg")
-        return [ toast, tb_str ] + pa_outputs
-
-
-states=[
-    State('ids', 'value'),
-    State('species', 'value'),
-]
-
-@dashapp.callback( 
-    Output('fig-output', 'children'),
-    Output('toast-make_fig_output','children'),
-    Output('session-data','data'),
-    Output({ "type":"traceback", "index":"make_fig_output" },'data'),
-    Output('save-excel-div', 'style'),
-    Output('save-tsv-div', 'style'),
-    Output('export-session','data'),
-    Output('save-excel', 'data'),
-    Output('save-tsv', 'data'),
-    Input("submit-button-state", "n_clicks"),
-    Input("export-filename-download","n_clicks"),
-    Input("save-session-btn","n_clicks"),
-    Input("saveas-session-btn","n_clicks"),
-    Input("excel-filename-download","n_clicks"),
-    Input("tsv-filename-download","n_clicks"),
-    [ State('session-id', 'data'),
-    State('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    State('export-filename','value'),
-    State('excel-filename', 'value'),
-    State('tsv-filename', 'value'),
-    State('upload-data-text', 'children')] + states,
-    prevent_initial_call=True
-    )
-def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,save_excel_btn, save_tsv_btn,  session_id,contents,filename,last_modified,export_filename,excel_filename,tsv_filename,upload_data_text, *args):
-    ## This function can be used for the export, save, and save as by making use of 
-    ## Determining which Input has fired with dash.callback_context
-    ## in https://dash.plotly.com/advanced-callbacks
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        button_id = 'No clicks yet'
-    else:
-        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    
-    download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
-    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'}
-    
-    try:
-        input_names = [item.component_id for item in states]
-
-        pa=figure_defaults()
-        for k, a in zip(input_names,args) :
-            if type(k) != dict :
-                pa[k]=a
-            elif type(k) == dict :
-                k_=k['type'] 
-                for i, a_ in enumerate(a) :
-                    pa[k_]=a_
-
-        session_data={ "session_data": {"app": { "kegg": {"filename":upload_data_text,"last_modified":last_modified,"pa":pa} } } }
-        session_data["APP_VERSION"]=app.config['APP_VERSION']
-        session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
-
-        
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"kegg")
-        return dash.no_update, toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None, None, None
-
-    if button_id == "export-filename-download" :
-        if not export_filename:
-            export_filename="kegg.json"
-        export_filename=secure_filename(export_filename)
-        if export_filename.split(".")[-1] != "json":
-            export_filename=f'{export_filename}.json'  
-
-        def write_json(export_filename,session_data=session_data):
-            export_filename.write(json.dumps(session_data).encode())
-            # export_filename.seek(0)
-
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update, dcc.send_bytes(write_json, export_filename), None, None
-
-    if button_id == "save-session-btn" :
-        try:
-            if filename and filename.split(".")[-1] == "json" :
-                toast=save_session(session_data, filename,current_user, "make_fig_output" )
-                return dash.no_update, toast, None, None, dash.no_update,dash.no_update, None, None, None
-            else:
-                session["session_data"]=session_data
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update,dash.no_update, dash.no_update, dash.no_update
-                # save session_data to redis session
-                # redirect to as a save as to file server
-
-        except Exception as e:
-            tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-            toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"kegg")
-            return dash.no_update, toast, None, tb_str, dash.no_update, dash.no_update, None, None, None
-
-        # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
-
-    if button_id == "saveas-session-btn" :
-        session["session_data"]=session_data
-        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'),  dash.no_update,  dash.no_update,dash.no_update, dash.no_update, dash.no_update, dash.no_update,dash.no_update, dash.no_update
-          # return dash.no_update, None, None, None, dash.no_update, dcc.send_bytes(write_json, export_filename)
-
-    if button_id in ["excel-filename-download","tsv-filename-download" ] :
-
-        eventlog = UserLogging(email=current_user.email,action="download kegg")
-        db.session.add(eventlog)
-        db.session.commit()
-    
-    if button_id == "excel-filename-download":
-        if not excel_filename:
-            excel_filename=secure_filename("kegg_results.%s.xlsx" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
-        excel_filename=secure_filename(excel_filename)
-        if excel_filename.split(".")[-1] != "xlsx":
-            excel_filename=f'{excel_filename}.xlsx'  
-
-        kegg_results=run_kegg_and_cache(pa, cache)
-        projected = pd.read_json(kegg_results["projected"]) 
-
-        import io
-        output = io.BytesIO()
-        writer= pd.ExcelWriter(output)
-        projected.to_excel(writer, sheet_name = 'kegg results', index = False)
-        writer.save()
-        data=output.getvalue()
-        return dash.no_update, None, None, None, dash.no_update, dash.no_update, None, dcc.send_bytes(data, excel_filename), None
-
-    if button_id == "tsv-filename-download":
-        if not tsv_filename:
-            tsv_filename=secure_filename("kegg_results.%s.tsv" %(time.strftime("%Y%m%d_%H%M%S", time.localtime())))
-        tsv_filename=secure_filename(tsv_filename)
-        if tsv_filename.split(".")[-1] != "tsv":
-            tsv_filename=f'{tsv_filename}.tsv'  
-
-        kegg_results=run_kegg_and_cache(pa, cache)
-        projected = pd.read_json(kegg_results["projected"]) 
-
-        return dash.no_update, None, None, None,dash.no_update, dash.no_update, None, None, dcc.send_data_frame(projected.to_csv, tsv_filename, sep = "\t")
-
-
-    try:
-        fig=None
-        kegg_results=run_kegg_and_cache(pa, cache)
-        projected = pd.read_json(kegg_results["projected"]) 
-        # truncate to two decimal points were appropriate
-
-        fig=make_table_kegg(projected, "kegg_results", fixed_columns = True)
-
-        return fig, None, None, None,  download_buttons_style_show,download_buttons_style_show,None, None, None
-
-    except Exception as e:
-        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"kegg")
-        return dash.no_update, toast, session_data, tb_str, download_buttons_style_hide,  download_buttons_style_hide, None, None, None
-
-
-@dashapp.callback(
-    Output('excel-filename-modal', 'is_open'),
-    [ Input('save-excel-btn',"n_clicks"),Input("excel-filename-download", "n_clicks")],
-    [ State("excel-filename-modal", "is_open")], 
-    prevent_initial_call=True
-)
-def download_excel_filename(n1, n2, is_open):
-    if n1 or n2:
-        return not is_open
-    return is_open
-
-@dashapp.callback(
-    Output('tsv-filename-modal', 'is_open'),
-    [ Input('save-tsv-btn',"n_clicks"),Input("tsv-filename-download", "n_clicks")],
-    [ State("tsv-filename-modal", "is_open")], 
-    prevent_initial_call=True
-)
-def download_tsv_filename(n1, n2, is_open):
-    if n1 or n2:
-        return not is_open
-    return is_open
-
-@dashapp.callback(
-    Output('export-filename-modal', 'is_open'),
-    [ Input('export-session-btn',"n_clicks"),Input("export-filename-download", "n_clicks")],
-    [ State("export-filename-modal", "is_open")], 
-    prevent_initial_call=True
-)
-def download_export_filename(n1, n2, is_open):
-    if n1 or n2:
-        return not is_open
-    return is_open
-
-@dashapp.callback(
-    Output( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
-    Input( { 'type': 'dynamic-card', 'index': MATCH }, "n_clicks"),
-    State( { 'type': 'collapse-dynamic-card', 'index': MATCH }, "is_open"),
-    prevent_initial_call=True
-)
-def toggle_accordion(n, is_open):
-    return not is_open
-
-@dashapp.callback(
-    Output( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
-    Output( { 'type': 'toggler-toast-traceback', 'index': MATCH }, "children"),
-    Input( { 'type': 'toggler-toast-traceback', 'index': MATCH }, "n_clicks"),
-    State( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
-    prevent_initial_call=True
-)
-def toggle_toast_traceback(n,is_open):
-    if not is_open:
-        return not is_open , "collapse"
-    else:
-        return not is_open , "expand"
-
-@dashapp.callback(
-    Output( { 'type': 'toast-error', 'index': ALL }, "is_open" ),
-    Output( 'toast-email' , "children" ),
-    Output( { 'type': 'toast-error', 'index': ALL }, "n_clicks" ),
-    Input( { 'type': 'help-toast-traceback', 'index': ALL }, "n_clicks" ),
-    State({ "type":"traceback", "index":ALL }, "data"),
-    State( "session-data", "data"),
-    prevent_initial_call=True
-)
-def help_email(n,tb_str, session_data):
-    closed=[ False for s in n ]
-    n=[ s for s in n if s ]
-    clicks=[ 0 for s in n ]
-    n=[ s for s in n if s > 0 ]
-    if n : 
-
-        toast=dbc.Toast(
-            [
-                "We have received your request for help and will get back to you as soon as possible.",
-            ],
-            id={'type':'success-email','index':"email"},
-            header="Help",
-            is_open=True,
-            dismissable=True,
-            icon="success",
-        )
-
-        if tb_str :
-            tb_str= [ s for s in tb_str if s ]
-            tb_str="\n\n***********************************\n\n".join(tb_str)
-        else:
-            tb_str="! traceback could not be found"
-
-        ask_for_help(tb_str,current_user, "kegg", session_data)
-
-        return closed, toast, clicks
-    else:
-        
-        raise PreventUpdate
-
-@dashapp.callback(
-    Output("navbar-collapse", "is_open"),
-    [Input("navbar-toggler", "n_clicks")],
-    [State("navbar-collapse", "is_open")],
-    )
-def toggle_navbar_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open

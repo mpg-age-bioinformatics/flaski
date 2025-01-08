@@ -188,7 +188,7 @@ def release_request(n_clicks, pathname):
     submission_tag=os.path.basename(dest)
 
     send_email(f'[Flaski][Automation][{submission_type}] Files have been transfered.',
-        sender=app.config['MAIL_USERNAME'],
+        sender=app.config['MAIL_USERNAME_ADDRESS'],
         recipients=[user.email, 'automation@age.mpg.de' ], 
         text_body=render_template('email/submissions.ftp.data.txt',
                                     user=user, filename=os.path.basename(submission_tag), submission_tag=submission_tag, submission_type=submission_type),

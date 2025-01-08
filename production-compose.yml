@@ -69,8 +69,9 @@ services:
    FLASK_ENV: production
    MAIL_PASSWORD: ${MAIL_PASSWORD}
    MAIL_PORT: 587
-   MAIL_SERVER: mail.age.mpg.de
+   MAIL_SERVER: mail.ox.gwdg.de
    MAIL_USERNAME: flaski@age.mpg.de
+   MAIL_USERNAME_ADDRESS: flaski@age.mpg.de
    ADMINS: flaski@age.mpg.de
    MAIL_USE_TLS: '1'
    MYSQL_HOST: mariadb
