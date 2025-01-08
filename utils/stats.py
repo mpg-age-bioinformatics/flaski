@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from flaski import app, db
-from flaski.models import User, UserLogging
+from myapp import app, db
+from myapp.models import User, UserLogging
 import sys, os, datetime
 import pandas as pd
 
@@ -24,8 +24,7 @@ def stats(outfolder="/flaski_private"):
 
 if __name__ == "__main__":
   with app.app_context():
-    if sys.argv[1] == "stats":
-      stats()
+    stats()
 
 # pod=$(kubectl --kubeconfig ~/admin.conf -n flaski-prod get pods  | grep server | head -n 1 | awk '{print $1}')
 # kubectl --kubeconfig ~/admin.conf -n flaski-prod cp stats.py ${pod}:/myapp/stats.py
