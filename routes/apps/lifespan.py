@@ -3,7 +3,6 @@ from plotly import optional_imports
 from myapp import app, PAGE_PREFIX
 from flask_login import current_user
 from flask_caching import Cache
-from myapp.models import UserLogging
 from flask import session
 import dash
 from dash import dcc, html

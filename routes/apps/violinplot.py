@@ -3014,6 +3014,10 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,se
         # return fig, None, session_data, None, download_buttons_style_show
         # as session data is no longer required for downloading the figure
 
+        eventlog = UserLogging(email=current_user.email,action="download figure venn")
+        db.session.add(eventlog)
+        db.session.commit()
+
         return fig, None, None, None, download_buttons_style_show, None
 
     except Exception as e:

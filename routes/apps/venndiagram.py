@@ -1,7 +1,6 @@
 from myapp import app, PAGE_PREFIX
 from flask_login import current_user
 from flask_caching import Cache
-from myapp.models import UserLogging
 from flask import session
 import dash
 from dash import dcc, html
@@ -1060,6 +1059,7 @@ def make_fig_output(n_clicks,export_click,save_session_btn,saveas_session_btn,sa
             df.to_excel(writer, sheet_name = 'Venn', index = False)
         writer.save()
         data=output.getvalue()
+
         return dash.no_update, None, None, None, dash.no_update,dash.no_update, dash.no_update, dcc.send_bytes(data, excel_filename)
 
     try:
@@ -1144,6 +1144,11 @@ def download_pdf(n_clicks,graph, pdf_filename):
         ## 
         fig=go.Figure(graph)
         fig.write_image(figure, format="pdf")
+
+    eventlog = UserLogging(email=current_user.email,action="download figure venn")
+    db.session.add(eventlog)
+    db.session.commit()
+    
     return dcc.send_bytes(write_image, pdf_filename)
 
 @dashapp.callback(
