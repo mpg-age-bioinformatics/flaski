@@ -14,7 +14,7 @@ ENV PYFLASKI_VERSION ${PYFLASKI_VERSION}
 USER root
 
 # -o Acquire::Check-Valid-Until=false 
-RUN apt-get update && apt-get install -yq --reinstall python3-pkg-resources && apt-get install -yq libgirepository1.0-dev && \
+RUN apt-get update && apt-get install -yq libgirepository1.0-dev && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
