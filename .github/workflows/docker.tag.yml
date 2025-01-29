@@ -6,7 +6,7 @@ on:
     
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     steps:
     - name: Remove unnecessary files
@@ -14,17 +14,6 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
     - uses: actions/checkout@v2
-    - name: Increase Swap Space (Prevent OOM)
-      run: |
-        sudo fallocate -l 4G /swapfile
-        sudo chmod 600 /swapfile
-        sudo mkswap /swapfile
-        sudo swapon /swapfile
-        free -h
-    - name: Install Dependencies for PyCairo
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libcairo2 libcairo2-dev libpango1.0-dev python3-cairo
     - name: Build the Docker image
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
