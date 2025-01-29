@@ -24,6 +24,10 @@ jobs:
         sudo mkswap /swapfile
         sudo swapon /swapfile
         free -h
+    - name: Install Dependencies for PyCairo
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2 libcairo2-dev libpango1.0-dev python3-cairo
     - name: Build the Docker image
       run: | 
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
