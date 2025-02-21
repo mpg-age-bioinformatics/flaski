@@ -34,7 +34,7 @@ docker-compose logs -f server
 ```
 If running myapp on development mode you will have to start flask from inside the server container:
 ```
-docker-compose exec server /bin/bash
+docker-compose exec server3 /bin/bash
 flask run --host 0.0.0.0 --port 8000
 ```
 Adding administrator user:

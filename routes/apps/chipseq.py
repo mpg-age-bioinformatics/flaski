@@ -330,8 +330,9 @@ Once you have been given access more information will be displayed on how to tra
         dbc.Row( 
             [
                 dbc.Col( html.Label('Adapter sequence') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input( id='adapter', placeholder="none",value="none",type='text',style={ "width":"100%"}),md=3 ),
-                dbc.Col( html.Label('potential adapter sequence to trim, e.g. transposase adapter'),md=6  ), 
+                dbc.Col( dcc.Input( id='adapter', placeholder="adapter_read1.fa,adapter_read2.fa",value="none",type='text',style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('fasta file containing potential adapter sequence to trim, e.g. transposase adapter. For single end sequencing \
+                                    `<filename>.fa`. For paired end sequencing `<filename1>.fa,<filename2>.fa` '),md=6  ), 
             ], 
             style={"margin-top":10,"margin-bottom":10}),  
         dbc.Row( 
@@ -340,7 +341,7 @@ Once you have been given access more information will be displayed on how to tra
                 dbc.Col( dcc.Input(id='macs2', placeholder="none", value="none", type='text', style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('For aditional parameters check MACS2 tutorial'),md=6  ), 
             ], 
-            style={"margin-top":10,"margin-bottom":10}),  
+            style={"margin-top":10, "margin-bottom":10 , 'display': 'none'}),  
         dbc.Row( 
             [
                 dbc.Col( html.Label('exclude mitochondria') ,md=3 , style={"textAlign":"right" }), 
