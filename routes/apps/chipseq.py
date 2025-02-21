@@ -161,7 +161,7 @@ def make_app_content(session_id):
 
 
     # generate dropdown options
-    organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "c_albicans_sc5314"]
+    organisms=["celegans","mmusculus","hsapiens","dmelanogaster"] # "nfurzeri", "c_albicans_sc5314"
     organisms_=make_options(organisms)
     ercc_=make_options(["YES","NO"])
     yes_no_=make_options(["yes","no"])
