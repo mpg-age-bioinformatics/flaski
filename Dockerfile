@@ -14,11 +14,12 @@ ENV PYFLASKI_VERSION ${PYFLASKI_VERSION}
 USER root
 
 # -o Acquire::Check-Valid-Until=false 
-RUN apt-get update && apt-get install -yq libgirepository1.0-dev libcairo2-dev python3-dev pkg-config ninja-build && \
-apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libgirepository1.0-dev libcairo2-dev python3-dev python3-pip pkg-config \
+    ninja-build libssl-dev libffi-dev libgmp-dev libglib2.0-dev gobject-introspection \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
-RUN pip3 install --prefer-binary -r /pyflaski.requirements.txt
+RUN sed -i '/pycrypto/d' /pyflaski.requirements.txt && pip3 install --prefer-binary -r /pyflaski.requirements.txt
 
 COPY requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
