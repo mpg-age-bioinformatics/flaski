@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -yq libgirepository1.0-dev libcairo2-dev p
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
-RUN sed -i '/pycrypto/d;/PyGObject/d' /pyflaski.requirements.txt && pip3 install --prefer-binary -r /pyflaski.requirements.txt
+RUN pip3 install --prefer-binary -r /pyflaski.requirements.txt
 
 COPY requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
