@@ -148,7 +148,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                 }
             },
             "mmusculus":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "mus_musculus" ,
                     "species":"mus musculus",
@@ -172,6 +172,19 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/mus_musculus/",
                     "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/" ,
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"mmusculus_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "113":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    #"genome" : "mm10",
+                    "genome_assembly_vep" : "GRCm39",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/mus_musculus/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
                     "biomart_dataset":"mmusculus_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
                 }
