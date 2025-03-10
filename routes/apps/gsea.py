@@ -112,7 +112,7 @@ def generate_submission_file(rows, expression,genessets, email,group,folder,proj
         edf=edf.to_json()
         gdf=gdf.to_json()
         df_=df_.to_json()
-        filename=make_submission_file(".GSEA.xlsx")
+        filename=make_submission_file(".GSEA.xlsx", folder="mpcdf")
 
         return {"filename": filename, "samples":df, "expression":edf ,"metadata":df_, "gene_sets":gdf}
     return _generate_submission_file(rows,expression, genessets, email,group,folder,project_title,organism,ref)
@@ -441,18 +441,20 @@ def update_output(session_id, n_clicks, rows, expression, genessets, email,group
     gene_sets.to_excel(EXCout,"GeneSets",index=None)
     EXCout.save()
 
+    send_submission_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
+
     # if user_domain == "age.mpg.de" :
     #     send_submission_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=None)
     # else:
-    ftp_user=send_submission_ftp_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
-    metadata=pd.concat([metadata,ftp_user])
+    # ftp_user=send_submission_ftp_email(user=current_user, submission_type="GSEA", submission_tag=subdic["filename"], submission_file=None, attachment_path=subdic["filename"])
+    # metadata=pd.concat([metadata,ftp_user])
 
-    EXCout=pd.ExcelWriter(subdic["filename"])
-    samples.to_excel(EXCout,"samples",index=None)
-    metadata.to_excel(EXCout,"GSEA",index=None)
-    expression.to_excel(EXCout,"ExpMatrix",index=None)
-    gene_sets.to_excel(EXCout,"GeneSets",index=None)
-    EXCout.save()
+    # EXCout=pd.ExcelWriter(subdic["filename"])
+    # samples.to_excel(EXCout,"samples",index=None)
+    # metadata.to_excel(EXCout,"GSEA",index=None)
+    # expression.to_excel(EXCout,"ExpMatrix",index=None)
+    # gene_sets.to_excel(EXCout,"GeneSets",index=None)
+    # EXCout.save()
 
     return header, msg, dcc.send_file( subdic["filename"] )
 
