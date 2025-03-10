@@ -76,9 +76,9 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito, wget, ftp):
+def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito, genes, wget, ftp):
     @cache.memoize(60*60*2) # 2 hours
-    def _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito, wget, ftp):
+    def _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,genes, wget, ftp):
         df=pd.DataFrame()
         for row in rows_atac:
             if row['Read 1'] != "" :
@@ -94,16 +94,16 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
         dfi.reset_index(inplace=True, drop=True)
 
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism", "ERCC",
-                                   "seq","Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "wget" ],\
+                                   "seq","Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "genes", "wget" ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, ercc,\
-                                    seq, adapter,macs2,mito, wget]}, index=list(range(12)))
+                                    seq, adapter,macs2,mito,genes,wget]}, index=list(range(13)))
         df=df.to_json()
         dfi=dfi.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".ChIPseq.xlsx")
 
         return {"filename": filename, "samples":df, "input":dfi , "metadata":df_}
-    return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget,ftp)
+    return _generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,genes,wget,ftp)
 
 
 @dashapp.callback(
@@ -351,6 +351,13 @@ Once you have been given access more information will be displayed on how to tra
             style={"margin-top":10,"margin-bottom":10}), 
         dbc.Row( 
             [
+                dbc.Col( html.Label('Genes') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='genes', placeholder="TP53,CDKN1A", value="none", type='text', style={ "width":"100%"}),md=3 ),
+                dbc.Col( html.Label('Comma separated list of genes for which to make coverage plots in either gene name or ensembl gene id as in https://www.ensembl.org'),md=6  ), 
+            ], 
+            style={"margin-top":10,"margin-bottom":10}), 
+        dbc.Row( 
+            [
                 dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right"}), 
                 dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3 ), 
@@ -460,6 +467,7 @@ Once you have been given access more information will be displayed on how to tra
     Output('adapter', 'value'),
     Output('macs2', 'value'),
     Output('opt-mito', 'value'),
+    Output('genes', 'value'),
     Output('wget', 'value'), 
     Output('ftp', 'value'), 
     Output('upload-data-text', 'children'),
@@ -497,7 +505,7 @@ def read_file(contents,filename,last_modified):
     input_df.style_table["height"]="62vh"
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "seq", "Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria", "wget", "ftp" ]
+    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "ERCC", "seq", "Adapter sequence", "Additional MACS2 parameter", "exclude mitochondria","Genes", "wget", "ftp" ]
     # for f in fields_to_return:
     #     values_to_return.append(  ChIPseq[ChIPseq["Field"]==f]["Value"].tolist()[0]  )
 
@@ -530,10 +538,11 @@ def read_file(contents,filename,last_modified):
     State('adapter', 'value'),
     State('macs2', 'value'),
     State('opt-mito', 'value'),
+    State('genes', 'value'),
     State('wget', 'value'),
     State('ftp', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,wget, ftp ):
+def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq, adapter,macs2,mito,genes, wget, ftp ):
     header, msg = check_access( 'chipseq' )
     # header, msg = None, None # for local debugging 
     if msg :
@@ -541,7 +550,7 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
 
     if not wget:
         wget="NONE"
-    subdic=generate_submission_file(rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq,adapter,macs2,mito,wget, ftp)
+    subdic=generate_submission_file(rows_atac,rows_input,email,group,folder,md5sums,project_title,organism,ercc,seq,adapter,macs2,mito,genes, wget, ftp)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
     inputdf=pd.read_json(subdic["input"])
