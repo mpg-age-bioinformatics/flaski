@@ -1,8 +1,8 @@
 humanize==3.13.1
-## agebot (testing)
-# llama-index==0.8.23.post1 
-# llama-cpp-python==0.1.78 
-# sentence_transformers==2.2.2
-## 
 biopython==1.84
 reportlab==4.2.5
+### packages for llms
+sentence-transformers==3.4.1
+openai==1.61.1
+# pymupdf==1.25.3
+faiss-cpu==1.10.0
