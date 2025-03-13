@@ -66,7 +66,6 @@ other_nav_dropdowns =[
                 "Version check":"/vcheck/",\
                 "Neanderthal age":"/neanderthalage/",\
                 "KEGG":"/kegg/",\
-                "Chatbot AGE":"/chatbot/",\
             }, \
 
     }, \
