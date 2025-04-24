@@ -3,7 +3,7 @@
 ARG MYAPP_IMAGE=mpgagebioinformatics/myapp:latest
 FROM $MYAPP_IMAGE
 
-LABEL maintainer "bioinformatics@age.mpg.de"
+LABEL maintainer="bioinformatics@age.mpg.de"
 
 ARG APP_VERSION
 ENV APP_VERSION ${APP_VERSION}
@@ -12,6 +12,8 @@ ARG PYFLASKI_VERSION
 ENV PYFLASKI_VERSION ${PYFLASKI_VERSION}
 
 USER root
+
+ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 
 # -o Acquire::Check-Valid-Until=false 
 RUN apt-get update && apt-get install -yq libgirepository1.0-dev libcairo2-dev python3-dev pkg-config ninja-build && \
