@@ -2,7 +2,6 @@ humanize==3.13.1
 biopython==1.84
 reportlab==4.2.5
 ### packages for LLMs
---extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.2.2+cpu
 sentence-transformers==3.4.1
 openai==1.61.1

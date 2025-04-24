@@ -23,7 +23,7 @@ COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
 RUN pip3 install --no-cache-dir --prefer-binary -r /pyflaski.requirements.txt
 
 COPY requirements.txt /requirements.txt
-RUN pip3 install --no-cache-dir -r /requirements.txt
+RUN pip3 install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r /requirements.txt
 
 RUN mkdir -p /myapp/data/kegg /myapp/data/david /mpcdf /submissions_ftp /flaski_private /backup/oc_data /oc_data
 RUN chown -R ${BUILD_NAME}:${BUILD_NAME} /submissions /flaski_private /mpcdf /backup/oc_data /oc_data /submissions_ftp
