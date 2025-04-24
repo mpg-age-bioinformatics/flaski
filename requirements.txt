@@ -2,7 +2,6 @@ humanize==3.13.1
 biopython==1.84
 reportlab==4.2.5
 ### packages for LLMs
-torch==2.2.2+cpu
 sentence-transformers==3.4.1
 openai==1.61.1
 # pymupdf==1.25.3
