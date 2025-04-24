@@ -16,11 +16,11 @@ USER root
 ENV DEB_PYTHON_INSTALL_LAYOUT=deb_system
 
 # -o Acquire::Check-Valid-Until=false 
-RUN apt-get update && apt-get install -yq libgirepository1.0-dev libcairo2-dev python3-dev pkg-config ninja-build && \
+RUN apt-get update && apt-get install -yq libgirepository1.0-dev libcairo2-dev python3-dev pkg-config ninja-build build-essential gobject-introspection gcc libglib2.0-dev && \
 apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./pyflaski/requirements.txt /pyflaski.requirements.txt
-RUN pip3 install --prefer-binary -r /pyflaski.requirements.txt
+RUN pip3 install --no-cache-dir --prefer-binary -r /pyflaski.requirements.txt
 
 COPY requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r /requirements.txt
