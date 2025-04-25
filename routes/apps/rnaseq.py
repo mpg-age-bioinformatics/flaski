@@ -126,7 +126,7 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
 
         species={
             "celegans":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "caenorhabditis_elegans" ,
                     "species":"caenorhabditis elegans",
@@ -148,10 +148,21 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
                     "biomart_dataset":"celegans_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "113":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/caenorhabditis_elegans/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"celegans_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
                 }
             },
             "mmusculus":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "mus_musculus" ,
                     "species":"mus musculus",
@@ -173,10 +184,21 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
                     "biomart_dataset":"mmusculus_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "113":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/mus_musculus/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"mmusculus_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
                 }
             },
             "hsapiens":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "homo_sapiens" ,
                     "species":"homo sapiens",
@@ -196,6 +218,17 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/",
                     "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/" ,
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"hsapiens_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "113":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
                     "biomart_dataset":"hsapiens_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
                 }
@@ -223,7 +256,18 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
                     "biomart_dataset":"dmelanogaster_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
-                },
+                },\
+                "113":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/drosophila_melanogaster/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"dmelanogaster_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                }
             },
             "nfurzeri":{
                 "current_release":"110",
@@ -248,10 +292,21 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
                     "biomart_dataset":"nfurzeri_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "113":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/nothobranchius_furzeri/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"nfurzeri_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
                 }
             },
             "drerio":{
-                "current_release":"110",
+                "current_release":"113",
                 "110":{
                     "organism" : "danio_rerio" ,
                     "species":"danio rerio",
@@ -262,10 +317,21 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
                     "biomart_dataset":"drerio_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
+                },
+                "113":{
+                    "organism" : "danio_rerio" ,
+                    "species":"danio rerio",
+                    "spec":"drerio",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/danio_rerio/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/danio_rerio/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"drerio_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
                 }
             },
             "scerevisiae":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "saccharomyces_cerevisiae" ,
                     "species":"saccharomyces cerevisiae",
@@ -285,6 +351,17 @@ def generate_submission_file(rows, email,group,folder,md5sums,project_title,orga
                     "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/saccharomyces_cerevisiae/",
                     "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/saccharomyces_cerevisiae/dna/" ,
                     "biomart_host":"http://jul2023.archive.ensembl.org/biomart/",
+                    "biomart_dataset":"scerevisiae_gene_ensembl",
+                    "daviddatabase":"ENSEMBL_GENE_ID"
+                },\
+                "113":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "biomart_host":"http://oct2024.archive.ensembl.org/biomart/",
                     "biomart_dataset":"scerevisiae_gene_ensembl",
                     "daviddatabase":"ENSEMBL_GENE_ID"
                 }
@@ -798,6 +875,13 @@ def update_output(n_clicks, rows, email, group, folder, md5sums, project_title, 
 
     samples=pd.read_json(json_config[filename]["samples"])
     metadata=pd.read_json(json_config[filename]["RNAseq"])
+
+    lsamples=len(samples)
+    lsamples_=len(samples[["Group","Replicate"]].drop_duplicates())
+    if lsamples != lsamples_ :
+        header="Attention"
+        msg='''You have duplicate entries (ie. Group - Replicate combinations). Please correct your input.'''
+        return header, msg, dash.no_update
 
     validation=validate_metadata(metadata)
     if validation:

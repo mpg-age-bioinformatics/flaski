@@ -138,7 +138,7 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
 
         species={
             "celegans":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "caenorhabditis_elegans" ,
                     "species":"caenorhabditis elegans",
@@ -169,10 +169,26 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                     "peakAnno_organism":"celegans",
                     "chrom":"1:6",
                     "GeTAG":"100286401"  
+                },\
+                "113":{
+                    "organism" : "caenorhabditis_elegans" ,
+                    "species":"caenorhabditis elegans",
+                    "spec":"celegans",
+                    # "UCSC_genome" : "ce11",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/caenorhabditis_elegans/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/caenorhabditis_elegans/dna/" ,
+                    "BSgenome":"BSgenome.Celegans.UCSC.ce11",
+                    "TxDb":"TxDb.Celegans.UCSC.ce11.ensGene",
+                    "annoDb":"org.Ce.eg.db",
+                    "atac_genome":"Celegans",
+                    "peakAnno_organism":"celegans",
+                    "chrom":"1:6",
+                    "GeTAG":"100286401"  
                 }
             },
             "mmusculus":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "mus_musculus" ,
                     "species":"mus musculus",
@@ -203,10 +219,26 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                     "peakAnno_organism":"mouse",
                     "chrom":"1:21",
                     "GeTAG":"2666151232" 
+                },\
+                "113":{
+                    "organism" : "mus_musculus" ,
+                    "species":"mus musculus",
+                    "spec":"mmusculus",
+                    # "UCSC_genome" : "mm39",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/mus_musculus/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/mus_musculus/dna/" ,
+                    "BSgenome":"BSgenome.Mmusculus.UCSC.mm39",
+                    "TxDb":"TxDb.Mmusculus.UCSC.mm39.knownGene",
+                    "annoDb":"org.Mm.eg.db",
+                    "atac_genome":"Mmusculus",
+                    "peakAnno_organism":"mouse",
+                    "chrom":"1:21",
+                    "GeTAG":"2666151232" 
                 }
             },
             "hsapiens":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "homo_sapiens" ,
                     "species":"homo sapiens",
@@ -238,10 +270,26 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                     "peakAnno_organism":"human",
                     "chrom":"1:24",
                     "GeTAG":"3103007597"                   
+                },\
+                "113":{
+                    "organism" : "homo_sapiens" ,
+                    "species":"homo sapiens",
+                    "spec":"hsapiens",
+                    #"genome" : "hg38",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/homo_sapiens/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/homo_sapiens/dna/" ,
+                    "BSgenome":"BSgenome.Hsapiens.UCSC.hg38",
+                    "TxDb":"TxDb.Hsapiens.UCSC.hg38.knownGene",
+                    "annoDb":"org.Hs.eg.db",
+                    "atac_genome":"Hsapiens",
+                    "peakAnno_organism":"human",
+                    "chrom":"1:24",
+                    "GeTAG":"3103007597"                   
                 }
             },
             "dmelanogaster":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "drosophila_melanogaster" ,
                     "species":"drosophila melanogaster",
@@ -271,10 +319,25 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                     "peakAnno_organism":"fly",
                     "chrom":"1:7",
                     "GeTAG":"142573024"
+                },\
+                "113":{
+                    "organism" : "drosophila_melanogaster" ,
+                    "species":"drosophila melanogaster",
+                    "spec":"dmelanogaster",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/drosophila_melanogaster/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/drosophila_melanogaster/dna/" ,
+                    "BSgenome":"BSgenome.Dmelanogaster.UCSC.dm6",
+                    "TxDb":"TxDb.Dmelanogaster.UCSC.dm6.ensGene",
+                    "annoDb":"org.Dm.eg.db",
+                    "atac_genome":"Dmelanogaster",
+                    "peakAnno_organism":"fly",
+                    "chrom":"1:7",
+                    "GeTAG":"142573024"
                 },
             },
             "nfurzeri":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "nothobranchius_furzeri" ,
                     "species":"nothobranchius furzeri",
@@ -305,10 +368,26 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                     "peakAnno_organism":"",
                     "chrom":"1:22",
                     "GeTAG":"856808511"
+                },\
+                "110":{
+                    "organism" : "nothobranchius_furzeri" ,
+                    "species":"nothobranchius furzeri",
+                    "spec":"nfurzeri",
+                    #"genome" : "",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/nothobranchius_furzeri/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/nothobranchius_furzeri/dna/" ,
+                    "BSgenome":"",
+                    "TxDb":"",
+                    "annoDb":"",
+                    "atac_genome":"Nfurzeri",
+                    "peakAnno_organism":"",
+                    "chrom":"1:22",
+                    "GeTAG":"856808511"
                 }
             },
             "scerevisiae":{
-                "current_release":"110",
+                "current_release":"113",
                 "105":{
                     "organism" : "saccharomyces_cerevisiae" ,
                     "species":"saccharomyces cerevisiae",
@@ -332,6 +411,21 @@ def generate_submission_file(rows_atac, rows_input, email,group,folder,md5sums,p
                     "release" : "110",
                     "url_gtf" : "ftp://ftp.ensembl.org/pub/release-110/gtf/saccharomyces_cerevisiae/",
                     "url_dna" : "ftp://ftp.ensembl.org/pub/release-110/fasta/saccharomyces_cerevisiae/dna/" ,
+                    "BSgenome":"BSgenome.Scerevisiae.UCSC.sacCer3",
+                    "TxDb":"TxDb.Scerevisiae.UCSC.sacCer3.sgdGene",
+                    "annoDb":"org.Sc.sgd.db",
+                    "atac_genome":"Scerevisiae",
+                    "peakAnno_organism":"yeast",
+                    "chrom":"1:16",
+                    "GeTAG":"12157105"
+                },\
+                "113":{
+                    "organism" : "saccharomyces_cerevisiae" ,
+                    "species":"saccharomyces cerevisiae",
+                    "spec":"scerevisiae",
+                    "release" : "113",
+                    "url_gtf" : "ftp://ftp.ensembl.org/pub/release-113/gtf/saccharomyces_cerevisiae/",
+                    "url_dna" : "ftp://ftp.ensembl.org/pub/release-113/fasta/saccharomyces_cerevisiae/dna/" ,
                     "BSgenome":"BSgenome.Scerevisiae.UCSC.sacCer3",
                     "TxDb":"TxDb.Scerevisiae.UCSC.sacCer3.sgdGene",
                     "annoDb":"org.Sc.sgd.db",
@@ -958,6 +1052,13 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
     samples=pd.read_json(json_config[filename]["samples"])
     metadata=pd.read_json(json_config[filename]["ATACseq"])
     inputdf=pd.read_json(json_config[filename]["input"])
+
+    lsamples=len(samples)
+    lsamples_=len(samples[["Group","Replicate"]].drop_duplicates())
+    if lsamples != lsamples_ :
+        header="Attention"
+        msg='''You have duplicate entries (ie. Group - Replicate combinations). Please correct your input.'''
+        return header, msg, dash.no_update
 
     validation=validate_metadata(metadata)
     if validation:

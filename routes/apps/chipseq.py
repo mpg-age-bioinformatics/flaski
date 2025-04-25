@@ -555,6 +555,13 @@ def update_output(n_clicks,rows_atac,rows_input,email,group,folder,md5sums,proje
     metadata=pd.read_json(subdic["metadata"])
     inputdf=pd.read_json(subdic["input"])
 
+    lsamples=len(samples)
+    lsamples_=len(samples[["Group","Replicate"]].drop_duplicates())
+    if lsamples != lsamples_ :
+        header="Attention"
+        msg='''You have duplicate entries (ie. Group - Replicate combinations). Please correct your input.'''
+        return header, msg, dash.no_update
+
     validation=validate_metadata(metadata)
     if validation:
         header="Attention"
