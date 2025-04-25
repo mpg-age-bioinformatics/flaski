@@ -63,10 +63,10 @@ other_nav_dropdowns =[
                 "cBioPortal":"/cbioportal/",\
                 "GTEx":"/gtex/",\
                 # "AGE bot":"/agebot/",\
-                "Version check":"/vcheck/",\
                 "Neanderthal age":"/neanderthalage/",\
                 "KEGG":"/kegg/",\
                 "Chatbot AGE":"/chatbot/",\
+                "Version check":"/vcheck/",\
             }, \
 
     }, \
