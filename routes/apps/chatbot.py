@@ -67,7 +67,27 @@ def make_layout(session_id):
 
     protected_content = html.Div(
         [
-            make_navbar_logged("Chatbot AGE", current_user),
+            make_navbar_logged(
+                html.Span(
+                    [
+                        "Chatbot AGE",
+                        html.I(
+                            className="fas fa-info-circle ms-2",
+                            id="chatbot-info-icon",
+                            style={
+                                "cursor": "pointer", "fontSize": "0.7em", "verticalAlign": "super"
+                            }
+                        )
+                    ],
+                    style={"display": "inline-flex", "alignItems": "flex-start"}
+                ),
+                current_user
+            ),
+            dbc.Tooltip(
+                "This AI assistant is based on the Meta LLaMA 3.1-8B Instruct model powered by GWDG and utilizes publicly available literature from PubMed relevant to MPI-AGE. Be aware that chatbots can produce hallucinated content; their responses can be unreliable and should be interpreted with caution.",
+                target="chatbot-info-icon",
+                placement="bottom"
+            ),
             html.Div(style={"marginTop": "10px"}),  # Added space between navbar and chat container
             html.Div(
                 [
