@@ -84,7 +84,7 @@ def make_layout(session_id):
                 current_user
             ),
             dbc.Tooltip(
-                "This AI assistant is based on the Meta LLaMA 3.1-8B Instruct model powered by GWDG and utilizes publicly available literature from PubMed relevant to MPI-AGE. Be aware that chatbots can produce hallucinated content; their responses can be unreliable and should be interpreted with caution.",
+                "This AI assistant uses the Meta LLaMA 3.1-8B Instruct model, powered by GWDG hardware, and is fed with the Open Access publications from the institute. Be aware that chatbots can produce hallucinated content; their responses can be unreliable and should be interpreted with caution.",
                 target="chatbot-info-icon",
                 placement="bottom"
             ),
