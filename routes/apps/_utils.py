@@ -41,6 +41,7 @@ GROUPS=["Adam_Antebi",\
 "Dario_Valenzano",\
 "Hans_Sprenger",\
 "Hannah_Scheiblich",\
+"Ina_Huppertz",\
 "Ivan_Matic",\
 "James_Stewart",\
 "Lena_Pernas",\
@@ -68,6 +69,7 @@ GROUPS_INITALS={"Adam_Antebi":"AA",\
 "Dario_Valenzano":"DV",\
 "Hans_Sprenger":"HS",\
 "Hannah_Scheiblich":"HSc",\
+"Ina_Huppertz":"IH",\
 "Ivan_Matic":"IM",\
 "James_Stewart":"JS",\
 "Lena_Pernas":"LPe",\
