@@ -118,6 +118,9 @@ def make_layout(pathname):
         )
         container_children.append(row)
 
+        if not getattr(current_user, 'email', None) or not current_user.email.endswith('.mpg.de'):
+            container_children.append(dbc.Alert("Log in with Max Planck Institute email address to access more Apps/Forms!", color="info", dismissable=True, style={"textAlign": "center"}))
+
     links_style={"color":"#35443f", "margin-left":"12px", "margin-right":"12px", "font-weight": "bold","text-decoration": "none"}
 
     open_content=html.Div(
