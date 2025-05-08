@@ -43,7 +43,7 @@ def make_layout(pathname):
             ),
             align="center",
             justify="center",
-            style={'textAlign':'center',"margin-top":"15%", "margin-bottom":"10%", "background-color":"#4d4d4d","color":"white","height":"150px","min-width":"375px"}
+            style={'textAlign':'center',"margin-top":"5%", "margin-bottom":"5%", "background-color":"#4d4d4d","color":"white","height":"150px","min-width":"375px"}
         )
 
         container_children.append(label_title)
@@ -119,7 +119,7 @@ def make_layout(pathname):
         container_children.append(row)
 
         if not getattr(current_user, 'email', None) or not current_user.email.endswith('.mpg.de'):
-            container_children.append(html.P("* Log in with Max Planck Institute email address to access more Apps/Forms!"))
+            container_children.append(html.P("* Log in with Max Planck Institute email address to access more Apps/Forms *", style={'textAlign': 'center'}))
 
     links_style={"color":"#35443f", "margin-left":"12px", "margin-right":"12px", "font-weight": "bold","text-decoration": "none"}
 
