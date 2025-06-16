@@ -71,8 +71,11 @@ def _resolve_reference(val, df):
 def _extract_text_from_pdf(decoded_pdf_bytes):
     """
     Extracts all text from a PDF file (bytes) using pdfplumber.
-    Returns a single string (text).
+    Returns a single string (text) or empty for more than 5mb.
     """
+    if len(decoded_pdf_bytes) > 5 * 1024 * 1024:
+        return ""
+    
     with pdfplumber.open(io.BytesIO(decoded_pdf_bytes)) as pdf:
         all_text = []
         for page in pdf.pages:
@@ -457,7 +460,7 @@ def plotai_prepare_dataframe(input_contents=None, filename=None, text_content=No
             try:
                 text = _extract_text_from_pdf(decoded)
                 if not text.strip():
-                    return None, None, "No extractable text found in PDF."
+                    return None, None, "No extractable text found in PDF or PDF too large."
                 df2, models, err2 = _text_to_dataframe(text)
                 if df2 is not None:
                     return df2, models, None

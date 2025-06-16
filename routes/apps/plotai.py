@@ -473,14 +473,14 @@ def export_pdf(n_clicks, fig_dict, filename):
 @dashapp.callback(
     Output("download-full-pdf", "data"),
     Input("pdf-full-download", "n_clicks"),
-    State("graph", "figure"),
+    State("plotai-spec", "data"),
     State("pdf-filename", "value"),
     prevent_initial_call=True
 )
 def export_full_pdf(n_clicks, fig_dict, filename):
     if not fig_dict: return no_update
     plotai_eventlog("download figure plotai")
-    fig = go.Figure(fig_dict)
+    fig = go.Figure(**fig_dict)
     filename = secure_filename(filename or "plotai")
     filename = filename if filename.lower().endswith(".pdf") else f"{filename}.pdf"
     fig.update_layout(autosize=False, width=2000, height=1200, margin=dict(l=150, r=150, t=150, b=180))
@@ -506,14 +506,14 @@ def export_png(n_clicks, fig_dict, filename):
 @dashapp.callback(
     Output("download-full-png", "data"),
     Input("png-full-download", "n_clicks"),
-    State("graph", "figure"),
+    State("plotai-spec", "data"),
     State("png-filename", "value"),
     prevent_initial_call=True
 )
 def export_full_png(n_clicks, fig_dict, filename):
     if not fig_dict: return no_update
     plotai_eventlog("download figure plotai")
-    fig = go.Figure(fig_dict)
+    fig = go.Figure(**fig_dict)
     filename = secure_filename(filename or "plotai")
     filename = filename if filename.lower().endswith(".png") else f"{filename}.png"
     fig.update_layout(autosize=False, width=2000, height=1200, margin=dict(l=150, r=150, t=150, b=180))
