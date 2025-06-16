@@ -66,6 +66,7 @@ other_nav_dropdowns =[
                 "Neanderthal age":"/neanderthalage/",\
                 "KEGG":"/kegg/",\
                 "Chatbot AGE":"/chatbot/",\
+                "Plot AI":"/plotai/",\
                 "Version check":"/vcheck/",\
             }, \
 
