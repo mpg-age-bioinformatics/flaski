@@ -569,10 +569,10 @@ fig.show()
 # --------------------------------------------------------------------
 
 try:
-    fig.write_image("{filename}.png")
-    print("✅ Plot saved as '{filename}.png'")
+    fig.write_image("{filename}.pdf")
+    print("✅ Plot saved as '{filename}.pdf'")
 except ValueError as e:
-    print("❌ Saving the plot failed! Please install kaleido if plot needs to be saved, via 'pip install kaleido'")
+    print(f"❌ Saving the plot failed: {{e}}")
 """
     
     return code

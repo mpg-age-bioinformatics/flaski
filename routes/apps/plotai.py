@@ -50,8 +50,8 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache":
 def plotai_generate_modal(modal_type, label="Filename"):
     if modal_type in ["pdf", "png"]:
         modal_footer = dbc.ModalFooter([
-            dbc.ModalFooter(dbc.Button("Download View", id=f"{modal_type}-filename-download", className="ms-auto", n_clicks=0)),
-            dbc.ModalFooter(dbc.Button("Download Full", id=f"{modal_type}-full-download", className="ms-auto", n_clicks=0)),
+            dbc.Button("Download View", id=f"{modal_type}-filename-download", className="ms-auto", n_clicks=0),
+            dbc.Button("Download Full", id=f"{modal_type}-full-download", n_clicks=0),
         ])
     else:
         modal_footer = dbc.ModalFooter(dbc.Button("Download", id=f"{modal_type}-filename-download", className="ms-auto", n_clicks=0))
