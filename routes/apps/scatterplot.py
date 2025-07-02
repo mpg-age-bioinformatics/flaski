@@ -1635,13 +1635,21 @@ def generate_markers(session_id,groups, contents,filename,last_modified,generate
             field_style_on_off= 'none'
             cards=[]
             groups_=df[[groups]].drop_duplicates()[groups].tolist()
-            for g, i in zip(  groups_, list( range( len(groups_) ) )  ):
-                if filename.split(".")[-1] == "json" and not filename in ["<from MDS app>.json", "<from PCA app>.json", "<from tSNE app>.json", "from.datalake.json"]:
-                    pa_=pa["groups_settings"][i]
-                    card=make_card(g, i, pa, pa_, cols_,field_style_on_off)
-                else:
-                    card=make_card(g, i, pa, pa, cols_,field_style_on_off)
+            required_keys = [
+                "marker", "markers", "markersizes_col", "markerc", "lower_size_value", "upper_size_value", "lower_size", "upper_size", "markerc_col", "reverse_color_scale",
+                "lower_value", "center_value", "upper_value", "lower_color", "center_color", "upper_color", "color_legend", "colorscaleTitle", "markerc_write", "marker_alpha",
+                 "colorscale_value", "edge_linewidth", "edgecolor", "edgecolor_col", "edgecolor_lower", "edgecolor_center", "edgecolor_upper", "edgecolor_lower_value",
+                "edgecolor_center_value", "edgecolor_upper_value", "ec_reverse_color_scale", "ec_colorscale_value", "edgecolor_write"
+            ]
+            group_styles = {g["name"]: g for g in pa.get("groups_settings", [])}
+
+            for i, g in enumerate(groups_):
+                pa_ = group_styles.get(g, {**pa, "name": g})
+                for key in required_keys:
+                    pa_.setdefault(key, "")
+                card = make_card(g, i, pa, pa_, cols_, field_style_on_off)
                 cards.append(card)
+
         return cards, None, None, generate_markers_import
 
     except Exception as e:

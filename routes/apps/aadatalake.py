@@ -880,9 +880,9 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
 
         pca_pa["xcols"]=pca_df.columns.tolist()
         pca_pa["ycols"]=pca_df.columns.tolist()
-        pca_pa["groups"]=["None"]+pca_df.columns.tolist()
-        pca_pa["labels_col"]=["select a column.."]+pca_df.columns.tolist()
-        pca_pa["labels_col_value"]="select a column.."
+        # pca_pa["groups"]=["None"]+pca_df.columns.tolist()
+        # pca_pa["labels_col"]=["select a column.."]+pca_df.columns.tolist()
+        # pca_pa["labels_col_value"]="select a column.."
 
         session_data={ 
             "APP_VERSION": app.config['APP_VERSION'],
