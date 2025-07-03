@@ -15,10 +15,9 @@ import numpy as np
 import re
 
 path_to_files="/flaski_private/aaprotlake/"
-file_path = "/myapp/aaprotlake/all_merged.csv"
-#file_path = "/myapp/aaprotlake/all_merged_test.csv"
-meta_file_path = "/myapp/aaprotlake/all_merged_meta.csv"
-latent_file_path = "/myapp/aaprotlake/latent_embedding_June2025.csv"
+file_path = f"{path_to_files}all_merged.csv"
+meta_file_path = f"{path_to_files}all_merged_meta.csv"
+latent_file_path = f"{path_to_files}latent_embedding_June2025.csv"
 
 
 def read_meta_file(cache):
@@ -82,10 +81,6 @@ def nFormat(x):
 
 def filter_samples(datasets=None, genotype=None, condition=None, cache=None):
     results_files=read_merged_file(cache)
-
-    # print(datasets)
-    # import sys
-    # sys.stdout.flush()
 
     if datasets:
         results_files=results_files[ results_files['study'].isin( datasets ) ]
@@ -255,6 +250,7 @@ def make_pca_plot(study, genotype, condition, cache):
 
     fig=make_scatter(df_,pa)
     return fig, pa, df_
+
 
 def make_annotated_col(x,annotate_genes):
     if x in annotate_genes:

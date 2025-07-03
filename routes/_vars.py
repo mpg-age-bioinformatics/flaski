@@ -1,6 +1,6 @@
 import os
 
-_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea",'aadatalake', "methylclock", "crispr", "neanderthalage"]
+_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "neanderthalage"]
 _PUBLIC_VIEWS = ['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
@@ -60,6 +60,7 @@ other_nav_dropdowns =[
                 "t-SNE":"/tsne/",\
                 "Lifespan":"/lifespan/",\
                 "Datalake":"/aadatalake/",\
+                "Datalake Proteomics":"/aadatalake_prot/",\
                 "cBioPortal":"/cbioportal/",\
                 "GTEx":"/gtex/",\
                 # "AGE bot":"/agebot/",\
