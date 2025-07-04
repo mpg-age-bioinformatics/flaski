@@ -527,6 +527,12 @@ def download_samples(n_clicks, datasets, genotype, condition, fileprefix):
 def download_geneexp(n_clicks,datasets, genotype, condition, geneids, fileprefix):
     selected_results_files, ids2labels=filter_samples(datasets=datasets,genotype=genotype, condition=condition, cache=cache)
     gene_expression=filter_gene_expression(ids2labels,geneids,cache)
+    
+    # Missing gene_id
+    gene_expression['gene_id'] = gene_expression.index
+    cols = gene_expression.columns.tolist()
+    gene_expression = gene_expression[[cols[-1]] + cols[:-1]]
+
     fileprefix=secure_filename(str(fileprefix))
     filename="%s.gene_expression.xlsx" %fileprefix
     return dcc.send_data_frame(gene_expression.to_excel, filename, sheet_name="gene exp.", index=False)
