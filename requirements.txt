@@ -7,3 +7,5 @@ openai==1.61.1
 # pymupdf==1.25.3
 faiss-cpu==1.10.0
 pdfplumber==0.11.6
+# pseudoclock
+torch==2.6.0
