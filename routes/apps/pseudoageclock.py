@@ -13,7 +13,7 @@ from pyflaski.violinplot import make_figure, figure_defaults
 import os
 import uuid
 import traceback
-import json
+#import json
 import pandas as pd
 import time
 import plotly.express as px
@@ -262,13 +262,13 @@ def make_app_content(pathname):
                                     "Results Download" 
                                 ]
                             ),
-                            id='download-csv-btn', 
+                            id='download-result-btn',
                             style={"max-width":"450px","width":"200%"},
                             color="secondary"
                         ),
-                        dcc.Download(id="download-csv")
+                        dcc.Download(id="download-result")
                     ],
-                    id="download-csv-div",
+                    id="download-result-div",
                     style={"max-width":"450px","width":"200%","margin":"4px", 'display': 'none'} # 'none' / 'inline-block'
                 )
 
@@ -357,16 +357,16 @@ def make_app_content(pathname):
                         dbc.ModalHeader("File name"), # dbc.ModalTitle(
                         dbc.ModalBody(
                             [
-                                dcc.Input(id='csv-filename', value="pseudoage.xlsx", type='text', style={"width":"100%"})
+                                dcc.Input(id='result-filename', value="pseudoage.xlsx", type='text', style={"width":"100%"})
                             ]
                         ),
                         dbc.ModalFooter(
                             dbc.Button(
-                                "Download", id="csv-filename-download", className="ms-auto", n_clicks=0
+                                "Download", id="result-filename-download", className="ms-auto", n_clicks=0
                             )
                         ),
                     ],
-                    id="csv-filename-modal",
+                    id="result-filename-modal",
                     is_open=False,
                 ),
             ],
@@ -450,10 +450,10 @@ def read_input_file(contents,filename,last_modified,session_id):
     Output('session-data','data'),
     Output({ "type":"traceback", "index":"make_fig_output" },'data'),
     Output('to-violin-div', 'style'),
-    Output('download-csv-div', 'style'),
+    Output('download-result-div', 'style'),
     Output('export-session','data'),
     Input("submit-button-state", "n_clicks"),
-    Input('x_val', 'value'),
+    State('x_val', 'value'),
     [State('session-id', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -554,7 +554,6 @@ def download_example(n_clicks):
                             'Group2_2': i+13,
         })
     outdf = pd.DataFrame().from_dict(for_outdf)
-    print(outdf)
     return dcc.send_data_frame(outdf.to_excel, example_filename, sheet_name="data", index=False)
 
 
@@ -571,16 +570,16 @@ def download_export_filename(n1, n2, is_open):
 
 
 @dashapp.callback(
-    Output('csv-filename-modal', 'is_open'),
-    [ Input('download-csv-btn',"n_clicks"),Input("csv-filename-download", "n_clicks")],
-    [ State("csv-filename-modal", "is_open")], 
+    Output('result-filename-modal', 'is_open'),
+    [ Input('download-result-btn',"n_clicks"),
+    Input("result-filename-download", "n_clicks")],
+    [ State("result-filename-modal", "is_open")],
     prevent_initial_call=True
 )
-def download_csv_filename(n1, n2, is_open):
-    #if n1 or n2:
-    #    return not is_open
-    #return is_open
-    return False
+def download_xlsx_filename(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 
 @dashapp.callback(
@@ -625,14 +624,15 @@ def download_pdf(n_clicks,graph, pdf_filename):
 
 
 @dashapp.callback(
-    Output('download-csv', 'data'),
-    #Input('csv-filename-download',"n_clicks"),
-    Input('download-csv-btn',"n_clicks"),
-    Input('outdf_', 'data'),
-    State("csv-filename", "value"),
+    Output('download-result', 'data'),
+    Input('result-filename-download',"n_clicks"),
+    #Input('download-result-btn',"n_clicks"),
+    State('outdf_', 'data'),
+    State("result-filename", "value"),
+    State("result-filename-modal", 'is_open'),
     prevent_initial_call=True
 )
-def download_csv(n_clicks, outdf, csv_filename):
+def download_csv(n_clicks, outdf, csv_filename, is_open):
     if n_clicks is None or n_clicks == 0:
         return
 
