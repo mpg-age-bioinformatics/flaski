@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-path_dir="/flaski_private/aaprotlake/"
+path_dir="/flaski_private/protclock/"
 path_to_encoder = f"{path_dir}/model_20250617.pt"
 path_to_features = f"{path_dir}/entire_features.pkl"
 path_to_regressor = f"{path_dir}/clock_regressor.pkl"
