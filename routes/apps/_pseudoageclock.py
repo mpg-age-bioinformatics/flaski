@@ -8,7 +8,7 @@ import torch.nn as nn
 path_dir="/flaski_private/protclock/"
 path_to_encoder = f"{path_dir}/model_20250617.pt"
 path_to_features = f"{path_dir}/entire_features.pkl"
-path_to_regressor = f"{path_dir}/clock_regressor.pkl"
+path_to_regressor = f"{path_dir}/regr_coef.csv"
 
 
 class AE(nn.Module):
@@ -73,8 +73,8 @@ def load_torch_model(cache):
 def load_regressor(cache):
     @cache.memoize(60*60*2) # 2 hours
     def _load_model():
-        _model = joblib.load(path_to_regressor)
-        return _model
+        _regr_df = pd.read_csv(path_to_regressor, index_col=0, header=0).to_numpy()
+        return _regr_df[0], _regr_df[1:]
     return _load_model()
 
 
@@ -90,7 +90,7 @@ def load_features(cache):
 def inference(target_df, gene_id_column, cache):
     entire_features = load_features(cache)
     model = load_torch_model(cache)
-    best_regr = load_regressor(cache)
+    _intercept, _coef = load_regressor(cache)
 
     # normalize
     target_df.index = target_df[gene_id_column]
@@ -114,7 +114,7 @@ def inference(target_df, gene_id_column, cache):
     target_embed = model.fit(torch.Tensor(target_df.to_numpy()))
 
     # biological age inference
-    page = best_regr.predict(target_embed.detach().numpy())
+    page = target_embed.detach().numpy() @ _coef + _intercept
 
     # output df format
     condition = ['_'.join(x.split('_')[:-1]) for x in target_df.index]
