@@ -50,8 +50,7 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         'CACHE_REDIS_SENTINELS': [ 
             [ os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port') ]
         ],
-        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER'),
-        'CACHE_REDIS_SENTINEL_READ_FROM_SLAVE': False
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
     })
 
 def run_david_and_cache(pa,cache):
