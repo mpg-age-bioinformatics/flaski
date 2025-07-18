@@ -49,7 +49,8 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
         'CACHE_REDIS_SENTINELS': [ 
             [ os.environ.get('CACHE_REDIS_SENTINELS_address'), os.environ.get('CACHE_REDIS_SENTINELS_port') ]
         ],
-        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER')
+        'CACHE_REDIS_SENTINEL_MASTER': os.environ.get('CACHE_REDIS_SENTINEL_MASTER'),
+        'CACHE_REDIS_SENTINEL_READ_FROM_SLAVE': False
     })
 
 def run_pca_and_cache(df, pa, cache):
