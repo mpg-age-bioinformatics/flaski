@@ -13,7 +13,7 @@ from pyflaski.violinplot import make_figure, figure_defaults
 import os
 import uuid
 import traceback
-#import json
+import json
 import pandas as pd
 import time
 import plotly.express as px
@@ -55,7 +55,7 @@ elif app.config["CACHE_TYPE"] == "RedisSentinelCache" :
 dashapp.layout=html.Div( 
     [ 
         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
-        dcc.Location( id='url', refresh=False ),
+        dcc.Location( id='url', refresh=True ),
         html.Div( id="protected-content" ),
     ] 
 )
@@ -397,16 +397,15 @@ def make_app_content(pathname):
     Output('upload-data', 'contents'),
     Output('upload-data', 'filename'),
     Output('upload-data', 'last_modified'),
-    Output('stored-file', 'children'),
     Input('session-id', 'data'))
 def read_session_redis(session_id):
     if "session_data" in list( session.keys() )  :
         imp=session["session_data"]
         del(session["session_data"])
-        sleep(3)
-        return imp["session_import"], imp["sessionfilename"], imp["last_modified"], None
+        sleep(2)
+        return imp["session_import"], imp["sessionfilename"], imp["last_modified"]
     else:
-        return dash.no_update, dash.no_update, dash.no_update, None
+        return dash.no_update, dash.no_update, dash.no_update
 
 
 @dashapp.callback( 
@@ -432,7 +431,12 @@ def read_input_file(contents,filename,last_modified,session_id):
             cols=df.columns.tolist()
             cols_=make_options(cols)
             filename=app_data["filename"]
-            x_val=app_data['pa']["x_val"]
+            try:
+                x_val = app_data["pa"]["x_val"]
+                if x_val not in cols:
+                    x_val = cols[0]  # fallback to first column
+            except Exception:
+                x_val = cols[0]
 
         else:
             df=parse_table(contents,filename,last_modified,current_user.id,cache,"protclock")
@@ -466,6 +470,9 @@ def read_input_file(contents,filename,last_modified,session_id):
     Output('download-result-div', 'style'),
     Output('export-session','data'),
     Input("submit-button-state", "n_clicks"),
+    Input("export-filename-download","n_clicks"),
+    Input("save-session-btn","n_clicks"),
+    Input("saveas-session-btn","n_clicks"),
     State('x_val', 'value'),
     [State('session-id', 'data'),
     State('upload-data', 'contents'),
@@ -477,6 +484,9 @@ def read_input_file(contents,filename,last_modified,session_id):
     )
 def make_fig_output(
         n_clicks,
+        export_click,
+        save_session_btn,
+        saveas_session_btn,
         gene_id_column,
         session_id,
         contents,
@@ -496,24 +506,53 @@ def make_fig_output(
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     download_buttons_style_show={"max-width":"150px","width":"100%","margin":"4px",'display': 'inline-block'} 
-    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'} 
+    download_buttons_style_hide={"max-width":"150px","width":"100%","margin":"4px",'display': 'none'}
 
-    if n_clicks > 0:
+    try:
+        df=parse_table(contents,filename,last_modified,current_user.id,cache,"protclock")
+
+        out_df = pseudoage_inference(df, gene_id_column, cache)
+
+        session_data={ "session_data": {"app": { "protclock": {"filename":upload_data_text ,'last_modified':last_modified,"df":df.reset_index().to_json(), "pa": { "x_val": gene_id_column }} } } }
+        session_data["APP_VERSION"]=app.config['APP_VERSION']
+        session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+            
+    except Exception as e:
+        tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
+        toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"protclock")
+        return dash.no_update, dash.no_update,toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None 
+    
+    if button_id == "export-filename-download" :
+            if not export_filename:
+                export_filename="psueoageck.json"
+            export_filename=secure_filename(export_filename)
+            if export_filename.split(".")[-1] != "json":
+                export_filename=f'{export_filename}.json'  
+
+            def write_json(export_filename,session_data=session_data):
+                export_filename.write(json.dumps(session_data).encode())
+            
+            return dash.no_update, dash.no_update, None, None, None, dash.no_update, dash.no_update, dcc.send_bytes(write_json, export_filename)
+    
+    if button_id == "save-session-btn" :
         try:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"protclock")
-        
-            out_df = pseudoage_inference(df, gene_id_column, cache)
-
-            session_data={ "session_data": {"app": { "protclock": {"filename":upload_data_text ,'last_modified':last_modified,"df":out_df.to_json()} } } }
-            session_data["APP_VERSION"]=app.config['APP_VERSION']
-            session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
+            if filename and filename.split(".")[-1] == "json" :
+                toast=save_session(session_data, filename,current_user, "make_fig_output" )
+                return dash.no_update, dash.no_update, toast, None, None, dash.no_update, dash.no_update, None
+            else:
+                session["session_data"]=session_data
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, None, dash.no_update, dash.no_update, None
             
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-            toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"protclock")
-            return dash.no_update, dash.no_update,toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None
-     
+            toast=make_except_toast("There was a problem saving your file.","save", e, current_user,"protclock")
+            return dash.no_update, dash.no_update, toast, None, tb_str, dash.no_update, dash.no_update, None
+        
+    if button_id == "saveas-session-btn" :
+        session["session_data"]=session_data
+        return dcc.Location(pathname=f"{PAGE_PREFIX}/storage/saveas/", id='index'), dash.no_update, dash.no_update, dash.no_update, None, dash.no_update, dash.no_update, None
 
+    if n_clicks > 0:
         try:
             fig = go.Figure( )
             fig = px.box(out_df, x='condition', y='PseudoAge', color='condition', points='all')
