@@ -65,11 +65,11 @@ other_nav_dropdowns =[
                 "GTEx":"/gtex/",\
                 # "AGE bot":"/agebot/",\
                 "Neanderthal age":"/neanderthalage/",\
+                "Proteomics Clock":"/protclock/",\
                 "KEGG":"/kegg/",\
                 "Chatbot AGE":"/chatbot/",\
                 "Plot AI":"/plotai/",\
                 "Version check":"/vcheck/",\
-                "Proteomics Clock":"/protclock/",\
             }, \
 
     }, \

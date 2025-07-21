@@ -1,4 +1,4 @@
-from myapp import app, PAGE_PREFIX
+from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
 from flask_login import current_user
 from flask_caching import Cache
 from flask import session
@@ -21,7 +21,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from werkzeug.utils import secure_filename
 from myapp import db
-from myapp.models import UserLogging
+from myapp.models import UserLogging, PrivateRoutes
 from time import sleep
 from ._pseudoageclock import inference as pseudoage_inference
 
@@ -72,6 +72,19 @@ card_body_style={ "padding":"2px", "padding-top":"2px"}#,"margin":"0px"}
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    # Check if user is authorized
+    if "protclock" in PRIVATE_ROUTES :
+        appdb=PrivateRoutes.query.filter_by(route="protclock").first()
+        if not appdb:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        allowed_users=appdb.users
+        if not allowed_users:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        if current_user.id not in allowed_users :
+            allowed_domains=appdb.users_domains
+            if current_user.domain not in allowed_domains:
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+
     eventlog = UserLogging(email=current_user.email, action="visit protclock")
     db.session.add(eventlog)
     db.session.commit()
@@ -414,7 +427,7 @@ def read_input_file(contents,filename,last_modified,session_id):
 
     try:
         if filename.split(".")[-1] == "json":
-            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "violinplot")
+            app_data=parse_import_json(contents,filename,last_modified,current_user.id,cache, "protclock")
             df=pd.read_json(app_data["df"])
             cols=df.columns.tolist()
             cols_=make_options(cols)
@@ -422,7 +435,7 @@ def read_input_file(contents,filename,last_modified,session_id):
             x_val=app_data['pa']["x_val"]
 
         else:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"violinplot")
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"protclock")
             app_data=dash.no_update
             cols=df.columns.tolist()
             cols_=make_options(cols)
@@ -436,7 +449,7 @@ def read_input_file(contents,filename,last_modified,session_id):
 
     except Exception as e:
         tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"violinplot")
+        toast=make_except_toast("There was a problem reading your input file:","read_input_file", e, current_user,"protclock")
         return [ dash.no_update, dash.no_update, toast, tb_str, dash.no_update ]
 
 
@@ -487,18 +500,18 @@ def make_fig_output(
 
     if n_clicks > 0:
         try:
-            df=parse_table(contents,filename,last_modified,current_user.id,cache,"violinplot")
+            df=parse_table(contents,filename,last_modified,current_user.id,cache,"protclock")
         
             out_df = pseudoage_inference(df, gene_id_column, cache)
 
-            session_data={ "session_data": {"app": { "violinplot": {"filename":upload_data_text ,'last_modified':last_modified,"df":out_df.to_json()} } } }
+            session_data={ "session_data": {"app": { "protclock": {"filename":upload_data_text ,'last_modified':last_modified,"df":out_df.to_json()} } } }
             session_data["APP_VERSION"]=app.config['APP_VERSION']
             session_data["PYFLASKI_VERSION"]=PYFLASKI_VERSION
             
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-            toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"violinplot")
-            return dash.no_update, dash.no_update,toast, None, tb_str, download_buttons_style_hide, None
+            toast=make_except_toast("There was a problem parsing your input.","make_fig_output", e, current_user,"protclock")
+            return dash.no_update, dash.no_update,toast, None, tb_str, download_buttons_style_hide, download_buttons_style_hide, None
      
 
         try:
@@ -517,7 +530,7 @@ def make_fig_output(
             # return fig, None, session_data, None, download_buttons_style_show
             # as session data is no longer required for downloading the figure
 
-            eventlog = UserLogging(email=current_user.email,action="download figure venn")
+            eventlog = UserLogging(email=current_user.email,action="display figure protclock")
             db.session.add(eventlog)
             db.session.commit()
 
@@ -525,7 +538,7 @@ def make_fig_output(
 
         except Exception as e:
             tb_str=''.join(traceback.format_exception(None, e, e.__traceback__))
-            toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"violinplot")
+            toast=make_except_toast("There was a problem generating your output.","make_fig_output", e, current_user,"protclock")
             return dash.no_update, dash.no_update,toast, session_data, tb_str, download_buttons_style_hide, download_buttons_style_hide, None
 
     return dash.no_update, dash.no_update, None, None, None, download_buttons_style_hide, download_buttons_style_hide, None
@@ -603,7 +616,7 @@ def download_pdf_filename(n1, n2, is_open):
 )
 def download_pdf(n_clicks,graph, pdf_filename):
     if not pdf_filename:
-        pdf_filename="violinplot.pdf"
+        pdf_filename="protclock.pdf"
     pdf_filename=secure_filename(pdf_filename)
     if pdf_filename.split(".")[-1] != "pdf":
         pdf_filename=f'{pdf_filename}.pdf'
@@ -617,7 +630,7 @@ def download_pdf(n_clicks,graph, pdf_filename):
         ## 
         fig=go.Figure(graph)
         fig.write_image(figure, format="pdf")
-    eventlog = UserLogging(email=current_user.email,action="download figure violinplot")
+    eventlog = UserLogging(email=current_user.email,action="download figure protclock")
     db.session.add(eventlog)
     db.session.commit()
     return dcc.send_bytes(write_image, pdf_filename)
@@ -740,7 +753,7 @@ def help_email(n,tb_str, session_data):
         else:
             tb_str="! traceback could not be found"
 
-        ask_for_help(tb_str,current_user, "violinplot", session_data)
+        ask_for_help(tb_str,current_user, "protclock", session_data)
 
         return closed, toast, clicks
     else:
