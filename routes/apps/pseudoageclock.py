@@ -798,3 +798,17 @@ def help_email(n,tb_str, session_data):
     else:
         
         raise PreventUpdate
+
+
+@dashapp.callback(
+    Output( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
+    Output( { 'type': 'toggler-toast-traceback', 'index': MATCH }, "children"),
+    Input( { 'type': 'toggler-toast-traceback', 'index': MATCH }, "n_clicks"),
+    State( { 'type': 'collapse-toast-traceback', 'index': MATCH }, "is_open"),
+    prevent_initial_call=True
+)
+def toggle_toast_traceback(n,is_open):
+    if not is_open:
+        return not is_open , "collapse"
+    else:
+        return not is_open , "expand"
