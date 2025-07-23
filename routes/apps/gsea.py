@@ -258,7 +258,7 @@ REACTOME_SIGNALING_BY_THE_B_CELL_RECEPTOR_BCR	http://www.gsea-msigdb.org/gsea/ms
             ], style={"margin-top":10, 'display': 'none' }),
             dbc.Row( [
                 dbc.Col( html.Label('Project title') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%","height":"35px"} ) ,md=3 ),
+                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%","height":"35px"}, maxLength=32) ,md=3 ),
                 dbc.Col( html.Label('Give a name to your project'),md=3  ), 
                 ], style={"margin-top":5, "margin-bottom":5}),
             dbc.Row( [

@@ -698,7 +698,7 @@ Once you have been given access more information will be displayed on how to tra
         dbc.Row( 
             [
                 dbc.Col( html.Label('Project title') ,md=3 , style={"textAlign":"right" }), 
-                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%"} ) ,md=3 ),
+                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%"}, maxLength=32) ,md=3 ),
                 dbc.Col( html.Label('Give a name to your project'),md=3  ), 
             ], 
             style={"margin-top":10}),
