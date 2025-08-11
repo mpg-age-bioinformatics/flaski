@@ -1,4 +1,4 @@
-from myapp import app, PAGE_PREFIX
+from myapp import app, PAGE_PREFIX, PRIVATE_ROUTES
 from flask_login import current_user
 from flask_caching import Cache
 from flask import session
@@ -66,6 +66,18 @@ dashapp.layout=html.Div(
     Output('protected-content', 'children'),
     Input('url', 'pathname'))
 def make_layout(pathname):
+    if "chatbot" in PRIVATE_ROUTES :
+        appdb=PrivateRoutes.query.filter_by(route="chatbot").first()
+        if not appdb:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        allowed_users=appdb.users
+        if not allowed_users:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        if current_user.id not in allowed_users :
+            allowed_domains=appdb.users_domains
+            if current_user.domain not in allowed_domains:
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+
     eventlog = UserLogging(email=current_user.email, action="visit agebot")
     db.session.add(eventlog)
     db.session.commit()
