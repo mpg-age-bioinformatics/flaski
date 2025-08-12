@@ -60,6 +60,18 @@ dashapp.layout = html.Div(
     Input('session-id', 'data')
 )
 def make_layout(session_id):
+    if "chatbot" in PRIVATE_ROUTES :
+        appdb=PrivateRoutes.query.filter_by(route="chatbot").first()
+        if not appdb:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        allowed_users=appdb.users
+        if not allowed_users:
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        if current_user.id not in allowed_users :
+            allowed_domains=appdb.users_domains
+            if current_user.domain not in allowed_domains:
+                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+
     ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit chatbot")
     db.session.add(eventlog)
