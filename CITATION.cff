@@ -1,0 +1,49 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Flaski
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Ayesha
+    family-names: Iqbal
+    affiliation: Max Planck Institute for Biology of Ageing
+  - given-names: Camila
+    family-names: Duitama
+    affiliation: Max Planck Institute for Biology of Ageing
+  - given-names: Franziska
+    family-names: Metge
+    affiliation: Max Planck Institute for Biology of Ageing
+  - given-names: Daniel
+    family-names: Rosskopp
+    affiliation: Max Planck Institute for Biology of Ageing
+  - given-names: Hossain
+    family-names: Amin
+    affiliation: Max Planck Institute for Biology of Ageing
+  - family-names: Boucas
+    given-names: Jorge
+    affiliation: Max Planck Institute for Biology of Ageing
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.4849515
+repository-code: 'https://github.com/mpg-age-bioinformatics/flaski'
+url: 'https://flaski.age.mpg.de'
+abstract: >-
+  Flaski is a myapp based collection of web apps for data
+  analysis and visualization in life sciences with session
+  management and versioning. Flaski is built thinking of
+  interactions between code experienced and non-experienced
+  users for which sessions created over the web interface
+  can be opened in python as standard plotly objects and
+  vice-versa. Among other things, error reporting includes a
+  session sharing option for optimal 1st level support.
+  Flaski is open-source under the MIT License.
+keywords:
+  - Bioinformatics
+  - Software
+  - Flask
+  - Dash
+license: MIT

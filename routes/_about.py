@@ -47,7 +47,7 @@ Please check our [CODE_OF_CONDUCT.md]({EXT_URL}github.com/mpg-age-bioinformatics
 
 ##### Citing
 
-Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515
+Iqbal, A., Duitama, C., Metge, F., Rosskopp, D., Amin, H., Boucas, J. Flaski. (2021). doi:10.5281/zenodo.4849515
 
 ##### Versioning
 
