@@ -86,7 +86,7 @@ other_nav_dropdowns =[
                 "16S":"/sixteens/",\
                 "Variant Calling":"/varcal/",\
                 "Ribo-Seq":"/riboseq/",\
-                "AlphaFold":"/alphafold/",\
+                "AlphaFold 3":"/alphafold/",\
                 "Methylation Clock":"/methylclock/",\
                 "GSEA":"/gsea/",\
                 "CRISPR" : "/crispr/"

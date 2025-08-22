@@ -21,7 +21,7 @@ from werkzeug.utils import secure_filename
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 
-dashapp = dash.Dash("alphafold",url_base_pathname=f'{PAGE_PREFIX}/alphafold/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title="AlphaFold" , assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
+dashapp = dash.Dash("alphafold",url_base_pathname=f'{PAGE_PREFIX}/alphafold/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title="AlphaFold 3" , assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
 protect_dashviews(dashapp)
 
@@ -68,7 +68,7 @@ def make_layout(pathname):
     db.session.commit()
     protected_content=html.Div(
         [
-            make_navbar_logged("AlphaFold",current_user),
+            make_navbar_logged("AlphaFold 3",current_user),
             html.Div(id="app-content",style={"height":"100%","overflow":"scroll"}),
             navbar_A,
         ],
@@ -167,11 +167,35 @@ GSRAHSSHLKSKKGQSTSRH\n\
                         dbc.Col( dcc.Textarea(id='sequence', placeholder=example_fasta, value="", style={ "width":"100%",'height': 400} ) ,md=5 ),
                         dbc.Col( html.Label('Protein sequence'),md=4  ), 
                     ], 
-                    style={"margin-top":10})
+                    style={"margin-top":10}),
+                
+                dbc.Row(
+                    [
+                        dbc.Col(md=2),
+                        dbc.Col(
+                            dbc.Checkbox(
+                                id="agree",
+                                value=False,
+                                label=html.Span([
+                                    "I have read and agree to the ",
+                                    html.A(
+                                        "AlphaFold 3 Output Terms of Use",
+                                        href="https://github.com/google-deepmind/alphafold3/blob/main/OUTPUT_TERMS_OF_USE.md",
+                                        target="_blank",
+                                        rel="noopener noreferrer",
+                                    ),
+                                ]),
+                            ),
+                            md=5,
+                        )
+                    ],
+                    style={"margin-top": 10},
+                ),
+
             ], 
             body=False
         ),
-        html.Button(id='submit-button-state', n_clicks=0, children='Submit', style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
+        html.Button(id='submit-button-state', n_clicks=0, children='Submit', disabled=True, style={"width": "200px","margin-top":4, "margin-bottom":"50px"}),
         dbc.Modal(
             dcc.Loading(
                 id=f"modal-load",
@@ -247,3 +271,18 @@ def toggle_navbar_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+# Submit button enabled when values are filled
+@dashapp.callback(
+    Output('submit-button-state', 'disabled'),
+    Input('email', 'value'),
+    Input('opt-group', 'value'),
+    Input('name', 'value'),
+    Input('sequence', 'value'),
+    Input('agree', 'value'),
+)
+def toggle_submit_disabled(email, group, name, sequence, agreed):
+    def _filled(x):
+        return bool(x and str(x).strip())
+    all_filled = _filled(email) and _filled(group) and _filled(name) and _filled(sequence)
+    return not (all_filled and bool(agreed))
