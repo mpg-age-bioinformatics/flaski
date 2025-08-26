@@ -178,7 +178,7 @@ GGCCGCUUAGCACAGUGGCAGUGCACCACUCUCGUAAAGUGGGGGUCGCGAGUUCGAUUCUCGCAGUGGCCUCCA"
                                 html.Label('Protein/DNA/RNA sequence(s)'),
                                 html.Br(),
                                 html.Br(),
-                                dbc.FormText("Guidelines:"),
+                                html.Label("Guidelines:"),
                                 html.Ul([
                                     html.Li([
                                         "For multi-FASTA, use ",
@@ -196,11 +196,6 @@ GGCCGCUUAGCACAGUGGCAGUGCACCACUCUCGUAAAGUGGGGGUCGCGAGUUCGAUUCUCGCAGUGGCCUCCA"
                                     ]),
                                     html.Li("By default, the sequence is treated as Protein"),
                                 ], className="mb-0"),
-                                html.Div([
-                                    dbc.Badge("FASTA", className="me-1"),
-                                    dbc.Badge("Multi-FASTA", className="me-1"),
-                                    dbc.Badge("Protein/DNA/RNA", className="me-1"),
-                                ], className="mt-2"),
                                 html.Br(),
                             ]),
                             md=4,
