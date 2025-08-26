@@ -12,6 +12,7 @@ import os
 import uuid
 import io
 import base64
+import re
 import pandas as pd
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
@@ -86,8 +87,18 @@ def make_submission_json(email,group, name, sequence):
             return sequence
 
         def clean_header(name):
-            name=secure_filename(name)
-            name=name.replace(" ","_")
+            name = re.sub(r'[^A-Z-]', '', name.upper())
+            name = re.sub(r'(?<!-)-(?!-)', '', name)
+            name = re.sub(r'-{2,}', '--', name)
+            if '--' in name:
+                before, after = name.split('--', 1)
+                after = after.replace('--', '')
+                before = before[:25]
+                name = before + '--' + after
+            else:
+                name = name[:25]
+
+            name = secure_filename(name)
             return name
 
         filename=make_submission_file(".alphafold.json", folder="mpcdf")
@@ -123,28 +134,25 @@ def make_app_content(session_id):
 
     example_fasta="MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP\
 DEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAK\
-SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHE\
-RCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNS\n\n\
+SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPH\n\n\
 ..or multifasta, for multimers:\n\n\
->sequence_1_name\n\
-MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP\
-DEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAK\
-SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPH\n\
->sequence_2_name\n\
-RCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNS\
-SCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELP\
-PGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPG\
-GSRAHSSHLKSKKGQSTSRH\n\
->sequence_n_nam...."
+>PROTEINA\n\
+MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRM\n\
+>PROTEINB\n\
+GPDSMEEVVVPEEPPKLVSALATYVQQERLCTMFLSIANKLLPLKPHACHLKRIRRSSATRVATAPMD\n\
+>DNAA--DNA\n\
+CCGCGCCTGTGGGATCTGCATGCCCC\n\
+>RNAA--RNA\n\
+GGCCGCUUAGCACAGUGGCAGUGCACCACUCUCGUAAAGUGGGGGUCGCGAGUUCGAUUCUCGCAGUGGCCUCCA"
 
     content=[ 
         dbc.Card(
             [ 
                 dbc.Row( 
                     [
-                        dbc.Col( html.Label('email') ,md=2, style={"textAlign":"right" }), 
+                        dbc.Col( html.Label('Email') ,md=2, style={"textAlign":"right" }), 
                         dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value=current_user.email, type='text', style={ "width":"100%"} ) ,md=5 ),
-                        dbc.Col( html.Label('your email address'),md=4  ), 
+                        dbc.Col( html.Label('Your email address'),md=4  ), 
                     ], 
                     style={"margin-top":10}),
                 dbc.Row( 
@@ -156,7 +164,7 @@ GSRAHSSHLKSKKGQSTSRH\n\
                     style={"margin-top":10}),
                 dbc.Row( 
                     [
-                        dbc.Col( html.Label('Sequence name') ,md=2 , style={"textAlign":"right" }), 
+                        dbc.Col( html.Label('Sequence Name') ,md=2 , style={"textAlign":"right" }), 
                         dbc.Col( dcc.Input(id='name', placeholder="my sequence name", value="", type='text', style={ "width":"100%"} ) ,md=5 ),
                         dbc.Col( html.Label('Fasta header'),md=4  ), 
                     ], 
@@ -165,7 +173,38 @@ GSRAHSSHLKSKKGQSTSRH\n\
                     [
                         dbc.Col( html.Label('Sequence') ,md=2 , style={"textAlign":"right" }), 
                         dbc.Col( dcc.Textarea(id='sequence', placeholder=example_fasta, value="", style={ "width":"100%",'height': 400} ) ,md=5 ),
-                        dbc.Col( html.Label('Protein sequence'),md=4  ), 
+                        dbc.Col(
+                            html.Div([
+                                html.Label('Protein/DNA/RNA sequence(s)'),
+                                html.Br(),
+                                html.Br(),
+                                dbc.FormText("Guidelines:"),
+                                html.Ul([
+                                    html.Li([
+                                        "For multi-FASTA, use ",
+                                        html.Code(">SEQUENCENAME"),
+                                        " on one line, then ",
+                                        html.Code("SEQUENCE"),
+                                        " on the next"
+                                    ]),
+                                    html.Li("SEQUENCENAME should contain only A–Z and be at most 25 characters"),
+                                    html.Li([
+                                        "For DNA or RNA sequences, write ",
+                                        html.Code(">SEQUENCENAME--DNA"),
+                                        " or ",
+                                        html.Code(">SEQUENCENAME--RNA")
+                                    ]),
+                                    html.Li("By default, the sequence is treated as Protein"),
+                                ], className="mb-0"),
+                                html.Div([
+                                    dbc.Badge("FASTA", className="me-1"),
+                                    dbc.Badge("Multi-FASTA", className="me-1"),
+                                    dbc.Badge("Protein/DNA/RNA", className="me-1"),
+                                ], className="mt-2"),
+                                html.Br(),
+                            ]),
+                            md=4,
+                        ), 
                     ], 
                     style={"margin-top":10}),
                 
