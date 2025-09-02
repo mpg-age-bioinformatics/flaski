@@ -1,5 +1,5 @@
 from myapp.routes.apps import storage, scatterplot, heatmap, violinplot, cellplot, gseaplot, david, lineplot, dendrogram, threeDscatterplot, mds, pca, tsne, histogram, circularbarplots, venndiagram, lifespan, aadatalake, aadatalake_prot, pseudoageclock
-from myapp.routes.apps import ip, rnaseq, transfer, atacseq, chipseq, asplicing, intronret, irfinder, circrna, mirna, sixteens, varcal, riboseq, methylclock,  alphafold, gsea, crispr, vcheck, convert, cbioportal, neanderthalage
+from myapp.routes.apps import ip, rnaseq, transfer, atacseq, chipseq, cutandtag, asplicing, intronret, irfinder, circrna, mirna, sixteens, varcal, riboseq, methylclock,  alphafold, gsea, crispr, vcheck, convert, cbioportal, neanderthalage
 from myapp.routes.apps import gtex, kegg, chatbot, plotai
 
  # kegg

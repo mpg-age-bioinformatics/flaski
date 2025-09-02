@@ -1,7 +1,7 @@
 import os
 
-_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "chatbot", "plotai", "neanderthalage", "protclock"]
-_PUBLIC_VIEWS = ['alphafold', 'rnaseq', "atacseq", "chipseq", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
+_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "chatbot", "plotai", "neanderthalage", "protclock"]
+_PUBLIC_VIEWS = ['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
     _DEV_ROUTES=[  "agebot" ]  #"cbioportal",
@@ -78,6 +78,7 @@ other_nav_dropdowns =[
                 "RNAseq":"/rnaseq/",\
                 "ATACseq":"/atacseq/",\
                 "ChIPseq":"/chipseq/",\
+                "CutNTag":"/cutandtag/",\
                 "Alternative Splicing":"/asplicing/",\
                 "Intron Retention":"/intronret/",\
                 "IRfinder":"/irfinder/",\
