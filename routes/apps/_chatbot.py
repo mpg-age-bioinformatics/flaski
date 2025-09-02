@@ -21,13 +21,17 @@ path_to_files="/flaski_private/chatbot/"
 INDEX_FILE = f"{path_to_files}mpnet_web.index"
 CHUNK_FILE = f"{path_to_files}chunks_web.pkl"
 
-# Preload the FAISS index and text chunks once
-faiss_index = faiss.read_index(INDEX_FILE)
-with open(CHUNK_FILE, "rb") as f:
-    text_chunks_with_metadata = pickle.load(f)
+faiss_index = None
+text_chunks_with_metadata = []
+embedding_model = None
+if os.path.exists(INDEX_FILE) and os.path.exists(CHUNK_FILE):
+    # Preload the FAISS index and text chunks once
+    faiss_index = faiss.read_index(INDEX_FILE)
+    with open(CHUNK_FILE, "rb") as f:
+        text_chunks_with_metadata = pickle.load(f)
 
-# Preload the embedding model once
-embedding_model = SentenceTransformer("multi-qa-mpnet-base-cos-v1")
+    # Preload the embedding model once
+    embedding_model = SentenceTransformer("multi-qa-mpnet-base-cos-v1")
 
 # api_key = app.config["GWDG_CHAT_API"]
 api_key = app.config.get("GWDG_CHAT_API", "")
