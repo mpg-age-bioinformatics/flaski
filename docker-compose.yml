@@ -205,7 +205,7 @@ services:
     args:
       BUILD_NAME: myapp
       MYAPP_VERSION: dev
-      UPGRADE_REQS: "no"
+      UPGRADE_REQS: "yes"
   entrypoint: /flaski/services/backup/entrypoint.sh
   user: root
   depends_on:
