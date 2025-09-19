@@ -50,13 +50,19 @@ style_cell={
         'whiteSpace': 'normal'
     }
 
-dashapp.layout=html.Div( 
-    [ 
-        dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
-        dcc.Location( id='url', refresh=True ),
-        html.Div( id="protected-content" ),
-    ] 
-)
+# dashapp.layout=html.Div( 
+#     [ 
+#         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
+#         dcc.Location( id='url', refresh=True ),
+#         html.Div( id="protected-content" ),
+#     ] 
+# )
+
+dashapp.layout = html.Div([
+    dcc.Store(data=str(uuid.uuid4()), id='session-id'),
+    dcc.Location(id='url', refresh=True),
+    html.Div(id="protected-content"),
+])
 
 @dashapp.callback(
     Output('protected-content', 'children'),
@@ -89,9 +95,8 @@ def generate_submission_file(rows_atac, email,group,folder,md5sums,project_title
         df_=pd.DataFrame({"Field":["email","Group","Folder","md5sums","Project title", "Organism",
                                    "seq","Adapter sequence", "Exclude mitochondria", "genes", "wget" ],\
                           "Value":[email,group,folder,md5sums,project_title, organism, \
-                                    seq, adapter, mito, genes,wget]}, index=list(range(14)))
+                                    seq, adapter, mito, genes,wget]})
         df=df.to_json()
-        dfi=dfi.to_json()
         df_=df_.to_json()
         filename=make_submission_file(".ATACseq.xlsx")
 
@@ -410,62 +415,69 @@ Once you have been given access more information will be displayed on how to tra
     return content
 
 
-@dashapp.callback( 
-    Output("updatable-df", 'children'),
-    Output("updatable-df-ai", 'children'),
-    Output('email', 'value'),
-    Output('opt-group', 'value'),
-    Output('folder', 'value'),
-    Output('md5sums', 'value'),
-    Output('project_title', 'value'),
-    Output('opt-organism', 'value'),
-    Output('opt-seq', 'value'),
-    Output('adapter', 'value'),
-    Output('mito', 'value'),
-    Output('genes', 'value'),
-    Output('wget', 'value'), 
-    Output('ftp', 'value'), 
-    Output('upload-data-text', 'children'),
-    Input('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
-    prevent_initial_call=True)
-def read_file(contents,filename,last_modified):
-    content_type, content_string = contents.split(',')
+@dashapp.callback(
+    Output("updatable-df", "children"),
+    Output("email", "value"),
+    Output("opt-group", "value"),
+    Output("folder", "value"),
+    Output("md5sums", "value"),
+    Output("project_title", "value"),
+    Output("opt-organism", "value"),
+    Output("opt-seq", "value"),
+    Output("adapter", "value"),
+    Output("opt-mito", "value"),
+    Output("genes", "value"),
+    Output("wget", "value"),
+    Output("ftp", "value"),
+    Output("upload-data-text", "children"),
+    Input("upload-data", "contents"),
+    State("upload-data", "filename"),
+    State("upload-data", "last_modified")
+)
+def read_file(contents, filename, last_modified):
+    if contents is None:
+        raise dash.exceptions.PreventUpdate
+
+    content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
-    extension=filename.split(".")[-1]
-    if extension not in ['xls', "xlsx"] :
+
+    extension = filename.split(".")[-1].lower()
+    if extension not in ["xls", "xlsx"]:
         raise dash.exceptions.PreventUpdate
-    exc=pd.ExcelFile(io.BytesIO(decoded))
-    if "samples" not in exc.sheet_names :
+
+    exc = pd.ExcelFile(io.BytesIO(decoded))
+    if "samples" not in exc.sheet_names or "ATACseq" not in exc.sheet_names:
         raise dash.exceptions.PreventUpdate
-    if "ATACseq" not in exc.sheet_names :
-        raise dash.exceptions.PreventUpdate
+
     samples = pd.read_excel(io.BytesIO(decoded), sheet_name="samples")
     ATACseq = pd.read_excel(io.BytesIO(decoded), sheet_name="ATACseq")
 
-    samples = samples[ samples.columns.tolist()[:6]]
+    # Build Dash table
+    samples = samples[samples.columns.tolist()[:6]]
+    samples_df = make_table(samples, "samples-table")
+    samples_df.editable = True
+    samples_df.row_deletable = True
+    samples_df.style_cell = style_cell
+    samples_df.style_table["height"] = "62vh"
 
-    samples_df=make_table(samples,'samples-table')
-    samples_df.editable=True
-    samples_df.row_deletable=True
-    samples_df.style_cell=style_cell
-    samples_df.style_table["height"]="62vh"
+    # Extract values from metadata sheet
+    fields_to_return = [
+        "email", "Group", "Folder", "md5sums",
+        "Project title", "Organism", "seq", "Adapter sequence",
+        "Exclude mitochondria", "Genes", "wget", "ftp"
+    ]
 
-    values_to_return=[]
-    fields_to_return=[ "email", "Group", "Folder", "md5sums", "Project title", "Organism", "seq", "Adapter sequence","Exclude mitochondria", "Genes", "wget", "ftp" ]
-    # for f in fields_to_return:
-    #     values_to_return.append(  ChIPseq[ChIPseq["Field"]==f]["Value"].tolist()[0]  )
-
-    fields_on_file=ATACseq["Field"].tolist()
-
+    values_to_return = []
+    fields_on_file = ATACseq["Field"].tolist()
     for f in fields_to_return:
-        if f in  fields_on_file:
-            values_to_return.append(  ATACseq[ATACseq["Field"]==f]["Value"].tolist()[0]  )
+        if f in fields_on_file:
+            values_to_return.append(
+                ATACseq[ATACseq["Field"] == f]["Value"].tolist()[0]
+            )
         else:
-            values_to_return.append( dash.no_update )
+            values_to_return.append(dash.no_update)
 
-    return [ samples_df ] + values_to_return + [ filename ]
+    return [samples_df] + values_to_return + [filename]
 
 # main submission call
 @dashapp.callback(
@@ -483,7 +495,7 @@ def read_file(contents,filename,last_modified):
     State('opt-organism', 'value'),
     State('opt-seq', 'value'),
     State('adapter', 'value'),
-    State('mito', 'value'),
+    State('opt-mito', 'value'),
     State('genes', 'value'),
     State('wget', 'value'),
     State('ftp', 'value'),
@@ -496,6 +508,7 @@ def update_output(n_clicks,rows_atac,email,group,folder,md5sums,project_title,or
 
     if not wget:
         wget="NONE"
+    
     subdic=generate_submission_file(rows_atac,email,group,folder,md5sums,project_title,organism,seq,adapter, mito, genes, wget, ftp)
     samples=pd.read_json(subdic["samples"])
     metadata=pd.read_json(subdic["metadata"])
