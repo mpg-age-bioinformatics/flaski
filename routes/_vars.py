@@ -9,11 +9,11 @@ if os.environ['FLASK_ENV'] != "development" :
 
 _META_TAGS=[{'name':'title', 'property':'og:title', 'content':'flaski' },\
 {'name':'image','property':'og:image', 'content':'https://i.ibb.co/pRL0sM1/Flaski.jpg' },\
-{'name':'description','property':'og:description', 'content':'Flaski is a myapp based collection of web apps for data analysis and visualization in life \
-sciences with session management and versioning. Flaski is built thinking of interactions between code experienced \
-and non-experienced users for which sessions created over the web interface can be opened in python as standard \
-plotly objects and vice-versa. Among other things, error reporting includes a session sharing option for optimal 1st level \
-support. Flaski is open-source under the MIT License. ' },\
+{'name':'description','property':'og:description', 'content':'Flaski is a myapp-based suite of web applications for data analysis and visualization in the life sciences, \
+featuring built-in session management and versioning. It is designed to support seamless collaboration between users with and without programming experience: sessions \
+created through the web interface can be opened in Python as standard Plotly objects—and vice versa. \
+Flaski also streamlines troubleshooting: its error-reporting tools include a session-sharing option that enables fast and effective first-level support. \
+Flaski is open-source and released under the MIT License.' },\
 {'property':'og:url', 'content':os.getenv("APP_URL") },\
 {'property':'og:image:width', 'content':'1200' },\
 {'property':'og:image:height', 'content':'675' },\
