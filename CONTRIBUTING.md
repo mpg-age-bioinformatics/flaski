@@ -45,11 +45,6 @@ Add the following line to your `/etc/hosts`
 
 You can now access flaski over https://flaski.localhost/v3.
 
-Adding administrator user:
-```
-docker-compose run --entrypoint="python3 /myapp/myapp.py admin --add myemail@gmail.com" init
-```
-
 ### Email logging
 
 To use the SMTP debugging server from Python comment all email related `env` in `docker-compose.yml`.
@@ -57,6 +52,11 @@ You can not using python's fake email server that accepts emails, but instead of
 To run this server, open a second terminal session and run the following command on it:
 ```bash
 docker-compose exec server3 python3 -m smtpd -n -c DebuggingServer localhost:8025
+```
+
+After generating your user you make it an administrator by running:
+```
+docker-compose run --entrypoint="python3 /myapp/myapp.py admin --add myemail@gmail.com" init
 ```
 
 ### pyflaski
