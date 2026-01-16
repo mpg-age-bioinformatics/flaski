@@ -159,8 +159,11 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
         source_folder_=os.path.join("/nexus/posix0/MAGE-flaski/ftp_data/" , ftp)
         project_folder_=os.path.join("/raven/ptmp/flaski/projects/", project_folder) 
         code_folder_=os.path.join("/nexus/posix0/MAGE-flaski/service/projects/code/", project_folder)
-        genomes_folder_="/nexus/posix0/MAGE-flaski/service/genomes/jawm/"
-        
+        if ercc not in ercc_dic.keys() :
+            genomes_folder_="/nexus/posix0/MAGE-flaski/service/genomes/jawm/"
+        else:
+            genomes_folder_=os.path.join("/raven/ptmp/flaski/projects/", project_folder, "genone") 
+
         ##############
         # yaml files #
         ##############
