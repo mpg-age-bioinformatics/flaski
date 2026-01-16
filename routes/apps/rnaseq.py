@@ -101,7 +101,16 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
         df.columns=["Read 1","Read 2","Group"]
 
         for c in df.columns:
-            df[c]=df[c].apply(lambda x: str(x).replace("\\x01", "").strip().replace(";","_")  )
+            df[c]=df[c].apply(lambda x: str(x).replace("\\x01", "").strip().replace(";","_") )
+        for c in ["Read 1","Read 2"]:
+            df[c]=df[c].apply( lambda x: str(x).replace(" ", "") )
+        df["Group"]=df["Group"].apply( lambda x: str(x).replace(" ", "_") )
+
+        files_for_md5sums=df["Read 1"].tolist() + df["Read 2"].tolist()
+        files_for_md5sums=",".join( files_for_md5sums ).replace(",,",",").strip(",")
+        if (".fastq.gz" not in files_for_md5sums) and (".fq.gz" not in files_for_md5sums) :
+            files_for_md5sums="NONE"
+
         df_=df.to_json()
 
         df = df.to_csv(sep=";", index=False, header=False ).rstrip("\n") # .replace("\n") #, r"\n")
@@ -132,22 +141,26 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
 
         if group != "External" :
             if group in GROUPS :
-                project_folder=group+"/"+GROUPS_INITALS[group]+"_at_"+secure_filename(project_title)
+                project_title=GROUPS_INITALS[group]+"_"+secure_filename(project_title)
+                project_folder=group+"/"+project_title
             else:
                 user_domain=[ s.replace(" ","") for s in email.split(",") if "mpg.de" in s ]
                 user_domain=user_domain[0].split("@")[-1]
-                mps_domain="mpg.de"
+                # mps_domain="mpg.de"
                 tag=user_domain.split(".mpg.de")[0]
 
-                project_folder=group+"/"+tag+"_at_"+secure_filename(project_title)
+                project_title=tag+"_"+secure_filename(project_title)
+
+                project_folder=group+"/"+project_title
         else:
-            project_folder="Bioinformatics/bit_ext_at_"+secure_filename(project_title)
+            project_title="bit_ext_"+secure_filename(project_title)
+            project_folder="Bioinformatics/"+project_title
 
         source_folder_=os.path.join("/nexus/posix0/MAGE-flaski/ftp_data/" , ftp)
         project_folder_=os.path.join("/raven/ptmp/flaski/projects/", project_folder) 
         code_folder_=os.path.join("/nexus/posix0/MAGE-flaski/service/projects/code/", project_folder)
         genomes_folder_="/nexus/posix0/MAGE-flaski/service/genomes/jawm/"
-
+        
         ##############
         # yaml files #
         ##############
@@ -164,6 +177,9 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   project_title: "{project_title}"
   link: "{link}"
   ftp: "<ftp_account>"
+  files_for_md5sums: "{files_for_md5sums}"
+  issue_title: "RNAseq pipeline"
+  workflow: "jawm_rnaseq"
 
 - scope: global
   environment: "apptainer"
@@ -282,27 +298,13 @@ def make_app_content(session_id):
     )
 
     # generate dropdown options
-    organisms=["celegans","mmusculus","hsapiens","dmelanogaster","nfurzeri", "drerio", "c_albicans_sc5314"]
+    organisms=["homo_sapiens", "mus_musculus", "danio_rerio", "drosophila_melanogaster", "caenorhabditis_elegans", "nothobranchius_furzeri"]
     organisms_=make_options(organisms)
     release=["115"]
     release_=make_options(release)
     ercc_=make_options(["ercc92","none"])
 
     readme_age='''
-**New data**
-
-For submitting samples for analysis you will need to first copy your raw files into `smb://octopus/group_bit_automation`.
-
-Make sure you create a folder eg. `my_proj_folder` and that all your `fastq.gz` files are inside as well as your md5sums file (attention: only one md5sums file per project).
-
-All files will have to be on your project folder (eg. `my_proj_folder` in `Info` > `Folder`) do not create further subfolders.
-
-Once all the files have been copied, edit the `Samples` and `Info` tabs here and then press submit.
-
-**Archived data**
-
-For analyzing previously archived data you do not need to transfer your files. For this in the `Folder` and `md5sums` fields you will need to 
-type in *TAPE*.
     '''
 
     readme_mps='''
@@ -320,14 +322,9 @@ type in *TAPE*.
 **SRA**
 
 If you want to analyse **GEO/SRA** data you can do this without downloading the respective files by giving in 
-the SRA run number instead of the file name. If you are analysing paired end data and only one run number 
-exists please give in the same run number in `Read 2`. In the `Folder` and `md5sums` fields you will need to 
+the SRA run number instead of the file name. In the `md5sums` fields you will need to 
 type in *SRA*. An example can be found [here](https://youtu.be/KMtk3NCWVnI). 
-
-If you choose to run this workflow locally on your laptop please be aware that the SRA section here described 
-does not apply to local runs. For local runs you will have to download the raw fastq.gz files yourself and 
-then fill up the submission form.
-    '''
+'''
 
     local_readme='''
 **Local runs**
@@ -384,23 +381,23 @@ jawm jawm_rnaseq -p /path/to/file.yaml --global.map.source_folder /path/to/your/
             readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
             groups_=make_options(GROUPS)
             groups_val=None
-            hide='block'
+            hide_style={"margin-top":10}
         else :
             readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
             groups_=make_options([user_domain])
             groups_val=user_domain
-            hide='none'
+            hide_style={"margin-top":10}
 
     elif not header_access :
         readme=dcc.Markdown(readme_mps, style={"width":"90%", "margin":"10px"} )
         groups_=make_options([user_domain])
         groups_val=user_domain
-        hide='none'
+        hide_style={"margin-top":10,"display": 'none'}
     else:
         readme=dcc.Markdown(readme_noaccess, style={"width":"90%", "margin":"10px"} )
         groups_=make_options(["External"])
         groups_val="External"
-        hide='none'
+        hide_style={"margin-top":10,"display": 'none'}
 
     input_df=make_table(input_df,'adding-rows-table')
     input_df.editable=True
@@ -420,63 +417,63 @@ jawm jawm_rnaseq -p /path/to/file.yaml --global.map.source_folder /path/to/your/
                 dbc.Col( dcc.Input(id='email', placeholder="your.email@age.mpg.de", value=current_user.email, type='text', style={ "width":"100%"} ) ,md=3 ),
                 dbc.Col( html.Label('your email address'),md=3  ), 
             ], 
-            style={"margin-top":10}),
+            style=hide_style),
         dbc.Row( 
             [
-                dbc.Col( html.Label('Group') ,md=3 , style={"textAlign":"right", 'display': hide  }), 
-                dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, value=groups_val, style={ "width":"100%", 'display': hide }),md=3 ),
-                dbc.Col( html.Label('Select from dropdown menu'), md=3 , style={'display': hide} ), 
+                dbc.Col( html.Label('Group') ,md=3 , style={"textAlign":"right"  }), 
+                dbc.Col( dcc.Dropdown( id='opt-group', options=groups_, value=groups_val, style={ "width":"100%" }),md=3 ),
+                dbc.Col( html.Label('Select from dropdown menu'), md=3  ), 
             ], 
-            style={"margin-top":10,'display': hide}),
+            style=hide_style ), # ,'display': hide
         dbc.Row( 
             [
-                dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right", 'display': hide }), 
-                dbc.Col( dcc.Input(id='md5sums', placeholder="md5sums.file.txt", value="", type='text', style={ "width":"100%", 'display': hide} ) ,md=3 ),
-                dbc.Col( html.Label('File with md5sums'),md=3 , style={'display': hide}  ), 
+                dbc.Col( html.Label('md5sums') ,md=3 , style={"textAlign":"right", }),  # 'display': hide
+                dbc.Col( dcc.Input(id='md5sums', placeholder="md5sums.file.txt", value="", type='text', style={ "width":"100%" } ) ,md=3), # 'display': hide
+                dbc.Col( html.Label('File with md5sums'),md=3   )  #, style={'display': hide}
             ], 
-            style={"margin-top":10,'display': hide}),
+            style=hide_style), #'display': hide
         dbc.Row( 
             [
-                dbc.Col( html.Label('Project title') ,md=3 , style={"textAlign":"right", 'display': hide }), 
-                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%", 'display': hide}, maxLength=32) ,md=3 ),
-                dbc.Col( html.Label('Give a name to your project'),md=3 , style={'display': hide} ), 
+                dbc.Col( html.Label('Project title') ,md=3 , style={"textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='project_title', placeholder="my_super_proj", value="", type='text', style={ "width":"100%" }, maxLength=32) ,md=3 ),
+                dbc.Col( html.Label('Give a name to your project'),md=3  ), 
             ], 
-            style={"margin-top":10,'display': hide}),
+            style=hide_style), # ,'display': hide
         dbc.Row( 
             [
                 dbc.Col( html.Label('Organism') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-organism', options=organisms_, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
             ], 
-            style={"margin-top":10}),
+            style={ "margin-top":10 }),
         dbc.Row( 
             [
                 dbc.Col( html.Label('Release') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-release', options=release_, style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('Select from dropdown menu'),md=3  ), 
             ], 
-            style={"margin-top":10}),
+            style={ "margin-top":10 }),
         dbc.Row( 
             [
                 dbc.Col( html.Label('ERCC') ,md=3 , style={"textAlign":"right" }), 
                 dbc.Col( dcc.Dropdown( id='opt-ercc', options=ercc_, value="none", style={ "width":"100%"}),md=3 ),
                 dbc.Col( html.Label('ERCC spikeins'),md=3  ), 
             ], 
-            style={"margin-top":10,"margin-bottom":10}),
+            style={ "margin-top":10 }),
         dbc.Row( 
             [
-                dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right",'display': hide} ) , 
-                dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%",'display': hide} ) ,md=3 ),
-                dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3, style={'display': hide} ), 
+                dbc.Col( html.Label('ftp user') ,md=3 , style={"textAlign":"right" } ) , 
+                dbc.Col( dcc.Input(id='ftp', placeholder="ftp user name", value="", type='text', style={ "width":"100%" } ) ,md=3 ),
+                dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3  ), 
             ], 
-            style={ "margin-top":10, "margin-bottom":10, 'display': hide } ),     
+            style=hide_style ), # , 'display': hide
         dbc.Row( 
             [
-                dbc.Col( html.Label('link') ,md=3 , style={"textAlign":"right",'display': hide}), 
-                dbc.Col( dcc.Input(id='link', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%",'display': hide} ) ,md=3 ),
-                dbc.Col( html.Label("`wget` or similar command for direct download (optional)"),md=3, style={'display': hide} ), 
+                dbc.Col( html.Label('link') ,md=3 , style={ "textAlign":"right" }), 
+                dbc.Col( dcc.Input(id='link', placeholder="wget -r --http-user=NGS_BGarcia_SRE01_A006850205 --http-passwd=qlATOWs0 http://bastet2.ccg.uni-koeln.de/downloads/NGS_BGarcia_SRE01_A006850205", value="", type='text', style={ "width":"100%" } ) ,md=3 ),
+                dbc.Col( html.Label("`wget` or similar command for direct download (optional)"),md=3 ), 
             ], 
-            style={ "margin-top":10, "margin-bottom":10,'display': hide }),       
+            style=hide_style ), # ,'display': hide
     ]
 
     content = [
@@ -717,6 +714,8 @@ jawm jawm_rnaseq -p {docker_yaml_file} --global.map.source_folder /path/to/your/
 
         metadata=metadata.astype(str)
         metadata=metadata[~metadata["Value"].isin( [ "", "NONE", "none", "External" ]) ]
+        metadata=metadata[~metadata["Field"].isin( [ "email" ]) ]
+
 
         def write_archive(bytes_io):
             # 1) build the Excel in memory
