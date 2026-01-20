@@ -108,14 +108,16 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
 
         files_for_md5sums=df["Read 1"].tolist() + df["Read 2"].tolist()
         files_for_md5sums=",".join( files_for_md5sums ).replace(",,",",").strip(",")
-        if (".fastq.gz" not in files_for_md5sums) and (".fq.gz" not in files_for_md5sums) :
-            files_for_md5sums="NONE"
 
         df_=df.to_json()
 
         df = df.to_csv(sep=";", index=False, header=False ).rstrip("\n") # .replace("\n") #, r"\n")
         df = df.strip().strip(";")
         df = df.split("\n")
+
+        if (".fastq.gz" not in files_for_md5sums) and (".fq.gz" not in files_for_md5sums) :
+            files_for_md5sums="NONE"
+        df=[ f"{s[0]};{s[2]}" for s in df.split(";") if s != "" ]
 
         ######################
         # metadata dataframe #
@@ -164,6 +166,12 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
         else:
             genomes_folder_=os.path.join("/raven/ptmp/flaski/projects/", project_folder, "genone") 
 
+        slurm_yaml_file=os.path.basename( make_submission_file(".RNAseq.slurm.yaml") )
+        uploads_file=slurm_yaml_file.replace( ".yaml", ".upload" )
+        uploads_file_="/nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/jawm_submissions/{uploads_file}"
+        docker_yaml_file=slurm_yaml_file.replace(".slurm.",".docker.")
+        excel_file=slurm_yaml_file.replace(".slurm.yaml",".flaski.xlsx")
+
         ##############
         # yaml files #
         ##############
@@ -183,6 +191,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   files_for_md5sums: "{files_for_md5sums}"
   issue_title: "RNAseq pipeline"
   workflow: "jawm_rnaseq"
+  report_file: "{uploads_file_}"
 
 - scope: global
   environment: "apptainer"
@@ -206,6 +215,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
       {row}"""
             
         slurm=slurm+rf"""
+    report_file: "/nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/jawm_submissions/{uploads_file}"
 
 - scope: process
   name: 
@@ -254,10 +264,6 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
 """
             slurm=slurm+ercc_yaml
             docker=docker+ercc_yaml
-
-        slurm_yaml_file=os.path.basename( make_submission_file(".RNAseq.slurm.yaml") )
-        docker_yaml_file=slurm_yaml_file.replace(".slurm.",".docker.")
-        excel_file=slurm_yaml_file.replace(".slurm.yaml",".flaski.xlsx")
                             
         return slurm, docker, slurm_yaml_file, docker_yaml_file, excel_file, meatadf_, df_
     
@@ -730,7 +736,7 @@ jawm jawm_rnaseq -p {docker_yaml_file} --global.map.source_folder /path/to/your/
 
             # 2) write everything into the zip (all in memory)
             with zipfile.ZipFile(bytes_io, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-                zf.writestr(os.path.basename(docker_yaml_file), docker)          # YAML string
+                zf.writestr(os.path.basename(docker_yaml_file), docker)         # YAML string
                 zf.writestr(os.path.basename(excel_file), excel_bytes)          # XLSX bytes
                 zf.writestr("README.md", readmeMD)                              # README string
 
