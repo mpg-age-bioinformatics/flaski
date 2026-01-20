@@ -85,7 +85,7 @@ def make_layout(pathname):
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp):
-    @cache.memoize(60*60*2) # 2 hours 60*60*2
+    #@cache.memoize(60*60*2) # 2 hours 60*60*2
     def _generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp):
         
         ############################
@@ -117,7 +117,8 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
 
         if (".fastq.gz" not in files_for_md5sums) and (".fq.gz" not in files_for_md5sums) :
             files_for_md5sums="NONE"
-        df=[ f"{s[0]};{s[2]}" for s in df.split(";") if s != "" ]
+            df=[ s.split(";") for s in df]
+            df=[ f"{s[0]};{s[2]}" for s in df if s != "" ]
 
         ######################
         # metadata dataframe #
@@ -642,10 +643,14 @@ def update_output(n_clicks, rows, email, group, md5sums, project_title, organism
     if ( user_domain[-len(mps_domain):] != mps_domain ) and ( authorized ) :
         group="Bioinformatics"
 
+
     slurm, docker, slurm_yaml_file, docker_yaml_file, excel_file, meatadf_, df_=generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp)
 
     samples=pd.read_json(df_)
     metadata=pd.read_json(meatadf_)
+
+    print(samples)
+
 
     validation=validate_metadata(metadata)
     if validation:
