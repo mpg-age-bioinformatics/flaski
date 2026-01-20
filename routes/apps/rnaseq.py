@@ -85,7 +85,7 @@ def make_layout(pathname):
 
 # Read in users input and generate submission file.
 def generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp):
-    #@cache.memoize(60*60*2) # 2 hours 60*60*2
+    @cache.memoize(60*60*2) # 2 hours 60*60*2
     def _generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp):
         
         ############################
@@ -169,7 +169,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
 
         slurm_yaml_file=os.path.basename( make_submission_file(".RNAseq.slurm.yaml") )
         uploads_file=slurm_yaml_file.replace( ".yaml", ".upload" )
-        uploads_file_="/nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/jawm_submissions/{uploads_file}"
+        uploads_file_=f"/nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/jawm_submissions/{uploads_file}"
         docker_yaml_file=slurm_yaml_file.replace(".slurm.",".docker.")
         excel_file=slurm_yaml_file.replace(".slurm.yaml",".flaski.xlsx")
 
