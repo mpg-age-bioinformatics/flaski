@@ -649,9 +649,6 @@ def update_output(n_clicks, rows, email, group, md5sums, project_title, organism
     samples=pd.read_json(df_)
     metadata=pd.read_json(meatadf_)
 
-    print(samples)
-
-
     validation=validate_metadata(metadata)
     if validation:
         header="Attention"
