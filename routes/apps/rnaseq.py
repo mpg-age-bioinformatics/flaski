@@ -204,6 +204,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   # manager_slurm: {{ "--ntasks-per-core":"2" , "-p":"general,small" }}
   parallel: True
   var:
+    skip_prepull: True
     map.source_folder: "{source_folder_}"
     mk.project_folder: "{project_folder_}"
     map.genomes_folder: "{genomes_folder_}"
