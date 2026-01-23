@@ -173,6 +173,8 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
         docker_yaml_file=slurm_yaml_file.replace(".slurm.",".docker.")
         excel_file=slurm_yaml_file.replace(".slurm.yaml",".flaski.xlsx")
 
+        ref_padj=os.path.join( project_folder_, "deseq2_output", "padj.hash.tsv" )
+
         ##############
         # yaml files #
         ##############
@@ -193,6 +195,14 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   issue_title: "RNAseq pipeline"
   workflow: "jawm_rnaseq"
   report_file: "{uploads_file_}"
+
+- includes:
+    - ./jawm_rnaseq/.submodules/*/yaml/nexus.apptainer.yaml
+
+- scope: hash
+  include: 
+    - {ref_padj}
+  overwrite: true
 
 - scope: global
   environment: "apptainer"
@@ -217,7 +227,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
       {row}"""
             
         slurm=slurm+rf"""
-    report_file: "/nexus/posix0/MAGE-flaski/service/projects/code/Bioinformatics/bit_mpcdf_automation/jawm_submissions/{uploads_file}"
+    report_file: "{uploads_file_}"
 
 - scope: process
   name: 
