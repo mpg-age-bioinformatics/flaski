@@ -197,6 +197,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   report_file: "{uploads_file_}"
 
 - includes:
+    - ./jawm_rnaseq/yaml/rnaseq.apptainer.yaml
     - ./jawm_rnaseq/.submodules/*/yaml/nexus.apptainer.yaml
 
 - scope: hash
