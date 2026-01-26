@@ -197,7 +197,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   report_file: "{uploads_file_}"
 
 - includes:
-    - ./jawm_rnaseq/yaml/rnaseq.apptainer.yaml
+    - ./jawm_rnaseq/yaml/nexus.apptainer.yaml
 
 - scope: hash
   include: 
@@ -209,9 +209,9 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   automated_mount: False
   environment_apptainer: {{ "-B": "/nexus:/nexus" }}
   manager: slurm
-  manager_slurm: {{ "-p": "cluster,dedicated" }}
-  # before_script: "module load apptainer"
-  # manager_slurm: {{ "--ntasks-per-core":"2" , "-p":"general,small" }}
+  # manager_slurm: {{ "-p": "cluster,dedicated" }}
+  before_script: "module load apptainer"
+  manager_slurm: {{ "--ntasks-per-core":"2" , "-p":"general,small" }}
   parallel: True
   var:
     skip_prepull: True
