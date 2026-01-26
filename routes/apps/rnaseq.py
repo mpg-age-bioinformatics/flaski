@@ -193,7 +193,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   ftp: "<ftp_account>"
   files_for_md5sums: "{files_for_md5sums}"
   issue_title: "RNAseq pipeline"
-  workflow: "jawm_rnaseq"
+  workflow: "jawm_rnaseq@latest-tag"
   report_file: "{uploads_file_}"
 
 - includes:
