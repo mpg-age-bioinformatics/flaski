@@ -207,11 +207,12 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
 - scope: global
   environment: "apptainer"
   automated_mount: False
-  environment_apptainer: {{ "-B": "/nexus:/nexus" }}
   manager: slurm
+  # environment_apptainer: {{ "-B": "/nexus:/nexus" }}
   # manager_slurm: {{ "-p": "cluster,dedicated" }}
-  before_script: "module load apptainer"
+  environment_apptainer: {{ "-B": [ "/nexus:/nexus", "/ptmp:/ptmp", "/raven:/raven" ] }}
   manager_slurm: {{ "--ntasks-per-core":"2" , "-p":"general,small" }}
+  before_script: "module load apptainer"
   parallel: True
   var:
     skip_prepull: True
