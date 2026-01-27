@@ -179,11 +179,16 @@ def release_request(n_clicks, pathname):
 
     user=User.query.get(s.user_id)
 
-    shutil.move(submission_file, dest)
+    if os.path.isfile(submission_file) :
+        shutil.move(submission_file, dest)
 
     xlsx_file=submission_file.replace(".json", ".xlsx")
     if os.path.isfile(xlsx_file) :
         shutil.move(xlsx_file, dest.replace(".json", ".xlsx"))
+
+    yaml_file=submission_file.replace(".xlsx", ".yaml")
+    if os.path.isfile(yaml_file) :
+        shutil.move(yaml_file, os.path.join("/mpcdf",os.path.basename(yaml_file)) )
 
     submission_tag=os.path.basename(dest)
 
