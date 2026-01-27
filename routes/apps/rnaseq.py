@@ -84,9 +84,9 @@ def make_layout(pathname):
     return protected_content
 
 # Read in users input and generate submission file.
-def generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp):
+def generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp, tape):
     @cache.memoize(60*60*2) # 2 hours 60*60*2
-    def _generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp):
+    def _generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp, tape):
         
         ############################
         # samples/groups dataframe #
@@ -124,8 +124,8 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
         # metadata dataframe #
         ######################
 
-        meatadf=pd.DataFrame({"Field":["email","Group","md5sums","Project title", "Organism", "release", "ERCC",  "link","ftp"],\
-                          "Value":[email,group,md5sums,project_title, organism,  release, ercc, link, ftp]}, index=list(range(9)))
+        meatadf=pd.DataFrame({"Field":["email","Group","md5sums","Project title", "Organism", "release", "ERCC",  "link","ftp", "tape"],\
+                          "Value":[email,group,md5sums,project_title, organism,  release, ercc, link, ftp, tape]}, index=list(range(10)))
         meatadf_=meatadf.to_json()
 
         #########
@@ -195,6 +195,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   issue_title: "RNAseq pipeline"
   workflow: "jawm_rnaseq@latest-tag"
   report_file: "{uploads_file_}"
+  tape: "{tape}"
 
 - includes:
     - ./jawm_rnaseq/yaml/nexus.apptainer.yaml
@@ -280,7 +281,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
                             
         return slurm, docker, slurm_yaml_file, docker_yaml_file, excel_file, meatadf_, df_
     
-    return _generate_submission_file( rows, email, group, md5sums, project_title, organism, release, ercc, link, ftp)
+    return _generate_submission_file( rows, email, group, md5sums, project_title, organism, release, ercc, link, ftp, tape)
 
 @dashapp.callback(
     Output('app-content', component_property='children'),
@@ -431,6 +432,8 @@ jawm jawm_rnaseq -p /path/to/file.yaml --global.map.source_folder /path/to/your/
     example_input.style_cell=style_cell
     example_input.style_table["height"]="68vh"
 
+    yes_no_options=[ {'label':'yes', 'value':'yes'}, {'label':'no', 'value':'no'} ]
+
     # arguments 
     arguments=[ 
         dbc.Row( 
@@ -489,6 +492,14 @@ jawm jawm_rnaseq -p /path/to/file.yaml --global.map.source_folder /path/to/your/
                 dbc.Col( html.Label("if data has already been uploaded please provide the user name used for ftp login"), md=3  ), 
             ], 
             style=hide_style ), # , 'display': hide
+        dbc.Row( 
+            [
+                dbc.Col( html.Label('TAPE') ,md=3 , style={"textAlign":"right", }),  # 'display': hide
+                dbc.Col( dcc.Dropdown( id='tape', options=yes_no_options, value="no", style={ "width":"100%" }),md=3 ),
+                #dbc.Col( dcc.Input(id='tape', placeholder="tape file", value="", type='text', style={ "width":"100%" } ) ,md=3), # 'display': hide
+                dbc.Col( html.Label('Has your data been analysed before and maybe already backed up to tape.'),md=3   )  #, style={'display': hide}
+            ], 
+            style=hide_style), #'display': hide
         dbc.Row( 
             [
                 dbc.Col( html.Label('link') ,md=3 , style={ "textAlign":"right" }), 
@@ -578,6 +589,7 @@ jawm jawm_rnaseq -p /path/to/file.yaml --global.map.source_folder /path/to/your/
     Output('opt-ercc', 'value'),
     Output('link', 'value'), 
     Output('ftp', 'value'),
+    Output('tape', 'value'),
     Output('upload-data-text', 'children'),
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
@@ -606,7 +618,7 @@ def read_file(contents,filename,last_modified):
     input_df.style_table["height"]="62vh"
 
     values_to_return=[]
-    fields_to_return=[ "email", "Group", "md5sums", "Project title", "Organism", "Release" "ERCC", "link", "ftp" ]
+    fields_to_return=[ "email", "Group", "md5sums", "Project title", "Organism", "Release", "ERCC", "link", "ftp", "tape" ]
     fields_on_file=RNAseq["Field"].tolist()
     for f in fields_to_return:
         if f in  fields_on_file:
@@ -633,8 +645,9 @@ def read_file(contents,filename,last_modified):
     State('opt-ercc', 'value'),
     State('link', 'value'),
     State('ftp', 'value'),
+    State('tape', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, rows, email, group, md5sums, project_title, organism, release, ercc, link, ftp):
+def update_output(n_clicks, rows, email, group, md5sums, project_title, organism, release, ercc, link, ftp, tape):
     header, msg = check_access( 'rnaseq' )
     if not msg:
         authorized = True
@@ -656,7 +669,7 @@ def update_output(n_clicks, rows, email, group, md5sums, project_title, organism
         group="Bioinformatics"
 
 
-    slurm, docker, slurm_yaml_file, docker_yaml_file, excel_file, meatadf_, df_=generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp)
+    slurm, docker, slurm_yaml_file, docker_yaml_file, excel_file, meatadf_, df_=generate_submission_file(rows, email,group,md5sums,project_title,organism, release, ercc, link, ftp, tape)
 
     samples=pd.read_json(df_)
     metadata=pd.read_json(meatadf_)
