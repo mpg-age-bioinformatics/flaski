@@ -190,6 +190,10 @@ def release_request(n_clicks, pathname):
     if os.path.isfile(yaml_file) :
         shutil.move(yaml_file, os.path.join("/mpcdf",os.path.basename(yaml_file)) )
 
+    docker_file=submission_file.replace(".flaski.xlsx", ".docker.yaml")
+    if os.path.isfile(docker_file) :
+        os.remove(docker_file)
+
     submission_tag=os.path.basename(dest)
 
     send_email(f'[Flaski][Automation][{submission_type}] Files have been transfered.',
