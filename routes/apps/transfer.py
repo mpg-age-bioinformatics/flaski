@@ -186,7 +186,7 @@ def release_request(n_clicks, pathname):
     if os.path.isfile(xlsx_file) :
         shutil.move(xlsx_file, dest.replace(".json", ".xlsx"))
 
-    yaml_file=submission_file.replace(".xlsx", ".yaml")
+    yaml_file=submission_file.replace(".flaski.xlsx", ".slurm.yaml")
     if os.path.isfile(yaml_file) :
         shutil.move(yaml_file, os.path.join("/mpcdf",os.path.basename(yaml_file)) )
 
