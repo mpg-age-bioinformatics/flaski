@@ -159,7 +159,7 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
             project_title="bit_ext_"+secure_filename(project_title)
             project_folder="Bioinformatics/"+project_title
 
-        source_folder_=os.path.join("/nexus/posix0/MAGE-flaski/ftp_data/" , ftp)
+        source_folder_="/nexus/posix0/MAGE-flaski/ftp_data/<ftp_account>/"
         project_folder_=os.path.join("/raven/ptmp/flaski/projects/", project_folder) 
         code_folder_=os.path.join("/nexus/posix0/MAGE-flaski/service/projects/code/", project_folder)
         if ercc not in ercc_dic.keys() :
