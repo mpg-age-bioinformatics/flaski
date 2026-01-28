@@ -230,7 +230,8 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
             
         if str(link) != "NONE":
             slurm=slurm+rf"""
-    download_link: '{link}'"""
+    download_link: '{link}'
+    md5sums_file: '{md5sums}'"""
 
         slurm=slurm+rf"""
     report_file: "{uploads_file_}"
@@ -272,7 +273,8 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
       {row}"""
         if str(link) != "NONE":
             slurm=slurm+rf"""
-    download_link: '{link}'"""
+    download_link: '{link}'
+    md5sums_file: '{md5sums}'"""
 
         if ercc in ercc_dic.keys(): 
             ercc_yaml=rf"""
