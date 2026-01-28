@@ -228,6 +228,10 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
             slurm=f"""{slurm}
       {row}"""
             
+        if str(link) != "NONE":
+            slurm=slurm+rf"""
+    download_link: '{link}'"""
+
         slurm=slurm+rf"""
     report_file: "{uploads_file_}"
 
@@ -266,6 +270,9 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
         for row in df:
             docker=f"""{docker}
       {row}"""
+        if str(link) != "NONE":
+            slurm=slurm+rf"""
+    download_link: '{link}'"""
 
         if ercc in ercc_dic.keys(): 
             ercc_yaml=rf"""
