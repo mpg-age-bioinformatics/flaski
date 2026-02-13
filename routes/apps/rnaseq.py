@@ -594,7 +594,7 @@ jawm jawm_rnaseq -p /path/to/file.yaml --global.map.source_folder /path/to/your/
     Output('md5sums', 'value'),
     Output('project_title', 'value'),
     Output('opt-organism', 'value'),
-    Output('release', 'value'),
+    Output('opt-release', 'value'),
     Output('opt-ercc', 'value'),
     Output('link', 'value'), 
     Output('ftp', 'value'),
