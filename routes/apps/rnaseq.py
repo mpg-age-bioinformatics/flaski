@@ -187,7 +187,6 @@ def generate_submission_file(rows, email,group,md5sums,project_title,organism, r
   project_folder: "{project_folder_}"
   email: "{email}"
   group: "{group}"
-  md5sums: "{md5sums}"
   project_title: "{project_title}"
   link: "{link}"
   ftp: "<ftp_account>"
