@@ -132,9 +132,7 @@ def make_app_content(session_id):
     groups_=make_options(GROUPS)
     external_=make_options(["External"])
 
-    example_fasta="MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP\
-DEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAK\
-SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPH\n\n\
+    example_fasta="MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRM\n\n\
 ..or multifasta, for multimers:\n\n\
 >PROTEINA\n\
 MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRM\n\
@@ -143,7 +141,11 @@ GPDSMEEVVVPEEPPKLVSALATYVQQERLCTMFLSIANKLLPLKPHACHLKRIRRSSATRVATAPMD\n\
 >DNAA--DNA\n\
 CCGCGCCTGTGGGATCTGCATGCCCC\n\
 >RNAA--RNA\n\
-GGCCGCUUAGCACAGUGGCAGUGCACCACUCUCGUAAAGUGGGGGUCGCGAGUUCGAUUCUCGCAGUGGCCUCCA"
+GGCCGCUUAGCACAGUGGCAGUGCACC\n\
+>LIGANDA--CCD\n\
+ATP\n\
+>IONA--ION\n\
+MG"
 
     content=[ 
         dbc.Card(
@@ -175,7 +177,7 @@ GGCCGCUUAGCACAGUGGCAGUGCACCACUCUCGUAAAGUGGGGGUCGCGAGUUCGAUUCUCGCAGUGGCCUCCA"
                         dbc.Col( dcc.Textarea(id='sequence', placeholder=example_fasta, value="", style={ "width":"100%",'height': 400} ) ,md=5 ),
                         dbc.Col(
                             html.Div([
-                                html.Label('Protein/DNA/RNA sequence(s)'),
+                                html.Label('Protein/DNA/RNA/Ligand/Ion sequence(s)'),
                                 html.Br(),
                                 html.Br(),
                                 html.Label("Guidelines:"),
@@ -193,6 +195,22 @@ GGCCGCUUAGCACAGUGGCAGUGCACCACUCUCGUAAAGUGGGGGUCGCGAGUUCGAUUCUCGCAGUGGCCUCCA"
                                         html.Code(">SEQUENCENAME--DNA"),
                                         " or ",
                                         html.Code(">SEQUENCENAME--RNA")
+                                    ]),
+                                    html.Li([
+                                        "For ligands specified by CCD code, write ",
+                                        html.Code(">SEQUENCENAME--CCD"),
+                                        " and put a valid AF3 supported CCD code on the next line, e.g. ",
+                                        html.Code("ATP"),
+                                        " or ",
+                                        html.Code("HEM")
+                                    ]),
+                                    html.Li([
+                                        "For ions, write ",
+                                        html.Code(">SEQUENCENAME--ION"),
+                                        " and put a valid AF3 supported ion CCD code on the next line, e.g. ",
+                                        html.Code("MG"),
+                                        " or ",
+                                        html.Code("ZN")
                                     ]),
                                     html.Li("By default, the sequence is treated as Protein"),
                                 ], className="mb-0"),
