@@ -202,16 +202,28 @@ MG"
                                         " and put a valid AF3 supported CCD code on the next line, e.g. ",
                                         html.Code("ATP"),
                                         " or ",
-                                        html.Code("HEM")
+                                        html.Code("HEM"),
+                                        html.Span(" ⓘ ", id="ccd-tooltip-target", style={"cursor": "pointer", "color": "green"})
                                     ]),
+                                    dbc.Tooltip(
+                                        "Potential ligand CCD codes: ADP, ATP, OLA, AMP, GTP, GDP, FAD, NAD, NAP, NDP, HEM, HEC, PLM, MYR, CIT, CLA, CHL, BCL, BCB. Support depends on whether the code is recognized by AlphaFold 3.",
+                                        target="ccd-tooltip-target",
+                                        placement="right",
+                                    ),
                                     html.Li([
                                         "For ions, write ",
                                         html.Code(">SEQUENCENAME--ION"),
                                         " and put a valid AF3 supported ion CCD code on the next line, e.g. ",
                                         html.Code("MG"),
                                         " or ",
-                                        html.Code("ZN")
+                                        html.Code("ZN"),
+                                        html.Span(" ⓘ ", id="ion-tooltip-target", style={"cursor": "pointer", "color": "green"})
                                     ]),
+                                    dbc.Tooltip(
+                                        "Potential ion CCD codes: MG, ZN, CL, CA, NA, MN, K, FE, CU, CO. Support depends on whether the code is recognized by AlphaFold 3.",
+                                        target="ion-tooltip-target",
+                                        placement="right",
+                                    ),
                                     html.Li("By default, the sequence is treated as Protein"),
                                 ], className="mb-0"),
                                 html.Br(),
