@@ -73,6 +73,22 @@ def change_fig_minWidth(fig,minwidth):
     fig.style=st
     return fig
 
+def guard_aadatalake():
+    if "aadatalake" in PRIVATE_ROUTES:
+        appdb = PrivateRoutes.query.filter_by(route="aadatalake").first()
+        if not appdb:
+            raise PreventUpdate
+
+        allowed_users = appdb.users
+        if not allowed_users:
+            raise PreventUpdate
+
+        if current_user.id not in allowed_users:
+            allowed_domains = appdb.users_domains or []
+            if current_user.domain not in allowed_domains:
+                raise PreventUpdate
+
+
 dashapp.layout=html.Div( 
     [ 
         dcc.Store( data=str(uuid.uuid4()), id='session-id' ),
@@ -192,6 +208,7 @@ def make_layout(session_id):
     State('download_name','value'),
 )
 def update_output(session_id, n_clicks, datasets, groups, samples, genenames, geneids, download_name):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
 
     ## samples
@@ -686,6 +703,7 @@ def display_volcano_data(selectedData):
     prevent_initial_call=True,
 )
 def download_selected_volcano(n_clicks,selectedData,datasets,groups,download_name):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
     selected_genes=selectedData["points"]
     selected_genes=[ s["text"] for s in selected_genes ]
@@ -707,6 +725,7 @@ def download_selected_volcano(n_clicks,selectedData,datasets,groups,download_nam
     prevent_initial_call=True,
 )
 def volcano_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
+    guard_aadatalake()
     if n_clicks:
         selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
         dge_datasets=list(set(selected_results_files["Set"]))
@@ -798,6 +817,7 @@ def display_ma_data(selectedData):
     prevent_initial_call=True,
 )
 def download_selected_ma(n_clicks,selectedData,datasets,groups,download_name):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
     selected_genes=selectedData["points"]
     selected_genes=[ s["text"] for s in selected_genes ]
@@ -819,6 +839,7 @@ def download_selected_ma(n_clicks,selectedData,datasets,groups,download_name):
     prevent_initial_call=True,
 )
 def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
+    guard_aadatalake()
     if n_clicks:
         selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
         dge_datasets=list(set(selected_results_files["Set"]))
@@ -872,6 +893,7 @@ def ma_to_iscatterplot(n_clicks,datasets, groups, genenames, geneids):
     prevent_initial_call=True,
 )
 def pca_to_iscatterplot(n_clicks,datasets, groups):
+    guard_aadatalake()
     if n_clicks:
         selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=None, cache=cache)    
         pca_data=filter_gene_expression(ids2labels,None,None,cache)
@@ -918,6 +940,7 @@ def pca_to_iscatterplot(n_clicks,datasets, groups):
     prevent_initial_call=True,
 )
 def download_samples(n_clicks,datasets, groups, samples, fileprefix):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
     results_files=selected_results_files[["Set","Group","Reps"]]
     results_files.columns=["Set","Group","Sample"]
@@ -938,6 +961,7 @@ def download_samples(n_clicks,datasets, groups, samples, fileprefix):
     prevent_initial_call=True,
 )
 def download_geneexp(n_clicks,datasets, groups, samples, genenames, geneids, fileprefix):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
     gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
     fileprefix=secure_filename(str(fileprefix))
@@ -956,6 +980,7 @@ def download_geneexp(n_clicks,datasets, groups, samples, genenames, geneids, fil
     prevent_initial_call=True,
 )
 def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, fileprefix):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
     # gene_expression=filter_gene_expression(ids2labels,genenames,geneids,cache)
 
@@ -984,6 +1009,7 @@ def download_dge(n_clicks,datasets, groups, samples, genenames, geneids, filepre
     prevent_initial_call=True,
 )
 def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets,groups=groups, reps=samples, cache=cache)    
     ## samples
     results_files=selected_results_files[["Set","Group","Reps"]]
@@ -1016,6 +1042,7 @@ def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
     Input('session-id', 'data')
     )
 def update_datasets(session_id):
+    guard_aadatalake()
     results_files=read_results_files(cache)
     datasets=list(set(results_files["Set"]))
     datasets=make_options(datasets)
@@ -1035,6 +1062,7 @@ def update_datasets(session_id):
     Input('session-id', 'data'),
     Input('opt-datasets', 'value') )
 def update_groups(session_id, datasets):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)    
     groups_=list(set(selected_results_files["Group"]))
     groups_=make_options(groups_)
@@ -1046,6 +1074,7 @@ def update_groups(session_id, datasets):
     Input('opt-datasets', 'value'),
     Input('opt-groups', 'value') )
 def update_reps(session_id, datasets, groups):
+    guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)    
     groups_=list(set(selected_results_files["Group"]))
     groups_=make_options(groups_)
