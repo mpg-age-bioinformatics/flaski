@@ -1044,15 +1044,15 @@ def download_bar(n_clicks,figure,datasets, groups, samples,download_name):
 def update_datasets(session_id):
     guard_aadatalake()
     results_files=read_results_files(cache)
-    datasets=list(set(results_files["Set"]))
+    datasets=sorted(set(results_files["Set"].dropna()))
     datasets=make_options(datasets)
 
     genes=read_genes(cache)
 
-    genenames=list(set(genes["gene_name"]))
+    genenames=sorted(set(genes["gene_name"].dropna()))
     genenames=make_options(genenames)
 
-    geneids=list(set(genes["gene_id"]))
+    geneids=sorted(set(genes["gene_id"].dropna()))
     geneids=make_options(geneids)
 
     return datasets, genenames, geneids
@@ -1064,7 +1064,7 @@ def update_datasets(session_id):
 def update_groups(session_id, datasets):
     guard_aadatalake()
     selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)    
-    groups_=list(set(selected_results_files["Group"]))
+    groups_=sorted(set(selected_results_files["Group"].dropna()))
     groups_=make_options(groups_)
     return groups_
 
@@ -1080,7 +1080,7 @@ def update_reps(session_id, datasets, groups):
     groups_=make_options(groups_)
 
     selected_results_files, ids2labels=filter_samples(datasets=datasets, groups=groups,cache=cache)    
-    reps_=list(set(selected_results_files["Reps"]))
+    reps_=sorted(set(selected_results_files["Reps"].dropna()))
     reps_=make_options(reps_)
 
     return reps_
