@@ -19,7 +19,7 @@ import pandas as pd
 from ._plotai import plotai_main_interface, plotai_generate_code
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-dashapp = dash.Dash("plotai", url_base_pathname=f'{PAGE_PREFIX}/plotai/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title="Plot AI", assets_folder=app.config["APP_ASSETS"])
+dashapp = dash.Dash("plotai", url_base_pathname=f'{PAGE_PREFIX}/plotai/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title="Plot AI", assets_folder=app.config["APP_ASSETS"], suppress_callback_exceptions=True)
 
 protect_dashviews(dashapp)
 
@@ -147,7 +147,7 @@ def make_layout(pathname):
                 current_user
             ),
             dbc.Tooltip(
-                "Plot AI uses models such as Qwen2.5 and LLaMA-3, powered by GWDG hardware. Be aware that LLM models can produce hallucinated content. It may fail to generate output, or the resulting plot can be flawed — interpret with caution.",
+                "Plot AI uses open models such as Qwen3-Coder or Gemma-4, powered by MPCDF hardware. Be aware that LLM models can produce hallucinated content. It may fail to generate output, or the resulting plot can be flawed — interpret with caution.",
                 target="plotai-info-icon",
                 placement="right"
             ),
@@ -156,6 +156,9 @@ def make_layout(pathname):
             # html.Div(id="redirect-app"),
             dcc.Store(data=str(uuid.uuid4()), id='session-id'),
             dcc.Store(id="plot-generated", data=False),
+            dcc.Store(id="plotai-prev-spec", data=None),
+            dcc.Store(id="plotai-prev-df", data=None),
+            dcc.Store(id="plotai-prev-instructions", data=None),
 
             dbc.Row(
                 [
@@ -179,7 +182,7 @@ def make_layout(pathname):
                                             id='upload-box-wrapper'
                                         ),
                                         dbc.Tooltip(
-                                            "Preferred formats: Excel, CSV, TSV, JSON, HTML, XML, TXT — but Plot AI will give any readable file a shot!",
+                                            "Supported formats: Excel, CSV, TSV, TXT, JSON, PDF, Parquet, Feather, HTML, XML.",
                                             target='upload-box-wrapper',
                                             placement='bottom'
                                         )
@@ -219,8 +222,32 @@ def make_layout(pathname):
                                     ]),
                                     dcc.Textarea(
                                         id='additional-instructions',
-                                        placeholder="Skip to let Plot AI decide - or include any plotting preferences here. Be clear and complete as it does not retain chat history.",
+                                        placeholder="Skip to let Plot AI decide - or include any plotting preferences here. Try to be clear and precise.",
                                         style={'width': '100%', 'height': '150px', 'padding': '10px'}
+                                    ),
+
+                                    # Further Instructions (visible after plot generation)
+                                    html.Div(
+                                        [
+                                            html.Div([
+                                                html.Span([
+                                                    html.Label("Further Instructions (on last generated plot)", style={"margin-top": 15}),
+                                                    html.I(className="fas fa-info-circle ms-2", id="further-tooltip-icon", style={"cursor": "pointer", "color": "#333333", "fontSize": "0.9em"})
+                                                ], style={"display": "inline-flex", "alignItems": "center"}),
+                                                dbc.Tooltip(
+                                                    "Try to modify the last generated figure. If required, download your current plot before resubmitting, as it will be replaced.",
+                                                    target="further-tooltip-icon",
+                                                    placement="bottom"
+                                                )
+                                            ]),
+                                            dcc.Textarea(
+                                                id='further-instructions',
+                                                placeholder="e.g. Make the points red, add a trendline, add a title...",
+                                                style={'width': '100%', 'height': '100px', 'padding': '10px'}
+                                            ),
+                                        ],
+                                        id='further-instructions-wrapper',
+                                        style={'display': 'none'}
                                     ),
                                 ],
                                 body=True
@@ -283,36 +310,62 @@ def make_layout(pathname):
 @dashapp.callback(
     Output("plotai-output", "children"),
     Output("plot-generated", "data"),
+    Output("plotai-prev-spec", "data"),
+    Output("plotai-prev-df", "data"),
+    Output("further-instructions-wrapper", "style"),
+    Output("further-instructions", "value", allow_duplicate=True),
+    Output("plotai-prev-instructions", "data"),
     Input("submit-button-state", "n_clicks"),
     State("upload-data", "contents"),
     State("upload-data", "filename"),
     State("text-content", "value"),
     State("additional-instructions", "value"),
+    State("further-instructions", "value"),
+    State("plotai-prev-spec", "data"),
+    State("plotai-prev-df", "data"),
+    State("plotai-prev-instructions", "data"),
     prevent_initial_call=True
 )
-def update_plotai_output(n_clicks, contents, filename, text_content, instructions):
+def update_plotai_output(n_clicks, contents, filename, text_content, instructions, further_instructions, prev_spec, prev_df_json, prev_instructions):
     triggered_input = callback_context.triggered[0]['prop_id'].split('.')[0]
     if triggered_input != 'submit-button-state':
         return no_update
 
-    if not (contents or text_content):
-        return html.Div([dcc.Markdown("❌ Please provide a file or text content to generate a plot.", style={"padding": "20px"})]), False
+    # Modification: only when Further Instructions has text, previous state exists,
+    # and the main Instructions field hasn't changed since the last generation
+    instructions_changed = (instructions or "") != (prev_instructions or "")
+    is_modify = bool(further_instructions and prev_spec and prev_df_json and not instructions_changed)
 
-    try:
-        fig, spec, df, logs = plotai_main_interface(
-            input_contents=contents,
-            filename=filename,
-            text_content=text_content,
-            additional_instructions=instructions
+    if not (contents or text_content or is_modify):
+        return (
+            html.Div([dcc.Markdown("❌ Please provide a file or text content to generate a plot.", style={"padding": "20px"})]),
+            False, None, None, {'display': 'none'}, "", no_update
         )
 
+    try:
+        if is_modify:
+            fig, spec, df, logs = plotai_main_interface(
+                additional_instructions=further_instructions,
+                previous_spec=prev_spec,
+                previous_df_json=prev_df_json,
+                original_instructions=prev_instructions
+            )
+        else:
+            fig, spec, df, logs = plotai_main_interface(
+                input_contents=contents,
+                filename=filename,
+                text_content=text_content,
+                additional_instructions=instructions
+            )
+
         if not fig:
-            e_text = Exception("\n".join(logs) or "Unknown issue during plot generation.")
+            error_lines = [l for l in logs if l.startswith("❌")]
+            e_text = Exception("\n".join(error_lines) or "Unknown issue during plot generation.")
             _ = make_except_toast("There was a problem generating your plot:", "plotai-soft-failure", e_text, current_user, "plotai")
     
     except Exception as e:
         _ = make_except_toast("There was a problem generating your plot:", "plotai-hard-failure", e, current_user, "plotai")
-        return html.Pre(f"❌ There was a problem generating your plot: {e}", style={"padding": "40px"}), False
+        return html.Pre("❌ There was a problem generating your plot. Please try again.", style={"padding": "40px"}), False, None, None, {'display': 'none'}, "", no_update
 
     tabs = []
 
@@ -376,7 +429,12 @@ def update_plotai_output(n_clicks, contents, filename, text_content, instruction
         )
     )
 
-    return dcc.Tabs(tabs), bool(fig)
+    # Store spec + df for follow-up modifications
+    df_json = df.to_json() if df is not None else None
+    show_further = {'display': 'block'} if fig else {'display': 'none'}
+    clear_further = no_update if is_modify else ""
+
+    return dcc.Tabs(tabs), bool(fig), spec, df_json, show_further, clear_further, instructions or ""
 
 
 @dashapp.callback(
@@ -390,6 +448,20 @@ def update_upload_filename(filename):
             html.A(filename)
         ])
     return html.Div(['Drag and Drop or ', html.A('Select File')])
+
+
+@dashapp.callback(
+    Output("further-instructions", "value"),
+    Output("plotai-prev-spec", "data", allow_duplicate=True),
+    Output("plotai-prev-df", "data", allow_duplicate=True),
+    Output("further-instructions-wrapper", "style", allow_duplicate=True),
+    Input("upload-data", "contents"),
+    prevent_initial_call=True
+)
+def clear_on_new_upload(contents):
+    if contents:
+        return "", None, None, {'display': 'none'}
+    return no_update
 
 
 # ------------------------------------------------------------------------------
