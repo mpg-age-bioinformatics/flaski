@@ -10,6 +10,7 @@ services:
     context: ./
     dockerfile: Dockerfile
     args:
+      MYAPP_IMAGE: mpgagebioinformatics/myapp:stable
       APP_VERSION: dev
       PYFLASKI_VERSION: dev
   entrypoint: /myapp/services/init/entrypoint.sh
