@@ -70,10 +70,9 @@ _FACTORY_PLOT_TYPES = {"dendrogram", "annotated_heatmap", "distplot",
 PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
 PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 
-api_key = app.config.get("MAGE_LLM_KEY", "")
-
 # API configuration
-base_url = "https://gpu.bioinformatics.studio/v1"
+api_key = app.config.get("MAGE_LLM_KEY", "")
+base_url = app.config.get("MAGE_LLM_URL", "")
 
 # Start OpenAI client
 client = OpenAI(
