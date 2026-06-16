@@ -186,43 +186,45 @@ def make_layout(pathname):
                                             target='upload-box-wrapper',
                                             placement='bottom'
                                         )
-                                    ]),
+                                    ], id='file-upload-section'),
 
                                     # Text Content textarea
                                     html.Div([
-                                        html.Span([
-                                            html.Label("(OR) Text Content", style={"margin-top": 15}),
-                                            html.I(className="fas fa-info-circle ms-2", id="textcontent-tooltip-icon", style={"cursor": "pointer", "color": "#333333", "fontSize": "0.9em"})
-                                        ], style={"display": "inline-flex", "alignItems": "center"}),
+                                        html.Div([
+                                            html.Span([
+                                                html.Label("(OR) Text Content", style={"margin-top": 15}),
+                                                html.I(className="fas fa-info-circle ms-2", id="textcontent-tooltip-icon", style={"cursor": "pointer", "color": "#333333", "fontSize": "0.9em"})
+                                            ], style={"display": "inline-flex", "alignItems": "center"}),
 
-                                        dbc.Tooltip(
-                                            "From your structured/unstructured text, Plot AI will attempt to construct a meaningful dataset.",
-                                            target="textcontent-tooltip-icon",
-                                            placement="bottom"
-                                        )
-                                    ]),
-                                    dcc.Textarea(
-                                        id='text-content',
-                                        placeholder="No file? - Paste your text content here.",
-                                        style={'width': '100%', 'height': '150px', 'padding': '10px', 'marginBottom': '10px'}
-                                    ),
+                                            dbc.Tooltip(
+                                                "From your structured/unstructured text, Plot AI will attempt to construct a meaningful dataset.",
+                                                target="textcontent-tooltip-icon",
+                                                placement="bottom"
+                                            )
+                                        ]),
+                                        dcc.Textarea(
+                                            id='text-content',
+                                            placeholder="No file? - Paste your text content here.",
+                                            style={'width': '100%', 'height': '150px', 'padding': '10px', 'marginBottom': '10px'}
+                                        ),
+                                    ], id='text-content-section'),
 
                                     # Instructions textarea
                                     html.Div([
                                         html.Span([
-                                            html.Label("Instructions (optional)", style={"margin-top": 15}),
+                                            html.Label("Instructions", style={"margin-top": 15}),
                                             html.I(className="fas fa-info-circle ms-2", id="instructions-tooltip-icon", style={"cursor": "pointer", "color": "#333333", "fontSize": "0.9em"})
                                         ], style={"display": "inline-flex", "alignItems": "center"}),
 
                                         dbc.Tooltip(
-                                            "Ambiguous or conflicting instructions can lead to failure or longer generation times.",
+                                            "You can ask for a specialized plot by name — e.g. 'heatmap', 'volcano plot', 'correlation matrix', 'dendrogram'. Or describe what you want: the columns, chart type, grouping, filters. Vague and conflicting requests can slow generation or cause it to fail.",
                                             target="instructions-tooltip-icon",
                                             placement="bottom"
                                         )
                                     ]),
                                     dcc.Textarea(
                                         id='additional-instructions',
-                                        placeholder="Skip to let Plot AI decide - or include any plotting preferences here. Try to be clear and precise.",
+                                        placeholder="Clear, precise instructions lead to better, faster graphs — e.g. 'generate a bar chart of gene counts'. Leave blank to let Plot AI choose a relevant chart.",
                                         style={'width': '100%', 'height': '150px', 'padding': '10px'}
                                     ),
 
@@ -763,5 +765,22 @@ dashapp.clientside_callback(
     """,
     Output("reset-btn-dummy", "children"),
     Input("plotai-output", "children"),
+    prevent_initial_call=True
+)
+
+dashapp.clientside_callback(
+    """
+    function(filename, text_value) {
+        var has_file = filename && filename.length > 0;
+        var has_text = text_value && text_value.length > 3;
+        var file_style = has_text ? {display: 'none'} : {};
+        var text_style = has_file ? {display: 'none'} : {};
+        return [file_style, text_style];
+    }
+    """,
+    [Output("file-upload-section", "style"),
+     Output("text-content-section", "style")],
+    [Input("upload-data", "filename"),
+     Input("text-content", "value")],
     prevent_initial_call=True
 )
