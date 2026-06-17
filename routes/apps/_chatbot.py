@@ -33,11 +33,9 @@ if os.path.exists(INDEX_FILE) and os.path.exists(CHUNK_FILE):
     # Preload the embedding model once
     embedding_model = SentenceTransformer("multi-qa-mpnet-base-cos-v1")
 
-# api_key = app.config["GWDG_CHAT_API"]
-api_key = app.config.get("GWDG_CHAT_API", "")
-
 # API configuration
-base_url = "https://chat-ai.academiccloud.de/v1"
+api_key = app.config.get("MAGE_LLM_KEY", "")
+base_url = app.config.get("MAGE_LLM_URL", "")
 
 # Start OpenAI client
 client = OpenAI(

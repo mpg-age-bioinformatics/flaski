@@ -1836,6 +1836,7 @@ def _make_ma_plot(df, config, model_list=None):
 
 # Manhattan plot guards / colors
 _MANHATTAN_MAX_POINTS = 100000   # thin to this many points for browser rendering
+_MANHATTAN_GL_THRESHOLD = 25000  # below this, render with SVG (no WebGL context needed)
 _MANHATTAN_MAX_LABELS = 15       # cap labeled top hits
 _MANHATTAN_COLORS = ["rgb(31,119,180)", "rgb(150,150,150)"]  # alternating per chromosome
 
@@ -1952,6 +1953,10 @@ def _make_manhattan(df, config, model_list=None):
             offset += cmax
         data["xcum"] = data["pos"] + data["chrom"].map(offsets)
 
+        # Use SVG (Scatter) for manageable point counts to avoid consuming a
+        # scarce browser WebGL context; switch to WebGL only when truly large.
+        Scatter = go.Scattergl if len(data) > _MANHATTAN_GL_THRESHOLD else go.Scatter
+
         fig = go.Figure()
         for i, ch in enumerate(chrom_order):
             sub = data[data["chrom"] == ch]
@@ -1966,7 +1971,7 @@ def _make_manhattan(df, config, model_list=None):
                 cd = sub["pos"].tolist()
                 ht = ("chr " + ch_s
                       + " : %{customdata}<br>-log10(p)=%{y:.2f}<extra></extra>")
-            fig.add_trace(go.Scattergl(
+            fig.add_trace(Scatter(
                 x=sub["xcum"].tolist(), y=sub["y"].tolist(), mode="markers",
                 marker=dict(color=color, size=4),
                 customdata=cd, hovertemplate=ht, showlegend=False,
@@ -1976,7 +1981,7 @@ def _make_manhattan(df, config, model_list=None):
         if yline is not None:
             hits = data[data["y"] >= yline]
             if not hits.empty:
-                fig.add_trace(go.Scattergl(
+                fig.add_trace(Scatter(
                     x=hits["xcum"].tolist(), y=hits["y"].tolist(), mode="markers",
                     marker=dict(color="rgb(214,39,40)", size=5),
                     showlegend=False, hoverinfo="skip",

@@ -115,13 +115,12 @@ def make_layout(pathname):
         appdb=PrivateRoutes.query.filter_by(route="plotai").first()
         if not appdb:
             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        allowed_users=appdb.users
-        if not allowed_users:
+        allowed_users=appdb.users or []
+        allowed_domains=appdb.users_domains or []
+        if not allowed_users and not allowed_domains:
             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        if current_user.id not in allowed_users :
-            allowed_domains=appdb.users_domains
-            if current_user.domain not in allowed_domains:
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        if ( current_user.id not in allowed_users ) and ( current_user.domain not in allowed_domains ):
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
             
     # Visit eventlog
     plotai_eventlog("visit plotai")
