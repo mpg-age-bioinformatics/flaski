@@ -30,6 +30,22 @@ _MAX_DATAFRAME_ROWS = 200_000          # 200K rows
 # "too many rows" rejection still fires for oversized files.
 _MAX_READ_ROWS = _MAX_DATAFRAME_ROWS + 1
 
+# ── Debug logging ─────────────────────────────────────────
+# Off by default. Flip to True to log
+PLOTAI_DEBUG = False
+def _debug(label, value=""):
+    """Log a debug line to the server log when PLOTAI_DEBUG is on. Never raises."""
+    if not PLOTAI_DEBUG:
+        return
+    try:
+        text = str(value)
+        if len(text) > 2000:                      # keep log lines bounded
+            text = text[:2000] + " …[truncated]"
+        print(f"[plotai-debug] {label}: {text}", flush=True)
+    except Exception:
+        pass
+
+
 def _sanitize_llm_error(e):
     """Return a short, safe error message and whether retrying is pointless."""
     msg = str(e)
@@ -74,10 +90,12 @@ PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 api_key = app.config.get("MAGE_LLM_KEY", "")
 base_url = app.config.get("MAGE_LLM_URL", "")
 
-# Start OpenAI client
+# Start OpenAI client.
+# max_retries=0 disables the SDK's built-in retries (default is 2) as our own generation loop already retries with model rotation
 client = OpenAI(
     api_key = api_key,
-    base_url = base_url
+    base_url = base_url,
+    max_retries = 0
 )
 
 
@@ -426,6 +444,7 @@ def _classify_plot_type(df, additional_instructions, model="qwen3-coder-30b",
                 } if "qwen" in model_used else {}),
             )
             response_text = chat_completion.choices[0].message.content.strip()
+            _debug("LLM raw response", response_text)
             fence = _CODE_FENCE_RE.search(response_text)
             if fence:
                 response_text = (response_text[:fence.start()]
@@ -2505,6 +2524,7 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
                 } if "qwen" in model_used else {}),
             )
             response_text = chat_completion.choices[0].message.content.strip()
+            _debug("LLM raw response", response_text)
             fence = _CODE_FENCE_RE.search(response_text)
             if fence:
                 response_text = response_text[:fence.start()] + fence.group(1) + response_text[fence.end():]
@@ -2629,6 +2649,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
                 } if "qwen" in model_used else {}),
             )
             response_text = chat_completion.choices[0].message.content.strip()
+            _debug("LLM raw response", response_text)
             fence = _CODE_FENCE_RE.search(response_text)
             if fence:
                 response_text = response_text[:fence.start()] + fence.group(1) + response_text[fence.end():]
@@ -2702,7 +2723,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
     return None, None, model_list, last_error
 
 
-def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1, datapoint_threshold=1000):
+def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1, datapoint_threshold=300):
     """
     Dispatch to the appropriate plotting function depending on DataFrame size.
     Checks for factory plot types (dendrogram, etc.) first when instructions
@@ -2718,6 +2739,7 @@ def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b
             df, additional_instructions, model=model,
             alternate_models=alternate_models
         )
+        _debug("classifier decided", f"plot_type={plot_type} config={config}")
         if plot_type != "standard" and config:
             if plot_type == "dendrogram":
                 return _make_dendrogram(df, config, model_list=cls_models)
@@ -2751,6 +2773,9 @@ def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b
                 return _make_kaplan_meier(df, config, model_list=cls_models)
 
     total_datapoints = df.shape[0] * df.shape[1]
+    _debug("dispatch (standard)", f"rows={df.shape[0]} cols={df.shape[1]} "
+           f"datapoints={total_datapoints} path="
+           f"{'large_df' if total_datapoints > datapoint_threshold else 'small_df'}")
 
     if total_datapoints > datapoint_threshold:
         return _plot_spec_large_df(
@@ -2855,6 +2880,7 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
                 } if "qwen" in model_used else {}),
             )
             response_text = chat_completion.choices[0].message.content.strip()
+            _debug("LLM raw response", response_text)
             fence = _CODE_FENCE_RE.search(response_text)
             if fence:
                 response_text = response_text[:fence.start()] + fence.group(1) + response_text[fence.end():]
@@ -2967,6 +2993,7 @@ def _text_to_dataframe(text_content, model="qwen3-coder-30b", alternate_models =
                 } if "qwen" in model_used else {}),
             )
             response_text = chat_completion.choices[0].message.content
+            _debug("LLM raw response", response_text)
             fence = _CODE_FENCE_RE.search(response_text)
             if fence:
                 response_text = response_text[:fence.start()] + fence.group(1) + response_text[fence.end():]
