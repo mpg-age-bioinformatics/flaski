@@ -43,6 +43,7 @@ other_nav_dropdowns =[
     { \
         "Apps": \
             {
+                "Plot AI":"/plotai/",\
                 "Scatter plot":"/scatterplot/",\
                 "3D Scatter plot":"/threeDscatterplot/",\
                 "Line plot":"/lineplot/",\
@@ -68,7 +69,6 @@ other_nav_dropdowns =[
                 "Proteomics Clock":"/protclock/",\
                 "KEGG":"/kegg/",\
                 "Chatbot AGE":"/chatbot/",\
-                "Plot AI":"/plotai/",\
                 "Version check":"/vcheck/",\
             }, \
 
