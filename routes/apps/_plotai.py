@@ -196,7 +196,7 @@ def _classify_plot_type(df, additional_instructions, model="qwen3-coder-30b",
         (plot_type: str, config: dict or None, model_list: list, error: str or None)
     """
     if alternate_models is None:
-        alternate_models = ["gemma4-31b", "qwen36-27b", "qwen3-coder-30b"]
+        alternate_models = ["gemma4-31b", "qwen36-27b"]
 
     column_info = {col: str(dtype) for col, dtype in df.dtypes.items()}
     sample_rows = df.head(3).to_dict(orient="records")
@@ -2454,7 +2454,7 @@ def _extract_text_from_pdf(decoded_pdf_bytes):
         return text, None
 
 
-def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b", "qwen3-coder-30b"], max_retries=3, delay=1):
+def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1):
     """
     Generate a Plotly figure from a DataFrame using an LLM that returns a JSONBlock with Plotly spec.
 
@@ -2499,7 +2499,7 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
             chat_completion = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model=model_used,
-                timeout=90,
+                timeout=60,
                 **({
                     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
                 } if "qwen" in model_used else {}),
@@ -2569,7 +2569,7 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
     return None, None, model_list, last_error
 
 
-def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b", "qwen3-coder-30b"], max_retries=3, delay=1):
+def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1):
     """
     Generate a Plotly figure spec from a summarized DataFrame using an LLM that returns a JSONBlock.
 
@@ -2623,7 +2623,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
             chat_completion = client.chat.completions.create(
                 model=model_used,
                 messages=[{"role": "user", "content": prompt}],
-                timeout=90,
+                timeout=60,
                 **({
                     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
                 } if "qwen" in model_used else {}),
@@ -2702,7 +2702,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
     return None, None, model_list, last_error
 
 
-def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b", "qwen3-coder-30b"], max_retries=3, delay=1, datapoint_threshold=1000):
+def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1, datapoint_threshold=1000):
     """
     Dispatch to the appropriate plotting function depending on DataFrame size.
     Checks for factory plot types (dendrogram, etc.) first when instructions
@@ -2810,7 +2810,7 @@ def _restore_kept_fields(modified, original):
     return modified
 
 
-def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", alternate_models=["gemma4-31b", "qwen36-27b", "qwen3-coder-30b"], max_retries=3, delay=1):
+def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", alternate_models=["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1):
     """
     Modify an existing Plotly spec based on a follow-up instruction.
 
@@ -2849,7 +2849,7 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
             chat_completion = client.chat.completions.create(
                 model=model_used,
                 messages=[{"role": "user", "content": prompt}],
-                timeout=90,
+                timeout=60,
                 **({
                     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
                 } if "qwen" in model_used else {}),
@@ -2928,7 +2928,7 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
     return None, None, model_list, last_error
 
 
-def _text_to_dataframe(text_content, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b", "qwen3-coder-30b"], max_retries=3, delay=1):
+def _text_to_dataframe(text_content, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1):
     """
     Converts structured or semi-structured text content into a pandas DataFrame using an LLM.
 
@@ -2961,7 +2961,7 @@ def _text_to_dataframe(text_content, model="qwen3-coder-30b", alternate_models =
             chat_completion = client.chat.completions.create(
                 model=model_used,
                 messages=[{"role": "user", "content": prompt}],
-                timeout=90,
+                timeout=60,
                 **({
                     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
                 } if "qwen" in model_used else {}),
