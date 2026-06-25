@@ -101,6 +101,15 @@ def make_submission_json(email,group, name, sequence):
             name = secure_filename(name)
             return name
 
+        def clean_smiles(smiles):
+            # SMILES is case-sensitive (lowercase = aromatic atoms) and relies on
+            # special characters and digits (ring-closure bonds). Keep it verbatim;
+            # only strip whitespace and characters that would break the tsv/json
+            # delimiters or be unsafe. Do NOT uppercase or run secure_filename here.
+            smiles = smiles.strip().replace(" ", "")
+            smiles = re.sub(r'[^A-Za-z0-9()\[\]=#+\-./\\@%*:$]', '', smiles)
+            return smiles
+
         filename=make_submission_file(".alphafold.json", folder="mpcdf")
         name=clean_header(name)
         email=email.replace(" ", ",")
@@ -109,11 +118,20 @@ def make_submission_json(email,group, name, sequence):
         email=",".join(email)
 
         if ">" in sequence :
-            sequence=sequence.split(">")
-            sequence=[ s.split("\n") for s in sequence ]
-            sequence=[ [ ">"+clean_header(s[0]), clean_seqs(s[1]) ]  for s in sequence if len(s) > 1 ]
-            sequence=[ ";".join( s ) for s in sequence ]
-            sequence=";".join(sequence)
+            records=[]
+            for s in sequence.split(">"):
+                s=s.split("\n")
+                if len(s) <= 1:
+                    continue
+                header=">"+clean_header(s[0])
+                # SMILES ligands must be preserved verbatim, everything else is
+                # uppercased/secured as before.
+                if header.upper().endswith("--SMILES"):
+                    body=clean_smiles(s[1])
+                else:
+                    body=clean_seqs(s[1])
+                records.append(";".join([header, body]))
+            sequence=";".join(records)
         else:
             sequence=clean_seqs(sequence)
         return {"filename":filename,"email": email, "group_name":group, "group_initials":GROUPS_INITALS[group],"name_fasta_header":name, "sequence_fasta":sequence}
@@ -144,6 +162,8 @@ CCGCGCCTGTGGGATCTGCATGCCCC\n\
 GGCCGCUUAGCACAGUGGCAGUGCACC\n\
 >LIGANDA--CCD\n\
 ATP\n\
+>LIGANDB--SMILES\n\
+CC(=O)Oc1ccccc1C(=O)O\n\
 >IONA--ION\n\
 MG"
 
@@ -174,7 +194,7 @@ MG"
                 dbc.Row( 
                     [
                         dbc.Col( html.Label('Sequence') ,md=2 , style={"textAlign":"right" }), 
-                        dbc.Col( dcc.Textarea(id='sequence', placeholder=example_fasta, value="", style={ "width":"100%",'height': 400} ) ,md=5 ),
+                        dbc.Col( dcc.Textarea(id='sequence', placeholder=example_fasta, value="", style={ "width":"100%",'height': 450} ) ,md=5 ),
                         dbc.Col(
                             html.Div([
                                 html.Label('Protein/DNA/RNA/Ligand/Ion sequence(s)'),
@@ -210,6 +230,13 @@ MG"
                                         target="ccd-tooltip-target",
                                         placement="right",
                                     ),
+                                    html.Li([
+                                        "For ligands specified by a SMILES string, write ",
+                                        html.Code(">SEQUENCENAME--SMILES"),
+                                        " and put a valid SMILES on the next line, e.g. ",
+                                        html.Code("CC(=O)Oc1ccccc1C(=O)O"),
+                                        " (aspirin). The SMILES is kept exactly as typed — it is case-sensitive, so do not change letter case."
+                                    ]),
                                     html.Li([
                                         "For ions, write ",
                                         html.Code(">SEQUENCENAME--ION"),
