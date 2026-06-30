@@ -43,6 +43,7 @@ other_nav_dropdowns =[
     { \
         "Apps": \
             {
+                "Chatbot AGE":"/chatbot/",\
                 "Plot AI":"/plotai/",\
                 "Scatter plot":"/scatterplot/",\
                 "3D Scatter plot":"/threeDscatterplot/",\
@@ -68,7 +69,6 @@ other_nav_dropdowns =[
                 "Neanderthal age":"/neanderthalage/",\
                 "Proteomics Clock":"/protclock/",\
                 "KEGG":"/kegg/",\
-                "Chatbot AGE":"/chatbot/",\
                 "Version check":"/vcheck/",\
             }, \
 
