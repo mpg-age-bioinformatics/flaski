@@ -64,13 +64,12 @@ def make_layout(session_id):
         appdb=PrivateRoutes.query.filter_by(route="chatbot").first()
         if not appdb:
             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        allowed_users=appdb.users
-        if not allowed_users:
+        allowed_users=appdb.users or []
+        allowed_domains=appdb.users_domains or []
+        if not allowed_users and not allowed_domains:
             return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
-        if current_user.id not in allowed_users :
-            allowed_domains=appdb.users_domains
-            if current_user.domain not in allowed_domains:
-                return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
+        if ( current_user.id not in allowed_users ) and ( current_user.domain not in allowed_domains ):
+            return dcc.Location(pathname=f"{PAGE_PREFIX}/", id="index")
 
     ## check if user is authorized
     eventlog = UserLogging(email=current_user.email, action="visit chatbot")
@@ -96,7 +95,7 @@ def make_layout(session_id):
                 current_user
             ),
             dbc.Tooltip(
-                "This AI assistant uses the Meta LLaMA 3.1-8B Instruct model, powered by GWDG hardware, and is fed with the Open Access publications from the institute. Be aware that chatbots can produce hallucinated content; their responses can be unreliable and should be interpreted with caution.",
+                "This AI assistant uses open Gemma 4 model, powered by MPCDF hardware, and is fed with the Open Access publications from the institute. Be aware that chatbots can produce hallucinated content; their responses can be unreliable and should be interpreted with caution.",
                 target="chatbot-info-icon",
                 placement="bottom"
             ),
@@ -188,7 +187,7 @@ def update_chat(n_clicks, user_message, chat_history, conversation_history):
     # Wrap the bot response in a Loading component so it shows a spinner
     bot_response = dcc.Loading(
         type="default",
-        children=[dcc.Markdown(bot_response_text)]
+        children=[dcc.Markdown(bot_response_text, mathjax=True)]
         # children=[(str(conversation_history))]
     )
 
