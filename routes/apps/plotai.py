@@ -232,19 +232,19 @@ def make_layout(pathname):
                                         [
                                             html.Div([
                                                 html.Span([
-                                                    html.Label("Further Instructions (on last generated plot)", style={"margin-top": 15}),
+                                                    html.Label("Modify Last Plot", style={"margin-top": 15}),
                                                     html.I(className="fas fa-info-circle ms-2", id="further-tooltip-icon", style={"cursor": "pointer", "color": "#333333", "fontSize": "0.9em"})
                                                 ], style={"display": "inline-flex", "alignItems": "center"}),
                                                 dbc.Tooltip(
-                                                    "Try to modify the last generated figure. If required, download your current plot before resubmitting, as it will be replaced.",
+                                                    "Tries to modify the last generated figure — best for simple tweaks; for complex changes, generate a new plot instead. If modification fails, Plot AI falls back to a fresh generation. Your current plot will be replaced, so download it first if you want to keep it.",
                                                     target="further-tooltip-icon",
                                                     placement="bottom"
                                                 )
                                             ]),
                                             dcc.Textarea(
                                                 id='further-instructions',
-                                                placeholder="e.g. Make the points red, add a trendline, add a title...",
-                                                style={'width': '100%', 'height': '100px', 'padding': '10px'}
+                                                placeholder="e.g. make the points red, add a title - use only for simple changes (may take longer than a fresh generation)",
+                                                style={'width': '100%', 'height': '120px', 'padding': '10px'}
                                             ),
                                         ],
                                         id='further-instructions-wrapper',
@@ -395,6 +395,11 @@ def update_plotai_output(n_clicks, contents, filename, text_content, instruction
                                     id="download-buttons-div",
                                     # style={"marginTop": "20px"}
                                     style={"display": "flex", "gap": "8px", "flexWrap": "wrap", "paddingLeft": "40px", "marginTop": "15px"}
+                                ),
+                                html.Div(
+                                    "* LLM output can be hallucinated, incomplete, or flawed — please interpret with caution.",
+                                    style={"paddingLeft": "40px", "marginTop": "14px", "fontSize": "0.8em",
+                                           "color": "#888", "fontStyle": "italic"}
                                 )
                             ]
                         ) if fig else html.Div("❌ Failed to generate plot.", style={"padding": "40px"})
@@ -683,6 +688,21 @@ dashapp.clientside_callback(
 
         btn.disabled = true;
 
+        // Safety net for a genuine hang: only a stuck request can leave us spinning
+        // this long (well past the slowest successful plot), so stop and tell the
+        // user. Reset on every click; cleared on completion by the callback below.
+        window.plotaiDone = false;
+        clearTimeout(window.plotaiTimeout);
+        window.plotaiTimeout = setTimeout(function () {
+            if (window.plotaiDone) return;                 // completed -> never show
+            if (window.plotaiMessageInterval) {
+                clearInterval(window.plotaiMessageInterval);
+                window.plotaiMessageInterval = null;
+            }
+            var b = document.getElementById('submit-button-state');
+            if (b) { b.disabled = true; b.innerHTML = "Took too long - consider refresh & retry!"; }
+        }, 150000);
+
         const messages = [
             "Nice! Data in, ideas forming...",
             "Let the plotting commence!",
@@ -750,6 +770,10 @@ dashapp.clientside_callback(
 dashapp.clientside_callback(
     """
     function(children) {
+        // Request finished -> mark done and cancel the timeout safety net, so the
+        // "Took too long" message can never appear on a successful/finished plot.
+        window.plotaiDone = true;
+        clearTimeout(window.plotaiTimeout);
         var btn = document.getElementById('submit-button-state');
         if (btn) {
             btn.disabled = false;
