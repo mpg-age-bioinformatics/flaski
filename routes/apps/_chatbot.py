@@ -4,9 +4,9 @@ import re
 import numpy as np
 import pandas as pd
 from openai import OpenAI
-from sentence_transformers import SentenceTransformer
 from flask_login import current_user
 from myapp.routes.apps._utils import make_except_toast
+from myapp.routes.apps._embedding import get_model, encode_query
 
 # BM25 is optional — if rank_bm25 isn't installed we fall back to semantic-only
 # retrieval (still fully functional). Install with: pip install rank_bm25
@@ -24,10 +24,9 @@ path_to_files = "/flaski_private/chatbot/"
 PAPERS_FILE = f"{path_to_files}papers.parquet"           # one row per paper
 EMB_FILE    = f"{path_to_files}abstract_embeddings.npy"  # (N, 1024) L2-normalized
 
-# Must match the build. BGE is asymmetric: passages got NO prefix, queries MUST
-# be prefixed, then normalized so cosine similarity == dot product.
-EMBED_MODEL  = "BAAI/bge-large-en-v1.5"
-QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
+# The BGE model + query-prefix contract live in the shared _embedding module so
+# every retrieval app loads a single instance. Passages were embedded prefix-free
+# at build time; encode_query() applies the query prefix + normalization to match.
 
 papers_df = None
 embeddings = None
@@ -44,7 +43,7 @@ try:
         papers_df["_authors_lc"] = papers_df["authors"].str.lower()   # for author filtering
 
         embeddings = np.load(EMB_FILE).astype(np.float32)             # already normalized
-        embedding_model = SentenceTransformer(EMBED_MODEL)
+        embedding_model = get_model()                                 # shared instance (loaded once per process)
 
         if _BM25_OK:
             # Token corpus for exact-term recall: prefer full text, fall back to abstract.
@@ -167,8 +166,7 @@ def extract_author_from_query(query):
 
 # ── Retrieval ──────────────────────────────────────────────
 def _semantic_scores(query):
-    qv = embedding_model.encode(QUERY_PREFIX + query,
-                                normalize_embeddings=True).astype(np.float32)
+    qv = encode_query(query).astype(np.float32)   # shared BGE encode (prefix + normalize)
     return embeddings @ qv                       # cosine vs every paper
 
 
