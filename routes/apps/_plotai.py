@@ -87,8 +87,8 @@ PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
 PYFLASKI_VERSION=str(PYFLASKI_VERSION)
 
 # API configuration
-api_key = app.config.get("MAGE_LLM_KEY", "sk-hamin-995a4b6e3f13810327603698262595e54e18a9bd57ac25b2")
-base_url = app.config.get("MAGE_LLM_URL", "https://gpu.bioinformatics.studio/v1")
+api_key = app.config.get("MAGE_LLM_KEY", "")
+base_url = app.config.get("MAGE_LLM_URL", "")
 
 # Start OpenAI client.
 # max_retries=0 disables the SDK's built-in retries (default is 2) as our own generation loop already retries with model rotation
@@ -426,17 +426,6 @@ def _classify_plot_type(df, additional_instructions, model="qwen3-coder-30b",
         "For anything else, respond:\n\n"
         "JSONBlock:\n"
         '{"plot_type": "standard"}\n\n'
-        "STYLING (optional, applies to ANY factory plot above): if the instruction "
-        "also asks for visual styling, add a top-level \"style\" object. Read the "
-        "user's wording and map it to ONLY these optional keys (omit the whole "
-        "object if no styling is requested):\n"
-        '- plot_bgcolor / paper_bgcolor: a colour, e.g. "white", or "rgba(0,0,0,0)" for transparent\n'
-        "- show_xticks / show_yticks: false to hide that axis's ticks and labels\n"
-        "- show_grid: false to hide gridlines\n"
-        "- show_legend: false to hide the legend\n"
-        "- xaxis_title / yaxis_title: axis label text\n"
-        'Example: {"plot_type": "dendrogram", "config": {...}, "style": '
-        '{"plot_bgcolor": "white", "show_xticks": false, "show_yticks": false}}\n\n'
         "Return ONLY the JSONBlock. No explanation."
     )
 
@@ -630,12 +619,6 @@ def _classify_plot_type(df, additional_instructions, model="qwen3-coder-30b",
                 grp = config.get("group_column")
                 if grp is not None and grp not in df.columns:
                     config["group_column"] = None
-
-            # Carry any styling the LLM extracted from the instruction alongside the
-            # config; it's applied (via _apply_style) after the figure is built.
-            style = result.get("style")
-            if isinstance(style, dict) and config is not None:
-                config["_style"] = style
 
             return plot_type, config, model_list, None
 
@@ -2740,84 +2723,6 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
     return None, None, model_list, last_error
 
 
-def _apply_style_hints(fig, instruction):
-    """Apply common, deterministic styling requests straight from the instruction
-    so factory plots (whose configs have no style fields) honor styling given in
-    the SAME request that creates them — no extra LLM call. Mutates fig in place.
-
-    Covers the unambiguous cases (background, axis ticks, grid, legend); anything
-    else is left to the LLM modify path on a follow-up.
-    """
-    if fig is None or not instruction:
-        return fig
-    t = instruction.lower()
-    remove = bool(re.search(
-        r"\b(remove|hide|no|without|drop|delete|get rid of|turn off|don'?t show)\b", t))
-
-    # Background colour
-    if "background" in t:
-        if "transparent" in t:
-            fig.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
-        elif "white" in t:
-            fig.update_layout(plot_bgcolor="white", paper_bgcolor="white")
-
-    # Axis ticks (order-independent: "remove the ticks on the x axis" etc.)
-    if remove and "tick" in t:
-        x = bool(re.search(r"\bx[\s-]*axis\b|\bx[\s-]*tick", t))
-        y = bool(re.search(r"\by[\s-]*axis\b|\by[\s-]*tick", t))
-        if x and not y:
-            fig.update_xaxes(showticklabels=False, ticks="")
-        elif y and not x:
-            fig.update_yaxes(showticklabels=False, ticks="")
-        else:                                          # "the axes" / unspecified -> both
-            fig.update_xaxes(showticklabels=False, ticks="")
-            fig.update_yaxes(showticklabels=False, ticks="")
-
-    # Grid lines
-    if remove and "grid" in t:
-        fig.update_xaxes(showgrid=False)
-        fig.update_yaxes(showgrid=False)
-
-    # Legend
-    if remove and "legend" in t:
-        fig.update_layout(showlegend=False)
-
-    return fig
-
-
-def _apply_style(fig, style):
-    """Apply a structured style dict (extracted by the classifier from the user's
-    own wording) to a figure. This is what lets factory plots honor arbitrary
-    styling phrasing in the same request — the LLM maps the language to these
-    keys, this applies them. Defensive: a malformed value never breaks the plot."""
-    if not isinstance(style, dict) or fig is None:
-        return fig
-    try:
-        layout = {}
-        if style.get("plot_bgcolor"):
-            layout["plot_bgcolor"] = style["plot_bgcolor"]
-        if style.get("paper_bgcolor"):
-            layout["paper_bgcolor"] = style["paper_bgcolor"]
-        if "show_legend" in style:
-            layout["showlegend"] = bool(style["show_legend"])
-        if layout:
-            fig.update_layout(**layout)
-        if style.get("show_xticks") is False:
-            fig.update_xaxes(showticklabels=False, ticks="")
-        if style.get("show_yticks") is False:
-            fig.update_yaxes(showticklabels=False, ticks="")
-        if style.get("show_grid") is False:
-            fig.update_xaxes(showgrid=False)
-            fig.update_yaxes(showgrid=False)
-        if style.get("xaxis_title") is not None:
-            fig.update_xaxes(title_text=str(style["xaxis_title"]))
-        if style.get("yaxis_title") is not None:
-            fig.update_yaxes(title_text=str(style["yaxis_title"]))
-    except Exception:
-        pass
-    return fig
-
-
 def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b", alternate_models = ["gemma4-31b", "qwen36-27b"], max_retries=2, delay=1, datapoint_threshold=300):
     """
     Dispatch to the appropriate plotting function depending on DataFrame size.
@@ -2836,49 +2741,36 @@ def plotai_spec_from_df(df, additional_instructions=None, model="qwen3-coder-30b
         )
         _debug("classifier decided", f"plot_type={plot_type} config={config}")
         if plot_type != "standard" and config:
-            result = None
             if plot_type == "dendrogram":
-                result = _make_dendrogram(df, config, model_list=cls_models)
+                return _make_dendrogram(df, config, model_list=cls_models)
             elif plot_type == "annotated_heatmap":
-                result = _make_annotated_heatmap(df, config, model_list=cls_models)
+                return _make_annotated_heatmap(df, config, model_list=cls_models)
             elif plot_type == "distplot":
-                result = _make_distplot(df, config, model_list=cls_models)
+                return _make_distplot(df, config, model_list=cls_models)
             elif plot_type == "venn_diagram":
                 # A Venn is only readable up to 3 sets — redirect larger
                 # requests to an UpSet plot, which scales to many sets.
                 if len(config.get("columns", [])) > 3:
-                    result = _make_upset(df, config, model_list=cls_models)
-                else:
-                    result = _make_venn_diagram(df, config, model_list=cls_models)
+                    return _make_upset(df, config, model_list=cls_models)
+                return _make_venn_diagram(df, config, model_list=cls_models)
             elif plot_type == "upset":
-                result = _make_upset(df, config, model_list=cls_models)
+                return _make_upset(df, config, model_list=cls_models)
             elif plot_type == "clustered_heatmap":
-                result = _make_clustered_heatmap(df, config, model_list=cls_models)
+                return _make_clustered_heatmap(df, config, model_list=cls_models)
             elif plot_type == "volcano":
-                result = _make_volcano(df, config, model_list=cls_models)
+                return _make_volcano(df, config, model_list=cls_models)
             elif plot_type == "ma_plot":
-                result = _make_ma_plot(df, config, model_list=cls_models)
+                return _make_ma_plot(df, config, model_list=cls_models)
             elif plot_type == "manhattan":
-                result = _make_manhattan(df, config, model_list=cls_models)
+                return _make_manhattan(df, config, model_list=cls_models)
             elif plot_type == "correlation_heatmap":
-                result = _make_correlation_heatmap(df, config, model_list=cls_models)
+                return _make_correlation_heatmap(df, config, model_list=cls_models)
             elif plot_type == "density_2d":
-                result = _make_2d_density(df, config, model_list=cls_models)
+                return _make_2d_density(df, config, model_list=cls_models)
             elif plot_type == "pca":
-                result = _make_pca(df, config, model_list=cls_models)
+                return _make_pca(df, config, model_list=cls_models)
             elif plot_type == "kaplan_meier":
-                result = _make_kaplan_meier(df, config, model_list=cls_models)
-
-            if result is not None:
-                fig, spec, models, err = result
-                # Factory configs have no styling fields, so common style requests
-                # in the SAME instruction ("white background", "remove ticks") would
-                # otherwise be dropped. Apply them deterministically post-build.
-                if fig is not None and not err:
-                    _apply_style(fig, config.get("_style"))            # LLM-extracted styling
-                    _apply_style_hints(fig, additional_instructions)   # keyword fallback
-                    spec = json.loads(fig.to_json())
-                return fig, spec, models, err
+                return _make_kaplan_meier(df, config, model_list=cls_models)
 
     total_datapoints = df.shape[0] * df.shape[1]
     _debug("dispatch (standard)", f"rows={df.shape[0]} cols={df.shape[1]} "
@@ -2951,12 +2843,6 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
     - (plotly.graph_objects.Figure or None, json spec or None, list of models tried, error message or None)
     """
     structural_spec = _strip_data_arrays(previous_spec)
-    # Drop the default Plotly layout.template before showing the spec to the LLM —
-    # it's huge boilerplate that bloats the prompt and makes big specs (e.g.
-    # dendrograms with many traces) impossible to round-trip. _restore_kept_fields
-    # re-merges it from previous_spec afterward, so the figure keeps its template.
-    if isinstance(structural_spec.get("layout"), dict):
-        structural_spec["layout"].pop("template", None)
     column_info = {col: str(dtype) for col, dtype in df.dtypes.items()}
     sample_rows = df.head(3).to_dict(orient="records")
 
