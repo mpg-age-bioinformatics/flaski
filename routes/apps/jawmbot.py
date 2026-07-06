@@ -202,7 +202,8 @@ def update_chat(n_clicks, user_message, chat_history, conversation_history):
     return chat_history, "", conversation_history  # Return updated history
 
 
-# Clientside callback to scroll to the last message and re-enable the ASK button after chat updates
+# Clientside callback: after chat updates, scroll to the last message, re-enable the
+# ASK button, and add Copy/Download buttons to each code block.
 dashapp.clientside_callback(
     """
     function(children) {
@@ -217,6 +218,71 @@ dashapp.clientside_callback(
                 btn.disabled = false;
                 btn.innerHTML = "ASK";
             }
+            // Decorate each code block with Copy + Download buttons (once each)
+            var blocks = document.querySelectorAll('#chat-container pre');
+            blocks.forEach(function(pre) {
+                if (pre.dataset.decorated) { return; }
+                pre.dataset.decorated = "1";
+                var code = pre.querySelector('code');
+                var text = code ? code.innerText : pre.innerText;   // capture before adding buttons
+                // Guess a file extension from the ```lang fence, if any
+                var ext = "txt";
+                if (code) {
+                    var m = (code.className || "").match(/language-([a-z0-9]+)/i);
+                    if (m) {
+                        var map = {python:"py", py:"py", bash:"sh", shell:"sh", sh:"sh",
+                                   javascript:"js", js:"js", json:"json", yaml:"yaml", yml:"yaml",
+                                   nextflow:"nf", groovy:"groovy", r:"R", text:"txt"};
+                        var lang = m[1].toLowerCase();
+                        ext = map[lang] || lang;
+                    }
+                }
+                pre.style.position = "relative";
+                pre.style.paddingTop = "1.9rem";              // room so buttons don't cover code
+                var bar = document.createElement("div");
+                bar.style.cssText = "position:absolute;top:4px;right:6px;display:flex;gap:4px;";
+                function mkBtn(label) {
+                    var b = document.createElement("button");
+                    b.type = "button";
+                    b.textContent = label;
+                    b.style.cssText = "font-size:11px;line-height:1;padding:3px 7px;border:1px solid #ccc;" +
+                                      "border-radius:4px;background:#fff;color:#333;cursor:pointer;opacity:0.85;";
+                    return b;
+                }
+                var copyBtn = mkBtn("Copy");
+                copyBtn.onclick = function() {
+                    var done = function() {
+                        copyBtn.textContent = "Copied!";
+                        setTimeout(function(){ copyBtn.textContent = "Copy"; }, 1500);
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(done, done);
+                    } else {                                   // fallback for non-secure contexts
+                        var ta = document.createElement("textarea");
+                        ta.value = text;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        try { document.execCommand("copy"); } catch (e) {}
+                        document.body.removeChild(ta);
+                        done();
+                    }
+                };
+                var dlBtn = mkBtn("Download");
+                dlBtn.onclick = function() {
+                    var blob = new Blob([text], {type: "text/plain"});
+                    var url = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    a.href = url;
+                    a.download = "jawm_snippet." + ext;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                };
+                bar.appendChild(copyBtn);
+                bar.appendChild(dlBtn);
+                pre.appendChild(bar);
+            });
         }, 100);
         return '';
     }
