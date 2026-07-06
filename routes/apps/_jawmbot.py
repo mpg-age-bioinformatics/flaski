@@ -24,6 +24,9 @@ path_to_files = "/flaski_private/jawmbot/"
 CHUNKS_FILE = f"{path_to_files}chunks.parquet"          # one row per doc/code chunk
 EMB_FILE    = f"{path_to_files}chunk_embeddings.npy"    # (N, 1024) L2-normalized
 
+# Files to drop from retrieval (substring match on file_path)
+EXCLUDE_FILES = ("nf2jm.py",)
+
 # Shared BGE model + query-prefix contract live in _embedding (one instance/process).
 # Chunks were embedded prefix-free at build time; encode_query() prefixes queries.
 
@@ -56,6 +59,13 @@ try:
         embeddings = np.load(EMB_FILE).astype(np.float32)         # already normalized
         embedding_model = get_model()                             # shared instance (once/process)
 
+        # Drop excluded files; filter df + embeddings together to keep alignment.
+        if EXCLUDE_FILES:
+            keep = ~chunks_df["file_path"].str.contains(
+                "|".join(re.escape(f) for f in EXCLUDE_FILES))
+            chunks_df = chunks_df[keep].reset_index(drop=True)
+            embeddings = embeddings[keep.to_numpy()]
+
         if _BM25_OK:
             bm25 = BM25Okapi([_tok(t) for t in chunks_df["text"]])   # exact-term recall
 
@@ -82,15 +92,23 @@ LLM_MODEL = "gemma4-31b"
 
 SYSTEM_PROMPT = (
     "You are the jawm AssistBot — an assistant for jawm, a Python-based workflow "
-    "orchestrator. Answer using the provided excerpts from jawm's documentation and "
-    "source code. The main jawm documentation is authoritative; the pipeline repos "
-    "(named jawm_*) are usage examples, not the spec. When you use a source, cite its "
-    "link so the user can open the exact docs page or file, and give runnable examples "
-    "where helpful. If the provided material doesn't cover the question, say so plainly "
-    "— you may add well-established general knowledge, but never invent jawm features, "
-    "flags, or citations. If the user references another workflow manager (Nextflow, "
-    "Snakemake, etc.), map the concept to the jawm equivalent using the provided "
-    "material. Take the conversation history into account; for greetings, respond naturally."
+    "manager. Ground answers about jawm in the provided excerpts from its "
+    "documentation and source code. The main jawm documentation is authoritative; the "
+    "pipeline repos (named jawm_*) are usage examples, not the spec. Cite each source "
+    "you use as a Markdown link with a short descriptive label — e.g. [Installation with dependencies]"
+    "(url) or [Ways to configure a Process](url) — using the source's EXACT url inside the "
+    "link (never alter or shorten the url itself). Give runnable examples where "
+    "helpful. Never invent jawm features, flags, or citations; if the jawm material "
+    "doesn't cover something, say so plainly. "
+    "Refer to your knowledge source naturally as 'the jawm documentation and code' or "
+    "'the jawm resources' — never as 'the provided excerpts', 'the provided context', "
+    "or anything implying the user gave you files (they did not). "
+    "For questions about OTHER workflow managers (Nextflow, Snakemake, etc.), answer "
+    "directly and confidently from your own general knowledge of those tools, and where "
+    "useful compare or map the concept to how jawm does it. Do NOT deflect with 'the "
+    "documentation doesn't cover Nextflow' — the docs are about jawm; use your general "
+    "knowledge for the other tool. Take the conversation history into account; for "
+    "greetings, respond naturally."
 )
 
 USER_TEMPLATE = (

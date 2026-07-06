@@ -95,7 +95,7 @@ def make_layout(session_id):
                 current_user
             ),
             dbc.Tooltip(
-                "This assistant answers questions about jawm (the workflow orchestrator) from its documentation and source code, using an open Gemma-4 model on MPCDF hardware. LLM answers can be incomplete or wrong — always verify against the docs it links to.",
+                "This assistant answers questions about jawm workflow manager from its documentation and source code, using open models on MPCDF hardware. LLM answers can be incomplete or wrong — interpret with caution.",
                 target="jawmbot-info-icon",
                 placement="bottom"
             ),
