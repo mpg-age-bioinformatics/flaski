@@ -155,6 +155,32 @@ def make_layout(session_id):
                     "backgroundColor": "#f8f9fa",
                 },
             ),
+            # Subtle "what is jawm?" hint for first-time visitors (bottom-left). maxWidth
+            # 60% keeps it one line on wide screens and wraps it on the left on small
+            # ones, so it never collides with the right-aligned 'flaski' footer title.
+            html.Div(
+                [
+                    html.I(className="fas fa-info-circle",
+                           style={"marginRight": "6px", "opacity": "0.7"}),
+                    "New to jawm? It's a lightweight Python-based workflow manager. ",
+                    html.A(
+                        "Learn more",
+                        href="https://bioinformatics.age.mpg.de/jawm/",
+                        target="_blank",
+                        style={"color": "#0d6efd", "textDecoration": "none"},
+                    ),
+                ],
+                style={
+                    "position": "fixed",
+                    "bottom": "10px",
+                    "left": "16px",
+                    "maxWidth": "60%",
+                    "fontSize": "0.78rem",
+                    "lineHeight": "1.3",
+                    "color": "#6c757d",
+                    "zIndex": "9998",
+                },
+            ),
             navbar_A,
         ]
     )

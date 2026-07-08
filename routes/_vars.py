@@ -45,7 +45,6 @@ other_nav_dropdowns =[
             {
                 "Chatbot AGE":"/chatbot/",\
                 "Plot AI":"/plotai/",\
-                "jawm AssistBot":"/jawmbot/",\
                 "Scatter plot":"/scatterplot/",\
                 "3D Scatter plot":"/threeDscatterplot/",\
                 "Line plot":"/lineplot/",\
@@ -70,6 +69,7 @@ other_nav_dropdowns =[
                 "Neanderthal age":"/neanderthalage/",\
                 "Proteomics Clock":"/protclock/",\
                 "KEGG":"/kegg/",\
+                "jawm AssistBot":"/jawmbot/",\
                 "Version check":"/vcheck/",\
             }, \
 
