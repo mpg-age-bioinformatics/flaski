@@ -3274,18 +3274,21 @@ def plotai_prepare_dataframe(input_contents=None, filename=None, text_content=No
             except Exception as e:
                 return None, None, f"Failed to extract text from PDF: {e}"
 
-        # If reading as DataFrame failed, fallback: extract as text and try LLM
-        try:
-            file_text = decoded.decode("utf-8", errors="ignore")
-            if not file_text.strip():
-                return None, None, f"Could not decode file as text for LLM fallback. Original error: {err}"
-            df2, models, err2 = _text_to_dataframe(file_text)
-            if df2 is not None:
-                return df2, models, None
-            else:
-                return None, models, f"Failed to create DataFrame from file text: {err2} (Original file read error: {err})"
-        except Exception as e:
-            return None, None, f"Failed to extract text from uploaded file: {e}; Original error: {err}"
+        # Text formats only -> let the LLM structure them. Anything else that failed to
+        # parse (or an unsupported/binary type such as an image) returns a clean error
+        if ext in (".md", ".txt"):
+            try:
+                file_text = decoded.decode("utf-8", errors="ignore")
+                if not file_text.strip():
+                    return None, None, f"Could not decode file as text. ({err})"
+                df2, models, err2 = _text_to_dataframe(file_text)
+                if df2 is not None:
+                    return df2, models, None
+                return None, models, f"Failed to create DataFrame from text: {err2}"
+            except Exception as e:
+                return None, None, f"Failed to read file: {e} ({err})"
+
+        return None, None, err or "Could not read the file as a table."
 
     # 3. No input at all
     return None, None, "No input file or text provided."
