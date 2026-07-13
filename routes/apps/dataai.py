@@ -349,7 +349,7 @@ def make_layout(pathname):
                                         ),
                                         dbc.Tooltip(
                                             "Upload one or more files. Supported: Excel, CSV, TSV, TXT, JSON, "
-                                            "PDF, Parquet, Feather, HTML, XML.",
+                                            "PDF, Parquet, Feather, MD, HTML, XML.",
                                             target="upload-box-wrapper", placement="bottom"
                                         ),
                                     ], id="file-upload-section"),

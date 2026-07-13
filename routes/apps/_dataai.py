@@ -40,8 +40,14 @@ LLM_MODEL = "qwen3-coder-30b"
 # Hard cap on how long a single generated query may run.
 QUERY_TIMEOUT = 60
 
-# Cap on text sent to the LLM when structuring free text / PDF into a table.
-MAX_TEXT_CHARS = 40000
+# Cap on text sent to the LLM when structuring free text / PDF into a table
+MAX_TEXT_CHARS = 25000
+
+# Accepted upload formats (whitelist)
+_STRUCTURED_EXTS = {".csv", ".tsv", ".txt", ".xlsx", ".xls", ".json", ".ndjson",
+                    ".parquet", ".feather", ".html", ".xml"}
+_TEXT_EXTS = {".pdf", ".md", ".txt"}            # routed to the LLM text->table path
+ALLOWED_EXTS = _STRUCTURED_EXTS | _TEXT_EXTS
 
 
 # ── File ingestion (self-contained) ────────────────────────────────────────
@@ -81,11 +87,6 @@ def _file_to_dataframe(contents, filename):
             return (dfs[0], None) if dfs else (None, "No tables found in HTML file.")
         elif ext == ".xml":
             return pd.read_xml(io.StringIO(decoded.decode("utf-8"))), None
-        elif ext in (".gz", ".zip", ".bz2", ".xz"):
-            try:
-                return pd.read_csv(io.BytesIO(decoded), compression="infer"), None
-            except Exception:
-                return pd.read_table(io.BytesIO(decoded), compression="infer"), None
         else:
             return None, f"Unsupported file extension: {ext}"
     except Exception as e:
@@ -130,10 +131,12 @@ def _text_to_dataframe(text_content, model=LLM_MODEL, max_retries=3):
 
 
 def _prepare_dataframe(contents, filename):
-    """One upload -> DataFrame: try direct parse, then PDF text, then text->df. (df, err)."""
-    # Pickle unpickling executes arbitrary code — never accept it from an upload.
-    if os.path.splitext(filename)[-1].lower() in (".pkl", ".pickle"):
-        return None, "Pickle (.pkl/.pickle) files are not supported."
+    """One upload -> DataFrame. Only whitelisted formats."""
+    ext = os.path.splitext(filename)[-1].lower()
+    if ext not in ALLOWED_EXTS:
+        return None, (f"Unsupported format ({ext or 'no extension'}). Accepted: CSV, TSV, "
+                      "TXT, MD, Excel, JSON, Parquet, Feather, HTML, XML, or PDF.")
+
     df, err = _file_to_dataframe(contents, filename)
     if df is not None:
         return df, None
@@ -143,21 +146,23 @@ def _prepare_dataframe(contents, filename):
     except Exception as e:
         return None, f"Failed to decode file: {e}"
 
-    ext = os.path.splitext(filename)[-1].lower()
     if ext == ".pdf":
         text = _extract_text_from_pdf(decoded)
         if not text.strip():
             return None, "No extractable text in PDF (or PDF too large)."
         return _text_to_dataframe(text)
 
-    # Last resort: decode as text and let the LLM structure it.
-    try:
-        file_text = decoded.decode("utf-8", errors="ignore")
-        if not file_text.strip():
-            return None, f"Could not read file. ({err})"
-        return _text_to_dataframe(file_text)
-    except Exception as e:
-        return None, f"Could not read file: {e} ({err})"
+    # Text formats only -> let the LLM structure them.
+    if ext in (".md", ".txt"):
+        try:
+            file_text = decoded.decode("utf-8", errors="ignore")
+            if not file_text.strip():
+                return None, f"Could not read file. ({err})"
+            return _text_to_dataframe(file_text)
+        except Exception as e:
+            return None, f"Could not read file: {e} ({err})"
+
+    return None, f"Could not read the file as a table. ({err})"
 
 
 def prepare_tables(contents_list, filenames):
