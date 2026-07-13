@@ -9,3 +9,4 @@ openai==1.61.1
 pdfplumber==0.11.6
 pyarrow==24.0.0
 rank-bm25==0.2.2
+duckdb==1.5.4

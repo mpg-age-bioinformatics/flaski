@@ -1,6 +1,6 @@
 import os
 
-_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "chatbot", "plotai", "neanderthalage", "protclock", "jawmbot"]
+_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "chatbot", "plotai", "neanderthalage", "protclock", "jawmbot", "dataai"]
 _PUBLIC_VIEWS = ['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
@@ -45,6 +45,7 @@ other_nav_dropdowns =[
             {
                 "Chatbot AGE":"/chatbot/",\
                 "Plot AI":"/plotai/",\
+                "Data AI":"/dataai/",\
                 "Scatter plot":"/scatterplot/",\
                 "3D Scatter plot":"/threeDscatterplot/",\
                 "Line plot":"/lineplot/",\
