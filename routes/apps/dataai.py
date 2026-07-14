@@ -223,6 +223,10 @@ def _df_block(name, df, is_result=False):
             f"Showing first {MAX_TABLE_ROWS:,} of {len(df):,} rows — download for the full table.",
             style={"marginTop": "6px", "fontSize": "0.8em", "color": "#888", "fontStyle": "italic"}))
     children.append(_dl_buttons(name, is_result=is_result))
+    if is_result:
+        children.append(html.Div(
+            "* LLM output can be hallucinated, incomplete, or flawed — please interpret with caution.",
+            style={"marginTop": "14px", "fontSize": "0.8em", "color": "#888", "fontStyle": "italic"}))
     return html.Div(children, style={"padding": "20px"})
 
 
@@ -251,12 +255,10 @@ def _output_tabs(result_block, source_items, log_blocks, show_disclaimer=False):
     else:
         source_children = html.Div("No source data.", style={"padding": "20px"})
 
-    result_tab_children = [html.Div(result_block, style={"padding": "20px"})]
     if show_disclaimer:
-        result_tab_children.append(html.Div(
-            "* LLM output can be hallucinated, incomplete, or flawed — please interpret with caution.",
-            style={"paddingLeft": "20px", "marginTop": "6px", "fontSize": "0.8em",
-                   "color": "#888", "fontStyle": "italic"}))
+        result_tab_children = [result_block]
+    else:
+        result_tab_children = [html.Div(result_block, style={"padding": "20px"})]
 
     log_md = "\n\n---\n\n".join(log_blocks) if log_blocks else "_No queries yet._"
 
