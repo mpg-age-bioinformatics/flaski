@@ -13,6 +13,7 @@ import pandas as pd
 from dash import dcc, html, dash_table, no_update, callback_context
 from dash.dependencies import Input, Output, State, MATCH
 from myapp.routes._utils import META_TAGS, navbar_A, protect_dashviews, make_navbar_logged
+from myapp.routes.apps._utils import make_except_toast
 import dash_bootstrap_components as dbc
 from ._dataai import run_dataai, prepare_tables
 
@@ -75,7 +76,17 @@ dashapp.layout = html.Div([
 # Frames are stored in dcc.Store as base64-encoded Parquet so dtypes (dates,
 # categoricals, ints/floats) survive the round-trip when results are chained.
 def _ser(df):
-    return base64.b64encode(df.to_parquet(index=False)).decode("ascii")
+    try:
+        return base64.b64encode(df.to_parquet(index=False)).decode("ascii")
+    except Exception:
+        # Some object columns mix types (e.g. floats + text/bytes, or blank-header junk
+        # columns) that Parquet/pyarrow can't encode. Stringify object columns and retry
+        # so the upload still works instead of erroring out.
+        safe = df.copy()
+        for c in safe.columns:
+            if safe[c].dtype == object:
+                safe[c] = safe[c].astype(str)
+        return base64.b64encode(safe.to_parquet(index=False)).decode("ascii")
 
 
 def _rj(frame_b64):
@@ -255,6 +266,8 @@ def _output_tabs(result_block, source_items, log_blocks, show_disclaimer=False):
     else:
         source_children = html.Div("No source data.", style={"padding": "20px"})
 
+    # On success, result_block is a fully-padded _df_block that already includes the
+    # disclaimer under its buttons. On error/warning it's a bare message needing padding.
     if show_disclaimer:
         result_tab_children = [result_block]
     else:
@@ -446,6 +459,22 @@ def _sources_view(base, results):
     return items
 
 
+def _notify(message, err, tag="dataai_error"):
+    """Send a Flaski error email/toast, guarded so notifying can never break the response."""
+    try:
+        make_except_toast(message, tag, err if isinstance(err, Exception) else Exception(str(err)),
+                          current_user, "dataai")
+    except Exception:
+        pass
+
+
+def _is_infra_error(err):
+    """True for infrastructure/unexpected failures worth alerting on (not routine bad-SQL
+    or user errors like unsupported format)."""
+    e = (err or "").lower()
+    return ("model call failed" in e) or ("timed out" in e) or ("timeout" in e)
+
+
 # ── main run ────────────────────────────────────────────────────────────────
 # One box. Every query runs over EVERYTHING in scope — the uploaded tables plus all
 # previous results (referenced by the names shown in the Source tabs). Each run adds a
@@ -469,6 +498,7 @@ def run_query(n_clicks, contents, filenames, instruction, state):
     try:
         return _run_query_impl(n_clicks, contents, filenames, instruction, state)
     except Exception as e:
+        _notify("There was an unexpected problem in Data AI:", e)
         return (_output_tabs(f"❌ Something went wrong — please try again. ({e})", None,
                              (state or {}).get("log") or []),
                 no_update, no_update, no_update, no_update)
@@ -527,6 +557,8 @@ def _run_query_impl(n_clicks, contents, filenames, instruction, state):
 
     n = len(log_blocks) + 1
     if err:
+        if _is_infra_error(err):          # alert the team on gateway/timeout failures only
+            _notify("There was a problem reaching the model in Data AI:", err)
         log_blocks = log_blocks + [_log_block(n, instruction, f"❌ {err}", sql, prep_errors)]
         state = {**state, "log": log_blocks}
         return (_output_tabs(f"❌ {err}", _sources_view(base, results), log_blocks),

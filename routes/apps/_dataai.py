@@ -205,29 +205,50 @@ _DISALLOWED = re.compile(
     r"pragma|export|import|call|set)\b", re.I)
 
 
+def _strip_quoted(sql):
+    """Blank out double-quoted identifiers and single-quoted strings so their contents
+    (which may contain ';' or SQL keywords, e.g. a column name with a ';') don't trip
+    the safety checks. Statement-chaining and real keywords stay outside quotes."""
+    sql = re.sub(r'"(?:[^"]|"")*"', '""', sql)
+    sql = re.sub(r"'(?:[^']|'')*'", "''", sql)
+    return sql
+
+
 def _is_safe_select(sql):
     """Allow a single read-only SELECT/WITH statement only. (ok, reason)."""
     if not sql.strip():
         return False, "Empty query."
     s = sql.strip().rstrip(";")
-    if ";" in s:
-        return False, "Only a single statement is allowed."
     if not re.match(r"^\s*(with|select)\b", s, re.I):
         return False, "Only SELECT / WITH queries are allowed."
-    if _DISALLOWED.search(s):
+    bare = _strip_quoted(s)        # ignore ';' / keywords inside quoted names or strings
+    if ";" in bare:
+        return False, "Only a single statement is allowed."
+    if _DISALLOWED.search(bare):
         return False, "Query contains a disallowed (data-modifying) keyword."
     return True, ""
 
 
-def _schema_text(tables):
-    """Compact schema + sample rows to ground the model."""
+def _schema_text(tables, max_cell=300, max_total=20000):
+    """Compact schema + truncated sample rows to ground the model. Long cell values are
+    clipped (and the whole thing capped) so very wide cells — e.g. huge comma-separated
+    ID lists — can't blow past the model's context window."""
     blocks = []
     for name, df in tables.items():
         cols = ", ".join(f'"{c}" ({df[c].dtype})' for c in df.columns)
+        sample = df.head(3).copy()
+        truncated = False
+        for c in sample.columns:
+            col = sample[c].astype(str)
+            if (col.str.len() > max_cell).any():
+                truncated = True
+            sample[c] = col.map(lambda v: (v[:max_cell] + "…") if len(v) > max_cell else v)
+        label = ("Sample rows (CSV, long values truncated):" if truncated
+                 else "Sample rows (CSV):")
         blocks.append(
-            f'Table "{name}" ({len(df)} rows):\nColumns: {cols}\n'
-            f"Sample rows (CSV):\n{df.head(3).to_csv(index=False)}")
-    return "Available tables:\n\n" + "\n\n".join(blocks)
+            f'Table "{name}" ({len(df)} rows):\nColumns: {cols}\n{label}\n'
+            f"{sample.to_csv(index=False)}")
+    return ("Available tables:\n\n" + "\n\n".join(blocks))[:max_total]
 
 
 SYSTEM_PROMPT = (
@@ -235,6 +256,8 @@ SYSTEM_PROMPT = (
     "below, and nothing else.\n"
     "- Output ONLY the SQL — no prose, no markdown fences.\n"
     "- Use ONLY SELECT / WITH; never modify data or the database.\n"
+    "- Every query MUST have a FROM clause naming one of the tables above — never write a "
+    "SELECT without FROM. If unsure which table, SELECT from the most relevant one.\n"
     "- Put EVERY column name in double quotes, exactly as given — e.g. \"a.b\". An "
     "unquoted name containing a dot (a.b) is read as table.column and will fail.\n"
     "- Always return a result set; for a single value, still SELECT it as one row.\n"
@@ -288,9 +311,9 @@ def run_dataai(tables, query, default_table=None, model=LLM_MODEL, max_retries=2
     system = SYSTEM_PROMPT + _schema_text(tables)
     if default_table and default_table in tables:
         system += (
-            f'\n\nIMPORTANT: If the question does not explicitly name a table, operate on '
-            f'the table "{default_table}" — it is the user\'s current working result. Only '
-            f'use the other tables when the question names them or clearly needs them '
+            f'\n\nIMPORTANT: If the question does not explicitly name a table, SELECT FROM '
+            f'"{default_table}" — it is the user\'s current working result. Only use the '
+            f'other tables when the question names them or clearly needs them '
             f'(e.g. "merge with ...", "join ... on ...").')
     sql, err = None, None
     for _ in range(max_retries):
@@ -298,7 +321,8 @@ def run_dataai(tables, query, default_table=None, model=LLM_MODEL, max_retries=2
         # the model to quote — the raw "table X not found" message alone doesn't say so.
         hint = ""
         if err and ("not found" in err.lower() or "binder error" in err.lower()):
-            hint = ' Put every column name in double quotes exactly as given (e.g. "a.b").'
+            hint = (' Ensure the query has a FROM clause naming a table, and put every '
+                    'column name in double quotes exactly as given (e.g. "a.b").')
         user = query if err is None else (
             f"{query}\n\nThe previous SQL failed with:\n{err}\nReturn corrected SQL only.{hint}")
         try:
