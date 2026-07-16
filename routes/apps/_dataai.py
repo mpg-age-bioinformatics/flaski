@@ -51,6 +51,29 @@ ALLOWED_EXTS = _STRUCTURED_EXTS | _TEXT_EXTS
 
 
 # ── File ingestion (self-contained) ────────────────────────────────────────
+def _looks_unheadered(df):
+    """True if most columns are 'Unnamed: N' — a sign the header row was empty or a title
+    block sitting above the real header."""
+    n = len(df.columns)
+    if n == 0:
+        return False
+    unnamed = sum(1 for c in df.columns if str(c).startswith("Unnamed:"))
+    return unnamed >= max(2, n * 0.6)
+
+
+def _excel_with_detected_header(decoded):
+    """Re-read an Excel file whose real header sits below title/blank rows: use the first
+    'full' row (mostly non-null) as the header. Returns a df, or None if none found."""
+    raw = pd.read_excel(io.BytesIO(decoded), header=None)
+    for i in range(min(15, len(raw))):
+        row = raw.iloc[i]
+        if int(row.notna().sum()) >= max(2, len(row) * 0.6):
+            body = raw.iloc[i + 1:].copy()
+            body.columns = [str(x).strip() for x in row.tolist()]
+            return body.reset_index(drop=True)
+    return None
+
+
 def _file_to_dataframe(contents, filename):
     """Parse a Dash-uploaded file into a DataFrame. Returns (df, None) or (None, err)."""
     try:
@@ -70,7 +93,17 @@ def _file_to_dataframe(contents, filename):
             except Exception:
                 return pd.read_csv(io.StringIO(decoded.decode("utf-8"))), None
         elif ext in (".xlsx", ".xls"):
-            return pd.read_excel(io.BytesIO(decoded)), None
+            df = pd.read_excel(io.BytesIO(decoded))
+            # If the header came through as mostly "Unnamed" (a title/blank row on top),
+            # re-detect the real header. Any failure falls back to the default parse.
+            try:
+                if _looks_unheadered(df):
+                    fixed = _excel_with_detected_header(decoded)
+                    if fixed is not None and len(fixed.columns):
+                        return fixed, None
+            except Exception:
+                pass
+            return df, None
         elif ext == ".json":
             try:
                 return pd.read_json(io.StringIO(decoded.decode("utf-8"))), None
