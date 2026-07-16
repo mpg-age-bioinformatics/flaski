@@ -12,7 +12,6 @@ Usage:
 """
 import os
 import threading
-from sentence_transformers import SentenceTransformer
 
 # The embedding model and its query convention. BGE is ASYMMETRIC: passages are
 # embedded with NO prefix (at build time); every QUERY must be prefixed. The
@@ -21,35 +20,39 @@ from sentence_transformers import SentenceTransformer
 MODEL_NAME   = "BAAI/bge-large-en-v1.5"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
-# Where to find the model cache. In prod the model is pre-seeded on the shared
-# private volume; locally we fall back to the default HF cache
-# (~/.cache/huggingface/hub). This is resolved in code — no HF_HOME / offline env
-# needed anywhere, and it can't be defeated by import order.
+# Model is pre-seeded on the shared private volume, which is treated as READ-ONLY source data
 _VOLUME_HUB = "/flaski_private/hf_cache/hub"
-_CACHE_DIR  = _VOLUME_HUB if os.path.isdir(_VOLUME_HUB) else None   # None → default HF cache
+_HAS_VOLUME = os.path.isdir(_VOLUME_HUB)
 
 _bge_model = None
 _lock_model = threading.Lock()
 
 
 def _resolve_model_path():
-    """Return a local filesystem path to the model, WITHOUT blocking on the network
-    when it's already cached.
+    """Return a local filesystem path to the model — never writing to the read-only
+    private volume, and never blocking on the network when the model is cached.
 
-    Step 1 — cache only (``local_files_only=True``): if the model is present (the
-    pre-seeded volume in prod, or ~/.cache locally) this returns instantly with no
-    network call, so startup never hangs on an HF outage.
+    1. Prod: read the pre-seeded volume with ``local_files_only=True`` — a pure read
+       (no writes to /flaski_private, no network). Returns instantly when present.
+    2. Otherwise (local dev, or a missing seed): use the default HF cache (~/.cache) —
+       read it if present, else download into it. Any download goes to the writable
+       default cache, NEVER the volume.
 
-    Step 2 — only if it isn't cached, fall back to a normal (online) download. This
-    keeps local first-run auto-download working. In prod the volume is seeded so this
-    branch isn't taken; if it were and HF were unreachable, the error propagates to the
-    caller's try/except, which marks the app unavailable (flaski itself never crashes).
+    A failure here propagates to the caller's try/except, which marks the app
+    unavailable; flaski itself never crashes.
     """
     from huggingface_hub import snapshot_download
+    # 1. Read-only lookup on the pre-seeded volume (never writes there).
+    if _HAS_VOLUME:
+        try:
+            return snapshot_download(MODEL_NAME, cache_dir=_VOLUME_HUB, local_files_only=True)
+        except Exception:
+            pass   # not on the volume → fall through to the default (writable) cache
+    # 2. Default cache: use if present, else download here (into ~/.cache, not the volume).
     try:
-        return snapshot_download(MODEL_NAME, cache_dir=_CACHE_DIR, local_files_only=True)
+        return snapshot_download(MODEL_NAME, local_files_only=True)
     except Exception:
-        return snapshot_download(MODEL_NAME, cache_dir=_CACHE_DIR)   # not cached: fetch
+        return snapshot_download(MODEL_NAME)   # local dev / self-heal into ~/.cache
 
 
 def get_model():
@@ -59,6 +62,11 @@ def get_model():
     if _bge_model is None:
         with _lock_model:
             if _bge_model is None:                    # only the first caller loads
+                # Import here (not at module top) so that merely importing this module
+                # — and the apps that import it — can never fail on a broken/missing
+                # sentence-transformers install. Every failure path now lands in the
+                # caller's try/except (STORE_LOADED=False), so flaski keeps running.
+                from sentence_transformers import SentenceTransformer
                 _bge_model = SentenceTransformer(_resolve_model_path())
     return _bge_model
 
