@@ -52,7 +52,8 @@ def _resolve_model_path():
     try:
         return snapshot_download(MODEL_NAME, local_files_only=True)
     except Exception:
-        return snapshot_download(MODEL_NAME)   # local dev / self-heal into ~/.cache
+        # Not cached anywhere → let SentenceTransformer fetch it. Return the repo id
+        return MODEL_NAME
 
 
 def get_model():
