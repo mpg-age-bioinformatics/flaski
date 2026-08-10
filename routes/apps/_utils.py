@@ -471,8 +471,17 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
         is_open=False
 
 
-    toast=dbc.Toast( text+
-        [
+    toast=dbc.Toast(
+        [   
+            html.Div(
+                text,
+                style={
+                    "maxHeight": "60vh",
+                    "overflowY": "auto",
+                    "overflowX": "auto",
+                    "paddingRight": "4px",
+                },
+            ),
             html.Div(
                 [
                     dbc.Button("expand", outline=True, color="dark",id={'type':'toggler-toast-traceback','index':id},size="sm", style={"margin-right":"2px"} ),
