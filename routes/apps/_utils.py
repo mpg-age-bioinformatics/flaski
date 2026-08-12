@@ -408,8 +408,24 @@ def encode_session_app(session_data):
 
 
 def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
+    assist_href = None
     if e:
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+
+        # Flaski AssistBot is optional and failure-isolated. Store only a sanitized
+        # copy of this error behind a session-scoped token; never let this path alter
+        # the existing exception email, traceback display, or Ice Cream workflow.
+        try:
+            from myapp.routes.apps._flaskibot import create_assist_case
+            assist_token = create_assist_case(e, tb_str, eapp or "", id or "")
+            if assist_token:
+                assist_href = f"{app.config['PAGE_PREFIX']}/flaskibot/?case={assist_token}"
+        except Exception as assist_error:
+            app.logger.warning(
+                "Flaski AssistBot integration failed (%s)",
+                type(assist_error).__name__,
+            )
+            assist_href = None
 
         emsg_html=tb_str.split("\n")
         send_email(
@@ -435,7 +451,7 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
 
         text=[ text,
             dcc.Markdown(f'```{e}```'),
-            "Something went wrong, we have been notified. If you would like to share your session with us and get help on this issue please press 'Ice Cream'.",
+            "Something went wrong, we have been notified. Press 'Flaski AssistBot' for an immediate best-effort AI explanation. If you would like to share your session with us and get help on this issue please press 'Ice Cream'.",
             dbc.Collapse(
                 dbc.Card(
                     dbc.CardBody(
@@ -471,8 +487,33 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
         is_open=False
 
 
+    if assist_href:
+        # Use an explicit anchor rather than relying on dbc.Button's href/disabled
+        # rendering. This guarantees a normal user-initiated new-tab navigation and
+        # avoids popup blockers or a false-looking enabled button.
+        assist_button = html.A(
+            "Flaski AssistBot",
+            id={'type':'flaskibot-toast-traceback','index':id},
+            href=assist_href,
+            target="_blank",
+            rel="noopener noreferrer",
+            title="Open a one-time AI explanation in a new tab",
+            className="btn btn-dark btn-sm",
+            role="button",
+            style={"margin-left":"2px", "background-color":"black", "border-color":"black", "color":"white"}
+        )
+    else:
+        assist_button = dbc.Button(
+            "AssistBot unavailable",
+            color="dark",
+            size="sm",
+            disabled=True,
+            title="Flaski AssistBot is temporarily unavailable",
+            style={"margin-left":"2px"}
+        )
+
     toast=dbc.Toast(
-        [   
+        [
             html.Div(
                 text,
                 style={
@@ -485,7 +526,8 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
             html.Div(
                 [
                     dbc.Button("expand", outline=True, color="dark",id={'type':'toggler-toast-traceback','index':id},size="sm", style={"margin-right":"2px"} ),
-                    dbc.Button("Ice Cream", outline=True, color="dark",id={'type':'help-toast-traceback','index':id},size="sm", style={"margin-left":"2px"} )
+                    dbc.Button("Ice Cream", outline=True, color="dark",id={'type':'help-toast-traceback','index':id},size="sm", style={"margin-left":"2px"} ),
+                    assist_button
                 ],
                 className="d-grid gap-2 d-md-flex justify-content-md-end",
                 style={"margin-top":"10px"} 
