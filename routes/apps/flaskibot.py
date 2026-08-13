@@ -9,7 +9,8 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from flask_login import current_user
 
-from myapp import PAGE_PREFIX, app
+from myapp import PAGE_PREFIX, app, db
+from myapp.models import UserLogging
 from myapp.routes._utils import META_TAGS, make_navbar_logged, navbar_A, protect_dashviews
 from myapp.routes.apps._utils import ask_for_help
 
@@ -140,6 +141,18 @@ def _invalid_case_page():
     ])
 
 
+def _record_visit():
+    """Record valid case visits without making diagnostics depend on logging."""
+    try:
+        db.session.add(UserLogging(email=current_user.email, action="visit flaskibot"))
+        db.session.commit()
+    except Exception:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+
+
 def _report_page(token, case, report):
     return _page_shell([
         dcc.Store(id="flaskibot-case-token", data=token),
@@ -212,9 +225,17 @@ def _report_page(token, case, report):
 )
 def render_diagnostic(search):
     token = (parse_qs((search or "").lstrip("?")).get("case") or [""])[0]
+    if not token:
+        return dcc.Location(
+            pathname=f"{PAGE_PREFIX}/",
+            id="flaskibot-home-redirect",
+        )
+
     case = get_assist_case(token)
     if not case:
         return _invalid_case_page()
+
+    _record_visit()
 
     report = case.get("answer")
     if not isinstance(report, dict):
