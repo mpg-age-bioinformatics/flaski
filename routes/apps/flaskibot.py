@@ -54,7 +54,33 @@ dashapp.layout = html.Div([
 
 def _page_shell(content):
     return html.Div([
-        make_navbar_logged("Flaski AssistBot", current_user),
+        make_navbar_logged(
+            html.Span(
+                [
+                    "Flaski AssistBot",
+                    html.I(
+                        className="fas fa-info-circle ms-2",
+                        id="flaskibot-info-icon",
+                        style={
+                            "cursor": "pointer",
+                            "fontSize": "0.7em",
+                            "verticalAlign": "super",
+                        },
+                    ),
+                ],
+                style={"display": "inline-flex", "alignItems": "flex-start"},
+            ),
+            current_user,
+        ),
+        dbc.Tooltip(
+            "This AssistBot uses Flaski code and infrastructure to generate error "
+            "explanations with open models on MPCDF hardware. "
+            "LLM output can be flawed; treat the explanation as guidance, not as a "
+            "confirmed answer. Diagnostic links are tied to your current session and "
+            "expire after 20 minutes.",
+            target="flaskibot-info-icon",
+            placement="bottom",
+        ),
         html.Main(
             content,
             style={
@@ -159,8 +185,8 @@ def _report_page(token, case, report):
         html.Div([
             html.H2("Flaski AssistBot", style={"marginBottom": "6px"}),
             html.Div(
-                "* This best-effort AI explanation is grounded in Flaski code and infrastructure; "
-                "LLM output can be hallucinated, incomplete, or flawed — please interpret "
+                "* This best-effort AI error explanation is grounded in Flaski code and infrastructure; "
+                "LLM output can be hallucinated, or flawed — please interpret "
                 "with caution.",
                 style={"fontSize": "0.8em", "color": "#888", "fontStyle": "italic"},
             ),

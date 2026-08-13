@@ -451,7 +451,12 @@ def make_except_toast(text=None,id=None,e=None,user=None, eapp=None):
 
         text=[ text,
             dcc.Markdown(f'```{e}```'),
-            "Something went wrong, we have been notified. Press 'Flaski AssistBot' for an immediate best-effort AI explanation. If you would like to share your session with us and get help on this issue please press 'Ice Cream'.",
+            dcc.Markdown(
+                "Something went wrong. The error has been reported automatically. "
+                "Press **Flaski AssistBot** for an immediate best-effort AI explanation. "
+                "If you would like to share your session with us and get help on this issue please press "
+                "**Ice Cream**."
+            ),
             dbc.Collapse(
                 dbc.Card(
                     dbc.CardBody(
