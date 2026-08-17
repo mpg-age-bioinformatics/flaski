@@ -21,6 +21,7 @@ from werkzeug.utils import secure_filename
 
 
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+ALLOWED_MODEL_SEED_COUNTS = {1, 5, 10, 20}
 
 dashapp = dash.Dash("alphafold",url_base_pathname=f'{PAGE_PREFIX}/alphafold/', meta_tags=META_TAGS, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME], title="AlphaFold 3" , assets_folder=app.config["APP_ASSETS"])# , assets_folder="/flaski/flaski/static/dash/")
 
@@ -77,9 +78,9 @@ def make_layout(pathname):
     )
     return protected_content
 
-def make_submission_json(email,group, name, sequence):
+def make_submission_json(email, group, name, sequence, model_seed_count=1):
     @cache.memoize(7200) # 2 hours
-    def _make_submission_json(email,group, name, sequence):
+    def _make_submission_json(email, group, name, sequence, model_seed_count):
         def clean_seqs(sequence):
             sequence=sequence.replace(" ", "")
             sequence=secure_filename(sequence)
@@ -111,6 +112,13 @@ def make_submission_json(email,group, name, sequence):
             return smiles
 
         filename=make_submission_file(".alphafold.json", folder="mpcdf")
+        try:
+            model_seed_count = int(model_seed_count)
+        except (TypeError, ValueError):
+            model_seed_count = 1
+        if model_seed_count not in ALLOWED_MODEL_SEED_COUNTS:
+            model_seed_count = 1
+
         name=clean_header(name)
         email=email.replace(" ", ",")
         email=email.split(",")
@@ -134,8 +142,8 @@ def make_submission_json(email,group, name, sequence):
             sequence=";".join(records)
         else:
             sequence=clean_seqs(sequence)
-        return {"filename":filename,"email": email, "group_name":group, "group_initials":GROUPS_INITALS[group],"name_fasta_header":name, "sequence_fasta":sequence}
-    return _make_submission_json(email,group, name, sequence)
+        return {"filename":filename,"email": email, "group_name":group, "group_initials":GROUPS_INITALS[group],"name_fasta_header":name, "sequence_fasta":sequence, "model_seed_count":model_seed_count}
+    return _make_submission_json(email, group, name, sequence, model_seed_count)
 
 
 
@@ -259,6 +267,70 @@ MG"
                         ), 
                     ], 
                     style={"margin-top":10}),
+
+                dbc.Row(
+                    [
+                        dbc.Col(md=2),
+                        dbc.Col(
+                            [
+                                dbc.Button(
+                                    [
+                                        html.Span("Advanced Options"),
+                                        html.Span("⚙️", **{"aria-hidden": "true"}),
+                                    ],
+                                    id="advanced-settings-button",
+                                    color="secondary",
+                                    outline=True,
+                                    n_clicks=0,
+                                    className="w-100 d-flex justify-content-between align-items-center",
+                                ),
+                                dbc.Collapse(
+                                    dbc.Card(
+                                        dbc.CardBody(
+                                            [
+                                                html.Label(
+                                                    "Prediction Effort",
+                                                    className="fw-bold mb-2",
+                                                ),
+                                                html.Div(
+                                                    "More seeds explore more predictions but proportionally increase compute time and the risk of hitting resource limits.",
+                                                    className="text-muted mb-2",
+                                                ),
+                                                dbc.RadioItems(
+                                                    id="prediction-effort",
+                                                    options=[
+                                                        {
+                                                            "label": "Default — 1 seed, 5 structures",
+                                                            "value": 1,
+                                                        },
+                                                        {
+                                                            "label": "Expanded — 5 seeds, 25 structures",
+                                                            "value": 5,
+                                                        },
+                                                        {
+                                                            "label": "Thorough — 10 seeds, 50 structures",
+                                                            "value": 10,
+                                                        },
+                                                        {
+                                                            "label": "Extensive — 20 seeds, 100 structures",
+                                                            "value": 20,
+                                                        },
+                                                    ],
+                                                    value=1,
+                                                ),
+                                            ]
+                                        ),
+                                        className="mt-2",
+                                    ),
+                                    id="advanced-settings-collapse",
+                                    is_open=False,
+                                ),
+                            ],
+                            md=5,
+                        ),
+                    ],
+                    style={"margin-top": 10},
+                ),
                 
                 dbc.Row(
                     [
@@ -320,14 +392,15 @@ MG"
     State('opt-group', 'value'),
     State('name', 'value'),
     State('sequence', 'value'),
+    State('prediction-effort', 'value'),
     prevent_initial_call=True )
-def update_output(n_clicks, email,group,name,sequence):
+def update_output(n_clicks, email, group, name, sequence, model_seed_count):
     header, msg = check_access( 'alphafold' )
     # header, msg = None, None    
     if msg :
         return header, msg, dash.no_update
 
-    subdic=make_submission_json( email,group, name, sequence)
+    subdic=make_submission_json(email, group, name, sequence, model_seed_count)
 
     if os.path.isfile(subdic["filename"].replace("json","tsv")):
         header="Attention"
@@ -350,6 +423,17 @@ def update_output(n_clicks, email,group,name,sequence):
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
+        return not is_open
+    return is_open
+
+@dashapp.callback(
+    Output("advanced-settings-collapse", "is_open"),
+    Input("advanced-settings-button", "n_clicks"),
+    State("advanced-settings-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_advanced_settings(n_clicks, is_open):
+    if n_clicks:
         return not is_open
     return is_open
 
