@@ -81,6 +81,17 @@ _FACTORY_PLOT_TYPES = {"dendrogram", "annotated_heatmap", "distplot",
                        "correlation_heatmap", "density_2d", "pca",
                        "kaplan_meier", "ma_plot", "manhattan"}
 
+_PLOTLY_VER = "5.11.0"
+_MAX_VALIDATION_ERROR_CHARS = 3_000
+
+_STANDARD_PLOTLY_RULES = (
+    f"- Target Plotly version {_PLOTLY_VER} (Python); use only trace types, properties, "
+    "and value types supported by that version.\n"
+    "- Do not use trace-level transforms; use supported trace and data structures instead.\n"
+    "- Preserve the requested data mappings and visual encodings without inventing "
+    "others; use a schema-valid representation when conversion is needed.\n"
+)
+
 
 # LLM API Connection
 PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
@@ -199,6 +210,53 @@ def _resolve_reference(val, df):
     elif isinstance(val, dict):
         return {k: _resolve_reference(v, df) for k, v in val.items()}
     return val
+
+
+def _prepare_standard_plot_spec(plot_spec, df, trim_matrix_labels=False):
+    """Resolve DataFrame references and apply the existing trace normalizations."""
+    for trace in plot_spec.get("data", []):
+        trace_type = trace.get("type", "")
+        if trace_type in PLOTLY_TRACE_ALIASES:
+            trace["type"] = PLOTLY_TRACE_ALIASES[trace_type]
+        _fix_marker_scalars(trace)
+
+        if trim_matrix_labels:
+            z = trace.get("z")
+            if isinstance(z, list) and z and isinstance(z[0], list):
+                ncols, nrows = len(z[0]), len(z)
+                for axis, expected in [("x", ncols), ("y", nrows)]:
+                    labels = trace.get(axis)
+                    if isinstance(labels, list) and len(labels) > expected:
+                        trace[axis] = labels[len(labels) - expected:]
+
+        for key, value in list(trace.items()):
+            try:
+                resolved = _resolve_reference(value, df)
+            except Exception as resolve_error:
+                # Preserve the previous behavior: leave the original value for
+                # Plotly's validator to reject and explain on the normal retry.
+                _debug("DataFrame reference resolution failed", resolve_error)
+                resolved = value
+            if key == "name" and isinstance(resolved, list):
+                trace[key] = ", ".join(map(str, resolved))
+            else:
+                trace[key] = resolved
+
+    return plot_spec
+
+
+def _with_validation_retry(prompt, validation_error):
+    """Add the previous Plotly validation error to an otherwise unchanged retry."""
+    if not validation_error:
+        return prompt
+    return (
+        f"{prompt}\n\n"
+        "The previous Plotly specification was rejected with this validation error:\n"
+        f"{validation_error}\n"
+        "Correct only the invalid Plotly properties and value representations; preserve "
+        "the chart's intent and return the complete specification. Do not repeat the "
+        "rejected representation."
+    )
 
 
 def _classify_plot_type(df, additional_instructions, model="qwen3-coder-30b",
@@ -2513,7 +2571,7 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
         "**Choosing the chart type:** Choose the chart type that best fits the data "
         "based on the columns present.\n\n"
         "**Requirements:**\n"
-        "- Target Plotly version 5.11.0 (Python). Only use trace types and attributes available in that version.\n"
+        f"{_STANDARD_PLOTLY_RULES}"
         "- Consider the entire DataFrame, and use the actual data values from the DataFrame.\n"
         "- The output must be a **raw JSON object**, not a string (i.e., do not wrap it in quotes).\n"
         "- Structure the object exactly as required by the Plotly `go.Figure()` constructor (i.e., include `data` and optionally `layout`).\n"
@@ -2526,6 +2584,7 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
     )
 
     last_error = "Unknown error occurred."
+    validation_error = None
     model_used = model
     model_list = []
 
@@ -2533,7 +2592,7 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
         try:
             model_list.append(model_used)
             chat_completion = client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
+                messages=[{"role": "user", "content": _with_validation_retry(prompt, validation_error)}],
                 model=model_used,
                 timeout=60,
                 **({
@@ -2570,22 +2629,12 @@ def _plot_spec_small_df(df, additional_instructions=None, model="qwen3-coder-30b
                     )
                     json_spec = json.loads(json_str_small)
 
-                for trace in json_spec.get("data", []):
-                    t = trace.get("type", "")
-                    if t in PLOTLY_TRACE_ALIASES:
-                        trace["type"] = PLOTLY_TRACE_ALIASES[t]
-                    _fix_marker_scalars(trace)
-                    for k, v in list(trace.items()):
-                        try:
-                            resolved = _resolve_reference(v, df)
-                        except Exception as e:
-                            last_error = f"Failed to resolve reference: {e}"
-                            resolved = v
-                        if k == "name" and isinstance(resolved, list):
-                            trace[k] = ", ".join(map(str, resolved))
-                        else:
-                            trace[k] = resolved
-                fig = go.Figure(**json_spec)
+                json_spec = _prepare_standard_plot_spec(json_spec, df)
+                try:
+                    fig = go.Figure(**json_spec)
+                except (ValueError, TypeError) as e:
+                    validation_error = str(e).strip()[:_MAX_VALIDATION_ERROR_CHARS]
+                    raise
                 return fig, json_spec, model_list, None
             except json.JSONDecodeError as e:
                 last_error = f"Plot AI failed on JSON decoding: {str(e).split(chr(10))[0][:200]}"
@@ -2632,7 +2681,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
         "**Choosing the chart type:** Choose the chart type that best fits the data "
         "based on the columns present.\n\n"
         "**Requirements:**\n"
-        "- Target Plotly version 5.11.0 (Python). Only use trace types and attributes available in that version.\n"
+        f"{_STANDARD_PLOTLY_RULES}"
         "- Reference columns symbolically using `df['column_name']`, not raw values.\n"
         "- All df references MUST be **quoted strings** in the JSON, e.g. `\"x\": \"df['col']\"`, NOT `\"x\": df['col']`.\n"
         "- For 2D array fields (e.g. heatmap `z`), use a quoted string expression like `\"z\": \"df[cols].values.tolist()\"`. Use `.corr()` only if a correlation matrix is appropriate.\n"
@@ -2651,6 +2700,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
     )
 
     last_error = "Unknown error occurred."
+    validation_error = None
     model_used = model
     model_list = []
 
@@ -2659,7 +2709,7 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
             model_list.append(model_used)
             chat_completion = client.chat.completions.create(
                 model=model_used,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[{"role": "user", "content": _with_validation_retry(prompt, validation_error)}],
                 timeout=60,
                 **({
                     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
@@ -2701,31 +2751,16 @@ def _plot_spec_large_df(df, additional_instructions=None, model="qwen3-coder-30b
                 except json.JSONDecodeError as e:
                     plot_spec = ast.literal_eval(json_str)
 
-            for trace in plot_spec.get("data", []):
-                t = trace.get("type", "")
-                if t in PLOTLY_TRACE_ALIASES:
-                    trace["type"] = PLOTLY_TRACE_ALIASES[t]
-                _fix_marker_scalars(trace)
-                z = trace.get("z")
-                if isinstance(z, list) and len(z) > 0 and isinstance(z[0], list):
-                    ncols, nrows = len(z[0]), len(z)
-                    for axis, expected in [("x", ncols), ("y", nrows)]:
-                        labels = trace.get(axis)
-                        if isinstance(labels, list) and len(labels) > expected:
-                            trimmed = labels[len(labels) - expected:]
-                            trace[axis] = trimmed
-                for k, v in list(trace.items()):
-                    try:
-                        resolved = _resolve_reference(v, df)
-                    except Exception as e:
-                        last_error = f"Failed to resolve reference: {e}"
-                        resolved = v
-                    if k == "name" and isinstance(resolved, list):
-                        trace[k] = ", ".join(map(str, resolved))
-                    else:
-                        trace[k] = resolved
-
-            fig = go.Figure(**plot_spec)
+            plot_spec = _prepare_standard_plot_spec(
+                plot_spec,
+                df,
+                trim_matrix_labels=True,
+            )
+            try:
+                fig = go.Figure(**plot_spec)
+            except (ValueError, TypeError) as e:
+                validation_error = str(e).strip()[:_MAX_VALIDATION_ERROR_CHARS]
+                raise
             return fig, plot_spec, model_list, None
 
         except Exception as e:
@@ -2971,7 +3006,7 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
         "Keep all <<KEEP:N values>> placeholders exactly as-is. Preserve all other properties unchanged.\n"
         "- For structural changes (different chart type, add/remove traces, remap data): you may rebuild traces. "
         "Use df column references like \"df['column_name'].tolist()\" for new data arrays.\n"
-        "- Target Plotly version 5.11.0 (Python).\n"
+        f"{_STANDARD_PLOTLY_RULES}"
         "- Return the **complete** spec. For any data array you do NOT need to change, keep the <<KEEP>> placeholder.\n"
         "- Output a raw JSON object only. No explanation, no markdown, no code blocks.\n\n"
         "JSONBlock:\n"
@@ -2979,6 +3014,7 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
     )
 
     last_error = "Unknown error occurred."
+    validation_error = None
     model_used = model
     model_list = []
 
@@ -2987,7 +3023,7 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
             model_list.append(model_used)
             chat_completion = client.chat.completions.create(
                 model=model_used,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[{"role": "user", "content": _with_validation_retry(prompt, validation_error)}],
                 timeout=60,
                 **({
                     "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
@@ -3029,31 +3065,16 @@ def _modify_spec(df, previous_spec, instruction, model="qwen3-coder-30b", altern
 
             plot_spec = _restore_kept_fields(plot_spec, previous_spec)
 
-            for trace in plot_spec.get("data", []):
-                t = trace.get("type", "")
-                if t in PLOTLY_TRACE_ALIASES:
-                    trace["type"] = PLOTLY_TRACE_ALIASES[t]
-                _fix_marker_scalars(trace)
-                z = trace.get("z")
-                if isinstance(z, list) and len(z) > 0 and isinstance(z[0], list):
-                    ncols, nrows = len(z[0]), len(z)
-                    for axis, expected in [("x", ncols), ("y", nrows)]:
-                        labels = trace.get(axis)
-                        if isinstance(labels, list) and len(labels) > expected:
-                            trimmed = labels[len(labels) - expected:]
-                            trace[axis] = trimmed
-                for k, v in list(trace.items()):
-                    try:
-                        resolved = _resolve_reference(v, df)
-                    except Exception as e:
-                        last_error = f"Failed to resolve reference: {e}"
-                        resolved = v
-                    if k == "name" and isinstance(resolved, list):
-                        trace[k] = ", ".join(map(str, resolved))
-                    else:
-                        trace[k] = resolved
-
-            fig = go.Figure(**plot_spec)
+            plot_spec = _prepare_standard_plot_spec(
+                plot_spec,
+                df,
+                trim_matrix_labels=True,
+            )
+            try:
+                fig = go.Figure(**plot_spec)
+            except (ValueError, TypeError) as e:
+                validation_error = str(e).strip()[:_MAX_VALIDATION_ERROR_CHARS]
+                raise
             return fig, plot_spec, model_list, None
 
         except Exception as e:
