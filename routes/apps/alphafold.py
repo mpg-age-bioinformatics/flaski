@@ -230,7 +230,12 @@ MG"
                                         " on the next"
                                     ]),
                                     html.Li("SEQUENCENAME should contain only A–Z and be at most 25 characters"),
-                                    html.Li("PTMs should be given directly after the proetin of interest, in a separate FASTA entry of the form ", html.Code("<modification>:<position>,<modification>:<position>"), " with the header ", html.Code(">MODS")),
+                                    html.Li([
+                                        "PTMs should be given directly after the protein of interest, in a separate FASTA entry of the form ",
+                                        html.Code("<modification>:<position>,<modification>:<position>"),
+                                        " with the header ",
+                                        html.Code(">MODS")
+                                    ]),
                                     html.Li([
                                         "For DNA or RNA sequences, write ",
                                         html.Code(">SEQUENCENAME--DNA"),
