@@ -111,6 +111,12 @@ def make_submission_json(email, group, name, sequence, model_seed_count=1):
             smiles = re.sub(r'[^A-Za-z0-9()\[\]=#+\-./\\@%*:$]', '', smiles)
             return smiles
 
+        def clean_mods(mods):
+            # <ptm>:<positon>,<ptm>:<positon> eg. HY3:23,P1L:52
+            mods=mods.replace(" ", "")
+            return mods
+        
+
         filename=make_submission_file(".alphafold.json", folder="mpcdf")
         try:
             model_seed_count = int(model_seed_count)
@@ -136,6 +142,8 @@ def make_submission_json(email, group, name, sequence, model_seed_count=1):
                 # uppercased/secured as before.
                 if header.upper().endswith("--SMILES"):
                     body=clean_smiles(s[1])
+                elif header.upper() == ">MODS" :
+                    body=clean_mods(s[1])
                 else:
                     body=clean_seqs(s[1])
                 records.append(";".join([header, body]))
@@ -162,8 +170,12 @@ def make_app_content(session_id):
 ..or multifasta, for multimers:\n\n\
 >PROTEINA\n\
 MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRM\n\
+>MODS\n\
+HY3:3,P1L:5\n\
 >PROTEINB\n\
 GPDSMEEVVVPEEPPKLVSALATYVQQERLCTMFLSIANKLLPLKPHACHLKRIRRSSATRVATAPMD\n\
+>MODS\n\
+P1L:12\n\
 >DNAA--DNA\n\
 CCGCGCCTGTGGGATCTGCATGCCCC\n\
 >RNAA--RNA\n\
@@ -218,6 +230,7 @@ MG"
                                         " on the next"
                                     ]),
                                     html.Li("SEQUENCENAME should contain only A–Z and be at most 25 characters"),
+                                    html.Li("PTMs should be given directly after the proetin of interest, in a separate FASTA entry of the form ", html.Code("<modification>:<position>,<modification>:<position>"), " with the header ", html.Code(">MODS")),
                                     html.Li([
                                         "For DNA or RNA sequences, write ",
                                         html.Code(">SEQUENCENAME--DNA"),
