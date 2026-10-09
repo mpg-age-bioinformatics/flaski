@@ -1,6 +1,6 @@
 import os
 
-_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "chatbot", "plotai", "neanderthalage", "protclock", "jawmbot", "dataai"]
+_PRIVATE_ROUTES=['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea", "aadatalake", "aadatalake_prot", "methylclock", "crispr", "chatbot", "plotai", "neanderthalage", "protclock", "jawmbot", "dataai","llms"]
 _PUBLIC_VIEWS = ['alphafold', 'rnaseq', "atacseq", "chipseq", "cutandtag", "asplicing", "intronret", "irfinder", "circrna", "mirna", "sixteens", "varcal", "riboseq","gsea"] #, "cbioportal"]
 
 if os.environ['FLASK_ENV'] != "development" :
@@ -94,6 +94,11 @@ other_nav_dropdowns =[
                 "GSEA":"/gsea/",\
                 "CRISPR" : "/crispr/"
             } \
+    }, \
+    { "Services": \
+        {
+            "LLMs":"/llms/",\
+        } \
     }
 ]
 ###################################

@@ -758,6 +758,7 @@ def make_submission_file(suffix,folder="submissions"):
   dt_string=timestamp()
   new_file, filename = tempfile.mkstemp(suffix=suffix, prefix=dt_string )
   os.close(new_file)
+  os.unlink(filename)
   if not os.path.isdir(f"/{folder}/"):
       os.makedirs(f"/{folder}/")
   filename=f"/{folder}/"+os.path.basename(filename)
