@@ -10,7 +10,7 @@ from myapp.routes.apps._utils import check_access, make_submission_file
 import os
 import uuid
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 import pandas as pd
 
@@ -205,8 +205,16 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
     filename = None
     temporary_filename = None
     try:
-        submission_folder = os.path.dirname(make_submission_file(".llms.xlsx"))
         acknowledged_at = datetime.now(ZoneInfo("Europe/Berlin"))
+        # Audit every validated, acknowledged click, including duplicate requests.
+        # UserLogging timestamps follow the database's naive UTC convention.
+        db.session.add(UserLogging(
+            email=current_user.email,
+            action=f"acknowledged llms request key; APP_VERSION={app.config['APP_VERSION']}",
+            date_time=acknowledged_at.astimezone(timezone.utc).replace(tzinfo=None),
+        ))
+        db.session.commit()
+        submission_folder = os.path.dirname(make_submission_file(".llms.xlsx"))
         date = acknowledged_at.strftime("%Y%m%d")
         filename = os.path.join(submission_folder, f"{date}.{current_user.id}.llms.xlsx")
         if os.path.exists(filename):
@@ -239,6 +247,7 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
         except FileExistsError:
             return dbc.Alert("Request already send.", color="warning")
     except Exception:
+        db.session.rollback()
         app.logger.exception("Failed to save LLM access request")
         return dbc.Alert("Your request could not be saved. Please try again or "
                          "contact the facility.", color="danger")
