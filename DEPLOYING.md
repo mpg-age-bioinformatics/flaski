@@ -141,3 +141,70 @@ docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 --build-arg 
 ```
 
 To push result image into registry use --push or to load image into docker use --load.
+
+## Annual email validation
+
+The daily job lives in the myapp repository at `utils/email_revalidation.py`.
+The myapp image already copies `utils`, providing `/myapp/utils/email_revalidation.py`.
+It requires the updated `myapp` package containing
+`myapp/email_revalidation.py` and the email lifecycle fields in `User`. Rebuild
+and deploy the myapp base image as well as the flaski image; updating flaski alone
+is insufficient.
+
+Before deploying the new model, back up the database and add the four nullable
+columns using the old application's configured container. This script is
+idempotent and does not send emails or alter passwords:
+
+```bash
+docker compose -f production-compose.yml cp /Users/jboucas/myapp/utils/migrate_email_revalidation.py server3:/myapp/utils/migrate_email_revalidation.py
+docker compose -f production-compose.yml exec -T server3 python3 /myapp/utils/migrate_email_revalidation.py
+```
+
+If your deployments track schema changes through Alembic, also reconcile these
+columns with that deployment's migration history. No Alembic revision is supplied
+because this repository has no committed baseline migration history.
+
+After deploying both images, verify the counts without making any changes:
+
+```bash
+docker compose -f production-compose.yml exec -T server3 python3 /myapp/utils/email_revalidation.py --dry-run
+```
+
+Schedule the Python command daily through a Kubernetes CronJob using the server
+image, database/mail/secret configuration, and appropriate mounts. The deployment
+guide in the bit_k8_tf repository (`wiki/email-revalidation-deployment.md`) covers
+creating and enabling the CronJob. Do not run it through every web worker.
+Per-user database row locks prevent overlapping scheduler runs from mailing the
+same user twice in normal operation.
+
+The lifecycle uses UTC database timestamps:
+
+- Active users whose latest validation (or original `confirmed_on`) is more than
+  one calendar year old receive a token link. For users with no validation date,
+  registration more than one year ago triggers the request.
+- `email_validation_first_sent_on` starts a new cycle;
+  `email_validation_last_sent_on` records the latest successfully submitted email.
+- At seven days, one reminder is sent. At fourteen days from the first email,
+  an unvalidated user's password is replaced with an unknown random password,
+  and `email_deactivated_on` is recorded. A deactivation email explains recovery.
+  If the scheduler missed the reminder entirely, it sends that reminder before
+  deactivating on a subsequent daily run.
+- A valid, current-cycle link records `email_validated_on` and ends the cycle.
+  Tokens cannot be used for password reset, for a changed email address, or reused
+  after validation. Existing registration/reset links that relied on their old
+  shared token purpose must be replaced with newly issued links after deployment.
+- Deactivated users are excluded from mail runs and their existing login sessions
+  are rejected. The administrative `active` flag stays unchanged so password
+  recovery remains available. Recovery changes the password; only a subsequent
+  successful login (including enabled 2FA) clears `email_deactivated_on` and
+  records fresh email validation, since recovery proves email access.
+
+Mail is sent synchronously; a failed SMTP submission does not advance the cycle
+or deactivate an account. Failures are retried on the next run, and the command
+returns a nonzero status if any user failed. SMTP acceptance and database commit
+are separate operations: a process crash or database commit failure after SMTP
+acceptance can cause a repeated email on retry. No validation token or password
+is intentionally written to the lifecycle job's logs.
+
+The schema changes, cron installation, and live email run are deployment steps;
+creating these files does not enable the job automatically.
