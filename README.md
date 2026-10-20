@@ -51,30 +51,14 @@ ___
 
 ## Local installation
 
-Feel free to contact us if you would like to deploy Flaski at your institution or if you would like to contribute to Flaski. 
+For local installation and app development, follow [CONTRIBUTING.md](CONTRIBUTING.md).
+It covers building with `docker-compose.yml`, starting the development server,
+and capturing test emails. After completing setup and starting the development
+server, the local app will be available at
+[https://flaski.localhost/v3](https://flaski.localhost/v3).
 
-```bash
-mkdir -p ~/flaski_data/backup/stats ~/flaski_data/backup/users_data ~/flaski_data/backup/mariadb
-git clone git@github.com:mpg-age-bioinformatics/flaski.git
-cd flaski
-cat << EOF > .env
-MYSQL_PASSWORD=$(openssl rand -base64 20)
-MYSQL_ROOT_PASSWORD=$(openssl rand -base64 20)
-REDIS_PASSWORD=$(openssl rand -base64 20)
-SECRET_KEY=$(openssl rand -base64 20)
-EOF
-docker-compose -f production-compose.yml up -d
-```
-
-Email logging:
-```bash
-docker-compose -f production-compose.yml exec server3 python3 -m smtpd -n -c DebuggingServer localhost:8025
-```
-
-Flaski is now accessible under [https://flaski.localhost](https://flaski.localhost). Depending on your local machine, it might take a few seconds until the server is up and running. You might need to edit your `/etc/hosts` file to include:
-```
-127.0.0.1       flaski.localhost
-```
+Feel free to contact us if you would like to deploy Flaski at your institution or
+contribute to Flaski.
 ___
 
 ## Citing
