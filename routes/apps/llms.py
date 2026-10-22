@@ -214,7 +214,7 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
             date_time=acknowledged_at.astimezone(timezone.utc).replace(tzinfo=None),
         ))
         db.session.commit()
-        submission_folder = os.path.dirname(make_submission_file(".llms.xlsx"))
+        submission_folder = os.path.dirname(make_submission_file(".llms.xlsx", folder="mpcdf"))
         date = acknowledged_at.strftime("%Y%m%d")
         filename = os.path.join(submission_folder, f"{date}.{current_user.id}.llms.xlsx")
         if os.path.exists(filename):
