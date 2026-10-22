@@ -10,6 +10,7 @@ from myapp.routes.apps._utils import check_access, make_submission_file
 import os
 import uuid
 import tempfile
+from glob import iglob
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 import pandas as pd
@@ -225,8 +226,12 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
         submission_folder = os.path.dirname(make_submission_file(".llms.xlsx", folder="mpcdf"))
         date = acknowledged_at.strftime("%Y%m%d")
         filename = os.path.join(submission_folder, f"{date}.{current_user.id}.llms.xlsx")
-        if os.path.exists(filename):
+        # Check both legacy and UUID filenames still waiting in the local queue.
+        pending_pattern = os.path.join(submission_folder, f"{date}.{current_user.id}.*.llms.xlsx")
+        if os.path.exists(filename) or next(iglob(pending_pattern), None) is not None:
             return dbc.Alert("Your request has already been submitted.", color="warning", dismissable=True)
+        filename = os.path.join(
+            submission_folder, f"{date}.{current_user.id}.{uuid.uuid4().hex}.llms.xlsx")
         # Stage on the same filesystem; consumers only see completed .xlsx files.
         with tempfile.NamedTemporaryFile(
                 dir=submission_folder, prefix=".llms-", suffix=".tmp",
@@ -249,7 +254,7 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
                 "notice_version": RESPONSIBILITY_NOTICE_VERSION,
                 "notice_text": RESPONSIBILITY_NOTICE.strip(),
             }]).to_excel(writer, sheet_name="Responsibility notice", index=False)
-        # A hard link publishes atomically and fails if another request won the race.
+        # Publish the completed file atomically without overwriting an existing file.
         try:
             os.link(temporary_filename, filename)
         except FileExistsError:
