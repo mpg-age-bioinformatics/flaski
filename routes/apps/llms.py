@@ -164,10 +164,18 @@ def make_app_content(session_id):
             label="I have read and understood the notice above and acknowledge "
                   "my responsibility for using the service and its outputs.",
             className="mb-3"),
-        dbc.Button("Request key", id="llms-request-key", n_clicks=0,
+        dbc.Button("Request Key", id="llms-request-key", n_clicks=0,
                    disabled=True, color="primary"),
-        html.Div(id="llms-request-result", className="mt-3", role="status"),
-    ], className="py-4", style={"maxWidth": "960px"})
+        html.Div(
+            id="llms-request-result", role="status",
+            **{"aria-live": "polite", "aria-atomic": "true"},
+            style={
+                "position": "fixed", "top": "1rem", "left": "50%",
+                "transform": "translateX(-50%)", "zIndex": 1080,
+                "width": "calc(100% - 2rem)", "maxWidth": "640px",
+            },
+        ),
+    ], className="pt-4", style={"maxWidth": "960px", "paddingBottom": "90px"})
 
 
 @dashapp.callback(
@@ -195,13 +203,13 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
         return dash.no_update
     header, message = check_access('llms')
     if header:
-        return dbc.Alert(message, color="danger")
+        return dbc.Alert(message, color="danger", dismissable=True)
     if toggle_request_disabled(first_name, last_name, acknowledged):
         return dbc.Alert("Enter your first and last name and acknowledge the "
-                         "responsibility notice before requesting a key.", color="warning")
+                         "responsibility notice before requesting a key.", color="warning", dismissable=True)
     first_name, last_name = first_name.strip(), last_name.strip()
     if len(first_name) > 128 or len(last_name) > 128:
-        return dbc.Alert("Names must be at most 128 characters each.", color="warning")
+        return dbc.Alert("Names must be at most 128 characters each.", color="warning", dismissable=True)
     filename = None
     temporary_filename = None
     try:
@@ -218,7 +226,7 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
         date = acknowledged_at.strftime("%Y%m%d")
         filename = os.path.join(submission_folder, f"{date}.{current_user.id}.llms.xlsx")
         if os.path.exists(filename):
-            return dbc.Alert("Request already send.", color="warning")
+            return dbc.Alert("Your request has already been submitted.", color="warning", dismissable=True)
         # Stage on the same filesystem; consumers only see completed .xlsx files.
         with tempfile.NamedTemporaryFile(
                 dir=submission_folder, prefix=".llms-", suffix=".tmp",
@@ -245,12 +253,12 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
         try:
             os.link(temporary_filename, filename)
         except FileExistsError:
-            return dbc.Alert("Request already send.", color="warning")
+            return dbc.Alert("Your request has already been submitted.", color="warning", dismissable=True)
     except Exception:
         db.session.rollback()
         app.logger.exception("Failed to save LLM access request")
         return dbc.Alert("Your request could not be saved. Please try again or "
-                         "contact the facility.", color="danger")
+                         "contact the facility.", color="danger", dismissable=True)
     finally:
         if temporary_filename is not None:
             try:
@@ -258,7 +266,7 @@ def request_key(n_clicks, first_name, last_name, acknowledged):
             except OSError:
                 app.logger.exception("Failed to remove temporary LLM submission")
     return dbc.Alert("Your access request is being processed. You should receive your "
-                     "account information by email within the next hour.", color="success")
+                     "account information by email within the next hour.", color="success", dismissable=True)
 
 
 @dashapp.callback(
