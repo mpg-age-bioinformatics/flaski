@@ -18,9 +18,8 @@ from time import sleep
 from werkzeug.utils import secure_filename
 from myapp import db
 from myapp.models import UserLogging, PrivateRoutes
-from pyflaski.violinplot import figure_defaults
 from ._aadatalake_prot import read_meta_file, filter_samples, filter_genes, filter_gene_expression, nFormat, \
-    make_pca_plot, make_bar_plot, make_violin_plot, plot_height, read_genes
+    make_pca_plot, make_bar_plot, plot_height, read_genes
 
 PYFLASKI_VERSION=os.environ['PYFLASKI_VERSION']
 PYFLASKI_VERSION=str(PYFLASKI_VERSION)
@@ -109,7 +108,6 @@ def make_layout(pathname):
             make_navbar_logged("Datalake for Proteomics",current_user),
             html.Div(id="app_access"),
             html.Div(id="redirect-pca"),
-            html.Div(id="redirect-violin"),
             # html.Div(id="redirect-volcano"),
             # html.Div(id="redirect-ma"),
             dcc.Store(data=str(uuid.uuid4()), id='session-id'),
@@ -222,8 +220,6 @@ def update_output(session_id, n_clicks, datasets, genotype, condition, geneids, 
 
     if (geneids and lgeneids == 1):
 
-        gene_expression=filter_gene_expression(ids2labels,geneids,cache)
-        
         bar_df=gene_expression
         if geneids:
             label=geneids[0]
@@ -244,208 +240,36 @@ def update_output(session_id, n_clicks, datasets, genotype, condition, geneids, 
         gene_expression_bar_bol=False
 
 
-    ## PCA
-    selected_study = list(set(selected_results_files["study"]))
-    selected_genotype = list(set(selected_results_files["genotype"]))
-    selected_condition = list(set(selected_results_files["condition"]))
-    pca_store = dash.no_update
-    if lgeneids==0 and (len(selected_sets) > 0 or len(selected_condition)): 
-        pca_plot, pca_pa, pca_df=make_pca_plot(selected_study, selected_genotype, selected_condition, cache)
+    # Compute PCA from the expression already loaded for this selection.
+    pca_store = None
+    pca_bol = gene_expression_bol and lgeneids != 1
+    if pca_bol:
+        pca_figure, pca_pa, pca_df = make_pca_plot(gene_expression, selected_results_files)
+        pca_config = {'toImageButtonOptions': {'format': 'svg', 'filename': download_name + ".pca"}}
+        pca_plot = dcc.Graph(figure=pca_figure, config=pca_config, style={"width": "100%", "overflow-x": "auto"})
+        iscatter_pca = html.Div()
+        if pca_pa is not None:
+            pca_store = {"df": pca_df.to_json(), "pa": pca_pa}
+            iscatter_pca = html.Button(
+                "Scatterplot", id="btn-iscatter_pca", n_clicks=0,
+                style={"margin-top": 4, "background-color": "#5474d8", "color": "white"})
 
-        pca_store = {
-            "df": pca_df.to_json(),
-            "pa": pca_pa
-        }
-        pca_config={ 'toImageButtonOptions': { 'format': 'svg', 'filename': download_name+".pca" }}
-        pca_plot=dcc.Graph(figure=pca_plot, config=pca_config, style={"width":"100%","overflow-x":"auto"})
-        
-        iscatter_pca=html.Div( 
-        [
-            html.Button(id='btn-iscatter_pca', n_clicks=0, children='Scatterplot', 
-            style={"margin-top":4, \
-                "margin-left":4,\
-                "margin-right":4,\
-                'background-color': "#5474d8", \
-                "color":"white"})
-        ])
-                
-        pca_bol=True
-    else:
-        pca_bol=False
-    
+    minwidth = str(150 * (1 + gene_expression_bol + gene_expression_bar_bol + pca_bol)) + "px"
+    results_files_ = change_table_minWidth(results_files_, minwidth)
+    tabs = [dcc.Tab([results_files_, download_samples], label="Samples", id="tab-samples")]
+    if pca_bol:
+        pca_plot = change_fig_minWidth(pca_plot, minwidth)
+        tabs.append(dcc.Tab([pca_plot, iscatter_pca], label="PCA", id="tab-pca"))
+    if gene_expression_bol:
+        gene_expression_ = change_table_minWidth(gene_expression_, minwidth)
+        tabs.append(dcc.Tab([gene_expression_, download_geneexp], label="Expression", id="tab-geneexpression"))
+    if gene_expression_bar_bol:
+        bar_plot = change_fig_minWidth(bar_plot, minwidth)
+        tabs.append(dcc.Tab([bar_plot, download_bar], label="Bar Plot", id="tab-bar"))
 
-    if lgeneids==0 and (len(selected_sets) > 0 or len(selected_condition)): 
-        violin_plot = make_violin_plot(selected_study, selected_genotype, selected_condition, cache)
-        violin_config = { 'toImageButtonOptions': { 'filename': download_name+".pseudoage" }, 'displaylogo': False} #'modeBarButtonsToRemove':["toImage"]
-        violin_plot = dcc.Graph(figure=violin_plot, config=violin_config,  id="graph")
-
-        violin_age=html.Div( 
-        [
-            html.Button(id='btn-violin-age', n_clicks=0, children='Violin plot', 
-            style={"margin-top":4, \
-                "margin-left":4,\
-                "margin-right":4,\
-                'background-color': "#5474d8", \
-                "color":"white"})
-        ])
-                
-        violin_bol=True
-    else:
-        violin_bol=False
- 
-
-
-    if  (pca_bol) & (gene_expression_bar_bol) :
-
-        minwidth=["Samples", "Expression", "PCA-Clock", "PseudoAge", "Bar Plot"]
-        minwidth=len(minwidth) * 150
-        minwidth = str(minwidth) + "px"
-
-        results_files_=change_table_minWidth(results_files_,minwidth)
-        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
-
-        pca_plot=change_fig_minWidth(pca_plot,minwidth)
-        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
-
-        out=dcc.Tabs( [ 
-                    dcc.Tab([ results_files_, download_samples], 
-                            label="Samples", id="tab-samples",
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ pca_plot, iscatter_pca ], 
-                            label="PCA-Clock", id="tab-pca", 
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ violin_plot, violin_age ], 
-                            label="PseudoAge", id="tab-age", 
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ bar_plot_, download_bar], 
-                            label="Bar Plot", id="tab-bar", 
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ gene_expression_, download_geneexp], 
-                            label="Expression", id="tab-geneexpression", 
-                            style={"margin-top":"0%"}),
-                    ],
-                    mobile_breakpoint=0,
-                    style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-
-    elif (gene_expression_bol) & (gene_expression_bar_bol) :
-        minwidth=["Samples","Expression", "Bar Plot"]
-        minwidth=len(minwidth) * 150
-        minwidth = str(minwidth) + "px"
-
-        results_files_=change_table_minWidth(results_files_,minwidth)
-        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
-        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
-
-
-        out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_, download_samples], 
-                    label="Samples", id="tab-samples",
-                    style={"margin-top":"0%"}),
-            dcc.Tab( [ gene_expression_, download_geneexp], 
-                    label="Expression", id="tab-geneexpression", 
-                    style={"margin-top":"0%"}),
-             dcc.Tab( [ bar_plot_, download_bar], 
-                    label="Bar Plot", id="tab-bar", 
-                    style={"margin-top":"0%"}),
-            ],  
-            mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-
-    elif (gene_expression_bol) & pca_bol :
-
-        minwidth=["Samples","Expression", "PCA-Clock"]
-        minwidth=len(minwidth) * 150
-        minwidth = str(minwidth) + "px"
-
-        results_files_=change_table_minWidth(results_files_,minwidth)
-        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
-
-        pca_plot=change_fig_minWidth(pca_plot,minwidth)
-
-        out=dcc.Tabs( [ 
-                    dcc.Tab([ results_files_, download_samples], 
-                            label="Samples", id="tab-samples",
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ pca_plot, iscatter_pca ], 
-                            label="PCA-Clock", id="tab-pca", 
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ violin_plot, violin_age ], 
-                            label="PseudoAge", id="tab-age", 
-                            style={"margin-top":"0%"}),
-                    dcc.Tab( [ gene_expression_, download_geneexp], 
-                            label="Expression", id="tab-geneexpression", 
-                            style={"margin-top":"0%"}),
-                    ],  
-                    mobile_breakpoint=0,
-                    style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-    
-    elif gene_expression_bar_bol :
-
-        minwidth=["Samples","Expression", "Bar Plot"]
-        minwidth=len(minwidth) * 150
-        minwidth = str(minwidth) + "px"
-
-        results_files_=change_table_minWidth(results_files_,minwidth)
-        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
-
-        bar_plot_=change_fig_minWidth(bar_plot,minwidth)
-
-        out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_, download_samples], 
-                    label="Samples", id="tab-samples",
-                    style={"margin-top":"0%"}),
-            dcc.Tab( [ gene_expression_, download_geneexp], 
-                    label="Expression", id="tab-geneexpression", 
-                    style={"margin-top":"0%"}),
-             dcc.Tab( [ bar_plot_, download_bar], 
-                    label="Bar Plot", id="tab-bar", 
-                    style={"margin-top":"0%"}),
-            ],  
-            mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-
-    elif gene_expression_bol:
-
-        minwidth=["Samples","Expression"]
-        minwidth=len(minwidth) * 150
-        minwidth = str(minwidth) + "px"
-
-        results_files_=change_table_minWidth(results_files_,minwidth)
-        gene_expression_=change_table_minWidth(gene_expression_,minwidth)
-
-        out=dcc.Tabs( [ 
-            dcc.Tab([ results_files_, download_samples], 
-                    label="Samples", id="tab-samples",
-                    style={"margin-top":"0%"}),
-            dcc.Tab( [ gene_expression_, download_geneexp], 
-                    label="Expression", id="tab-geneexpression", 
-                    style={"margin-top":"0%"}),
-            ],  
-            mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-
-    else:
-        minwidth=["Samples"]
-        # minwidth=len(minwidth) * 150
-        # minwidth = str(minwidth) + "px"
-
-        # results_files_=change_table_minWidth(results_files_,minwidth)
-
-        out=dcc.Tabs( 
-            [ 
-                dcc.Tab(
-                    [ 
-                        results_files_, 
-                        download_samples
-                    ], 
-                    label="Samples", id="tab-samples",
-                    style={"margin-top":"0%"}
-                ),
-            ],  
-            mobile_breakpoint=0,
-            style={"height":"50px","margin-top":"0px","margin-botom":"0px", "width":"100%","overflow-x":"auto", "minWidth":minwidth} )
-
-    #return out
+    out = dcc.Tabs(tabs, mobile_breakpoint=0,
+                   style={"height": "50px", "margin-top": "0px", "margin-bottom": "0px",
+                          "width": "100%", "overflow-x": "auto", "minWidth": minwidth})
     return out, pca_store
 
 
@@ -584,61 +408,3 @@ def pca_to_iscatterplot(n_clicks, datasets, genotype, condition, pca_store):
         sleep(2)
 
         return dcc.Location(pathname=f"{PAGE_PREFIX}/scatterplot/", id="index")
-
-
-@dashapp.callback(
-    Output("redirect-violin", 'children'),
-    Input("btn-violin-age", "n_clicks"),
-    State("opt-datasets", "value"),
-    State("opt-genotypes", "value"),
-    State("opt-conditions", "value"),
-    prevent_initial_call=True,
-)
-def pseudoage_to_violin(n_clicks, datasets, genotype, condition):
-    if not n_clicks:
-        raise PreventUpdate
-
-    from datetime import datetime
-    from time import sleep
-
-    # Filter data
-    selected_results_files, _ = filter_samples(datasets=datasets, genotype=genotype, condition=condition, cache=cache)
-    violin_df = selected_results_files[["study", "genotype", "condition", "PseudoAge"]].dropna()
-
-    if violin_df.empty:
-        raise PreventUpdate
-
-    # Use default parameters and override values to match the original generated figure
-    pa = figure_defaults()
-    pa["x_val"] = "condition"
-    pa["y_val"] = "PseudoAge"
-    # pa["style"] = "Boxplot and Swarmplot"
-    pa["style"] = "Boxplot"
-    pa["plot_type"] = "box"
-    pa["points"] = "false"
-    pa["legend_title"] = "Condition"
-    pa["ylabel"] = "Biological Age (1.0 = mean life span)"
-    pa["title"] = "PseudoAge prediction (Jun2025 ver)"
-
-    # Prepare session data for violinplot app
-    session_data = {
-        "APP_VERSION": app.config['APP_VERSION'],
-        "PYFLASKI_VERSION": PYFLASKI_VERSION,
-        "session_data": {
-            "app": {
-                "violinplot": {
-                    "df": violin_df.to_json(),
-                    "filename": "from.datalake.prot.json",
-                    "last_modified": datetime.now().timestamp(),
-                    "pa": pa
-                }
-            }
-        }
-    }
-
-    # Encode and store session
-    session_data = encode_session_app(session_data)
-    session["session_data"] = session_data
-
-    sleep(2)
-    return dcc.Location(pathname=f"{PAGE_PREFIX}/violinplot/", id="index")

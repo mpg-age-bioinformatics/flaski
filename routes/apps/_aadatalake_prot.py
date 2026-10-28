@@ -1,9 +1,8 @@
 import hashlib
+from pathlib import Path
 from matplotlib.pyplot import plot
 import pandas as pd
 # from flaski.routines import fuzzy_search
-from pyflaski.violinplot import figure_defaults as default_violin
-from pyflaski.violinplot import make_figure as make_violin
 from pyflaski.scatterplot import make_figure as make_scatter
 from pyflaski.scatterplot import figure_defaults as defaults_scatter
 from pyflaski.pca import make_figure as make_pca
@@ -15,51 +14,29 @@ import numpy as np
 import re
 
 path_to_files="/flaski_private/aaprotlake/"
-file_path = f"{path_to_files}all_merged.csv"
-meta_file_path = f"{path_to_files}all_merged_meta.csv"
-latent_file_path = f"{path_to_files}latent_embedding_June2025.csv"
+meta_file_path = f"{path_to_files}metadata.csv"
+
+
+def _read_data_file(cache, filename, header_only=False):
+    filename = str(filename)
+    stat = Path(filename).stat()
+
+    @cache.memoize(60*60*2) # 2 hours
+    def _read_csv(filename, modified_ns, size_bytes, header_only):
+        return pd.read_csv(filename, index_col=0, nrows=0 if header_only else None)
+
+    # Separate cache entries per file; replacing data invalidates its cached copy.
+    return _read_csv(filename, stat.st_mtime_ns, stat.st_size, header_only)
 
 
 def read_meta_file(cache):
-    @cache.memoize(60*60*2) # 2 hours
-    def _load_h5():
-        agg_df = pd.read_csv(meta_file_path, header=0, index_col=0)
-        agg_df = agg_df.sort_index()
-        agg_df = agg_df[~agg_df.index.duplicated(keep='first')]
-        return agg_df
-    return _load_h5()
-
-
-
-def read_merged_file(cache):
-    @cache.memoize(60*60*2) # 2 hours
-    def _load_h5():
-        agg_df = pd.read_csv(file_path, header=0, index_col=0)
-        agg_df = agg_df.sort_index()
-        agg_df = agg_df[~agg_df.index.duplicated(keep='first')]
-        return agg_df
-    return _load_h5()
+    return _read_data_file(cache, meta_file_path).sort_index().copy()
 
 
 def read_genes(cache,path_to_files=path_to_files):
-    @cache.memoize(60*60*2)
-    def _read_genes():
-        agg_df = pd.read_csv(file_path, header=0, index_col=0)
-        wormbaseID = agg_df.columns[:-5]
-        df = pd.DataFrame(wormbaseID)
-        df.columns = ["gene_id"]
-        return df.to_json()
-    return pd.read_json(_read_genes())
-
-def read_gene_expression(cache,path_to_files=path_to_files):
-    @cache.memoize(60*60*2)
-    # currently failing to read gene_expression with caching
-    def _read_gene_expression(path_to_files=path_to_files):
-        df = read_merged_file(cache)
-        df = df.sort_index()
-        gedf = df.iloc[:,:-5].T
-        return gedf
-    return (_read_gene_expression())
+    files = _read_data_file(cache, Path(path_to_files) / "file_index.csv")
+    header = _read_data_file(cache, Path(path_to_files) / files.index[0], header_only=True)
+    return pd.DataFrame({"gene_id": [c for c in header.columns if c.startswith("WBGene")]})
 
 
 """
@@ -80,7 +57,7 @@ def nFormat(x):
         return str('{:.3f}'.format(float(x)))
 
 def filter_samples(datasets=None, genotype=None, condition=None, cache=None):
-    results_files=read_merged_file(cache)
+    results_files=read_meta_file(cache)
 
     if datasets:
         results_files=results_files[ results_files['study'].isin( datasets ) ]
@@ -107,93 +84,63 @@ def filter_genes(selected_gene_ids, cache):
     return selected_genes
 
 
-# TODO: clean the code
 def filter_gene_expression(ids2labels, selected_gene_ids, cache):
-    #@cache.memoize(60*60*2)
-    def _filter_gene_expression(ids2labels, selected_gene_ids):
-        gedf=read_gene_expression(cache)
-        gedf[pd.isnull(gedf)] = 0.0
+    sample_ids = list(ids2labels)
+    genes = read_genes(cache)["gene_id"].tolist()
+    if selected_gene_ids:
+        selected_gene_ids = set(selected_gene_ids)
+        genes = [gene for gene in genes if gene in selected_gene_ids]
+    if not sample_ids or not genes:
+        return pd.DataFrame(index=genes, columns=sample_ids, dtype=float)
 
-        selected_genes = filter_genes(selected_gene_ids, cache)
-        if (selected_genes.shape[0]) > 1:
-            selected_genes = selected_genes.squeeze()
-        else:
-            selected_genes = selected_genes[0]
-        
-        selected_ge = gedf[list(ids2labels.keys())]
-        selected_ge = selected_ge.filter(selected_genes, axis=0)
-        selected_ge = selected_ge.astype(float)
-        cols = selected_ge.columns.tolist()
-        #selected_ge["sum"] = selected_ge.sum(axis=1)
-        #selected_ge = selected_ge[selected_ge["sum"]>0]
-        #selected_ge = selected_ge.drop(["sum"],axis=1)
-        #selected_ge['gene_id'] = selected_ge.index
-        #selected_ge=pd.merge(selected_genes, selected_ge, left_on=["gene_id"], right_index=True, how="left")
-        selected_ge=selected_ge.dropna(subset=cols,how="all",axis=0)
-        selected_ge=selected_ge.dropna(how="all",axis=1)
-        if 'gene_id' in selected_ge.columns:
-            selected_ge=selected_ge.drop(["gene_id"],axis=1)
-        #selected_ge.reset_index(inplace=True,drop=True)
-        #selected_ge.rename(columns=ids2labels,inplace=True)
+    metadata = read_meta_file(cache).loc[sample_ids]
+    frames = []
+    for source_file, samples in metadata.groupby("source_file", sort=False):
+        study = _read_data_file(cache, Path(path_to_files) / source_file)
+        frames.append(study.loc[samples.index, genes])
 
-        selected_ge =selected_ge.round(3)
-        #for c in selected_ge.columns.tolist()[:]:
-        #    selected_ge[c]=selected_ge[c].apply(lambda x: nFormat(x) )
-        #rename=selected_ge.columns.tolist()[2:]
-        #rename=[ s.replace("_", " ")  for s in rename ]
-        #rename=selected_ge.columns.tolist()[:2]+rename
-        #selected_ge.columns=rename
+    # Subset each study before combining; preserve the requested sample order.
+    expression = pd.concat(frames).loc[sample_ids, genes].T
+    expression.index.name = None
+    expression.columns.name = None
+    return expression.astype(float).fillna(0.0).round(3)
 
-        return selected_ge
-    return _filter_gene_expression(ids2labels, selected_gene_ids)
+def make_pca_plot(expression, metadata):
+    # Samples are observations and genes are features; retain the selected sample order.
+    values = expression.T.astype(float)
+    message = None
+    if len(values) < 2:
+        message = "PCA requires at least two selected samples."
+    elif not np.isfinite(values.to_numpy()).all():
+        message = "PCA is unavailable because the selected expression contains non-finite values."
+    else:
+        values = values.loc[:, values.var(ddof=0) > 0]
+        if values.shape[1] < 2:
+            message = "PCA requires at least two genes with varying expression."
 
-def read_latent(cache):
-    @cache.memoize(60*60*2) # 2 hours
-    def _read_metadata(path_to_files=path_to_files):
-        df=pd.read_csv(latent_file_path, index_col=0, header=0)
-        return df.to_json()
-    return pd.read_json(_read_metadata())
+    if message:
+        fig = go.Figure()
+        fig.add_annotation(text=message, x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False)
+        fig.update_xaxes(visible=False)
+        fig.update_yaxes(visible=False)
+        return fig, None, pd.DataFrame()
 
-
-
-# TODO: Clean
-# this is for visualization of PseudoAge latent embedding
-def make_pca_plot(study, genotype, condition, cache):
-    df_ = read_latent(cache)
-    
-    if study is not None and len(study) > 0:
-        df_ = df_[df_['group'].isin(study)]
-    if genotype is not None and len(genotype) > 0:
-        df_ = df_[df_['genotype'].isin(genotype)]
-    if condition is not None and len(condition) > 0:
-        df_ = df_[df_['condition'].isin(condition)]
-
-    """
-    df_['gene_id'] = df_.index
-    pa=defaults_pca()
-    pa["xvals"]="gene_id"
-    pa["yvals"]=df_.columns.tolist()[1:-5]
-    pa["scale_value"]="feature"
-    pa["percvar"]="20"
-    projected, features=make_pca(df_,pa)
-
-    cols=projected.columns.tolist()
-
-    def fix_comp(c):
-        label=c.split(" - ")[0]
-        c=c.split(" ")[-1].split("%")[0]
-        c=nFormat(c)
-        c=label+" - "+c+"%"
-        return c
-    
-    cols=[ cols[0], fix_comp( cols[1] ),  fix_comp( cols[2] )]
-    projected.columns=cols
-
-    samples=projected[cols[0]].tolist()
-    groups=[ s[:-2] for s in samples ]
-    projected["Group"]=groups
-    """
-    groups=list(set(df_['condition']))
+    # Use the same calculation as Flaski's PCA app, with explicit settings.
+    pca_input = values.T.copy()
+    pca_input.insert(0, "gene_id", pca_input.index)
+    pca_pa = defaults_pca()
+    pca_pa["xvals"] = "gene_id"
+    pca_pa["yvals"] = values.index.tolist()
+    pca_pa["ncomponents"] = "2"
+    pca_pa["percvar"] = "100"
+    pca_pa["scale_value"] = "feature"
+    projected, _ = make_pca(pca_input, pca_pa)
+    axes = projected.columns.tolist()[1:3]
+    df_ = projected.set_index(projected.columns[0]).loc[values.index, axes].copy()
+    df_["sample_id"] = df_.index
+    df_["study"] = metadata.loc[df_.index, "study"]
+    df_["condition"] = metadata.loc[df_.index, "condition"]
+    groups=sorted(df_["condition"].unique())
 
     COLORS=["blue","green","red","black", "yellow", "purple"]
     MARKERS_1=["circle", "square", "diamond", \
@@ -210,18 +157,18 @@ def make_pca_plot(study, genotype, condition, cache):
         for c in COLORS:
             color_markers.append([c,m])
 
-    groups=dict(zip(groups, color_markers[:len(groups)]))
+    groups={group: color_markers[i % len(color_markers)] for i, group in enumerate(groups)}
 
     pa=defaults_scatter()
     pa["fig_width"] = "1000"
-    pa["xvals"]='z'
-    pa["yvals"]='y'
-    pa["title"]='PsudoAge latent space'
-    pa["markerc_col"]="sig"
-    pa["xlabel"]='z'
-    pa["ylabel"]='y'
+    pa["xvals"]=axes[0]
+    pa["yvals"]=axes[1]
+    pa["title"]="PCA (gene-wise scaled expression)"
+    pa["markerc_col"]="select a column.."
+    pa["xlabel"]=axes[0]
+    pa["ylabel"]=axes[1]
     pa["marker_alpha"]="1"
-    pa["labels_col_value"]='condition'
+    pa["labels_col_value"]="sample_id"
     pa["groups_value"]="condition"
     pa["list_of_groups"]=list(groups.keys())
 
@@ -269,53 +216,6 @@ def plot_height(sets):
         minheight=945
     
     return minheight
-
-def make_violin_plot(study, genotype, condition, cache):
-    df_ = read_meta_file(cache)
-    
-    if study is not None and len(study) > 0:
-        df_ = df_[df_['study'].isin(study)]
-    if genotype is not None and len(genotype) > 0:
-        df_ = df_[df_['genotype'].isin(genotype)]
-    if condition is not None and len(condition) > 0:
-        df_ = df_[df_['condition'].isin(condition)]
-
-    _meta_condition = condition.copy()
-    _meta_condition = sorted(_meta_condition)
-
-    height_=plot_height(set(_meta_condition))
-    
-    if len(list(set(df_["condition"].tolist() ))) ==1:
-        width_bar=0.15
-    elif len(list(set(df_["condition"].tolist() ))) == 2:
-        width_bar=0.25
-    else:
-        width_bar=0.5
-
-    if len(set(df_['study'])) > 1:
-        df_['plot_x'] = df_['study'] + '__' + df_['condition']
-    else:
-        df_['plot_x'] = df_['condition']
-    
-    fig = go.Figure()
-    fig = px.box(df_,x='plot_x', y='PseudoAge', color="condition", height=height_)
-    fig.update_traces(width=width_bar)
-    fig.update_xaxes(categoryorder='array', categoryarray= sorted(df_['plot_x']))
-    fig.update_layout(
-        yaxis = dict(
-            title_text = "Biological Age (1.0 = mean life span)",
-        ),
-        title={
-            'text': 'PseudoAge prediction (Jun2025 ver)',
-            'xanchor': 'left',
-            'yanchor': 'top' }
-            # "font": {"size": float(pa["titles"]), "color":"black"  } } 
-    )
-
-
-
-    return fig
-
 
 def make_bar_plot(df, meta_study, meta_condition, label): 
     bar_df=df.copy()
@@ -384,6 +284,4 @@ def make_bar_plot(df, meta_study, meta_condition, label):
     
     #fig.show()
     return fig
-
-
 
