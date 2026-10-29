@@ -283,7 +283,7 @@ def update_output(session_id, n_clicks, datasets, genotype, condition, geneids, 
 def update_datasets(session_id):#, datasets):
     #results_files, _ = filter_samples(datasets=datasets, cache=cache)    
     results_files = read_meta_file(cache)    
-    datasets=list(set(results_files["study"]))
+    datasets=sorted(set(results_files["study"]), key=str.casefold)
     datasets=make_options(datasets)
 
     #results_files = results_files[results_files['study'].isin(datasets)]
@@ -291,7 +291,7 @@ def update_datasets(session_id):#, datasets):
     #conditions=make_options(conditions)
 
     genes=read_genes(cache)
-    geneids=list(set(genes['gene_id']))
+    geneids=sorted(set(genes['gene_id']), key=str.casefold)
     geneids=make_options(geneids)
 
     return datasets, geneids#, conditions
@@ -302,7 +302,7 @@ def update_datasets(session_id):#, datasets):
     Input('opt-datasets', 'value') )
 def update_groups(session_id, datasets):
     selected_results_files, ids2labels=filter_samples(datasets=datasets, cache=cache)
-    groups_=list(set(selected_results_files["genotype"]))
+    groups_=sorted(set(selected_results_files["genotype"]), key=str.casefold)
     groups_=make_options(groups_)
     return groups_
 
@@ -313,7 +313,7 @@ def update_groups(session_id, datasets):
     Input('opt-genotypes', 'value'))
 def update_condition(session_id, datasets, genotype):
     selected_results_files, ids2labels = filter_samples(datasets=datasets, genotype=genotype, cache=cache)    
-    condition_ = list(set(selected_results_files["condition"]))
+    condition_ = sorted(set(selected_results_files["condition"]), key=str.casefold)
     condition_ = make_options(condition_)
     return condition_
 
